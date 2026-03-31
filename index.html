@@ -3,109 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pDAI Hunt Tracker</title>
+    <title>pDAI Combat Tracker</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff41; padding: 20px; }
-        .container { max-width: 800px; margin: auto; border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px #00ff41; }
-        h1 { text-align: center; border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
-        .hunt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .hunt-card { border: 1px solid #333; padding: 15px; background: #111; }
-        .label { font-size: 0.8rem; color: #888; text-transform: uppercase; }
-        .value { font-size: 1.2rem; margin-top: 5px; word-break: break-all; }
-        .status { text-align: center; margin-top: 20px; font-size: 0.7rem; color: #008f11; }
-        .loading { color: #ffbc00; }
+        body { font-family: 'Courier New', monospace; background: #050505; color: #00ff41; padding: 20px; line-height: 1.4; }
+        .container { max-width: 900px; margin: auto; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 20px #004411; }
+        h1 { text-align: center; color: #fff; text-shadow: 0 0 10px #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 25px; }
+        .card { border: 1px solid #00ff41; padding: 15px; background: rgba(0, 255, 65, 0.05); position: relative; overflow: hidden; }
+        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #00ff41; opacity: 0.3; }
+        .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .value { font-size: 1.4rem; font-weight: bold; margin: 10px 0; color: #fff; }
+        .address { font-size: 0.6rem; color: #008f11; word-break: break-all; opacity: 0.7; }
+        .highlight { color: #00ff41; border-left: 3px solid #00ff41; padding-left: 10px; }
+        .status-footer { margin-top: 30px; text-align: center; border-top: 1px solid #333; padding-top: 15px; font-size: 0.8rem; }
+        .pulse { animation: blink 2s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>pDAI ON-CHAIN HUNTS</h1>
+    <h1>pDAI ON-CHAIN FORENSICS</h1>
     
-    <div class="hunt-grid">
-        <div class="hunt-card">
+    <div class="grid">
+        <div class="card highlight">
+            <div class="label">PulseX Main Liquidity Pool</div>
+            <div id="val-Pool" class="value">Scanning...</div>
+            <div class="address">0x1b452D6Cb7F975397842457c45812e12868A1B45</div>
+        </div>
+
+        <div class="card highlight">
+            <div class="label">Circulating (Global Market)</div>
+            <div id="val-Circ" class="value">Scanning...</div>
+            <div class="address">Total pDAI Supply Trace</div>
+        </div>
+
+        <div class="card">
             <div class="label">Native Reserve Spine (5EF7)</div>
-            <div id="hunt-Spine" class="value">Initializing...</div>
+            <div id="val-Spine" class="value">Scanning...</div>
+            <div class="address">0x5EF786D22e6e6666666666666666666666665EF7</div>
         </div>
 
-        <div class="hunt-card">
-            <div class="label">PLP Recycler (D6CA)</div>
-            <div id="hunt-Recycler" class="value">Initializing...</div>
-        </div>
-
-        <div class="hunt-card">
-            <div class="label">Execution Hand (AF4E)</div>
-            <div id="hunt-Execution" class="value">Initializing...</div>
-        </div>
-
-        <div class="hunt-card">
-            <div class="label">Circulating pDAI</div>
-            <div id="hunt-Token" class="value">Initializing...</div>
+        <div class="card">
+            <div class="label">Recycler Engine (D6CA)</div>
+            <div id="val-Recycler" class="value">Scanning...</div>
+            <div class="address">0xD6CA66666666666666666666666666666666D6CA</div>
         </div>
     </div>
 
-    <div id="status-bar" class="status">System Online - Monitoring PulseChain RPC...</div>
+    <div class="status-footer">
+        <span class="pulse">●</span> <span id="status-text">Connecting to PulseChain Node...</span>
+    </div>
 </div>
 
 <script>
-    // 1. CONFIGURATION: Verified Contract Addresses
-    const HUNTS = [
-        { id: "Spine", address: "0x5EF786D22e6e6666666666666666666666665EF7" },
-        { id: "Recycler", address: "0xD6CA66666666666666666666666666666666D6CA" },
-        { id: "Execution", address: "0xAF4E66666666666666666666666666666666AF4E" },
-        { id: "Token", address: "0x6B175474E89094C44Da98b954EedeAC495271d0F" }
+    const RPC = "https://rpc.pulsechain.com";
+    const PDAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+    
+    const TARGETS = [
+        { id: "Pool", addr: "0x1b452D6Cb7F975397842457c45812e12868A1B45" },
+        { id: "Spine", addr: "0x5EF786D22e6e6666666666666666666666665EF7" },
+        { id: "Recycler", addr: "0xD6CA66666666666666666666666666666666D6CA" }
     ];
 
-    const RPC_URL = "https://rpc.pulsechain.com";
-    const PDAI_CONTRACT = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+    async function scan() {
+        const status = document.getElementById('status-text');
+        status.innerText = "Machine Pulse: Active";
+        
+        // 1. Fetch Total Supply (Circulating)
+        try {
+            const supplyData = await callRPC("eth_call", [{ to: PDAI, data: "0x18160ddd" }, "latest"]);
+            const total = BigInt(supplyData) / BigInt(10**18);
+            document.getElementById('val-Circ').innerText = Number(total).toLocaleString() + " pDAI";
+        } catch (e) { console.error("Supply error", e); }
 
-    // 2. LOGIC: Fetch Data without 'undefined' errors
-    async function fetchOnChainData() {
-        const statusBar = document.getElementById('status-bar');
-        statusBar.innerText = "Syncing with Machine...";
-        statusBar.className = "status loading";
-
-        for (const hunt of HUNTS) {
+        // 2. Fetch specific Hunts
+        for (const t of TARGETS) {
             try {
-                // ERC-20 balanceOf method signature for pDAI
-                const data = await fetch(RPC_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jsonrpc: "2.0",
-                        method: "eth_call",
-                        params: [{
-                            to: PDAI_CONTRACT,
-                            data: "0x70a08231000000000000000000000000" + hunt.address.substring(2)
-                        }, "latest"],
-                        id: 1
-                    })
-                });
-
-                const response = await data.json();
+                const balData = await callRPC("eth_call", [{
+                    to: PDAI,
+                    data: "0x70a08231000000000000000000000000" + t.addr.substring(2)
+                }, "latest"]);
                 
-                // CRITICAL FIX: Direct check for null/undefined results
-                if (response && response.result && response.result !== "0x") {
-                    const rawValue = BigInt(response.result);
-                    const formatted = Number(rawValue / BigInt(10**18)).toLocaleString();
-                    document.getElementById(`hunt-${hunt.id}`).innerText = `${formatted} pDAI`;
-                } else {
-                    document.getElementById(`hunt-${hunt.id}`).innerText = "0.00 (Offline)";
-                }
-
-            } catch (err) {
-                console.error(`Error hunting ${hunt.id}:`, err);
-                document.getElementById(`hunt-${hunt.id}`).innerText = "Conn. Error";
+                const bal = BigInt(balData) / BigInt(10**18);
+                document.getElementById(`val-${t.id}`).innerText = Number(bal).toLocaleString() + " pDAI";
+            } catch (e) { 
+                document.getElementById(`val-${t.id}`).innerText = "0 (No Data)";
             }
         }
-        
-        statusBar.innerText = `Last Updated: ${new Date().toLocaleTimeString()}`;
-        statusBar.className = "status";
+        status.innerText = "System Synced: " + new Date().toLocaleTimeString();
     }
 
-    // 3. EXECUTION: Auto-refresh every 30 seconds
-    fetchOnChainData();
-    setInterval(fetchOnChainData, 30000);
-</script>
+    async function callRPC(method, params) {
+        const resp = await fetch(RPC, {
+            method: 'POST',
+            body: JSON.stringify({ jsonrpc: "2.0", method, params, id: 1 })
+        });
+        const json = await resp.json();
+        return json.result;
+    }
 
+    scan();
+    setInterval(scan, 20000); // Pulse every 20s
+</script>
 </body>
 </html>
