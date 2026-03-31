@@ -1,146 +1,956 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pDAI | CLUSTER-RESILIENT V4.8</title>
-    <style>
-        :root { --neon: #00ff41; --ammo: #00d4ff; --burn: #ff3e3e; --bg: #010101; --border: rgba(0, 255, 65, 0.4); }
-        body { background: var(--bg); color: var(--neon); font-family: 'Consolas', monospace; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .terminal { width: 100%; max-width: 1400px; border: 2px solid var(--border); padding: 25px; background: black; box-shadow: 0 0 50px #000; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .card { border: 1px solid var(--border); padding: 20px; background: #050505; }
-        .label { font-size: 0.65rem; color: #666; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 2px; }
-        .value { font-size: 1.7rem; color: #fff; font-weight: bold; }
-        .progress-box { margin-top: 30px; border: 1px solid var(--border); padding: 25px; background: #020202; }
-        .bar-bg { width: 100%; height: 12px; background: #111; margin-top: 20px; }
-        .bar-fill { height: 100%; background: var(--neon); width: 0%; transition: width 2s ease; box-shadow: 0 0 15px var(--neon); }
-        header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 30px; }
-        .status-active { color: var(--neon); text-shadow: 0 0 5px var(--neon); }
-        .status-fail { color: var(--burn); animation: blink 0.5s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-        footer { margin-top: 30px; font-size: 0.6rem; color: #444; display: flex; justify-content: space-between; border-top: 1px solid #222; padding-top: 10px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pDAI PEG PROVER | AUTO-DISCOVERY V6</title>
+  <style>
+    :root{
+      --bg:#040404;
+      --panel:#090909;
+      --panel2:#0d0d0d;
+      --line:rgba(0,255,65,.22);
+      --green:#00ff41;
+      --cyan:#00d4ff;
+      --amber:#ffcc00;
+      --red:#ff4d4d;
+      --text:#e8ffe8;
+      --muted:#7ea07e;
+      --white:#ffffff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Consolas,Menlo,Monaco,monospace}
+    body{padding:16px}
+    .wrap{max-width:1500px;margin:0 auto;border:2px solid var(--line);background:linear-gradient(180deg,#050505,#020202);box-shadow:0 0 40px rgba(0,0,0,.45)}
+    .top{
+      display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+      padding:18px 20px;border-bottom:1px solid var(--line)
+    }
+    .title{font-size:1.25rem;font-weight:800;letter-spacing:.06em}
+    .sub{margin-top:6px;color:var(--muted);font-size:.8rem;line-height:1.45}
+    .rightTop{text-align:right}
+    .pill{
+      display:inline-block;padding:6px 10px;border:1px solid var(--line);background:#071107;
+      color:var(--green);font-size:.78rem;border-radius:999px
+    }
+    .rowMeta{margin-top:8px;font-size:.78rem;color:var(--muted);line-height:1.5}
+    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    button{
+      background:#071107;color:var(--green);border:1px solid var(--line);padding:10px 12px;
+      font:inherit;cursor:pointer
+    }
+    button:hover{filter:brightness(1.15)}
+    .section{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.04)}
+    .grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px
+    }
+    .card{
+      border:1px solid var(--line);background:var(--panel);padding:14px 14px 12px 14px;min-height:96px
+    }
+    .label{font-size:.68rem;letter-spacing:.12em;color:#7b8d7b;text-transform:uppercase;margin-bottom:10px}
+    .value{font-size:1.55rem;font-weight:800;color:var(--white);line-height:1.15}
+    .hint{margin-top:8px;color:var(--muted);font-size:.78rem}
+    .cyan{color:var(--cyan)!important}
+    .amber{color:var(--amber)!important}
+    .red{color:var(--red)!important}
+    .green{color:var(--green)!important}
+    .scoreBox{
+      border:1px solid var(--line);background:var(--panel2);padding:18px
+    }
+    .scoreTop{
+      display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap
+    }
+    .scoreBig{font-size:3rem;font-weight:900;color:var(--white);line-height:1}
+    .scoreVerdict{font-size:1rem;font-weight:800;margin-top:4px}
+    .barBg{margin-top:16px;height:14px;background:#101010;border:1px solid #1b251b}
+    .barFill{
+      height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));
+      box-shadow:0 0 18px rgba(0,255,65,.25);transition:width .8s ease
+    }
+    .scoreParts{
+      margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px
+    }
+    .mini{
+      padding:10px 12px;border:1px solid rgba(255,255,255,.06);background:#070707
+    }
+    .mini .k{font-size:.68rem;color:#7b8d7b;text-transform:uppercase;letter-spacing:.1em}
+    .mini .v{margin-top:6px;font-size:1.1rem;font-weight:700}
+    .cols{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    @media (max-width:1100px){.cols{grid-template-columns:1fr}}
+    .box{border:1px solid var(--line);background:var(--panel);padding:14px}
+    .boxTitle{font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;color:#9db39d;margin-bottom:10px}
+    .list{display:grid;gap:8px}
+    .item{
+      padding:9px 10px;border-left:3px solid var(--line);background:#080808;font-size:.88rem;line-height:1.45
+    }
+    .item.good{border-left-color:var(--green)}
+    .item.warn{border-left-color:var(--amber)}
+    .item.bad{border-left-color:var(--red)}
+    .tableWrap{overflow:auto;border:1px solid var(--line);background:#070707}
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}
+    th{color:#98ad98;background:#0c0c0c;position:sticky;top:0}
+    tr:hover td{background:#0b0f0b}
+    a{color:var(--cyan);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .tag{
+      display:inline-block;padding:2px 7px;border:1px solid rgba(255,255,255,.08);font-size:.7rem;margin-right:5px;margin-bottom:5px
+    }
+    .tag.wpls{color:var(--cyan);border-color:rgba(0,212,255,.25)}
+    .tag.ref{color:var(--amber);border-color:rgba(255,204,0,.25)}
+    .tag.other{color:#bbb;border-color:rgba(255,255,255,.12)}
+    .muted{color:var(--muted)}
+    .mono{font-family:Consolas,Menlo,Monaco,monospace}
+    .foot{
+      display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+      padding:14px 20px;color:#7c8a7c;font-size:.75rem;border-top:1px solid var(--line)
+    }
+    .tiny{font-size:.74rem;color:var(--muted)}
+    .divider{height:1px;background:rgba(255,255,255,.05);margin:12px 0}
+  </style>
 </head>
 <body>
-
-<div class="terminal">
-    <header>
-        <div><strong>pDAI CLUSTER SENSOR</strong> <span id="v-tag">v4.8</span></div>
-        <div id="node-status" class="status-active">INITIALIZING...</div>
-    </header>
-
-    <div class="grid">
-        <div class="card"><div class="label">Total Forked Supply</div><div id="v-total" class="value">0</div></div>
-        <div class="card"><div class="label">Vaporized (0xDead)</div><div id="v-burned" class="value" style="color:var(--burn)">0</div></div>
-        <div class="card"><div class="label">True Circulating</div><div id="v-circ" class="value" style="color:#aaa">0</div></div>
-        <div class="card"><div class="label">Market Ratio (PLS/pDAI)</div><div id="v-price" class="value" style="color:#ffcc00">0.00000000</div></div>
-        <div class="card"><div class="label">Reserve Ammo (5EF7)</div><div id="v-ammo" class="value" style="color:var(--ammo)">0 PLS</div></div>
-        <div class="card"><div class="label">LP Wall (PulseX V2)</div><div id="v-wall" class="value">0 PLS</div></div>
-    </div>
-
-    <div class="progress-box">
-        <div style="display:flex; justify-content:space-between; align-items: flex-end;">
-            <div>
-                <span class="label">Machine Capture Progress</span>
-                <div id="v-peg-text" style="font-size:2.5rem; font-weight: bold;">0.000000%</div>
-            </div>
-            <div style="text-align: right;">
-                <span class="label">Attack Power (Ammo vs Pool)</span>
-                <div id="v-ratio" style="font-size:1.5rem; color:var(--ammo)">0.0000x</div>
-            </div>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="title">pDAI PEG PROVER <span class="green">AUTO-DISCOVERY V6</span></div>
+        <div class="sub">
+          No hardcoded pool. Finds live pDAI pools, verifies reserves on-chain, separates
+          <span class="cyan">WPLS market structure</span> from
+          <span class="amber">reference-basket structure</span>, and scores evidence instead of pretending certainty.
         </div>
-        <div class="bar-bg"><div id="v-bar" class="bar-fill"></div></div>
+      </div>
+      <div class="rightTop">
+        <div id="syncStatus" class="pill">BOOTING...</div>
+        <div class="rowMeta">
+          <div id="nodeStatus">RPC: —</div>
+          <div id="lastSync">LAST SYNC: —</div>
+          <div id="modeLine">MODE: AUTO POOL DISCOVERY / ON-CHAIN RESERVE VERIFICATION</div>
+        </div>
+        <div class="actions">
+          <button id="refreshBtn">REFRESH NOW</button>
+        </div>
+      </div>
     </div>
 
-    <footer>
-        <div id="v-node">CLUSTER: OFFLINE</div>
-        <div>NO PLACEHOLDERS | RULE 1 ACTIVE</div>
-    </footer>
-</div>
+    <div class="section">
+      <div class="grid">
+        <div class="card">
+          <div class="label">Total Supply</div>
+          <div class="value" id="vTotal">—</div>
+          <div class="hint">ERC-20 totalSupply()</div>
+        </div>
+        <div class="card">
+          <div class="label">Burned (0xDead)</div>
+          <div class="value red" id="vBurned">—</div>
+          <div class="hint">balanceOf(dead)</div>
+        </div>
+        <div class="card">
+          <div class="label">Ex-Burn Circulating</div>
+          <div class="value" id="vCirc">—</div>
+          <div class="hint">total - burned</div>
+        </div>
+        <div class="card">
+          <div class="label">SPINE pDAI</div>
+          <div class="value" id="vSpinePdai">—</div>
+          <div class="hint">balanceOf(SPINE)</div>
+        </div>
+        <div class="card">
+          <div class="label">Effective Float</div>
+          <div class="value amber" id="vFloat">—</div>
+          <div class="hint">ex-burn circ - SPINE pDAI</div>
+        </div>
+        <div class="card">
+          <div class="label">Supply Capture</div>
+          <div class="value cyan" id="vCapture">—</div>
+          <div class="hint">SPINE pDAI / ex-burn circ</div>
+        </div>
+        <div class="card">
+          <div class="label">SPINE WPLS Ammo</div>
+          <div class="value cyan" id="vAmmo">—</div>
+          <div class="hint">WPLS in reserve wallet</div>
+        </div>
+        <div class="card">
+          <div class="label">Verified WPLS Wall</div>
+          <div class="value" id="vWall">—</div>
+          <div class="hint">sum of WPLS in all live pDAI/WPLS pools</div>
+        </div>
+        <div class="card">
+          <div class="label">Coverage Ratio</div>
+          <div class="value cyan" id="vCoverage">—</div>
+          <div class="hint">SPINE WPLS / verified WPLS wall</div>
+        </div>
+        <div class="card">
+          <div class="label">pDAI / WPLS Price</div>
+          <div class="value amber" id="vPwpls">—</div>
+          <div class="hint">aggregate WPLS per pDAI from verified reserves</div>
+        </div>
+        <div class="card">
+          <div class="label">Ref Basket Price</div>
+          <div class="value amber" id="vPref">—</div>
+          <div class="hint">aggregate REF per pDAI (DAI / USDC / USDT basket)</div>
+        </div>
+        <div class="card">
+          <div class="label">WPLS-Implied Ref</div>
+          <div class="value amber" id="vPwplsRef">—</div>
+          <div class="hint">pDAI/WPLS × REF/WPLS</div>
+        </div>
+      </div>
+    </div>
 
-<script>
-    const NODES = [
+    <div class="section">
+      <div class="scoreBox">
+        <div class="scoreTop">
+          <div>
+            <div class="label">Peg Evidence Score</div>
+            <div class="scoreBig" id="scoreBig">0.0</div>
+            <div class="scoreVerdict" id="scoreVerdict">CALCULATING...</div>
+          </div>
+          <div style="text-align:right">
+            <div class="label">Gap To 1.00</div>
+            <div class="scoreBig" style="font-size:2.2rem" id="pegGap">—</div>
+            <div class="tiny" id="scoreNote">Evidence-weighted. Not prophecy.</div>
+          </div>
+        </div>
+        <div class="barBg"><div class="barFill" id="scoreBar"></div></div>
+
+        <div class="scoreParts">
+          <div class="mini"><div class="k">Capture Component</div><div class="v" id="cCapture">—</div></div>
+          <div class="mini"><div class="k">Coverage Component</div><div class="v" id="cCoverage">—</div></div>
+          <div class="mini"><div class="k">Price Component</div><div class="v" id="cPrice">—</div></div>
+          <div class="mini"><div class="k">Consistency Component</div><div class="v" id="cConsistency">—</div></div>
+          <div class="mini"><div class="k">Breadth Component</div><div class="v" id="cBreadth">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section cols">
+      <div class="box">
+        <div class="boxTitle">Positive Signals</div>
+        <div class="list" id="signalsList"></div>
+      </div>
+      <div class="box">
+        <div class="boxTitle">Falsifiers / Weaknesses</div>
+        <div class="list" id="falsifiersList"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="boxTitle">Discovered pDAI Pools</div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>DEX</th>
+              <th>Pair</th>
+              <th>Other Token</th>
+              <th>pDAI Reserve</th>
+              <th>Other Reserve</th>
+              <th>Implied Price</th>
+              <th>DEX Liq $</th>
+              <th>24h Vol $</th>
+              <th>Flags</th>
+            </tr>
+          </thead>
+          <tbody id="pairsBody">
+            <tr><td colspan="10" class="muted">Waiting for discovery...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="boxTitle">WPLS Reference Basket Pools</div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>DEX</th>
+              <th>Pair</th>
+              <th>Ref Token</th>
+              <th>WPLS Reserve</th>
+              <th>Ref Reserve</th>
+              <th>Ref / WPLS</th>
+              <th>DEX Liq $</th>
+              <th>24h Vol $</th>
+            </tr>
+          </thead>
+          <tbody id="wplsRefBody">
+            <tr><td colspan="8" class="muted">Waiting for reference discovery...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="box">
+        <div class="boxTitle">Assumptions / Notes</div>
+        <div class="list">
+          <div class="item warn">The <strong>reference basket</strong> assumes symbols <span class="mono">DAI / USDC / USDT</span> behave close to <span class="mono">1.00</span>. Edit the config if your preferred basket is different.</div>
+          <div class="item warn">This page uses <strong>DexScreener only for pool discovery</strong>. The reserve math is re-read from PulseChain RPC, so price evidence comes from verified balances, not just a UI quote.</div>
+          <div class="item warn">The score is designed to answer <strong>“how much hard evidence exists right now?”</strong> It does not guarantee a future peg.</div>
+          <div class="item warn">If you want stricter proof later, next upgrades should be: TWAP history, holder-cluster scans, pool creation monitoring, and pair-factory verification.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div id="nodeFoot">NODE: —</div>
+      <div>TARGET: <span class="mono">0x6B175474E89094C44Da98b954EedeAC495271d0F</span></div>
+      <div>RULE: NO HARDCODED POOL ASSUMPTION</div>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // EDIT THESE IF NEEDED
+    // =========================
+    const CONFIG = {
+      CHAIN_ID: "pulsechain",
+      TARGET: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      WPLS: "0xA1077a294D2D00ca00bb46556459739d482282c6",
+      ADDR: {
+        DEAD: "0x000000000000000000000000000000000000dEaD",
+        SPINE: "0x5EF786D22e6e6666666666666666666666665EF7"
+      },
+      REF_SYMBOLS: ["DAI", "USDC", "USDT"],
+      TARGET_PEG: 1.0,
+      AUTO_REFRESH_MS: 30000,
+      MAX_PDAI_PAIRS: 12,
+      MAX_WPLS_REF_PAIRS: 8,
+      TIMEOUT_MS: 12000,
+      RPCS: [
         "https://rpc.pulsechain.com",
         "https://pulsechain.publicnode.com",
         "https://rpc-pulsechain.g4mm4.io",
         "https://rpc.pulsechainrpc.com",
         "https://pulsechain.rpc.thirdweb.com"
-    ];
-
-    const PDAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
-    const WPLS = "0xA1077a294D2D00ca00bb46556459739d482282c6";
-    const ADDR = {
-        DEAD: "0x000000000000000000000000000000000000dEaD",
-        SPINE: "0x5EF786D22e6e6666666666666666666666665EF7",
-        POOL: "0xE5604367AD2C51604811568b1a0eAcbdc1DE0aE"
+      ]
     };
 
-    let nodeIdx = 0;
+    const STATE = {
+      rpcIndex: 0,
+      syncing: false,
+      lastSync: null
+    };
 
-    async function query(method, params) {
-        // Updated for 2026 RPC compliance
-        const r = await fetch(NODES[nodeIdx], {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+    const DEC_CACHE = new Map();
+    const $ = (id) => document.getElementById(id);
+
+    function normalizeAddr(a) {
+      return (a || "").toLowerCase();
+    }
+
+    function esc(v) {
+      return String(v ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function short(a) {
+      const s = String(a || "");
+      return s.length > 12 ? `${s.slice(0, 6)}...${s.slice(-4)}` : s;
+    }
+
+    function setText(id, text) {
+      const el = $(id);
+      if (el) el.textContent = text;
+    }
+
+    function setHTML(id, html) {
+      const el = $(id);
+      if (el) el.innerHTML = html;
+    }
+
+    function fmtNum(v, digits = 2) {
+      if (v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: digits
+      });
+    }
+
+    function fmtFixed(v, digits = 6) {
+      if (v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toFixed(digits);
+    }
+
+    function fmtCompact(v, digits = 2) {
+      if (v == null || !Number.isFinite(v)) return "—";
+      const abs = Math.abs(v);
+      if (abs >= 1e12) return (v / 1e12).toFixed(digits) + "T";
+      if (abs >= 1e9) return (v / 1e9).toFixed(digits) + "B";
+      if (abs >= 1e6) return (v / 1e6).toFixed(digits) + "M";
+      if (abs >= 1e3) return (v / 1e3).toFixed(digits) + "K";
+      return fmtNum(v, digits);
+    }
+
+    function fmtUsd(v, digits = 2) {
+      if (v == null || !Number.isFinite(v)) return "—";
+      return "$" + Number(v).toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: digits
+      });
+    }
+
+    function fmtPct(v, digits = 2) {
+      if (v == null || !Number.isFinite(v)) return "—";
+      return (v * 100).toFixed(digits) + "%";
+    }
+
+    function fmtX(v, digits = 3) {
+      if (v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toFixed(digits) + "x";
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function nowStamp() {
+      return new Date().toLocaleString();
+    }
+
+    function itemHTML(text, cls) {
+      return `<div class="item ${cls}">${text}</div>`;
+    }
+
+    function tagHTML(type) {
+      if (type === "WPLS") return `<span class="tag wpls">WPLS</span>`;
+      if (type === "REF") return `<span class="tag ref">REF</span>`;
+      return `<span class="tag other">OTHER</span>`;
+    }
+
+    function isRefStableSymbol(symbol) {
+      return CONFIG.REF_SYMBOLS.includes(String(symbol || "").toUpperCase());
+    }
+
+    function withTimeout(promise, ms, label = "Timeout") {
+      let timer;
+      return Promise.race([
+        promise.finally(() => clearTimeout(timer)),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(label)), ms);
+        })
+      ]);
+    }
+
+    async function fetchJson(url) {
+      const res = await withTimeout(fetch(url, {
+        headers: { "accept": "application/json" }
+      }), CONFIG.TIMEOUT_MS, "HTTP timeout");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }
+
+    async function rpcCall(method, params) {
+      let lastErr;
+      for (let i = 0; i < CONFIG.RPCS.length; i++) {
+        const idx = (STATE.rpcIndex + i) % CONFIG.RPCS.length;
+        const rpc = CONFIG.RPCS[idx];
+        try {
+          const res = await withTimeout(fetch(rpc, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
             },
-            body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method, params })
-        });
-        if (!r.ok) throw new Error("HTTP_FAIL");
-        const d = await r.json();
-        return d.result;
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: Date.now() + i,
+              method,
+              params
+            })
+          }), CONFIG.TIMEOUT_MS, "RPC timeout");
+
+          if (!res.ok) throw new Error(`RPC HTTP ${res.status}`);
+
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message || "RPC error");
+
+          STATE.rpcIndex = idx;
+          setText("nodeStatus", "RPC: " + rpc.replace("https://", ""));
+          setText("nodeFoot", "NODE: " + rpc);
+          return data.result;
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      throw lastErr || new Error("All RPCs failed");
+    }
+
+    const ABI = {
+      totalSupply: "0x18160ddd",
+      decimals: "0x313ce567"
+    };
+
+    function encodeBalanceOf(addr) {
+      return "0x70a08231" + normalizeAddr(addr).replace(/^0x/, "").padStart(64, "0");
+    }
+
+    function hexToBigInt(hex) {
+      try {
+        if (!hex || hex === "0x") return 0n;
+        return BigInt(hex);
+      } catch {
+        return 0n;
+      }
+    }
+
+    async function ercDecimals(token) {
+      const key = normalizeAddr(token);
+      if (DEC_CACHE.has(key)) return DEC_CACHE.get(key);
+      let dec = 18;
+      try {
+        const raw = await rpcCall("eth_call", [{ to: token, data: ABI.decimals }, "latest"]);
+        dec = parseInt(raw, 16);
+        if (!Number.isFinite(dec)) dec = 18;
+      } catch {
+        dec = 18;
+      }
+      DEC_CACHE.set(key, dec);
+      return dec;
+    }
+
+    async function ercTotalSupply(token) {
+      const raw = await rpcCall("eth_call", [{ to: token, data: ABI.totalSupply }, "latest"]);
+      return hexToBigInt(raw);
+    }
+
+    async function ercBalanceOf(token, holder) {
+      const raw = await rpcCall("eth_call", [{ to: token, data: encodeBalanceOf(holder) }, "latest"]);
+      return hexToBigInt(raw);
+    }
+
+    function units(bigintValue, decimals) {
+      const n = Number(bigintValue);
+      return n / Math.pow(10, decimals);
+    }
+
+    async function mapLimit(items, limit, mapper) {
+      const results = new Array(items.length);
+      let nextIndex = 0;
+
+      async function worker() {
+        while (true) {
+          const idx = nextIndex++;
+          if (idx >= items.length) return;
+          try {
+            results[idx] = await mapper(items[idx], idx);
+          } catch (err) {
+            results[idx] = {
+              ...items[idx],
+              error: err?.message || String(err)
+            };
+          }
+        }
+      }
+
+      const workers = Array.from({ length: Math.min(limit, items.length || 1) }, worker);
+      await Promise.all(workers);
+      return results;
+    }
+
+    async function discoverTokenPairs(tokenAddress) {
+      const url = `https://api.dexscreener.com/token-pairs/v1/${CONFIG.CHAIN_ID}/${tokenAddress}`;
+      const data = await fetchJson(url);
+      return Array.isArray(data) ? data : (data?.pairs || []);
+    }
+
+    function normalizePairEntry(pair, targetAddress) {
+      const target = normalizeAddr(targetAddress);
+      const base = normalizeAddr(pair?.baseToken?.address);
+      const quote = normalizeAddr(pair?.quoteToken?.address);
+      if (base !== target && quote !== target) return null;
+
+      const targetIsBase = base === target;
+      const other = targetIsBase ? pair.quoteToken : pair.baseToken;
+
+      return {
+        pairAddress: normalizeAddr(pair?.pairAddress),
+        url: pair?.url || `https://dexscreener.com/${CONFIG.CHAIN_ID}/${pair?.pairAddress}`,
+        dexId: pair?.dexId || "unknown",
+        targetIsBase,
+        otherAddress: normalizeAddr(other?.address),
+        otherSymbol: other?.symbol || "UNKNOWN",
+        otherName: other?.name || "Unknown",
+        otherIsWpls: normalizeAddr(other?.address) === normalizeAddr(CONFIG.WPLS),
+        otherIsStable: isRefStableSymbol(other?.symbol),
+        liqUsd: Number(pair?.liquidity?.usd || 0),
+        volume24: Number(pair?.volume?.h24 || 0),
+        pairCreatedAt: Number(pair?.pairCreatedAt || 0),
+        labels: Array.isArray(pair?.labels) ? pair.labels : []
+      };
+    }
+
+    async function hydratePairs(targetAddress, normalizedRows, targetDecimals) {
+      return await mapLimit(normalizedRows, 4, async (row) => {
+        const targetReserve = units(await ercBalanceOf(targetAddress, row.pairAddress), targetDecimals);
+        let otherReserve = null;
+        let otherDecimals = null;
+        let impliedPrice = null;
+
+        if (row.otherAddress && (row.otherIsWpls || row.otherIsStable)) {
+          otherDecimals = await ercDecimals(row.otherAddress);
+          otherReserve = units(await ercBalanceOf(row.otherAddress, row.pairAddress), otherDecimals);
+          if (targetReserve > 0 && otherReserve > 0) {
+            impliedPrice = otherReserve / targetReserve;
+          }
+        }
+
+        const type = row.otherIsWpls ? "WPLS" : (row.otherIsStable ? "REF" : "OTHER");
+        const verifiedLive = targetReserve > 0 && ((row.otherIsWpls || row.otherIsStable) ? (otherReserve > 0) : true);
+
+        return {
+          ...row,
+          type,
+          targetReserve,
+          otherReserve,
+          otherDecimals,
+          impliedPrice,
+          verifiedLive
+        };
+      });
+    }
+
+    function ratioFromRows(rows) {
+      const good = rows.filter(r =>
+        r &&
+        Number.isFinite(r.targetReserve) &&
+        Number.isFinite(r.otherReserve) &&
+        r.targetReserve > 0 &&
+        r.otherReserve > 0
+      );
+
+      const targetSum = good.reduce((s, r) => s + r.targetReserve, 0);
+      const otherSum = good.reduce((s, r) => s + r.otherReserve, 0);
+
+      return {
+        count: good.length,
+        targetSum,
+        otherSum,
+        ratio: targetSum > 0 ? otherSum / targetSum : null
+      };
+    }
+
+    function verdictFromScore(score, pegGap, coverage, capture, livePairs) {
+      if (livePairs === 0) return "NO LIVE MARKET EVIDENCE";
+      if (score >= 85 && pegGap != null && pegGap <= 0.10 && coverage >= 1 && capture >= 0.20) return "PEG THESIS: STRONG";
+      if (score >= 65) return "PEG THESIS: BUILDING";
+      if (score >= 45) return "PEG THESIS: SPECULATIVE";
+      return "PEG THESIS: UNPROVED";
+    }
+
+    function verdictClass(score) {
+      if (score >= 85) return "green";
+      if (score >= 65) return "cyan";
+      if (score >= 45) return "amber";
+      return "red";
+    }
+
+    function renderSignalLists(signals, falsifiers) {
+      setHTML(
+        "signalsList",
+        signals.length
+          ? signals.map(s => itemHTML(s, "good")).join("")
+          : itemHTML("No strong positive signal passed the threshold on this sync.", "warn")
+      );
+
+      setHTML(
+        "falsifiersList",
+        falsifiers.length
+          ? falsifiers.map(s => itemHTML(s, "bad")).join("")
+          : itemHTML("No major falsifier triggered on this sync.", "good")
+      );
+    }
+
+    function renderPdaiPairs(rows) {
+      const ordered = [...rows].sort((a, b) => {
+        const rank = (x) => x.type === "WPLS" ? 0 : (x.type === "REF" ? 1 : 2);
+        return rank(a) - rank(b) || (b.liqUsd - a.liqUsd);
+      });
+
+      if (!ordered.length) {
+        setHTML("pairsBody", `<tr><td colspan="10" class="muted">No pairs discovered.</td></tr>`);
+        return;
+      }
+
+      const html = ordered.map(row => {
+        const impliedLabel =
+          row.type === "WPLS" ? (row.impliedPrice != null ? `${fmtFixed(row.impliedPrice, 8)} WPLS` : "—") :
+          row.type === "REF" ? (row.impliedPrice != null ? `${fmtFixed(row.impliedPrice, 8)} REF` : "—") :
+          "—";
+
+        const otherReserveLabel =
+          row.type === "WPLS" ? `${fmtCompact(row.otherReserve, 3)} WPLS` :
+          row.type === "REF" ? `${fmtCompact(row.otherReserve, 3)} ${esc(row.otherSymbol)}` :
+          "—";
+
+        const flags = [
+          row.verifiedLive ? "verified" : "unverified",
+          row.error ? `error:${esc(row.error)}` : null,
+          ...(row.labels || []).slice(0, 2)
+        ].filter(Boolean).join(" | ");
+
+        return `
+          <tr>
+            <td>${tagHTML(row.type)}</td>
+            <td>${esc(row.dexId)}</td>
+            <td><a href="${esc(row.url)}" target="_blank" rel="noopener">${esc(short(row.pairAddress))}</a></td>
+            <td>${esc(row.otherSymbol)} <span class="muted mono">${esc(short(row.otherAddress))}</span></td>
+            <td>${fmtCompact(row.targetReserve, 3)}</td>
+            <td>${otherReserveLabel}</td>
+            <td>${impliedLabel}</td>
+            <td>${fmtUsd(row.liqUsd, 0)}</td>
+            <td>${fmtUsd(row.volume24, 0)}</td>
+            <td class="muted">${flags}</td>
+          </tr>
+        `;
+      }).join("");
+
+      setHTML("pairsBody", html);
+    }
+
+    function renderWplsRefs(rows) {
+      const ordered = [...rows].sort((a, b) => (b.liqUsd - a.liqUsd));
+
+      if (!ordered.length) {
+        setHTML("wplsRefBody", `<tr><td colspan="8" class="muted">No WPLS reference-basket pools discovered.</td></tr>`);
+        return;
+      }
+
+      const html = ordered.map(row => `
+        <tr>
+          <td>${esc(row.dexId)}</td>
+          <td><a href="${esc(row.url)}" target="_blank" rel="noopener">${esc(short(row.pairAddress))}</a></td>
+          <td>${esc(row.otherSymbol)} <span class="muted mono">${esc(short(row.otherAddress))}</span></td>
+          <td>${fmtCompact(row.targetReserve, 3)} WPLS</td>
+          <td>${fmtCompact(row.otherReserve, 3)} ${esc(row.otherSymbol)}</td>
+          <td>${row.impliedPrice != null ? fmtFixed(row.impliedPrice, 10) : "—"}</td>
+          <td>${fmtUsd(row.liqUsd, 0)}</td>
+          <td>${fmtUsd(row.volume24, 0)}</td>
+        </tr>
+      `).join("");
+
+      setHTML("wplsRefBody", html);
+    }
+
+    async function buildModel() {
+      const targetDecimals = await ercDecimals(CONFIG.TARGET);
+
+      const [
+        totalRaw,
+        burnedRaw,
+        spinePdaiRaw,
+        spineWplsRaw,
+        rawTargetPairs,
+        rawWplsPairs
+      ] = await Promise.all([
+        ercTotalSupply(CONFIG.TARGET),
+        ercBalanceOf(CONFIG.TARGET, CONFIG.ADDR.DEAD),
+        ercBalanceOf(CONFIG.TARGET, CONFIG.ADDR.SPINE),
+        ercBalanceOf(CONFIG.WPLS, CONFIG.ADDR.SPINE),
+        discoverTokenPairs(CONFIG.TARGET),
+        discoverTokenPairs(CONFIG.WPLS)
+      ]);
+
+      const total = units(totalRaw, targetDecimals);
+      const burned = units(burnedRaw, targetDecimals);
+      const spinePdai = units(spinePdaiRaw, targetDecimals);
+      const spineWpls = units(spineWplsRaw, 18);
+
+      const normTargetPairs = rawTargetPairs
+        .map(p => normalizePairEntry(p, CONFIG.TARGET))
+        .filter(Boolean)
+        .sort((a, b) => b.liqUsd - a.liqUsd)
+        .slice(0, CONFIG.MAX_PDAI_PAIRS);
+
+      const normWplsRefPairs = rawWplsPairs
+        .map(p => normalizePairEntry(p, CONFIG.WPLS))
+        .filter(Boolean)
+        .filter(p => p.otherIsStable)
+        .sort((a, b) => b.liqUsd - a.liqUsd)
+        .slice(0, CONFIG.MAX_WPLS_REF_PAIRS);
+
+      const [pdaiPairs, wplsRefPairs] = await Promise.all([
+        hydratePairs(CONFIG.TARGET, normTargetPairs, targetDecimals),
+        hydratePairs(CONFIG.WPLS, normWplsRefPairs, 18)
+      ]);
+
+      const circ = Math.max(total - burned, 0);
+      const effectiveFloat = Math.max(circ - spinePdai, 0);
+      const capture = circ > 0 ? spinePdai / circ : 0;
+
+      const wplsPairs = pdaiPairs.filter(r => r.type === "WPLS" && r.verifiedLive);
+      const refPairs = pdaiPairs.filter(r => r.type === "REF" && r.verifiedLive);
+
+      const wplsAgg = ratioFromRows(wplsPairs);
+      const refAgg = ratioFromRows(refPairs);
+      const wplsRefAgg = ratioFromRows(wplsRefPairs.filter(r => r.verifiedLive));
+
+      const coverage = wplsAgg.otherSum > 0 ? spineWpls / wplsAgg.otherSum : 0;
+      const pdaiPerWpls = wplsAgg.ratio;
+      const refPerPdai = refAgg.ratio;
+      const refPerWpls = wplsRefAgg.ratio;
+      const wplsImpliedRef = (pdaiPerWpls != null && refPerWpls != null) ? (pdaiPerWpls * refPerWpls) : null;
+      const primaryRef = refPerPdai != null ? refPerPdai : wplsImpliedRef;
+      const pegGap = primaryRef != null ? Math.abs(CONFIG.TARGET_PEG - primaryRef) : null;
+      const consistencyGap =
+        (refPerPdai != null && wplsImpliedRef != null)
+          ? Math.abs(refPerPdai - wplsImpliedRef) / Math.max(refPerPdai, wplsImpliedRef, 1e-12)
+          : null;
+
+      const components = {
+        capture: 30 * clamp(capture / 0.33, 0, 1),
+        coverage: 30 * clamp(coverage / 1.0, 0, 1),
+        price: 25 * (primaryRef != null ? clamp(1 - pegGap, 0, 1) : 0),
+        consistency: 10 * (consistencyGap != null ? clamp(1 - consistencyGap, 0, 1) : 0),
+        breadth: 5 * clamp((wplsAgg.count + refAgg.count) / 4, 0, 1)
+      };
+
+      const score = Object.values(components).reduce((a, b) => a + b, 0);
+      const verdict = verdictFromScore(score, pegGap, coverage, capture, pdaiPairs.filter(r => r.verifiedLive).length);
+
+      const signals = [];
+      const falsifiers = [];
+
+      if (wplsAgg.count > 0) {
+        signals.push(`Discovered and verified <strong>${wplsAgg.count}</strong> live pDAI/WPLS pool(s) on-chain.`);
+      } else {
+        falsifiers.push(`No live pDAI/WPLS pool was verified from the discovered pair list.`);
+      }
+
+      if (refAgg.count > 0) {
+        signals.push(`Discovered and verified <strong>${refAgg.count}</strong> pDAI reference-basket pool(s) using ${CONFIG.REF_SYMBOLS.join(" / ")}.`);
+      } else {
+        falsifiers.push(`No pDAI reference-basket pool was verified. Price evidence is weaker without it.`);
+      }
+
+      if (wplsRefAgg.count > 0) {
+        signals.push(`Discovered and verified <strong>${wplsRefAgg.count}</strong> WPLS reference-basket pool(s).`);
+      } else {
+        falsifiers.push(`No WPLS reference-basket pool was verified, so WPLS-implied pricing is weaker.`);
+      }
+
+      if (capture >= 0.25) {
+        signals.push(`SPINE controls <strong>${fmtPct(capture, 2)}</strong> of ex-burn supply, which is meaningful capture.`);
+      } else {
+        falsifiers.push(`Supply capture is only <strong>${fmtPct(capture, 2)}</strong>; that is not dominant yet.`);
+      }
+
+      if (coverage >= 1) {
+        signals.push(`SPINE WPLS ammo covers the verified WPLS wall at <strong>${fmtX(coverage, 3)}</strong>.`);
+      } else {
+        falsifiers.push(`SPINE WPLS ammo covers only <strong>${fmtX(coverage, 3)}</strong> of the verified WPLS wall.`);
+      }
+
+      if (primaryRef != null) {
+        if (pegGap <= 0.05) {
+          signals.push(`Primary reference price sits <strong>${fmtPct(pegGap, 2)}</strong> from 1.00, which is already tight.`);
+        } else {
+          falsifiers.push(`Primary reference price is <strong>${fmtFixed(primaryRef, 6)}</strong>, which is <strong>${fmtPct(pegGap, 2)}</strong> away from 1.00.`);
+        }
+      } else {
+        falsifiers.push(`No usable primary reference price could be built from the discovered pools.`);
+      }
+
+      if (consistencyGap != null) {
+        if (consistencyGap <= 0.15) {
+          signals.push(`WPLS-implied and reference-basket prices agree within <strong>${fmtPct(consistencyGap, 2)}</strong>.`);
+        } else {
+          falsifiers.push(`WPLS-implied and reference-basket prices disagree by <strong>${fmtPct(consistencyGap, 2)}</strong>.`);
+        }
+      }
+
+      return {
+        total,
+        burned,
+        circ,
+        spinePdai,
+        effectiveFloat,
+        capture,
+        spineWpls,
+        verifiedWplsWall: wplsAgg.otherSum,
+        coverage,
+        pdaiPerWpls,
+        refPerPdai,
+        refPerWpls,
+        wplsImpliedRef,
+        pegGap,
+        score,
+        components,
+        verdict,
+        pdaiPairs,
+        wplsRefPairs,
+        signals,
+        falsifiers
+      };
+    }
+
+    function renderModel(m) {
+      setText("vTotal", fmtCompact(m.total, 3));
+      setText("vBurned", fmtCompact(m.burned, 3));
+      setText("vCirc", fmtCompact(m.circ, 3));
+      setText("vSpinePdai", fmtCompact(m.spinePdai, 3));
+      setText("vFloat", fmtCompact(m.effectiveFloat, 3));
+      setText("vCapture", fmtPct(m.capture, 3));
+      setText("vAmmo", fmtCompact(m.spineWpls, 3) + " WPLS");
+      setText("vWall", fmtCompact(m.verifiedWplsWall, 3) + " WPLS");
+      setText("vCoverage", fmtX(m.coverage, 4));
+      setText("vPwpls", m.pdaiPerWpls != null ? fmtFixed(m.pdaiPerWpls, 8) + " WPLS" : "—");
+      setText("vPref", m.refPerPdai != null ? fmtFixed(m.refPerPdai, 8) : "—");
+      setText("vPwplsRef", m.wplsImpliedRef != null ? fmtFixed(m.wplsImpliedRef, 8) : "—");
+
+      setText("scoreBig", fmtFixed(m.score, 1));
+      setText("pegGap", m.pegGap != null ? fmtPct(m.pegGap, 2) : "—");
+
+      const verdictEl = $("scoreVerdict");
+      verdictEl.textContent = m.verdict;
+      verdictEl.className = "scoreVerdict " + verdictClass(m.score);
+
+      $("scoreBar").style.width = clamp(m.score, 0, 100) + "%";
+
+      setText("cCapture", fmtFixed(m.components.capture, 1) + " / 30");
+      setText("cCoverage", fmtFixed(m.components.coverage, 1) + " / 30");
+      setText("cPrice", fmtFixed(m.components.price, 1) + " / 25");
+      setText("cConsistency", fmtFixed(m.components.consistency, 1) + " / 10");
+      setText("cBreadth", fmtFixed(m.components.breadth, 1) + " / 5");
+
+      renderSignalLists(m.signals, m.falsifiers);
+      renderPdaiPairs(m.pdaiPairs);
+      renderWplsRefs(m.wplsRefPairs);
     }
 
     async function sync() {
-        const statusMsg = document.getElementById('node-status');
-        try {
-            document.getElementById('v-node').innerText = "CLUSTER: " + NODES[nodeIdx];
-            
-            // Getting data in chunks to prevent RPC timeout
-            const totalHex = await query("eth_call", [{to: PDAI, data: "0x18160ddd"}, "latest"]);
-            const burnedHex = await query("eth_call", [{to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.DEAD.substring(2)}, "latest"]);
-            const spineHex = await query("eth_call", [{to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2)}, "latest"]);
-            const ammoHex = await query("eth_call", [{to: WPLS, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2)}, "latest"]);
-            const pPoolHex = await query("eth_call", [{to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2)}, "latest"]);
-            const wPoolHex = await query("eth_call", [{to: WPLS, data: "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2)}, "latest"]);
+      if (STATE.syncing) return;
+      STATE.syncing = true;
 
-            const fTotal = Number(BigInt(totalHex || 0)) / 1e18;
-            const fBurned = Number(BigInt(burnedHex || 0)) / 1e18;
-            const fSpine = Number(BigInt(spineHex || 0)) / 1e18;
-            const fAmmo = Number(BigInt(ammoHex || 0)) / 1e18;
-            const fPdaiPool = Number(BigInt(pPoolHex || 0)) / 1e18;
-            const fWplsPool = Number(BigInt(wPoolHex || 0)) / 1e18;
-            const fCirc = fTotal - fBurned;
+      setText("syncStatus", "SYNCING...");
+      try {
+        const model = await buildModel();
+        renderModel(model);
+        STATE.lastSync = new Date();
+        setText("lastSync", "LAST SYNC: " + nowStamp());
+        setText("syncStatus", "LINK: STABLE");
+      } catch (err) {
+        console.error(err);
+        setText("syncStatus", "SYNC FAILED / ROTATING RPC");
+        setText("lastSync", "LAST ERROR: " + (err?.message || String(err)));
 
-            document.getElementById('v-total').innerText = fTotal.toLocaleString(undefined, {maximumFractionDigits:0});
-            document.getElementById('v-burned').innerText = fBurned.toLocaleString(undefined, {maximumFractionDigits:0});
-            document.getElementById('v-circ').innerText = fCirc.toLocaleString(undefined, {maximumFractionDigits:0});
-            document.getElementById('v-price').innerText = fPdaiPool > 0 ? (fWplsPool / fPdaiPool).toFixed(8) : "0.00000000";
-            document.getElementById('v-ammo').innerText = fAmmo.toLocaleString() + " PLS";
-            document.getElementById('v-wall').innerText = fWplsPool.toLocaleString() + " PLS";
-            
-            const progress = fCirc > 0 ? (fSpine / fCirc) * 100 : 0;
-            const coverage = fWplsPool > 0 ? fAmmo / fWplsPool : 0;
-
-            document.getElementById('v-peg-text').innerText = progress.toFixed(6) + "%";
-            document.getElementById('v-bar').style.width = Math.min(progress, 100) + "%";
-            document.getElementById('v-ratio').innerText = coverage.toFixed(6) + "x";
-
-            statusMsg.innerText = "LINK: STABLE";
-            statusMsg.className = "status-active";
-        } catch (e) {
-            console.error("RPC Failure at " + NODES[nodeIdx], e);
-            statusMsg.innerText = "LINK LOST - ROTATING";
-            statusMsg.className = "status-fail";
-            nodeIdx = (nodeIdx + 1) % NODES.length;
-            setTimeout(sync, 2000);
-        }
+        setHTML("signalsList", itemHTML("Last sync failed before a full model could be built.", "bad"));
+        setHTML("falsifiersList", itemHTML(esc(err?.message || String(err)), "bad"));
+      } finally {
+        STATE.syncing = false;
+      }
     }
 
-    setInterval(sync, 15000); // 15s cycle to respect rate limits
+    $("refreshBtn").addEventListener("click", sync);
+    setInterval(sync, CONFIG.AUTO_REFRESH_MS);
     sync();
-</script>
+  </script>
 </body>
 </html>
