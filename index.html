@@ -3,56 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pDAI | ON-CHAIN DIRECT V4.6</title>
+    <title>pDAI | HIGH-AVAILABILITY V4.7</title>
     <style>
-        :root { --neon: #00ff41; --ammo: #00d4ff; --burn: #ff3e3e; --bg: #010101; --border: rgba(0, 255, 65, 0.3); }
-        body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .terminal { width: 100%; max-width: 1200px; border: 1px solid var(--border); padding: 25px; background: black; box-shadow: 0 0 40px #000; position: relative; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .card { border: 1px solid var(--border); padding: 20px; background: linear-gradient(180deg, #050505 0%, #000 100%); }
-        .label { font-size: 0.7rem; color: #555; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-        .value { font-size: 1.6rem; color: #fff; font-weight: bold; }
-        .progress-box { margin-top: 25px; border: 1px solid var(--border); padding: 20px; background: #020202; }
-        .bar-bg { width: 100%; height: 10px; background: #111; margin-top: 15px; border-radius: 2px; border: 1px solid #222; }
-        .bar-fill { height: 100%; background: var(--neon); width: 0%; transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px var(--neon); }
-        header { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        :root { --neon: #00ff41; --ammo: #00d4ff; --burn: #ff3e3e; --bg: #010101; --border: rgba(0, 255, 65, 0.4); }
+        body { background: var(--bg); color: var(--neon); font-family: 'Consolas', 'Courier New', monospace; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .terminal { width: 100%; max-width: 1400px; border: 2px solid var(--border); padding: 25px; background: black; box-shadow: 0 0 50px #000; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .card { border: 1px solid var(--border); padding: 20px; background: #050505; position: relative; }
+        .label { font-size: 0.65rem; color: #666; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 2px; }
+        .value { font-size: 1.7rem; color: #fff; font-weight: bold; overflow-wrap: break-word; }
+        .progress-box { margin-top: 30px; border: 1px solid var(--border); padding: 25px; background: #020202; }
+        .bar-bg { width: 100%; height: 12px; background: #111; margin-top: 20px; border-radius: 2px; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #003300, var(--neon)); width: 0%; transition: width 2s ease-in-out; box-shadow: 0 0 15px var(--neon); }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 30px; }
         .status-active { color: var(--neon); text-shadow: 0 0 5px var(--neon); }
-        .status-error { color: var(--burn); animation: blink 0.8s infinite; }
+        .status-fail { color: var(--burn); animation: blink 0.5s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
-        footer { margin-top: 25px; font-size: 0.65rem; color: #333; display: flex; justify-content: space-between; }
+        footer { margin-top: 30px; font-size: 0.6rem; color: #444; display: flex; justify-content: space-between; border-top: 1px solid #222; padding-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="terminal">
     <header>
-        <div><strong>DIRECT ON-CHAIN FORENSICS</strong> <span id="v-ver">v4.6</span></div>
-        <div id="node-status" class="status-active">NODE ONLINE</div>
+        <div><strong>pDAI ON-CHAIN PROOF ENGINE</strong> <span id="v-tag">v4.7</span></div>
+        <div id="node-status" class="status-active">LINK: STABLE</div>
     </header>
 
     <div class="grid">
         <div class="card">
-            <div class="label">Total Forked Supply</div>
-            <div id="v-supply" class="value">0</div>
+            <div class="label">Chainwide Supply (Total)</div>
+            <div id="v-total" class="value">0</div>
         </div>
         <div class="card">
             <div class="label">Vaporized (0xDead)</div>
             <div id="v-burned" class="value" style="color:var(--burn)">0</div>
         </div>
         <div class="card">
-            <div class="label">Price Ratio (PLS/pDAI)</div>
+            <div class="label">True Circulating Supply</div>
+            <div id="v-circ" class="value" style="color:#aaa">0</div>
+        </div>
+        <div class="card">
+            <div class="label">Market Ratio (PLS/pDAI)</div>
             <div id="v-price" class="value" style="color:#ffcc00">0.00000000</div>
         </div>
         <div class="card">
-            <div class="label">Reserve Ammo (5EF7)</div>
+            <div class="label">Reserve Ammo (Spine 5EF7)</div>
             <div id="v-ammo" class="value" style="color:var(--ammo)">0 PLS</div>
         </div>
         <div class="card">
-            <div class="label">Captured Supply (Spine)</div>
-            <div id="v-spine" class="value">0</div>
-        </div>
-        <div class="card">
-            <div class="label">LP Wall (Pool WPLS)</div>
+            <div class="label">Pool Liquidity (PulseX V2)</div>
             <div id="v-wall" class="value">0 PLS</div>
         </div>
     </div>
@@ -60,30 +60,34 @@
     <div class="progress-box">
         <div style="display:flex; justify-content:space-between; align-items: flex-end;">
             <div>
-                <span class="label">Mechanism Absorption Progress</span>
-                <div id="v-peg-text" style="font-size:2.2rem; font-weight: bold; margin-top: 5px;">0.000000%</div>
+                <span class="label">Machine Capture Progress (Spine / Circulating)</span>
+                <div id="v-peg-text" style="font-size:2.5rem; font-weight: bold;">0.000000%</div>
             </div>
             <div style="text-align: right;">
-                <span class="label">Attack Power (Coverage)</span>
-                <div id="v-ratio" style="font-size:1.1rem; color:var(--ammo)">0.00x</div>
+                <span class="label">Attack Power (Ammo vs Pool)</span>
+                <div id="v-ratio" style="font-size:1.5rem; color:var(--ammo)">0.0000x</div>
             </div>
         </div>
         <div class="bar-bg"><div id="v-bar" class="bar-fill"></div></div>
     </div>
 
     <footer>
-        <div id="v-node">RPC: INITIALIZING...</div>
-        <div>DATA SOURCE: PULSECHAIN MAINNET | NO SIMULATION</div>
+        <div id="v-node">SCANNING CLUSTER...</div>
+        <div>STRICT ON-CHAIN DATA | RULE 1 ENFORCED</div>
     </footer>
 </div>
 
 <script>
-    // Pure On-Chain Constants
     const NODES = [
-        "https://pulsechain-rpc.publicnode.com",
         "https://rpc.pulsechain.com",
-        "https://rpc-pulsechain.g4mm4.io"
+        "https://pulsechain.publicnode.com",
+        "https://rpc.pulsechainstats.com",
+        "https://rpc-pulsechain.g4mm4.io",
+        "https://rpc.pulsechainrpc.com",
+        "https://api-pulse-mainnet.n.dwellir.com/d8603a55-ced0-4d7c-976b-b8ce57eea6e5",
+        "https://pulsechain.rpc.thirdweb.com"
     ];
+
     const PDAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
     const WPLS = "0xA1077a294d2D00ca00bb46556459739d482282c6";
     const ADDR = {
@@ -95,75 +99,74 @@
     let nodeIdx = 0;
 
     async function query(method, params) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
         const r = await fetch(NODES[nodeIdx], {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method, params })
+            body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method, params }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         const d = await r.json();
-        if (d.error) throw new Error(d.error.message);
         return d.result;
     }
 
-    async function getBalance(token, user) {
+    async function getBal(token, user) {
         const data = "0x70a08231000000000000000000000000" + user.substring(2);
         const hex = await query("eth_call", [{to: token, data}, "latest"]);
         return BigInt(hex || 0);
     }
 
     async function sync() {
-        const status = document.getElementById('node-status');
+        const statusMsg = document.getElementById('node-status');
         try {
             document.getElementById('v-node').innerText = "RPC: " + NODES[nodeIdx];
             
-            // 1. Raw Data Extraction
-            const supplyHex = await query("eth_call", [{to: PDAI, data: "0x18160ddd"}, "latest"]);
-            const supply = BigInt(supplyHex || 0);
+            const totalHex = await query("eth_call", [{to: PDAI, data: "0x18160ddd"}, "latest"]);
+            const total = BigInt(totalHex || 0);
             
-            const burned = await getBalance(PDAI, ADDR.DEAD);
-            const spine = await getBalance(PDAI, ADDR.SPINE);
-            const ammo = await getBalance(WPLS, ADDR.SPINE);
-            const pdaiPool = await getBalance(PDAI, ADDR.POOL);
-            const wplsPool = await getBalance(WPLS, ADDR.POOL);
+            const burned = await getBal(PDAI, ADDR.DEAD);
+            const spine = await getBal(PDAI, ADDR.SPINE);
+            const ammo = await getBal(WPLS, ADDR.SPINE);
+            const pdaiPool = await getBal(PDAI, ADDR.POOL);
+            const wplsPool = await getBal(WPLS, ADDR.POOL);
 
-            // 2. Converters (18 Decimals)
-            const fSupply = Number(supply) / 1e18;
+            const fTotal = Number(total) / 1e18;
             const fBurned = Number(burned) / 1e18;
             const fSpine = Number(spine) / 1e18;
             const fAmmo = Number(ammo) / 1e18;
             const fPdaiPool = Number(pdaiPool) / 1e18;
             const fWplsPool = Number(wplsPool) / 1e18;
+            const fCirc = fTotal - fBurned;
 
-            // 3. Mathematical Truths
             const price = fPdaiPool > 0 ? fWplsPool / fPdaiPool : 0;
             const coverage = fWplsPool > 0 ? fAmmo / fWplsPool : 0;
-            const circulating = fSupply - fBurned;
-            const progress = circulating > 0 ? (fSpine / circulating) * 100 : 0;
+            const progress = fCirc > 0 ? (fSpine / fCirc) * 100 : 0;
 
-            // 4. Update UI
-            document.getElementById('v-supply').innerText = fSupply.toLocaleString(undefined, {maximumFractionDigits:0});
+            document.getElementById('v-total').innerText = fTotal.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('v-burned').innerText = fBurned.toLocaleString(undefined, {maximumFractionDigits:0});
+            document.getElementById('v-circ').innerText = fCirc.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('v-price').innerText = price.toFixed(8);
             document.getElementById('v-ammo').innerText = fAmmo.toLocaleString() + " PLS";
-            document.getElementById('v-spine').innerText = fSpine.toLocaleString();
             document.getElementById('v-wall').innerText = fWplsPool.toLocaleString() + " PLS";
             
             document.getElementById('v-peg-text').innerText = progress.toFixed(6) + "%";
             document.getElementById('v-bar').style.width = Math.min(progress, 100) + "%";
-            document.getElementById('v-ratio').innerText = coverage.toFixed(4) + "x";
+            document.getElementById('v-ratio').innerText = coverage.toFixed(6) + "x";
 
-            status.innerText = "NODE ONLINE";
-            status.className = "status-active";
+            statusMsg.innerText = "LINK: STABLE";
+            statusMsg.className = "status-active";
         } catch (e) {
-            console.error("Forensic Error:", e);
-            status.innerText = "RPC FAILOVER";
-            status.className = "status-error";
+            statusMsg.innerText = "LINK: REROUTING...";
+            statusMsg.className = "status-fail";
             nodeIdx = (nodeIdx + 1) % NODES.length;
-            setTimeout(sync, 1500);
+            setTimeout(sync, 1000);
         }
     }
 
-    setInterval(sync, 12000);
+    setInterval(sync, 10000);
     sync();
 </script>
 </body>
