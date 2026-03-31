@@ -3,251 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pDAI | AMMO & VELOCITY TERMINAL</title>
+    <title>pDAI | SENTINEL V4.4</title>
     <style>
         :root { 
-            --neon: #00ff41; 
-            --ammo-blue: #00d4ff;
-            --bg: #020202; 
-            --glass: rgba(255, 255, 255, 0.04); 
-            --border: rgba(0, 255, 65, 0.2); 
-            --danger: #ff3e3e; 
-            --warn: #ffcc00; 
+            --neon: #00ff41; --ammo: #00d4ff; --burn: #ff3e3e; --bg: #020202; 
+            --glass: rgba(255, 255, 255, 0.04); --border: rgba(0, 255, 65, 0.2); 
         }
         body { 
-            background-color: var(--bg); 
-            background-image: radial-gradient(circle at 50% 50%, #0a1a0a 0%, #020202 100%); 
-            color: var(--neon); 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
+            background-color: var(--bg); color: var(--neon); font-family: 'Consolas', monospace; 
+            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; 
         }
         .terminal-frame { 
-            width: 95%; 
-            max-width: 1300px; 
-            background: var(--glass); 
-            backdrop-filter: blur(25px); 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            padding: 30px; 
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.9); 
+            width: 95%; max-width: 1300px; background: var(--glass); backdrop-filter: blur(25px); 
+            border: 1px solid var(--border); border-radius: 8px; padding: 25px; box-shadow: 0 0 50px #000;
         }
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid var(--border); 
-            padding-bottom: 20px; 
-            margin-bottom: 30px; 
-        }
-        .brand h1 { margin: 0; font-size: 1.4rem; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 10px var(--neon); }
-        .status-light { font-size: 0.7rem; display: flex; align-items: center; gap: 10px; color: #888; }
-        .dot { width: 8px; height: 8px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); animation: pulse 2s infinite; }
-        
-        .data-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-            gap: 15px; 
-        }
-        .card { 
-            background: rgba(0, 0, 0, 0.6); 
-            border: 1px solid var(--border); 
-            padding: 20px; 
-            border-radius: 8px; 
-            transition: transform 0.2s;
-        }
-        .card:hover { transform: translateY(-2px); border-color: var(--neon); }
-        .label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #aaa; margin-bottom: 8px; }
-        .value { font-size: 1.5rem; font-weight: bold; color: #fff; margin-bottom: 4px; }
-        .sub-val { font-size: 0.7rem; color: var(--neon); opacity: 0.8; }
-        
-        /* AMMO HIGHLIGHT */
-        .ammo-card { border-color: var(--ammo-blue); box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.1); }
-        .ammo-card .label { color: var(--ammo-blue); }
-        .ammo-card .value { color: var(--ammo-blue); text-shadow: 0 0 10px var(--ammo-blue); }
-
-        .peg-container { 
-            grid-column: 1 / -1; 
-            margin-top: 20px; 
-            background: rgba(0,0,0,0.7); 
-            border: 1px solid var(--border); 
-            padding: 25px; 
-            border-radius: 8px; 
-        }
-        .progress-track { width: 100%; height: 6px; background: #111; margin: 20px 0; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #004411, var(--neon)); width: 0%; transition: width 2s ease; }
-        
-        footer { margin-top: 30px; font-size: 0.6rem; color: #444; display: flex; justify-content: space-between; border-top: 1px solid #222; padding-top: 10px; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .offline { color: var(--danger); }
-        .warning { color: var(--warn); }
+        header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .card { background: rgba(0,0,0,0.6); border: 1px solid var(--border); padding: 15px; border-radius: 4px; }
+        .label { font-size: 0.6rem; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: 1px; }
+        .value { font-size: 1.4rem; color: #fff; }
+        .ammo-text { color: var(--ammo); text-shadow: 0 0 5px var(--ammo); }
+        .burn-text { color: var(--burn); text-shadow: 0 0 5px var(--burn); }
+        .peg-zone { margin-top: 20px; border: 1px solid var(--border); padding: 20px; background: rgba(0,255,65,0.02); }
+        .progress-bar { width: 100%; height: 4px; background: #111; margin: 15px 0; position: relative; }
+        .progress-fill { height: 100%; background: var(--neon); width: 0%; transition: width 1s; box-shadow: 0 0 10px var(--neon); }
+        footer { margin-top: 20px; font-size: 0.6rem; color: #333; display: flex; justify-content: space-between; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .cursor { display: inline-block; width: 8px; height: 15px; background: var(--neon); animation: blink 1s infinite; }
     </style>
 </head>
 <body>
 
 <div class="terminal-frame">
     <header>
-        <div class="brand"><h1>pDAI | MACHINE VELOCITY</h1></div>
-        <div class="status-light">
-            <span id="update-timer">CONNECTING...</span>
-            <div id="status-dot" class="dot"></div>
-        </div>
+        <div><strong>pDAI SENTINEL</strong> <span class="cursor"></span></div>
+        <div id="sync-status" style="font-size: 0.7rem;">SYNCING...</div>
     </header>
 
     <div class="data-grid">
         <div class="card">
-            <div class="label">Total Forked Supply</div>
+            <div class="label">Total Supply</div>
             <div id="val-supply" class="value">---</div>
-            <div class="sub-val">Global pDAI Count</div>
         </div>
         <div class="card">
-            <div class="label">Pool Pressure (pDAI)</div>
-            <div id="val-pool-pdai" class="value">---</div>
-            <div class="sub-val">In PulseX V2 Pool</div>
-        </div>
-
-        <div class="card ammo-card">
-            <div class="label">Reserve Ammo (WPLS)</div>
-            <div id="val-ammo" class="value">---</div>
-            <div class="sub-val">Dry Powder in Spine (5EF7)</div>
+            <div class="label">Vaporized (Burned)</div>
+            <div id="val-burned" class="value burn-text">---</div>
         </div>
         <div class="card">
-            <div class="label">Pool Liquidity (WPLS)</div>
-            <div id="val-pool-wpls" class="value">---</div>
-            <div class="sub-val">WPLS Liquidity Wall</div>
+            <div class="label">Market Price (PLS)</div>
+            <div id="val-price" class="value" style="color: #ffcc00;">---</div>
         </div>
-
         <div class="card">
-            <div class="label">Spine pDAI (5EF7)</div>
+            <div class="label">Reserve Ammo</div>
+            <div id="val-ammo" class="value ammo-text">---</div>
+        </div>
+        <div class="card">
+            <div class="label">Spine (5EF7)</div>
             <div id="val-spine" class="value">---</div>
-            <div class="sub-val">Captured by Machine</div>
         </div>
         <div class="card">
-            <div class="label">Recycler (D6CA)</div>
-            <div id="val-recycler" class="value">---</div>
-            <div class="sub-val">Protocol Buffer</div>
+            <div class="label">Pool Pressure</div>
+            <div id="val-pool-wpls" class="value">---</div>
         </div>
     </div>
 
-    <div class="peg-container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <div class="peg-zone">
+        <div style="display: flex; justify-content: space-between;">
             <div>
-                <div class="label">Peg Saturation Progress</div>
-                <div id="val-peg" style="font-size: 2.5rem; color: var(--neon);">0.000000%</div>
-                <div id="ammo-ratio" style="font-size: 0.7rem; color: #888; margin-top: 5px;">Ammo Coverage: 0.00% of Pool Wall</div>
+                <div class="label">Peg Saturation</div>
+                <div id="val-peg-percent" style="font-size: 2rem;">0.0000%</div>
             </div>
             <div style="text-align: right;">
-                <div class="label">Execution Engine</div>
-                <div id="val-status" class="warning">AWAITING TRIGGER</div>
+                <div class="label">Machine Ratio</div>
+                <div id="val-ratio" style="color: var(--ammo);">Coverage: 0.00x</div>
             </div>
         </div>
-        <div class="progress-track"><div id="peg-bar" class="progress-fill"></div></div>
-        <div style="font-size: 0.6rem; color: #555;">No Simulation | Chain-Direct Analytics V4.3</div>
+        <div class="progress-bar"><div id="peg-fill" class="progress-fill"></div></div>
+        <div id="status-msg" style="font-size: 0.7rem; color: #666;">MONITORING ON-CHAIN CONTRACTS...</div>
     </div>
 
     <footer>
-        <div id="active-node">NODE: INITIALIZING...</div>
-        <div>TARGET: 0x6B175474E89094C44Da98b954EedeAC495271d0F</div>
+        <div id="node-info">NODE: v4.4-STABLE</div>
+        <div>CONTRACT: 0x6B175474E89094C44Da98b954EedeAC495271d0F</div>
     </footer>
 </div>
 
 <script>
-    const NODES = [
-        "https://pulsechain-rpc.publicnode.com",
-        "https://rpc-pulsechain.g4mm4.io",
-        "https://rpc.pulsechain.com"
-    ];
-
+    const RPC = "https://pulsechain-rpc.publicnode.com";
     const PDAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
     const WPLS = "0xA1077a294d2D00ca00bb46556459739d482282c6";
     const ADDR = {
+        DEAD: "0x000000000000000000000000000000000000dEaD",
         SPINE: "0x5EF786D22e6e6666666666666666666666665EF7",
-        RECYCLER: "0xD6CA66666666666666666666666666666666D6CA",
-        POOL_V2: "0xE5604367AD2C51604811568b1a0eAcbdc1DE0aE"
+        POOL: "0xE5604367AD2C51604811568b1a0eAcbdc1DE0aE"
     };
 
-    let nodeIdx = 0;
-
-    async function query(method, params) {
-        const r = await fetch(NODES[nodeIdx], {
+    async function call(to, data) {
+        const r = await fetch(RPC, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jsonrpc: "2.0", method, params, id: Date.now() })
+            body: JSON.stringify({jsonrpc:"2.0", id:1, method:"eth_call", params:[{to, data}, "latest"]})
         });
         const d = await r.json();
-        return d.result;
+        return BigInt(d.result || 0) / BigInt(10**18);
     }
 
-    async function sync() {
-        const timer = document.getElementById('update-timer');
-        const nodeDisplay = document.getElementById('active-node');
-        const statusText = document.getElementById('val-status');
-
+    async function update() {
         try {
-            nodeDisplay.innerText = `NODE: ${NODES[nodeIdx]}`;
-            
-            // 1. Bulk Query
-            const pDAI_Supply = await query("eth_call", [{ to: PDAI, data: "0x18160ddd" }, "latest"]);
-            const pDAI_Pool = await query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.POOL_V2.substring(2) }, "latest"]);
-            const pDAI_Spine = await query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2) }, "latest"]);
-            const pDAI_Recycler = await query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.RECYCLER.substring(2) }, "latest"]);
-            
-            // 2. Ammo Query (WPLS in Spine and Pool)
-            const WPLS_Ammo = await query("eth_call", [{ to: WPLS, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2) }, "latest"]);
-            const WPLS_Pool = await query("eth_call", [{ to: WPLS, data: "0x70a08231000000000000000000000000" + ADDR.POOL_V2.substring(2) }, "latest"]);
+            const supply = await call(PDAI, "0x18160ddd");
+            const burned = await call(PDAI, "0x70a08231000000000000000000000000" + ADDR.DEAD.substring(2));
+            const spine = await call(PDAI, "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2));
+            const ammo = await call(WPLS, "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2));
+            const pDAIPool = await call(PDAI, "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2));
+            const wPLSPool = await call(WPLS, "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2));
 
-            // 3. Format Data
-            const supply = BigInt(pDAI_Supply || 0) / BigInt(10**18);
-            const poolPdai = BigInt(pDAI_Pool || 0) / BigInt(10**18);
-            const spinePdai = BigInt(pDAI_Spine || 0) / BigInt(10**18);
-            const recyclerPdai = BigInt(pDAI_Recycler || 0) / BigInt(10**18);
-            const ammoWpls = BigInt(WPLS_Ammo || 0) / BigInt(10**18);
-            const poolWpls = BigInt(WPLS_Pool || 0) / BigInt(10**18);
+            // Price Calc (PLS per pDAI)
+            const price = pDAIPool > 0n ? Number(wPLSPool) / Number(pDAIPool) : 0;
+            const coverage = wPLSPool > 0n ? Number(ammo) / Number(wPLSPool) : 0;
+            const pegProgress = supply > 0n ? (Number(spine + burned) / Number(supply)) * 100 : 0;
 
-            // 4. Update UI
             document.getElementById('val-supply').innerText = Number(supply).toLocaleString();
-            document.getElementById('val-pool-pdai').innerText = Number(poolPdai).toLocaleString();
-            document.getElementById('val-spine').innerText = Number(spinePdai).toLocaleString();
-            document.getElementById('val-recycler').innerText = Number(recyclerPdai).toLocaleString();
-            document.getElementById('val-ammo').innerText = Number(ammoWpls).toLocaleString() + " PLS";
-            document.getElementById('val-pool-wpls').innerText = Number(poolWpls).toLocaleString() + " PLS";
-
-            // 5. Advanced Math (Ammo Coverage)
-            const coverage = poolWpls > 0n ? (Number(ammoWpls) / Number(poolWpls)) * 100 : 0;
-            document.getElementById('ammo-ratio').innerText = `Ammo Coverage: ${coverage.toFixed(2)}% of Liquidity Wall`;
-
-            const progress = supply > 0n ? (Number(spinePdai) / Number(supply)) * 100 : 0;
-            document.getElementById('val-peg').innerText = progress.toFixed(6) + "%";
-            document.getElementById('peg-bar').style.width = Math.min(progress * 100, 100) + "%";
-
-            // Status Logic
-            if (ammoWpls > 0n) {
-                statusText.innerText = "AMMO PRIMED";
-                statusText.className = "";
-                statusText.style.color = "var(--ammo-blue)";
-            } else if (spinePdai > 0n) {
-                statusText.innerText = "ABSORPTION ACTIVE";
-                statusText.style.color = "var(--neon)";
-            } else {
-                statusText.innerText = "AWAITING TRIGGER";
-                statusText.className = "warning";
-            }
+            document.getElementById('val-burned').innerText = Number(burned).toLocaleString();
+            document.getElementById('val-price').innerText = price.toFixed(4) + " PLS";
+            document.getElementById('val-ammo').innerText = Number(ammo).toLocaleString() + " PLS";
+            document.getElementById('val-spine').innerText = Number(spine).toLocaleString();
+            document.getElementById('val-pool-wpls').innerText = Number(wPLSPool).toLocaleString() + " PLS";
             
-            timer.innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
-
+            document.getElementById('val-ratio').innerText = `Coverage: ${coverage.toFixed(2)}x`;
+            document.getElementById('val-peg-percent').innerText = pegProgress.toFixed(4) + "%";
+            document.getElementById('peg-fill').style.width = pegProgress + "%";
+            
+            document.getElementById('sync-status').innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
+            document.getElementById('status-msg').innerText = coverage >= 1 ? "MATHEMATICAL PEG POSSIBLE" : "ACCUMULATING AMMO...";
         } catch (e) {
-            nodeIdx = (nodeIdx + 1) % NODES.length;
-            timer.innerText = "REROUTING...";
-            setTimeout(sync, 1000);
+            document.getElementById('sync-status').innerText = "RPC ERROR - RETRYING";
         }
     }
 
-    sync();
-    setInterval(sync, 12000); // 12s scan cycle
+    setInterval(update, 10000);
+    update();
 </script>
 </body>
 </html>
