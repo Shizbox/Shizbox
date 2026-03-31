@@ -3,108 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pDAI Combat Tracker</title>
+    <title>pDAI | INTERNAL MACHINE TERMINAL</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #050505; color: #00ff41; padding: 20px; line-height: 1.4; }
-        .container { max-width: 900px; margin: auto; border: 2px solid #00ff41; padding: 20px; box-shadow: 0 0 20px #004411; }
-        h1 { text-align: center; color: #fff; text-shadow: 0 0 10px #00ff41; border-bottom: 2px solid #00ff41; padding-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 25px; }
-        .card { border: 1px solid #00ff41; padding: 15px; background: rgba(0, 255, 65, 0.05); position: relative; overflow: hidden; }
-        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #00ff41; opacity: 0.3; }
-        .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .value { font-size: 1.4rem; font-weight: bold; margin: 10px 0; color: #fff; }
-        .address { font-size: 0.6rem; color: #008f11; word-break: break-all; opacity: 0.7; }
-        .highlight { color: #00ff41; border-left: 3px solid #00ff41; padding-left: 10px; }
-        .status-footer { margin-top: 30px; text-align: center; border-top: 1px solid #333; padding-top: 15px; font-size: 0.8rem; }
-        .pulse { animation: blink 2s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        :root {
+            --neon: #00ff41;
+            --bg: #020202;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(0, 255, 65, 0.2);
+            --danger: #ff3e3e;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, #0a1a0a 0%, #020202 100%);
+            color: var(--neon);
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .terminal-frame {
+            width: 95%;
+            max-width: 1200px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 255, 65, 0.05);
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon);
+        }
+
+        .status-light {
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #888;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neon);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon);
+            animation: pulse 2s infinite;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--neon);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .value {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .sub-val {
+            font-size: 0.75rem;
+            color: var(--neon);
+            opacity: 0.7;
+        }
+
+        /* PEG GAUSE */
+        .peg-container {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 4px;
+            background: #111;
+            margin: 20px 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--neon));
+            width: 0%;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--neon);
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.6rem;
+            color: #444;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .warning-text { color: var(--danger); text-shadow: 0 0 5px var(--danger); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>pDAI ON-CHAIN FORENSICS</h1>
-    
-    <div class="grid">
-        <div class="card highlight">
-            <div class="label">PulseX Main Liquidity Pool</div>
-            <div id="val-Pool" class="value">Scanning...</div>
-            <div class="address">0x1b452D6Cb7F975397842457c45812e12868A1B45</div>
+<div class="terminal-frame">
+    <header>
+        <div class="brand">
+            <h1>pDAI Forensics Terminal</h1>
         </div>
+        <div class="status-light">
+            <span id="update-timer">SCANNING...</span>
+            <div class="dot"></div>
+        </div>
+    </header>
 
-        <div class="card highlight">
-            <div class="label">Circulating (Global Market)</div>
-            <div id="val-Circ" class="value">Scanning...</div>
-            <div class="address">Total pDAI Supply Trace</div>
+    <div class="data-grid">
+        <div class="card">
+            <div class="label">Total Forked Supply</div>
+            <div id="val-supply" class="value">0</div>
+            <div class="sub-val">Chainwide Existence</div>
         </div>
 
         <div class="card">
-            <div class="label">Native Reserve Spine (5EF7)</div>
-            <div id="val-Spine" class="value">Scanning...</div>
-            <div class="address">0x5EF786D22e6e6666666666666666666666665EF7</div>
+            <div class="label">Market Pressure (Pools)</div>
+            <div id="val-pool" class="value">0</div>
+            <div class="sub-val">Liquid at External Gate</div>
         </div>
 
         <div class="card">
-            <div class="label">Recycler Engine (D6CA)</div>
-            <div id="val-Recycler" class="value">Scanning...</div>
-            <div class="address">0xD6CA66666666666666666666666666666666D6CA</div>
+            <div class="label">Reserves (5EF7)</div>
+            <div id="val-spine" class="value">0</div>
+            <div class="sub-val">Secured in Native Spine</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Recycler (D6CA)</div>
+            <div id="val-recycler" class="value">0</div>
+            <div class="sub-val">Buffer in Recycler Engine</div>
         </div>
     </div>
 
-    <div class="status-footer">
-        <span class="pulse">●</span> <span id="status-text">Connecting to PulseChain Node...</span>
+    <div class="peg-container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <div class="label">Peg Saturation Progress</div>
+                <div id="val-peg" style="font-size: 2.5rem; color: var(--neon);">0.000000%</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="label">Mechanism Status</div>
+                <div id="val-status" class="warning-text">STANDBY</div>
+            </div>
+        </div>
+        <div class="progress-track">
+            <div id="peg-bar" class="progress-fill"></div>
+        </div>
+        <div style="font-size: 0.6rem; color: #555;">Telemetric Data: (Spine / Total Supply) | No Simulation Mode Active</div>
     </div>
+
+    <footer>
+        <div>NODE: HTTPS://RPC.PULSECHAIN.COM</div>
+        <div>CONTRACT: 0x6B175474E89094C44Da98b954EedeAC495271d0F</div>
+    </footer>
 </div>
 
 <script>
     const RPC = "https://rpc.pulsechain.com";
     const PDAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
-    
-    const TARGETS = [
-        { id: "Pool", addr: "0x1b452D6Cb7F975397842457c45812e12868A1B45" },
-        { id: "Spine", addr: "0x5EF786D22e6e6666666666666666666666665EF7" },
-        { id: "Recycler", addr: "0xD6CA66666666666666666666666666666666D6CA" }
-    ];
+    const ADDR = {
+        SPINE: "0x5EF786D22e6e6666666666666666666666665EF7",
+        RECYCLER: "0xD6CA66666666666666666666666666666666D6CA",
+        POOL: "0x1b452D6Cb7F975397842457c45812e12868A1B45"
+    };
 
-    async function scan() {
-        const status = document.getElementById('status-text');
-        status.innerText = "Machine Pulse: Active";
-        
-        // 1. Fetch Total Supply (Circulating)
-        try {
-            const supplyData = await callRPC("eth_call", [{ to: PDAI, data: "0x18160ddd" }, "latest"]);
-            const total = BigInt(supplyData) / BigInt(10**18);
-            document.getElementById('val-Circ').innerText = Number(total).toLocaleString() + " pDAI";
-        } catch (e) { console.error("Supply error", e); }
-
-        // 2. Fetch specific Hunts
-        for (const t of TARGETS) {
-            try {
-                const balData = await callRPC("eth_call", [{
-                    to: PDAI,
-                    data: "0x70a08231000000000000000000000000" + t.addr.substring(2)
-                }, "latest"]);
-                
-                const bal = BigInt(balData) / BigInt(10**18);
-                document.getElementById(`val-${t.id}`).innerText = Number(bal).toLocaleString() + " pDAI";
-            } catch (e) { 
-                document.getElementById(`val-${t.id}`).innerText = "0 (No Data)";
-            }
-        }
-        status.innerText = "System Synced: " + new Date().toLocaleTimeString();
-    }
-
-    async function callRPC(method, params) {
-        const resp = await fetch(RPC, {
+    async function query(method, params) {
+        const r = await fetch(RPC, {
             method: 'POST',
-            body: JSON.stringify({ jsonrpc: "2.0", method, params, id: 1 })
+            body: JSON.stringify({ jsonrpc: "2.0", method, params, id: Date.now() })
         });
-        const json = await resp.json();
-        return json.result;
+        const d = await r.json();
+        return d.result;
     }
 
-    scan();
-    setInterval(scan, 20000); // Pulse every 20s
+    async function sync() {
+        try {
+            // 1. Total Supply
+            const sHex = await query("eth_call", [{ to: PDAI, data: "0x18160ddd" }, "latest"]);
+            const supply = BigInt(sHex) / BigInt(10**18);
+            document.getElementById('val-supply').innerText = Number(supply).toLocaleString();
+
+            // 2. Balances
+            const bals = await Promise.all([
+                query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2) }, "latest"]),
+                query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.RECYCLER.substring(2) }, "latest"]),
+                query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2) }, "latest"])
+            ]);
+
+            const spine = BigInt(bals[0]) / BigInt(10**18);
+            const recycler = BigInt(bals[1]) / BigInt(10**18);
+            const pool = BigInt(bals[2]) / BigInt(10**18);
+
+            document.getElementById('val-spine').innerText = Number(spine).toLocaleString();
+            document.getElementById('val-recycler').innerText = Number(recycler).toLocaleString();
+            document.getElementById('val-pool').innerText = Number(pool).toLocaleString();
+
+            // 3. Peg Math
+            const progress = (Number(spine) / Number(supply)) * 100;
+            document.getElementById('val-peg').innerText = progress.toFixed(6) + "%";
+            document.getElementById('peg-bar').style.width = (progress > 0 ? Math.min(progress * 100, 100) : 1) + "%";
+
+            // Status Logic
+            const statusEl = document.getElementById('val-status');
+            if (spine > 0n) {
+                statusEl.innerText = "MACHINE ACTIVE";
+                statusEl.style.color = "var(--neon)";
+            } else {
+                statusEl.innerText = "AWAITING BURST";
+                statusEl.style.color = "var(--danger)";
+            }
+
+            document.getElementById('update-timer').innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
+        } catch (e) {
+            document.getElementById('update-timer').innerText = "RPC CONNECTION OFFLINE";
+        }
+    }
+
+    sync();
+    setInterval(sync, 10000); // 10 second refresh
 </script>
+
 </body>
 </html>
