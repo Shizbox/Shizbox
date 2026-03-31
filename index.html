@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>PulseChain Investigator | Native Research Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --bg: #0b1020; --panel: #121933; --muted: #98a2b3; --text: #e5e7eb;
+            --accent: #7c3aed; --accent2: #22c55e; --danger: #ef4444; --border: #25304f;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.5;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { 
+            background: var(--panel); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 20px; margin-bottom: 20px; 
+        }
+        .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        h2 { color: var(--accent2); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+        input, select, textarea {
+            width: 100%; background: #080d1a; color: #fff; border: 1px solid var(--border);
+            padding: 10px; border-radius: 6px; margin-bottom: 15px; font-family: monospace;
+        }
+        button {
+            background: var(--accent); color: white; border: none; padding: 10px 15px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.8; }
+        button.secondary { background: var(--border); }
+        .mono { font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; }
+        .result-box {
+            background: #000; color: #0f0; padding: 15px; border-radius: 8px;
+            max-height: 400px; overflow-y: auto; white-space: pre-wrap; border: 1px solid #333;
+        }
+        .pill { 
+            display: inline-block; background: #1e293b; padding: 2px 8px; 
+            border-radius: 4px; font-size: 11px; margin: 2px; border: 1px solid #334155;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>PulseChain Investigator</h1>
+    <p style="color: var(--muted)">Single-file on-demand RPC tool. Direct ancestry & contract mapping.</p>
+
+    <div class="card">
+        <h2>1. Connection Settings</h2>
+        <label>PulseChain RPC URL (Dwellir/HTTP)</label>
+        <input type="text" id="rpcUrl" placeholder="https://api-pulse-mainnet.n.dwellir.com/v1/your-api-key" />
+        <div class="grid">
+            <div>
+                <label>From Block</label>
+                <input type="text" id="fromBlock" value="25700000" />
+            </div>
+            <div>
+                <label>To Block</label>
+                <input type="text" id="toBlock" value="latest" />
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>2. Core Proof Hunts</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="runHunt('AF4E_OUT')">AF4E Outgoing Transfers</button>
+                <button onclick="runHunt('AF4E_IN')">AF4E Incoming Transfers</button>
+                <button onclick="runHunt('D6CA_OUT')">D6CA Outgoing Transfers</button>
+                <button onclick="runHunt('3D07_APP')">3D07 Approvals</button>
+                <button class="secondary" onclick="checkCode()">Verify Core Contract Code</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. Custom RPC Console</h2>
+            <label>Method</label>
+            <input type="text" id="rpcMethod" value="eth_blockNumber" />
+            <label>Params (JSON Array)</label>
+            <textarea id="rpcParams">[]</textarea>
+            <button onclick="customCall()" style="width: 100%;">Execute Call</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. On-Chain Trace Result</h2>
+        <div id="status" style="margin-bottom: 10px; font-size: 14px;">Status: <span style="color: var(--accent2)">Ready</span></div>
+        <div id="output" class="result-box mono">Results will appear here after RPC query...</div>
+    </div>
+
+    <div class="card">
+        <h2>Documented Ecosystem Hubs</h2>
+        <div id="knownAddresses"></div>
+    </div>
+</div>
+
+<script>
+    const KNOWN = {
+        "AF4E (Execution)": "0xAF4E1325d3E33fb0f926a95fa676d7E55e68b1fd",
+        "D6CA (PLP Recycler)": "0xd6cA7ee047a6F45d20d2962E4394E070cF27724F",
+        "5EF7 (Reserve Spine)": "0x5EF7AaC0DE4F2012CB36730Da140025B113FAdA4",
+        "3D07 (Approvals)": "0x3D07A35EBaf3563D19838aeD0d3Ce0DBBc14585e",
+        "LibertySwap Balancer": "0xDB8AA76f4B32Ed107d47983261f91178fEeafC0c"
+    };
+
+    // Initialize UI
+    const knownDiv = document.getElementById('knownAddresses');
+    for (const [name, addr] of Object.entries(KNOWN)) {
+        knownDiv.innerHTML += `<div class="pill"><strong>${name}</strong>: ${addr}</div>`;
+    }
+
+    async function rpcRequest(method, params = []) {
+        const url = document.getElementById('rpcUrl').value;
+        if (!url) {
+            alert("Please enter a PulseChain RPC URL first.");
+            return;
+        }
+
+        document.getElementById('status').innerHTML = "Status: <span style='color: orange'>Querying RPC...</span>";
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+            });
+            const data = await response.json();
+            document.getElementById('status').innerHTML = "Status: <span style='color: var(--accent2)'>Success</span>";
+            return data.result;
+        } catch (err) {
+            document.getElementById('status').innerHTML = "Status: <span style='color: var(--danger)'>Error</span>";
+            return { error: err.message };
+        }
+    }
+
+    async function runHunt(type) {
+        let addr = "";
+        let topic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"; // Transfer
+        const fromBlock = document.getElementById('fromBlock').value;
+        const toBlock = document.getElementById('toBlock').value;
+
+        if(type.startsWith("AF4E")) addr = KNOWN["AF4E (Execution)"];
+        if(type.startsWith("D6CA")) addr = KNOWN["D6CA (PLP Recycler)"];
+        if(type.startsWith("3D07")) {
+            addr = KNOWN["3D07 (Approvals)"];
+            topic = "0x8c5be1e5ebec7d5bd14f714f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3"; // Approval
+        }
+
+        const paddedAddr = "0x000000000000000000000000" + addr.slice(2);
+        const filter = {
+            fromBlock: fromBlock.startsWith("0x") ? fromBlock : "0x" + parseInt(fromBlock).toString(16),
+            toBlock: toBlock === "latest" ? "latest" : "0x" + parseInt(toBlock).toString(16),
+            topics: [topic, type.includes("IN") ? null : paddedAddr, type.includes("IN") ? paddedAddr : null]
+        };
+
+        const logs = await rpcRequest("eth_getLogs", [filter]);
+        document.getElementById('output').innerText = JSON.stringify(logs, null, 2);
+    }
+
+    async function checkCode() {
+        const results = {};
+        for (const [name, addr] of Object.entries(KNOWN)) {
+            results[name] = await rpcRequest("eth_getCode", [addr, "latest"]);
+        }
+        document.getElementById('output').innerText = JSON.stringify(results, null, 2);
+    }
+
+    async function customCall() {
+        const method = document.getElementById('rpcMethod').value;
+        const params = JSON.parse(document.getElementById('rpcParams').value);
+        const res = await rpcRequest(method, params);
+        document.getElementById('output').innerText = JSON.stringify(res, null, 2);
+    }
+</script>
+
+</body>
+</html>
