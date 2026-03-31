@@ -3,954 +3,1549 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pDAI PEG PROVER | AUTO-DISCOVERY V6</title>
+  <title>pDAI PEG PROVER | NO-LIES EVIDENCE CORE</title>
   <style>
     :root{
-      --bg:#040404;
-      --panel:#090909;
-      --panel2:#0d0d0d;
-      --line:rgba(0,255,65,.22);
-      --green:#00ff41;
-      --cyan:#00d4ff;
-      --amber:#ffcc00;
-      --red:#ff4d4d;
-      --text:#e8ffe8;
-      --muted:#7ea07e;
-      --white:#ffffff;
+      --bg:#04060c;
+      --bg2:#070b14;
+      --panel:rgba(10,14,24,.76);
+      --panel2:rgba(8,11,18,.88);
+      --line:rgba(88,255,185,.18);
+      --line2:rgba(72,196,255,.16);
+      --text:#ebfff5;
+      --muted:#8ca0ad;
+      --green:#58ffb9;
+      --green2:#2cff70;
+      --cyan:#48c4ff;
+      --blue:#4f7cff;
+      --amber:#ffcc52;
+      --red:#ff5d73;
+      --pink:#ff56da;
+      --shadow:0 0 30px rgba(72,196,255,.12), 0 0 60px rgba(88,255,185,.06);
+      --radius:22px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Consolas,Menlo,Monaco,monospace}
-    body{padding:16px}
-    .wrap{max-width:1500px;margin:0 auto;border:2px solid var(--line);background:linear-gradient(180deg,#050505,#020202);box-shadow:0 0 40px rgba(0,0,0,.45)}
+    html,body{margin:0;padding:0;background:radial-gradient(circle at top,#0a1326 0%, var(--bg) 45%, #020306 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100%}
+    body{overflow-x:hidden}
+    .bgfx,.bgfx:before,.bgfx:after{
+      content:"";position:fixed;inset:-10% -10%;pointer-events:none;z-index:-1;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(72,196,255,.11), transparent 24%),
+        radial-gradient(circle at 78% 16%, rgba(88,255,185,.08), transparent 22%),
+        radial-gradient(circle at 50% 80%, rgba(255,86,218,.06), transparent 24%);
+      filter:blur(18px);
+      animation: drift 20s ease-in-out infinite alternate;
+    }
+    .bgfx:after{
+      background:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size:40px 40px;
+      opacity:.2;
+      filter:none;
+      transform:perspective(800px) rotateX(64deg) translateY(24vh) scale(1.5);
+      animation: gridmove 22s linear infinite;
+    }
+    .stars{
+      position:fixed;inset:0;pointer-events:none;z-index:-1;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.6), transparent),
+        radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.5), transparent),
+        radial-gradient(1px 1px at 140px 60px, rgba(255,255,255,.55), transparent),
+        radial-gradient(1px 1px at 200px 180px, rgba(255,255,255,.4), transparent),
+        radial-gradient(2px 2px at 280px 100px, rgba(255,255,255,.35), transparent);
+      background-size:320px 240px;
+      opacity:.22;
+      animation: twinkle 12s linear infinite;
+    }
+    @keyframes drift { 0%{transform:translate3d(0,0,0) scale(1)} 100%{transform:translate3d(2vw,-2vh,0) scale(1.06)} }
+    @keyframes gridmove { 0%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(0) scale(1.5)} 100%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(-80px) scale(1.5)} }
+    @keyframes twinkle { 0%,100%{opacity:.18} 50%{opacity:.32} }
+
+    .app{max-width:1520px;margin:0 auto;padding:18px}
+    .glass{
+      background:linear-gradient(180deg, rgba(16,24,38,.88), rgba(8,12,20,.9));
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+      border-radius:var(--radius);
+    }
     .top{
-      display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
-      padding:18px 20px;border-bottom:1px solid var(--line)
+      padding:18px 20px;
+      display:grid;
+      grid-template-columns:1.2fr .85fr;
+      gap:14px;
+      position:relative;
+      overflow:hidden;
     }
-    .title{font-size:1.25rem;font-weight:800;letter-spacing:.06em}
-    .sub{margin-top:6px;color:var(--muted);font-size:.8rem;line-height:1.45}
-    .rightTop{text-align:right}
-    .pill{
-      display:inline-block;padding:6px 10px;border:1px solid var(--line);background:#071107;
-      color:var(--green);font-size:.78rem;border-radius:999px
+    .top:before{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.05), transparent);
+      transform:translateX(-100%);
+      animation: scan 10s linear infinite;
+      pointer-events:none;
     }
-    .rowMeta{margin-top:8px;font-size:.78rem;color:var(--muted);line-height:1.5}
-    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    @keyframes scan { 100%{transform:translateX(120%)} }
+    .title{
+      font-size:1.55rem;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      line-height:1.05;
+      margin:0;
+    }
+    .titleGlow{
+      background:linear-gradient(90deg, var(--green), var(--cyan), #fff);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      filter:drop-shadow(0 0 18px rgba(88,255,185,.12));
+    }
+    .sub{
+      margin-top:10px;color:var(--muted);font-size:.93rem;line-height:1.55;max-width:900px
+    }
+    .truthBar{
+      margin-top:14px;display:flex;gap:8px;flex-wrap:wrap
+    }
+    .chip{
+      border:1px solid rgba(255,255,255,.1);
+      padding:8px 10px;border-radius:999px;font-size:.77rem;
+      background:rgba(255,255,255,.03)
+    }
+    .chip.good{color:var(--green);border-color:rgba(88,255,185,.25)}
+    .chip.warn{color:var(--amber);border-color:rgba(255,204,82,.25)}
+    .chip.info{color:var(--cyan);border-color:rgba(72,196,255,.24)}
+    .rightHead{
+      display:flex;flex-direction:column;align-items:flex-end;gap:10px
+    }
+    .statusPill{
+      padding:10px 14px;border-radius:999px;
+      font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04)
+    }
+    .stable{color:var(--green);box-shadow:0 0 20px rgba(88,255,185,.14) inset}
+    .warned{color:var(--amber);box-shadow:0 0 20px rgba(255,204,82,.10) inset}
+    .bad{color:var(--red);box-shadow:0 0 20px rgba(255,93,115,.10) inset}
+    .meta{
+      text-align:right;color:var(--muted);font-size:.78rem;line-height:1.55
+    }
+    .btnRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
     button{
-      background:#071107;color:var(--green);border:1px solid var(--line);padding:10px 12px;
-      font:inherit;cursor:pointer
+      appearance:none;border:none;cursor:pointer;
+      padding:11px 14px;border-radius:14px;font:inherit;font-weight:700;
+      color:var(--text);background:linear-gradient(180deg, rgba(72,196,255,.18), rgba(88,255,185,.08));
+      border:1px solid rgba(72,196,255,.25);box-shadow:0 0 18px rgba(72,196,255,.08);
     }
-    button:hover{filter:brightness(1.15)}
-    .section{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.04)}
-    .grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px
+    button.secondary{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border-color:rgba(255,255,255,.08)
+    }
+    button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+    .section{margin-top:14px;padding:14px}
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:12px;
     }
     .card{
-      border:1px solid var(--line);background:var(--panel);padding:14px 14px 12px 14px;min-height:96px
+      background:linear-gradient(180deg, rgba(12,18,28,.9), rgba(9,13,21,.95));
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:20px;
+      padding:14px;
+      min-height:104px;
+      position:relative;
+      overflow:hidden;
     }
-    .label{font-size:.68rem;letter-spacing:.12em;color:#7b8d7b;text-transform:uppercase;margin-bottom:10px}
-    .value{font-size:1.55rem;font-weight:800;color:var(--white);line-height:1.15}
-    .hint{margin-top:8px;color:var(--muted);font-size:.78rem}
-    .cyan{color:var(--cyan)!important}
-    .amber{color:var(--amber)!important}
-    .red{color:var(--red)!important}
-    .green{color:var(--green)!important}
-    .scoreBox{
-      border:1px solid var(--line);background:var(--panel2);padding:18px
+    .card:before{
+      content:"";
+      position:absolute;inset:auto -40% 0 -40%;height:1px;
+      background:linear-gradient(90deg, transparent, rgba(88,255,185,.45), transparent);
+      opacity:.7;
     }
-    .scoreTop{
-      display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap
+    .label{font-size:.70rem;text-transform:uppercase;letter-spacing:.14em;color:#92a3ad;margin-bottom:10px}
+    .value{font-size:1.48rem;font-weight:900;line-height:1.1;text-shadow:0 0 22px rgba(255,255,255,.03)}
+    .hint{margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.45}
+    .g{color:var(--green)} .c{color:var(--cyan)} .a{color:var(--amber)} .r{color:var(--red)} .p{color:var(--pink)}
+
+    .hero{
+      display:grid;
+      grid-template-columns: 430px 1fr;
+      gap:14px;
+      align-items:stretch;
     }
-    .scoreBig{font-size:3rem;font-weight:900;color:var(--white);line-height:1}
-    .scoreVerdict{font-size:1rem;font-weight:800;margin-top:4px}
-    .barBg{margin-top:16px;height:14px;background:#101010;border:1px solid #1b251b}
-    .barFill{
-      height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));
-      box-shadow:0 0 18px rgba(0,255,65,.25);transition:width .8s ease
+    .reactor{
+      position:relative;
+      min-height:430px;
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+      isolation:isolate;
     }
-    .scoreParts{
-      margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px
+    .reactor:before,.reactor:after{
+      content:"";position:absolute;border-radius:50%;
+      inset:50%;transform:translate(-50%,-50%);
+      pointer-events:none;
     }
-    .mini{
-      padding:10px 12px;border:1px solid rgba(255,255,255,.06);background:#070707
+    .reactor:before{
+      width:360px;height:360px;
+      background:
+        radial-gradient(circle, rgba(88,255,185,.12), transparent 55%),
+        radial-gradient(circle at 30% 30%, rgba(72,196,255,.18), transparent 24%),
+        radial-gradient(circle at 70% 70%, rgba(255,86,218,.12), transparent 24%);
+      filter:blur(14px);
+      animation:pulseGlow 5s ease-in-out infinite;
     }
-    .mini .k{font-size:.68rem;color:#7b8d7b;text-transform:uppercase;letter-spacing:.1em}
-    .mini .v{margin-top:6px;font-size:1.1rem;font-weight:700}
-    .cols{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
-    @media (max-width:1100px){.cols{grid-template-columns:1fr}}
-    .box{border:1px solid var(--line);background:var(--panel);padding:14px}
-    .boxTitle{font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;color:#9db39d;margin-bottom:10px}
+    .reactor:after{
+      width:520px;height:520px;
+      border:1px dashed rgba(72,196,255,.18);
+      animation:spin 18s linear infinite;
+      opacity:.6
+    }
+    @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+    @keyframes pulseGlow{
+      0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}
+      50%{opacity:.9;transform:translate(-50%,-50%) scale(1.08)}
+    }
+    .ringWrap{
+      position:relative;width:320px;height:320px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      background:
+        radial-gradient(circle at center, rgba(5,8,14,.96) 0 48%, transparent 49% 100%),
+        conic-gradient(from -90deg, var(--green), var(--cyan), var(--blue), var(--pink), var(--green));
+      box-shadow:
+        0 0 26px rgba(72,196,255,.18),
+        inset 0 0 32px rgba(255,255,255,.03);
+      animation: ringRotate 14s linear infinite;
+    }
+    .ringWrap::before{
+      content:"";position:absolute;inset:12px;border-radius:50%;
+      background:
+        radial-gradient(circle at center, rgba(6,10,16,.97) 0 62%, transparent 63% 100%),
+        conic-gradient(from -90deg,
+          rgba(88,255,185,.18) 0 calc(var(--score)*1%),
+          rgba(255,255,255,.05) calc(var(--score)*1%) 100%);
+      box-shadow: inset 0 0 45px rgba(72,196,255,.08);
+    }
+    .ringWrap::after{
+      content:"";position:absolute;inset:30px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow:0 0 24px rgba(88,255,185,.06) inset;
+    }
+    @keyframes ringRotate{to{transform:rotate(360deg)}}
+    .reactorCore{
+      position:absolute;width:208px;height:208px;border-radius:50%;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(88,255,185,.13), transparent 22%),
+        radial-gradient(circle at 50% 50%, rgba(12,20,34,.98), rgba(4,7,12,.99));
+      border:1px solid rgba(255,255,255,.08);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;padding:18px;box-shadow:inset 0 0 35px rgba(255,255,255,.03)
+    }
+    .coreKicker{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#9bb1bd}
+    .coreScore{font-size:3.2rem;font-weight:1000;line-height:1;margin-top:8px}
+    .coreState{margin-top:8px;font-size:1rem;font-weight:900;letter-spacing:.06em}
+    .coreGap{margin-top:8px;font-size:.84rem;color:var(--muted)}
+    .heroRight{
+      display:grid;grid-template-rows:auto auto 1fr;gap:12px;
+    }
+    .verdictBox,.proofGrid,.lists2{min-height:0}
+    .verdictBox{
+      padding:16px;border-radius:22px;border:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(12,19,31,.92), rgba(7,11,18,.95));
+    }
+    .verdictTop{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}
+    .bigVerdict{font-size:1.36rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+    .scoreBar{
+      margin-top:14px;height:16px;border-radius:999px;background:#0b1118;
+      border:1px solid rgba(255,255,255,.06);overflow:hidden;position:relative
+    }
+    .scoreFill{
+      height:100%;width:0%;border-radius:999px;
+      background:linear-gradient(90deg, var(--red), var(--amber), var(--green), var(--cyan));
+      box-shadow:0 0 24px rgba(88,255,185,.18);
+      transition:width .8s ease;
+      position:relative;
+    }
+    .scoreFill:after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+      transform:translateX(-100%);
+      animation:barScan 2.6s linear infinite;
+    }
+    @keyframes barScan { 100%{transform:translateX(130%)} }
+    .parts{
+      margin-top:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px
+    }
+    .part{
+      border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:10px 12px;
+      background:rgba(255,255,255,.02)
+    }
+    .part .k{font-size:.69rem;color:#95a8b3;text-transform:uppercase;letter-spacing:.12em}
+    .part .v{margin-top:7px;font-size:1.06rem;font-weight:800}
+    .proofGrid{
+      display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px
+    }
+    .proof{
+      border-radius:18px;padding:14px;min-height:154px;
+      border:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(12,18,29,.94), rgba(8,11,18,.96));
+      position:relative;overflow:hidden
+    }
+    .proof:before{
+      content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.1)
+    }
+    .proof.ok:before{background:var(--green)}
+    .proof.wait:before{background:var(--amber)}
+    .proof.no:before{background:var(--red)}
+    .proofTitle{font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:#9bb0bc}
+    .proofState{margin-top:10px;font-size:1rem;font-weight:900}
+    .proofStat{margin-top:7px;font-size:1.5rem;font-weight:1000}
+    .proofText{margin-top:8px;color:var(--muted);font-size:.83rem;line-height:1.48}
+    .lists2{
+      display:grid;grid-template-columns:1fr 1fr;gap:12px
+    }
+    .listBox{
+      padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(10,15,24,.92), rgba(7,11,18,.95))
+    }
+    .boxTitle{font-size:.80rem;text-transform:uppercase;letter-spacing:.14em;color:#9eb2be;margin-bottom:10px}
     .list{display:grid;gap:8px}
     .item{
-      padding:9px 10px;border-left:3px solid var(--line);background:#080808;font-size:.88rem;line-height:1.45
+      padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.05);font-size:.86rem;line-height:1.48
     }
-    .item.good{border-left-color:var(--green)}
-    .item.warn{border-left-color:var(--amber)}
-    .item.bad{border-left-color:var(--red)}
-    .tableWrap{overflow:auto;border:1px solid var(--line);background:#070707}
-    table{width:100%;border-collapse:collapse;min-width:980px}
-    th,td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}
-    th{color:#98ad98;background:#0c0c0c;position:sticky;top:0}
-    tr:hover td{background:#0b0f0b}
+    .item.good{border-color:rgba(88,255,185,.18)}
+    .item.warn{border-color:rgba(255,204,82,.18)}
+    .item.bad{border-color:rgba(255,93,115,.18)}
+    .tables{
+      display:grid;grid-template-columns:1fr;gap:12px
+    }
+    .tableCard{
+      padding:14px;border-radius:22px;border:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(11,16,26,.94), rgba(8,11,18,.97))
+    }
+    .tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)}
+    table{width:100%;border-collapse:collapse;min-width:1100px;background:#081019}
+    th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}
+    th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .tag{
+      display:inline-block;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:700;
+      border:1px solid rgba(255,255,255,.08)
+    }
+    .tag.wpls{color:var(--cyan);border-color:rgba(72,196,255,.22)}
+    .tag.ref{color:var(--amber);border-color:rgba(255,204,82,.22)}
+    .tag.other{color:#c2ccd2}
+    .settings{
+      display:none;margin-top:12px;padding:14px;border-radius:18px;
+      background:linear-gradient(180deg, rgba(9,14,22,.95), rgba(6,10,16,.98));
+      border:1px solid rgba(255,255,255,.06)
+    }
+    .settings.open{display:block}
+    .formGrid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px
+    }
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:.74rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}
+    .field input{
+      width:100%;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
+      background:#081019;color:var(--text);font:inherit
+    }
+    .foot{
+      margin:14px 0 22px;padding:14px 16px;
+      display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;
+      color:var(--muted);font-size:.78rem
+    }
     a{color:var(--cyan);text-decoration:none}
     a:hover{text-decoration:underline}
-    .tag{
-      display:inline-block;padding:2px 7px;border:1px solid rgba(255,255,255,.08);font-size:.7rem;margin-right:5px;margin-bottom:5px
+    .small{font-size:.76rem;color:var(--muted)}
+    @media (max-width:1320px){
+      .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .hero{grid-template-columns:1fr}
+      .proofGrid,.parts{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .top{grid-template-columns:1fr}
+      .rightHead{align-items:flex-start}
+      .meta{text-align:left}
+      .btnRow{justify-content:flex-start}
+      .formGrid{grid-template-columns:1fr 1fr}
     }
-    .tag.wpls{color:var(--cyan);border-color:rgba(0,212,255,.25)}
-    .tag.ref{color:var(--amber);border-color:rgba(255,204,0,.25)}
-    .tag.other{color:#bbb;border-color:rgba(255,255,255,.12)}
-    .muted{color:var(--muted)}
-    .mono{font-family:Consolas,Menlo,Monaco,monospace}
-    .foot{
-      display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-      padding:14px 20px;color:#7c8a7c;font-size:.75rem;border-top:1px solid var(--line)
+    @media (max-width:820px){
+      .metrics,.proofGrid,.parts,.lists2,.formGrid{grid-template-columns:1fr}
+      .reactor{min-height:360px}
+      .ringWrap{width:280px;height:280px}
+      .reactorCore{width:184px;height:184px}
+      .coreScore{font-size:2.5rem}
     }
-    .tiny{font-size:.74rem;color:var(--muted)}
-    .divider{height:1px;background:rgba(255,255,255,.05);margin:12px 0}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
+  <div class="bgfx"></div>
+  <div class="stars"></div>
+
+  <div class="app">
+    <div class="glass top">
       <div>
-        <div class="title">pDAI PEG PROVER <span class="green">AUTO-DISCOVERY V6</span></div>
+        <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • No-Lies Evidence Core</h1>
         <div class="sub">
-          No hardcoded pool. Finds live pDAI pools, verifies reserves on-chain, separates
-          <span class="cyan">WPLS market structure</span> from
-          <span class="amber">reference-basket structure</span>, and scores evidence instead of pretending certainty.
+          Only show what the page can actually measure. Pools are auto-discovered, reserves are re-verified on-chain,
+          and machine-theory claims stay separated into <span class="c">verified</span>,
+          <span class="a">hypothesis</span>, and <span class="r">not seen</span>.
+        </div>
+        <div class="truthBar">
+          <span class="chip good">Truth Mode: live on-page proof only</span>
+          <span class="chip info">Pool discovery + on-chain reserve verification</span>
+          <span class="chip warn">Community narrative never treated as proof</span>
         </div>
       </div>
-      <div class="rightTop">
-        <div id="syncStatus" class="pill">BOOTING...</div>
-        <div class="rowMeta">
+
+      <div class="rightHead">
+        <div id="syncStatus" class="statusPill warned">Booting...</div>
+        <div class="meta">
           <div id="nodeStatus">RPC: —</div>
-          <div id="lastSync">LAST SYNC: —</div>
-          <div id="modeLine">MODE: AUTO POOL DISCOVERY / ON-CHAIN RESERVE VERIFICATION</div>
+          <div id="lastSync">Last sync: —</div>
+          <div id="scanWindow">Recent log window: —</div>
         </div>
-        <div class="actions">
-          <button id="refreshBtn">REFRESH NOW</button>
+        <div class="btnRow">
+          <button id="refreshBtn">Refresh now</button>
+          <button id="settingsBtn" class="secondary">Settings</button>
         </div>
       </div>
     </div>
 
-    <div class="section">
-      <div class="grid">
+    <div id="settingsBox" class="glass section settings">
+      <div class="boxTitle">Local Settings</div>
+      <div class="small" style="margin-bottom:12px">
+        Private RPC and watch addresses are saved only in your browser via localStorage. Nothing is embedded in this file.
+      </div>
+      <div class="formGrid">
+        <div class="field"><label>Private RPC (optional)</label><input id="sPrivateRpc" placeholder="https://your-private-rpc.example" /></div>
+        <div class="field"><label>AF4E address (optional)</label><input id="sAf4e" placeholder="0x..." /></div>
+        <div class="field"><label>D6CA address (optional)</label><input id="sD6ca" placeholder="0x..." /></div>
+        <div class="field"><label>4fd0 / buffer address (optional)</label><input id="sVault" placeholder="0x..." /></div>
+        <div class="field"><label>Hammer / 0968 address (optional)</label><input id="sHammer" placeholder="0x..." /></div>
+        <div class="field"><label>3D07 / approval target (optional)</label><input id="s3d07" placeholder="0x..." /></div>
+        <div class="field"><label>Liberty balancer (optional)</label><input id="sLibertyBalancer" placeholder="0x..." /></div>
+        <div class="field"><label>Liberty gasless (optional)</label><input id="sLibertyGasless" placeholder="0x..." /></div>
+        <div class="field"><label>Recent block window</label><input id="sScanBlocks" placeholder="2500" /></div>
+      </div>
+      <div class="btnRow" style="margin-top:12px">
+        <button id="saveSettingsBtn">Save settings</button>
+        <button id="clearSettingsBtn" class="secondary">Clear saved settings</button>
+      </div>
+    </div>
+
+    <div class="glass section">
+      <div class="metrics">
         <div class="card">
-          <div class="label">Total Supply</div>
-          <div class="value" id="vTotal">—</div>
+          <div class="label">Total supply</div>
+          <div class="value" id="mTotal">—</div>
           <div class="hint">ERC-20 totalSupply()</div>
         </div>
         <div class="card">
-          <div class="label">Burned (0xDead)</div>
-          <div class="value red" id="vBurned">—</div>
-          <div class="hint">balanceOf(dead)</div>
+          <div class="label">Burned</div>
+          <div class="value r" id="mBurned">—</div>
+          <div class="hint">balanceOf(0x...dEaD)</div>
         </div>
         <div class="card">
-          <div class="label">Ex-Burn Circulating</div>
-          <div class="value" id="vCirc">—</div>
+          <div class="label">Ex-burn circulating</div>
+          <div class="value" id="mCirc">—</div>
           <div class="hint">total - burned</div>
         </div>
         <div class="card">
-          <div class="label">SPINE pDAI</div>
-          <div class="value" id="vSpinePdai">—</div>
-          <div class="hint">balanceOf(SPINE)</div>
+          <div class="label">5EF7 pDAI</div>
+          <div class="value c" id="mSpinePdai">—</div>
+          <div class="hint">reserve concentration</div>
         </div>
         <div class="card">
-          <div class="label">Effective Float</div>
-          <div class="value amber" id="vFloat">—</div>
-          <div class="hint">ex-burn circ - SPINE pDAI</div>
+          <div class="label">5EF7 WPLS</div>
+          <div class="value c" id="mSpineWpls">—</div>
+          <div class="hint">ammo balance</div>
         </div>
         <div class="card">
-          <div class="label">Supply Capture</div>
-          <div class="value cyan" id="vCapture">—</div>
-          <div class="hint">SPINE pDAI / ex-burn circ</div>
+          <div class="label">Supply capture</div>
+          <div class="value a" id="mCapture">—</div>
+          <div class="hint">5EF7 pDAI / ex-burn circ</div>
         </div>
         <div class="card">
-          <div class="label">SPINE WPLS Ammo</div>
-          <div class="value cyan" id="vAmmo">—</div>
-          <div class="hint">WPLS in reserve wallet</div>
+          <div class="label">Verified WPLS wall</div>
+          <div class="value" id="mWall">—</div>
+          <div class="hint">all verified pDAI/WPLS pools</div>
         </div>
         <div class="card">
-          <div class="label">Verified WPLS Wall</div>
-          <div class="value" id="vWall">—</div>
-          <div class="hint">sum of WPLS in all live pDAI/WPLS pools</div>
+          <div class="label">Coverage ratio</div>
+          <div class="value c" id="mCoverage">—</div>
+          <div class="hint">5EF7 WPLS / WPLS wall</div>
         </div>
         <div class="card">
-          <div class="label">Coverage Ratio</div>
-          <div class="value cyan" id="vCoverage">—</div>
-          <div class="hint">SPINE WPLS / verified WPLS wall</div>
+          <div class="label">pDAI / WPLS</div>
+          <div class="value a" id="mPwpls">—</div>
+          <div class="hint">aggregate from verified reserves</div>
         </div>
         <div class="card">
-          <div class="label">pDAI / WPLS Price</div>
-          <div class="value amber" id="vPwpls">—</div>
-          <div class="hint">aggregate WPLS per pDAI from verified reserves</div>
+          <div class="label">Reference price</div>
+          <div class="value a" id="mRef">—</div>
+          <div class="hint">DAI/USDC/USDT basket when found</div>
         </div>
         <div class="card">
-          <div class="label">Ref Basket Price</div>
-          <div class="value amber" id="vPref">—</div>
-          <div class="hint">aggregate REF per pDAI (DAI / USDC / USDT basket)</div>
+          <div class="label">WPLS-implied ref</div>
+          <div class="value a" id="mImplied">—</div>
+          <div class="hint">pDAI/WPLS × ref/WPLS</div>
         </div>
         <div class="card">
-          <div class="label">WPLS-Implied Ref</div>
-          <div class="value amber" id="vPwplsRef">—</div>
-          <div class="hint">pDAI/WPLS × REF/WPLS</div>
+          <div class="label">Gap to 1.00</div>
+          <div class="value" id="mGap">—</div>
+          <div class="hint">closest measurable peg gap</div>
         </div>
       </div>
     </div>
 
-    <div class="section">
-      <div class="scoreBox">
-        <div class="scoreTop">
-          <div>
-            <div class="label">Peg Evidence Score</div>
-            <div class="scoreBig" id="scoreBig">0.0</div>
-            <div class="scoreVerdict" id="scoreVerdict">CALCULATING...</div>
-          </div>
-          <div style="text-align:right">
-            <div class="label">Gap To 1.00</div>
-            <div class="scoreBig" style="font-size:2.2rem" id="pegGap">—</div>
-            <div class="tiny" id="scoreNote">Evidence-weighted. Not prophecy.</div>
+    <div class="glass section hero">
+      <div class="reactor">
+        <div class="ringWrap" id="reactorRing" style="--score:0">
+          <div class="reactorCore">
+            <div class="coreKicker">Peg evidence</div>
+            <div class="coreScore" id="scoreBig">0.0</div>
+            <div class="coreState" id="coreState">Calibrating</div>
+            <div class="coreGap" id="coreGap">No live verdict yet</div>
           </div>
         </div>
-        <div class="barBg"><div class="barFill" id="scoreBar"></div></div>
+      </div>
 
-        <div class="scoreParts">
-          <div class="mini"><div class="k">Capture Component</div><div class="v" id="cCapture">—</div></div>
-          <div class="mini"><div class="k">Coverage Component</div><div class="v" id="cCoverage">—</div></div>
-          <div class="mini"><div class="k">Price Component</div><div class="v" id="cPrice">—</div></div>
-          <div class="mini"><div class="k">Consistency Component</div><div class="v" id="cConsistency">—</div></div>
-          <div class="mini"><div class="k">Breadth Component</div><div class="v" id="cBreadth">—</div></div>
+      <div class="heroRight">
+        <div class="verdictBox">
+          <div class="verdictTop">
+            <div>
+              <div class="label">Primary verdict</div>
+              <div class="bigVerdict" id="bigVerdict">Initializing...</div>
+            </div>
+            <div class="small" id="verdictExplain">Building only from measurable evidence on this page.</div>
+          </div>
+          <div class="scoreBar"><div id="scoreFill" class="scoreFill"></div></div>
+          <div class="parts">
+            <div class="part"><div class="k">Price</div><div class="v" id="sPrice">—</div></div>
+            <div class="part"><div class="k">Capture</div><div class="v" id="sCapture">—</div></div>
+            <div class="part"><div class="k">Coverage</div><div class="v" id="sCoverage">—</div></div>
+            <div class="part"><div class="k">Consistency</div><div class="v" id="sConsistency">—</div></div>
+            <div class="part"><div class="k">Breadth</div><div class="v" id="sBreadth">—</div></div>
+          </div>
+        </div>
+
+        <div class="proofGrid" id="proofGrid"></div>
+
+        <div class="lists2">
+          <div class="listBox">
+            <div class="boxTitle">Verified now</div>
+            <div class="list" id="verifiedList"></div>
+          </div>
+          <div class="listBox">
+            <div class="boxTitle">Hypothesis / not proven here</div>
+            <div class="list" id="hypothesisList"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="section cols">
-      <div class="box">
-        <div class="boxTitle">Positive Signals</div>
-        <div class="list" id="signalsList"></div>
+    <div class="tables">
+      <div class="glass tableCard">
+        <div class="boxTitle">Discovered pDAI pools</div>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>DEX</th>
+                <th>Pair</th>
+                <th>Other token</th>
+                <th>pDAI reserve</th>
+                <th>Other reserve</th>
+                <th>Implied price</th>
+                <th>Liquidity</th>
+                <th>24h vol</th>
+                <th>Flags</th>
+              </tr>
+            </thead>
+            <tbody id="pairsBody">
+              <tr><td colspan="10" class="small">Waiting for pair discovery...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="box">
-        <div class="boxTitle">Falsifiers / Weaknesses</div>
-        <div class="list" id="falsifiersList"></div>
-      </div>
-    </div>
 
-    <div class="section">
-      <div class="boxTitle">Discovered pDAI Pools</div>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>DEX</th>
-              <th>Pair</th>
-              <th>Other Token</th>
-              <th>pDAI Reserve</th>
-              <th>Other Reserve</th>
-              <th>Implied Price</th>
-              <th>DEX Liq $</th>
-              <th>24h Vol $</th>
-              <th>Flags</th>
-            </tr>
-          </thead>
-          <tbody id="pairsBody">
-            <tr><td colspan="10" class="muted">Waiting for discovery...</td></tr>
-          </tbody>
-        </table>
+      <div class="glass tableCard">
+        <div class="boxTitle">Recent machine pulse</div>
+        <div class="small" style="margin-bottom:10px">
+          Only from the recent scanned block window, only from live token logs, only for addresses you configured plus 5EF7.
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Block</th>
+                <th>Token</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Amount</th>
+                <th>Tx</th>
+                <th>Classification</th>
+              </tr>
+            </thead>
+            <tbody id="pulseBody">
+              <tr><td colspan="7" class="small">Waiting for recent log scan...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-    <div class="section">
-      <div class="boxTitle">WPLS Reference Basket Pools</div>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>DEX</th>
-              <th>Pair</th>
-              <th>Ref Token</th>
-              <th>WPLS Reserve</th>
-              <th>Ref Reserve</th>
-              <th>Ref / WPLS</th>
-              <th>DEX Liq $</th>
-              <th>24h Vol $</th>
-            </tr>
-          </thead>
-          <tbody id="wplsRefBody">
-            <tr><td colspan="8" class="muted">Waiting for reference discovery...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="box">
-        <div class="boxTitle">Assumptions / Notes</div>
-        <div class="list">
-          <div class="item warn">The <strong>reference basket</strong> assumes symbols <span class="mono">DAI / USDC / USDT</span> behave close to <span class="mono">1.00</span>. Edit the config if your preferred basket is different.</div>
-          <div class="item warn">This page uses <strong>DexScreener only for pool discovery</strong>. The reserve math is re-read from PulseChain RPC, so price evidence comes from verified balances, not just a UI quote.</div>
-          <div class="item warn">The score is designed to answer <strong>“how much hard evidence exists right now?”</strong> It does not guarantee a future peg.</div>
-          <div class="item warn">If you want stricter proof later, next upgrades should be: TWAP history, holder-cluster scans, pool creation monitoring, and pair-factory verification.</div>
+      <div class="glass tableCard">
+        <div class="boxTitle">Truth ledger</div>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Claim</th>
+                <th>Status</th>
+                <th>Measured result</th>
+              </tr>
+            </thead>
+            <tbody id="truthBody">
+              <tr><td colspan="3" class="small">Waiting for evidence model...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <div class="foot">
-      <div id="nodeFoot">NODE: —</div>
+    <div class="glass foot">
       <div>TARGET: <span class="mono">0x6B175474E89094C44Da98b954EedeAC495271d0F</span></div>
-      <div>RULE: NO HARDCODED POOL ASSUMPTION</div>
+      <div>WPLS: <span class="mono">0xA1077a294D2D00ca00bb46556459739d482282c6</span></div>
+      <div>RULE: Never treat unverified story as peg proof</div>
     </div>
   </div>
 
   <script>
-    // =========================
-    // EDIT THESE IF NEEDED
-    // =========================
-    const CONFIG = {
-      CHAIN_ID: "pulsechain",
+    const DEFAULTS = {
       TARGET: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
       WPLS: "0xA1077a294D2D00ca00bb46556459739d482282c6",
-      ADDR: {
-        DEAD: "0x000000000000000000000000000000000000dEaD",
-        SPINE: "0x5EF786D22e6e6666666666666666666666665EF7"
-      },
-      REF_SYMBOLS: ["DAI", "USDC", "USDT"],
-      TARGET_PEG: 1.0,
-      AUTO_REFRESH_MS: 30000,
+      DEAD: "0x000000000000000000000000000000000000dEaD",
+      SPINE: "0x5EF786D22e6e6666666666666666666666665EF7",
+      REF_SYMBOLS: ["DAI","USDC","USDT"],
+      SCAN_BLOCKS: 2500,
+      AUTO_REFRESH_MS: 45000,
       MAX_PDAI_PAIRS: 12,
-      MAX_WPLS_REF_PAIRS: 8,
-      TIMEOUT_MS: 12000,
+      MAX_WPLS_REF_PAIRS: 10,
       RPCS: [
         "https://rpc.pulsechain.com",
         "https://pulsechain.publicnode.com",
         "https://rpc-pulsechain.g4mm4.io",
         "https://rpc.pulsechainrpc.com",
         "https://pulsechain.rpc.thirdweb.com"
-      ]
+      ],
+      // Optional addresses discovered by you. Leave blank until you know them.
+      WATCH: {
+        AF4E: "",
+        D6CA: "",
+        V4FD0: "",
+        HAMMER: "",
+        APPROVAL_3D07: "",
+        LIBERTY_BALANCER: "",
+        LIBERTY_GASLESS: ""
+      }
     };
 
-    const STATE = {
-      rpcIndex: 0,
+    const STORAGE_KEY = "pdai-peg-prover-settings-v2";
+    const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+    const APPROVAL_TOPIC = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
+
+    const state = {
       syncing: false,
-      lastSync: null
+      rpcIndex: 0,
+      decimalsCache: new Map(),
+      settings: null
     };
 
-    const DEC_CACHE = new Map();
     const $ = (id) => document.getElementById(id);
 
-    function normalizeAddr(a) {
-      return (a || "").toLowerCase();
+    function norm(a){ return String(a || "").trim().toLowerCase(); }
+    function isAddr(a){ return /^0x[a-fA-F0-9]{40}$/.test(String(a || "").trim()); }
+    function short(s, n=6, m=4){
+      s = String(s || "");
+      return s.length > n + m + 3 ? `${s.slice(0,n)}...${s.slice(-m)}` : s;
     }
-
-    function esc(v) {
+    function esc(v){
       return String(v ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
     }
-
-    function short(a) {
-      const s = String(a || "");
-      return s.length > 12 ? `${s.slice(0, 6)}...${s.slice(-4)}` : s;
+    function fmtNum(v, d=2){
+      if(v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toLocaleString(undefined,{maximumFractionDigits:d});
     }
-
-    function setText(id, text) {
-      const el = $(id);
-      if (el) el.textContent = text;
+    function fmtUsd(v, d=0){
+      if(v == null || !Number.isFinite(v)) return "—";
+      return "$" + Number(v).toLocaleString(undefined,{maximumFractionDigits:d});
     }
-
-    function setHTML(id, html) {
-      const el = $(id);
-      if (el) el.innerHTML = html;
+    function fmtPct01(v, d=2){
+      if(v == null || !Number.isFinite(v)) return "—";
+      return (v * 100).toFixed(d) + "%";
     }
-
-    function fmtNum(v, digits = 2) {
-      if (v == null || !Number.isFinite(v)) return "—";
-      return Number(v).toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: digits
-      });
+    function fmtPct100(v, d=2){
+      if(v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toFixed(d) + "%";
     }
-
-    function fmtFixed(v, digits = 6) {
-      if (v == null || !Number.isFinite(v)) return "—";
-      return Number(v).toFixed(digits);
+    function fmtFixed(v, d=6){
+      if(v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toFixed(d);
     }
-
-    function fmtCompact(v, digits = 2) {
-      if (v == null || !Number.isFinite(v)) return "—";
-      const abs = Math.abs(v);
-      if (abs >= 1e12) return (v / 1e12).toFixed(digits) + "T";
-      if (abs >= 1e9) return (v / 1e9).toFixed(digits) + "B";
-      if (abs >= 1e6) return (v / 1e6).toFixed(digits) + "M";
-      if (abs >= 1e3) return (v / 1e3).toFixed(digits) + "K";
-      return fmtNum(v, digits);
+    function fmtX(v, d=3){
+      if(v == null || !Number.isFinite(v)) return "—";
+      return Number(v).toFixed(d) + "x";
     }
-
-    function fmtUsd(v, digits = 2) {
-      if (v == null || !Number.isFinite(v)) return "—";
-      return "$" + Number(v).toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: digits
-      });
+    function fmtCompact(v, d=2){
+      if(v == null || !Number.isFinite(v)) return "—";
+      const a = Math.abs(v);
+      if(a >= 1e12) return (v/1e12).toFixed(d) + "T";
+      if(a >= 1e9) return (v/1e9).toFixed(d) + "B";
+      if(a >= 1e6) return (v/1e6).toFixed(d) + "M";
+      if(a >= 1e3) return (v/1e3).toFixed(d) + "K";
+      return fmtNum(v, d);
     }
+    function setText(id, txt){ const el = $(id); if(el) el.textContent = txt; }
+    function setHTML(id, html){ const el = $(id); if(el) el.innerHTML = html; }
+    function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+    function toHex(n){ return "0x" + BigInt(n).toString(16); }
+    function topicAddress(addr){ return "0x" + norm(addr).replace(/^0x/,"").padStart(64,"0"); }
+    function fromTopic(t){ return "0x" + String(t || "").slice(-40); }
+    function nowStamp(){ return new Date().toLocaleString(); }
+    function addrsEqual(a,b){ return norm(a) === norm(b); }
 
-    function fmtPct(v, digits = 2) {
-      if (v == null || !Number.isFinite(v)) return "—";
-      return (v * 100).toFixed(digits) + "%";
-    }
-
-    function fmtX(v, digits = 3) {
-      if (v == null || !Number.isFinite(v)) return "—";
-      return Number(v).toFixed(digits) + "x";
-    }
-
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
-    }
-
-    function nowStamp() {
-      return new Date().toLocaleString();
-    }
-
-    function itemHTML(text, cls) {
+    function itemHtml(text, cls="warn"){
       return `<div class="item ${cls}">${text}</div>`;
     }
 
-    function tagHTML(type) {
-      if (type === "WPLS") return `<span class="tag wpls">WPLS</span>`;
-      if (type === "REF") return `<span class="tag ref">REF</span>`;
-      return `<span class="tag other">OTHER</span>`;
+    function loadSettings(){
+      let saved = {};
+      try{ saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }catch{}
+      const merged = structuredClone(DEFAULTS);
+      if(saved.privateRpc) merged.privateRpc = saved.privateRpc;
+      if(saved.scanBlocks) merged.SCAN_BLOCKS = Number(saved.scanBlocks) || DEFAULTS.SCAN_BLOCKS;
+      merged.WATCH = { ...DEFAULTS.WATCH, ...(saved.watch || {}) };
+      return merged;
     }
 
-    function isRefStableSymbol(symbol) {
-      return CONFIG.REF_SYMBOLS.includes(String(symbol || "").toUpperCase());
+    function pushSettingsToUI(cfg){
+      $("sPrivateRpc").value = cfg.privateRpc || "";
+      $("sAf4e").value = cfg.WATCH.AF4E || "";
+      $("sD6ca").value = cfg.WATCH.D6CA || "";
+      $("sVault").value = cfg.WATCH.V4FD0 || "";
+      $("sHammer").value = cfg.WATCH.HAMMER || "";
+      $("s3d07").value = cfg.WATCH.APPROVAL_3D07 || "";
+      $("sLibertyBalancer").value = cfg.WATCH.LIBERTY_BALANCER || "";
+      $("sLibertyGasless").value = cfg.WATCH.LIBERTY_GASLESS || "";
+      $("sScanBlocks").value = String(cfg.SCAN_BLOCKS || DEFAULTS.SCAN_BLOCKS);
     }
 
-    function withTimeout(promise, ms, label = "Timeout") {
+    function saveSettingsFromUI(){
+      const saved = {
+        privateRpc: $("sPrivateRpc").value.trim(),
+        scanBlocks: Number($("sScanBlocks").value.trim() || DEFAULTS.SCAN_BLOCKS),
+        watch: {
+          AF4E: $("sAf4e").value.trim(),
+          D6CA: $("sD6ca").value.trim(),
+          V4FD0: $("sVault").value.trim(),
+          HAMMER: $("sHammer").value.trim(),
+          APPROVAL_3D07: $("s3d07").value.trim(),
+          LIBERTY_BALANCER: $("sLibertyBalancer").value.trim(),
+          LIBERTY_GASLESS: $("sLibertyGasless").value.trim()
+        }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      state.settings = loadSettings();
+      setText("scanWindow", `Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`);
+    }
+
+    function clearSavedSettings(){
+      localStorage.removeItem(STORAGE_KEY);
+      state.settings = loadSettings();
+      pushSettingsToUI(state.settings);
+      setText("scanWindow", `Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`);
+    }
+
+    function activeRpcs(){
+      const arr = [...DEFAULTS.RPCS];
+      if(state.settings?.privateRpc) arr.unshift(state.settings.privateRpc);
+      return [...new Set(arr.filter(Boolean))];
+    }
+
+    async function withTimeout(promise, ms=15000){
       let timer;
       return Promise.race([
         promise.finally(() => clearTimeout(timer)),
-        new Promise((_, reject) => {
-          timer = setTimeout(() => reject(new Error(label)), ms);
-        })
+        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error("timeout")), ms); })
       ]);
     }
 
-    async function fetchJson(url) {
-      const res = await withTimeout(fetch(url, {
-        headers: { "accept": "application/json" }
-      }), CONFIG.TIMEOUT_MS, "HTTP timeout");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    }
-
-    async function rpcCall(method, params) {
+    async function rpc(method, params){
+      const rpcs = activeRpcs();
       let lastErr;
-      for (let i = 0; i < CONFIG.RPCS.length; i++) {
-        const idx = (STATE.rpcIndex + i) % CONFIG.RPCS.length;
-        const rpc = CONFIG.RPCS[idx];
-        try {
-          const res = await withTimeout(fetch(rpc, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json"
-            },
-            body: JSON.stringify({
-              jsonrpc: "2.0",
-              id: Date.now() + i,
-              method,
-              params
-            })
-          }), CONFIG.TIMEOUT_MS, "RPC timeout");
-
-          if (!res.ok) throw new Error(`RPC HTTP ${res.status}`);
-
+      for(let i=0;i<rpcs.length;i++){
+        const idx = (state.rpcIndex + i) % rpcs.length;
+        const url = rpcs[idx];
+        try{
+          const res = await withTimeout(fetch(url,{
+            method:"POST",
+            headers:{ "content-type":"application/json", "accept":"application/json" },
+            body: JSON.stringify({ jsonrpc:"2.0", id: Date.now() + i, method, params })
+          }), 14000);
+          if(!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
-          if (data.error) throw new Error(data.error.message || "RPC error");
-
-          STATE.rpcIndex = idx;
-          setText("nodeStatus", "RPC: " + rpc.replace("https://", ""));
-          setText("nodeFoot", "NODE: " + rpc);
+          if(data.error) throw new Error(data.error.message || "rpc error");
+          state.rpcIndex = idx;
+          setText("nodeStatus", "RPC: " + url.replace(/^https?:\/\//,""));
           return data.result;
-        } catch (err) {
+        }catch(err){
           lastErr = err;
         }
       }
       throw lastErr || new Error("All RPCs failed");
     }
 
-    const ABI = {
-      totalSupply: "0x18160ddd",
-      decimals: "0x313ce567"
-    };
-
-    function encodeBalanceOf(addr) {
-      return "0x70a08231" + normalizeAddr(addr).replace(/^0x/, "").padStart(64, "0");
+    async function rpcBlockNumber(){
+      const hex = await rpc("eth_blockNumber", []);
+      return parseInt(hex, 16);
     }
 
-    function hexToBigInt(hex) {
-      try {
-        if (!hex || hex === "0x") return 0n;
-        return BigInt(hex);
-      } catch {
-        return 0n;
-      }
+    function hexToBigInt(hex){
+      try{ return BigInt(hex || "0x0"); }catch{ return 0n; }
     }
 
-    async function ercDecimals(token) {
-      const key = normalizeAddr(token);
-      if (DEC_CACHE.has(key)) return DEC_CACHE.get(key);
-      let dec = 18;
-      try {
-        const raw = await rpcCall("eth_call", [{ to: token, data: ABI.decimals }, "latest"]);
-        dec = parseInt(raw, 16);
-        if (!Number.isFinite(dec)) dec = 18;
-      } catch {
-        dec = 18;
-      }
-      DEC_CACHE.set(key, dec);
-      return dec;
+    function units(big, decimals=18){
+      const neg = big < 0n;
+      const val = neg ? -big : big;
+      let s = val.toString();
+      if(decimals === 0) return Number((neg ? "-" : "") + s);
+      if(s.length <= decimals) s = "0".repeat(decimals - s.length + 1) + s;
+      const int = s.slice(0, -decimals) || "0";
+      const frac = s.slice(-decimals).replace(/0+$/,"").slice(0, 12);
+      return parseFloat((neg ? "-" : "") + int + (frac ? "." + frac : ""));
     }
 
-    async function ercTotalSupply(token) {
-      const raw = await rpcCall("eth_call", [{ to: token, data: ABI.totalSupply }, "latest"]);
+    async function ercDecimals(token){
+      const key = norm(token);
+      if(state.decimalsCache.has(key)) return state.decimalsCache.get(key);
+      const raw = await rpc("eth_call", [{ to: token, data: "0x313ce567" }, "latest"]);
+      const dec = parseInt(raw, 16);
+      const out = Number.isFinite(dec) ? dec : 18;
+      state.decimalsCache.set(key, out);
+      return out;
+    }
+
+    async function ercTotalSupply(token){
+      const raw = await rpc("eth_call", [{ to: token, data: "0x18160ddd" }, "latest"]);
       return hexToBigInt(raw);
     }
 
-    async function ercBalanceOf(token, holder) {
-      const raw = await rpcCall("eth_call", [{ to: token, data: encodeBalanceOf(holder) }, "latest"]);
+    async function ercBalanceOf(token, holder){
+      const data = "0x70a08231" + norm(holder).replace(/^0x/,"").padStart(64,"0");
+      const raw = await rpc("eth_call", [{ to: token, data }, "latest"]);
       return hexToBigInt(raw);
     }
 
-    function units(bigintValue, decimals) {
-      const n = Number(bigintValue);
-      return n / Math.pow(10, decimals);
+    async function fetchJson(url){
+      const res = await withTimeout(fetch(url, { headers:{ accept:"application/json" } }), 12000);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
     }
 
-    async function mapLimit(items, limit, mapper) {
-      const results = new Array(items.length);
-      let nextIndex = 0;
-
-      async function worker() {
-        while (true) {
-          const idx = nextIndex++;
-          if (idx >= items.length) return;
-          try {
-            results[idx] = await mapper(items[idx], idx);
-          } catch (err) {
-            results[idx] = {
-              ...items[idx],
-              error: err?.message || String(err)
-            };
-          }
-        }
-      }
-
-      const workers = Array.from({ length: Math.min(limit, items.length || 1) }, worker);
-      await Promise.all(workers);
-      return results;
-    }
-
-    async function discoverTokenPairs(tokenAddress) {
-      const url = `https://api.dexscreener.com/token-pairs/v1/${CONFIG.CHAIN_ID}/${tokenAddress}`;
+    async function discoverPairs(token){
+      const url = `https://api.dexscreener.com/token-pairs/v1/pulsechain/${token}`;
       const data = await fetchJson(url);
       return Array.isArray(data) ? data : (data?.pairs || []);
     }
 
-    function normalizePairEntry(pair, targetAddress) {
-      const target = normalizeAddr(targetAddress);
-      const base = normalizeAddr(pair?.baseToken?.address);
-      const quote = normalizeAddr(pair?.quoteToken?.address);
-      if (base !== target && quote !== target) return null;
-
-      const targetIsBase = base === target;
+    function normalizePairEntry(pair, target){
+      const t = norm(target);
+      const base = norm(pair?.baseToken?.address);
+      const quote = norm(pair?.quoteToken?.address);
+      if(base !== t && quote !== t) return null;
+      const targetIsBase = base === t;
       const other = targetIsBase ? pair.quoteToken : pair.baseToken;
-
       return {
-        pairAddress: normalizeAddr(pair?.pairAddress),
-        url: pair?.url || `https://dexscreener.com/${CONFIG.CHAIN_ID}/${pair?.pairAddress}`,
+        pairAddress: pair?.pairAddress || "",
+        url: pair?.url || "",
         dexId: pair?.dexId || "unknown",
         targetIsBase,
-        otherAddress: normalizeAddr(other?.address),
+        otherAddress: other?.address || "",
         otherSymbol: other?.symbol || "UNKNOWN",
         otherName: other?.name || "Unknown",
-        otherIsWpls: normalizeAddr(other?.address) === normalizeAddr(CONFIG.WPLS),
-        otherIsStable: isRefStableSymbol(other?.symbol),
         liqUsd: Number(pair?.liquidity?.usd || 0),
         volume24: Number(pair?.volume?.h24 || 0),
-        pairCreatedAt: Number(pair?.pairCreatedAt || 0),
-        labels: Array.isArray(pair?.labels) ? pair.labels : []
+        labels: Array.isArray(pair?.labels) ? pair.labels : [],
       };
     }
 
-    async function hydratePairs(targetAddress, normalizedRows, targetDecimals) {
-      return await mapLimit(normalizedRows, 4, async (row) => {
-        const targetReserve = units(await ercBalanceOf(targetAddress, row.pairAddress), targetDecimals);
-        let otherReserve = null;
-        let otherDecimals = null;
-        let impliedPrice = null;
-
-        if (row.otherAddress && (row.otherIsWpls || row.otherIsStable)) {
-          otherDecimals = await ercDecimals(row.otherAddress);
-          otherReserve = units(await ercBalanceOf(row.otherAddress, row.pairAddress), otherDecimals);
-          if (targetReserve > 0 && otherReserve > 0) {
-            impliedPrice = otherReserve / targetReserve;
-          }
+    async function mapLimit(arr, limit, fn){
+      const out = new Array(arr.length);
+      let i = 0;
+      async function worker(){
+        while(i < arr.length){
+          const idx = i++;
+          try{ out[idx] = await fn(arr[idx], idx); }
+          catch(err){ out[idx] = { ...arr[idx], error: err?.message || String(err) }; }
         }
+      }
+      const workers = Array.from({length:Math.max(1,Math.min(limit, arr.length))}, worker);
+      await Promise.all(workers);
+      return out;
+    }
 
-        const type = row.otherIsWpls ? "WPLS" : (row.otherIsStable ? "REF" : "OTHER");
-        const verifiedLive = targetReserve > 0 && ((row.otherIsWpls || row.otherIsStable) ? (otherReserve > 0) : true);
-
+    async function hydratePairs(target, rows, targetDecimals){
+      return await mapLimit(rows, 4, async (row) => {
+        const targetReserve = units(await ercBalanceOf(target, row.pairAddress), targetDecimals);
+        const otherDecimals = isAddr(row.otherAddress) ? await ercDecimals(row.otherAddress) : 18;
+        const otherReserve = isAddr(row.otherAddress) ? units(await ercBalanceOf(row.otherAddress, row.pairAddress), otherDecimals) : null;
+        const isWpls = addrsEqual(row.otherAddress, state.settings.WPLS);
+        const isRef = state.settings.REF_SYMBOLS.includes(String(row.otherSymbol || "").toUpperCase());
         return {
           ...row,
-          type,
           targetReserve,
           otherReserve,
-          otherDecimals,
-          impliedPrice,
-          verifiedLive
+          type: isWpls ? "WPLS" : (isRef ? "REF" : "OTHER"),
+          impliedPrice: targetReserve > 0 && otherReserve > 0 ? otherReserve / targetReserve : null,
+          verifiedLive: targetReserve > 0 && (otherReserve == null || otherReserve >= 0)
         };
       });
     }
 
-    function ratioFromRows(rows) {
-      const good = rows.filter(r =>
-        r &&
-        Number.isFinite(r.targetReserve) &&
-        Number.isFinite(r.otherReserve) &&
-        r.targetReserve > 0 &&
-        r.otherReserve > 0
-      );
+    function ratioFromRows(rows){
+      const good = rows.filter(r => Number.isFinite(r.targetReserve) && Number.isFinite(r.otherReserve) && r.targetReserve > 0 && r.otherReserve > 0);
+      const t = good.reduce((s,r) => s + r.targetReserve, 0);
+      const o = good.reduce((s,r) => s + r.otherReserve, 0);
+      return { count: good.length, targetSum: t, otherSum: o, ratio: t > 0 ? o / t : null };
+    }
 
-      const targetSum = good.reduce((s, r) => s + r.targetReserve, 0);
-      const otherSum = good.reduce((s, r) => s + r.otherReserve, 0);
+    async function getLogsAdaptive(address, topic0, fromBlock, toBlock){
+      let start = fromBlock;
+      while(true){
+        try{
+          return await rpc("eth_getLogs", [{
+            address,
+            fromBlock: toHex(start),
+            toBlock: toHex(toBlock),
+            topics: [topic0]
+          }]);
+        }catch(err){
+          const span = toBlock - start;
+          if(span <= 250) throw err;
+          start = toBlock - Math.floor(span / 2);
+        }
+      }
+    }
+
+    function parseTransferLogs(logs, symbol, decimals){
+      return (logs || []).map(log => ({
+        block: parseInt(log.blockNumber, 16),
+        txHash: log.transactionHash,
+        from: fromTopic(log.topics[1]),
+        to: fromTopic(log.topics[2]),
+        amount: units(hexToBigInt(log.data), decimals),
+        token: symbol
+      }));
+    }
+
+    function parseApprovalLogs(logs, symbol, decimals){
+      return (logs || []).map(log => ({
+        block: parseInt(log.blockNumber, 16),
+        txHash: log.transactionHash,
+        owner: fromTopic(log.topics[1]),
+        spender: fromTopic(log.topics[2]),
+        amount: units(hexToBigInt(log.data), decimals),
+        token: symbol
+      }));
+    }
+
+    function truthRow(claim, status, result, cls){
+      return `<tr>
+        <td>${claim}</td>
+        <td><span class="tag ${cls === "good" ? "wpls" : cls === "warn" ? "ref" : "other"}">${status}</span></td>
+        <td>${result}</td>
+      </tr>`;
+    }
+
+    function proofCard(title, stateText, stat, detail, cls){
+      return `<div class="proof ${cls}">
+        <div class="proofTitle">${title}</div>
+        <div class="proofState">${stateText}</div>
+        <div class="proofStat">${stat}</div>
+        <div class="proofText">${detail}</div>
+      </div>`;
+    }
+
+    function classifyPulse(ev, cfg){
+      const nFrom = norm(ev.from), nTo = norm(ev.to);
+      const W = cfg.WATCH;
+      if(addrsEqual(nFrom, cfg.SPINE) || addrsEqual(nTo, cfg.SPINE)) return "5EF7 reserve pulse";
+      if(W.AF4E && (addrsEqual(nFrom, W.AF4E) || addrsEqual(nTo, W.AF4E))) return "AF4E transfer";
+      if(W.D6CA && (addrsEqual(nFrom, W.D6CA) || addrsEqual(nTo, W.D6CA))) return "D6CA transfer";
+      if(W.V4FD0 && (addrsEqual(nFrom, W.V4FD0) || addrsEqual(nTo, W.V4FD0))) return "4fd0 buffer pulse";
+      if(W.HAMMER && (addrsEqual(nFrom, W.HAMMER) || addrsEqual(nTo, W.HAMMER))) return "Hammer pulse";
+      return "watchlist transfer";
+    }
+
+    function watchAddrs(cfg){
+      const raw = [
+        cfg.SPINE,
+        cfg.WATCH.AF4E,
+        cfg.WATCH.D6CA,
+        cfg.WATCH.V4FD0,
+        cfg.WATCH.HAMMER
+      ].filter(isAddr);
+      return [...new Set(raw.map(norm))];
+    }
+
+    function libertyAddrs(cfg){
+      const raw = [cfg.WATCH.LIBERTY_BALANCER, cfg.WATCH.LIBERTY_GASLESS].filter(isAddr);
+      return [...new Set(raw.map(norm))];
+    }
+
+    function buildProofs(cfg, transfersPdai, transfersWpls, approvalsPdai){
+      const watch = watchAddrs(cfg);
+      const liberty = libertyAddrs(cfg);
+      const machineTransfers = [...transfersPdai, ...transfersWpls]
+        .filter(ev => watch.includes(norm(ev.from)) || watch.includes(norm(ev.to)))
+        .sort((a,b) => b.block - a.block);
+
+      const af4eConfigured = isAddr(cfg.WATCH.AF4E);
+      const d6caConfigured = isAddr(cfg.WATCH.D6CA);
+      const v4fd0Configured = isAddr(cfg.WATCH.V4FD0);
+      const libertyConfigured = liberty.length > 0;
+      const approvalTargetConfigured = isAddr(cfg.WATCH.APPROVAL_3D07) || libertyConfigured;
+
+      const af4eRecent = af4eConfigured
+        ? transfersPdai.filter(ev => addrsEqual(ev.from, cfg.WATCH.AF4E))
+        : [];
+      const af4eUniqueRecipients = new Set(af4eRecent.map(ev => norm(ev.to))).size;
+      const af4eAmount = af4eRecent.reduce((s,ev) => s + ev.amount, 0);
+
+      const d6caWplsOut = d6caConfigured
+        ? transfersWpls.filter(ev => addrsEqual(ev.from, cfg.WATCH.D6CA))
+        : [];
+      const d6caWplsAmount = d6caWplsOut.reduce((s,ev) => s + ev.amount, 0);
+
+      const v4fd0Pulse = v4fd0Configured
+        ? transfersPdai.filter(ev => addrsEqual(ev.from, cfg.WATCH.V4FD0) || addrsEqual(ev.to, cfg.WATCH.V4FD0))
+        : [];
+
+      const handshakeTransfers = libertyConfigured
+        ? machineTransfers.filter(ev => liberty.includes(norm(ev.from)) || liberty.includes(norm(ev.to)))
+        : [];
+
+      const approvalTargets = new Set([
+        ...(libertyConfigured ? liberty : []),
+        ...(isAddr(cfg.WATCH.APPROVAL_3D07) ? [norm(cfg.WATCH.APPROVAL_3D07)] : [])
+      ]);
+
+      const approvalHits = approvalTargetConfigured
+        ? approvalsPdai.filter(ev =>
+            watch.includes(norm(ev.owner)) &&
+            approvalTargets.has(norm(ev.spender))
+          )
+        : [];
+
+      const recentPulses = machineTransfers.slice(0, 18);
 
       return {
-        count: good.length,
-        targetSum,
-        otherSum,
-        ratio: targetSum > 0 ? otherSum / targetSum : null
+        af4eConfigured,
+        d6caConfigured,
+        v4fd0Configured,
+        libertyConfigured,
+        approvalTargetConfigured,
+        af4eRecent,
+        af4eUniqueRecipients,
+        af4eAmount,
+        d6caWplsOut,
+        d6caWplsAmount,
+        v4fd0Pulse,
+        handshakeTransfers,
+        approvalHits,
+        recentPulses
       };
     }
 
-    function verdictFromScore(score, pegGap, coverage, capture, livePairs) {
-      if (livePairs === 0) return "NO LIVE MARKET EVIDENCE";
-      if (score >= 85 && pegGap != null && pegGap <= 0.10 && coverage >= 1 && capture >= 0.20) return "PEG THESIS: STRONG";
-      if (score >= 65) return "PEG THESIS: BUILDING";
-      if (score >= 45) return "PEG THESIS: SPECULATIVE";
-      return "PEG THESIS: UNPROVED";
+    function scoreVerdict(score, gap, wplsCount, refCount){
+      if(score >= 90 && gap != null && gap <= 0.02 && wplsCount > 0 && refCount > 0) return "Peg-like evidence very strong";
+      if(score >= 72) return "Peg evidence building";
+      if(score >= 50) return "Speculative but measurable";
+      if(score >= 28) return "Weak evidence";
+      return "Unproved";
     }
 
-    function verdictClass(score) {
-      if (score >= 85) return "green";
-      if (score >= 65) return "cyan";
-      if (score >= 45) return "amber";
-      return "red";
-    }
-
-    function renderSignalLists(signals, falsifiers) {
-      setHTML(
-        "signalsList",
-        signals.length
-          ? signals.map(s => itemHTML(s, "good")).join("")
-          : itemHTML("No strong positive signal passed the threshold on this sync.", "warn")
-      );
-
-      setHTML(
-        "falsifiersList",
-        falsifiers.length
-          ? falsifiers.map(s => itemHTML(s, "bad")).join("")
-          : itemHTML("No major falsifier triggered on this sync.", "good")
-      );
-    }
-
-    function renderPdaiPairs(rows) {
-      const ordered = [...rows].sort((a, b) => {
-        const rank = (x) => x.type === "WPLS" ? 0 : (x.type === "REF" ? 1 : 2);
-        return rank(a) - rank(b) || (b.liqUsd - a.liqUsd);
-      });
-
-      if (!ordered.length) {
-        setHTML("pairsBody", `<tr><td colspan="10" class="muted">No pairs discovered.</td></tr>`);
-        return;
-      }
-
-      const html = ordered.map(row => {
-        const impliedLabel =
-          row.type === "WPLS" ? (row.impliedPrice != null ? `${fmtFixed(row.impliedPrice, 8)} WPLS` : "—") :
-          row.type === "REF" ? (row.impliedPrice != null ? `${fmtFixed(row.impliedPrice, 8)} REF` : "—") :
-          "—";
-
-        const otherReserveLabel =
-          row.type === "WPLS" ? `${fmtCompact(row.otherReserve, 3)} WPLS` :
-          row.type === "REF" ? `${fmtCompact(row.otherReserve, 3)} ${esc(row.otherSymbol)}` :
-          "—";
-
-        const flags = [
-          row.verifiedLive ? "verified" : "unverified",
-          row.error ? `error:${esc(row.error)}` : null,
-          ...(row.labels || []).slice(0, 2)
-        ].filter(Boolean).join(" | ");
-
-        return `
-          <tr>
-            <td>${tagHTML(row.type)}</td>
-            <td>${esc(row.dexId)}</td>
-            <td><a href="${esc(row.url)}" target="_blank" rel="noopener">${esc(short(row.pairAddress))}</a></td>
-            <td>${esc(row.otherSymbol)} <span class="muted mono">${esc(short(row.otherAddress))}</span></td>
-            <td>${fmtCompact(row.targetReserve, 3)}</td>
-            <td>${otherReserveLabel}</td>
-            <td>${impliedLabel}</td>
-            <td>${fmtUsd(row.liqUsd, 0)}</td>
-            <td>${fmtUsd(row.volume24, 0)}</td>
-            <td class="muted">${flags}</td>
-          </tr>
-        `;
-      }).join("");
-
-      setHTML("pairsBody", html);
-    }
-
-    function renderWplsRefs(rows) {
-      const ordered = [...rows].sort((a, b) => (b.liqUsd - a.liqUsd));
-
-      if (!ordered.length) {
-        setHTML("wplsRefBody", `<tr><td colspan="8" class="muted">No WPLS reference-basket pools discovered.</td></tr>`);
-        return;
-      }
-
-      const html = ordered.map(row => `
-        <tr>
-          <td>${esc(row.dexId)}</td>
-          <td><a href="${esc(row.url)}" target="_blank" rel="noopener">${esc(short(row.pairAddress))}</a></td>
-          <td>${esc(row.otherSymbol)} <span class="muted mono">${esc(short(row.otherAddress))}</span></td>
-          <td>${fmtCompact(row.targetReserve, 3)} WPLS</td>
-          <td>${fmtCompact(row.otherReserve, 3)} ${esc(row.otherSymbol)}</td>
-          <td>${row.impliedPrice != null ? fmtFixed(row.impliedPrice, 10) : "—"}</td>
-          <td>${fmtUsd(row.liqUsd, 0)}</td>
-          <td>${fmtUsd(row.volume24, 0)}</td>
-        </tr>
-      `).join("");
-
-      setHTML("wplsRefBody", html);
-    }
-
-    async function buildModel() {
-      const targetDecimals = await ercDecimals(CONFIG.TARGET);
-
-      const [
-        totalRaw,
-        burnedRaw,
-        spinePdaiRaw,
-        spineWplsRaw,
-        rawTargetPairs,
-        rawWplsPairs
-      ] = await Promise.all([
-        ercTotalSupply(CONFIG.TARGET),
-        ercBalanceOf(CONFIG.TARGET, CONFIG.ADDR.DEAD),
-        ercBalanceOf(CONFIG.TARGET, CONFIG.ADDR.SPINE),
-        ercBalanceOf(CONFIG.WPLS, CONFIG.ADDR.SPINE),
-        discoverTokenPairs(CONFIG.TARGET),
-        discoverTokenPairs(CONFIG.WPLS)
+    async function buildModel(){
+      const cfg = state.settings;
+      const targetDecimals = await ercDecimals(cfg.TARGET);
+      const [totalRaw, burnedRaw, spinePdaiRaw, spineWplsRaw, targetPairsRaw, wplsPairsRaw, latestBlock] = await Promise.all([
+        ercTotalSupply(cfg.TARGET),
+        ercBalanceOf(cfg.TARGET, cfg.DEAD),
+        ercBalanceOf(cfg.TARGET, cfg.SPINE),
+        ercBalanceOf(cfg.WPLS, cfg.SPINE),
+        discoverPairs(cfg.TARGET),
+        discoverPairs(cfg.WPLS),
+        rpcBlockNumber()
       ]);
 
       const total = units(totalRaw, targetDecimals);
       const burned = units(burnedRaw, targetDecimals);
+      const circ = Math.max(total - burned, 0);
       const spinePdai = units(spinePdaiRaw, targetDecimals);
       const spineWpls = units(spineWplsRaw, 18);
-
-      const normTargetPairs = rawTargetPairs
-        .map(p => normalizePairEntry(p, CONFIG.TARGET))
-        .filter(Boolean)
-        .sort((a, b) => b.liqUsd - a.liqUsd)
-        .slice(0, CONFIG.MAX_PDAI_PAIRS);
-
-      const normWplsRefPairs = rawWplsPairs
-        .map(p => normalizePairEntry(p, CONFIG.WPLS))
-        .filter(Boolean)
-        .filter(p => p.otherIsStable)
-        .sort((a, b) => b.liqUsd - a.liqUsd)
-        .slice(0, CONFIG.MAX_WPLS_REF_PAIRS);
-
-      const [pdaiPairs, wplsRefPairs] = await Promise.all([
-        hydratePairs(CONFIG.TARGET, normTargetPairs, targetDecimals),
-        hydratePairs(CONFIG.WPLS, normWplsRefPairs, 18)
-      ]);
-
-      const circ = Math.max(total - burned, 0);
-      const effectiveFloat = Math.max(circ - spinePdai, 0);
       const capture = circ > 0 ? spinePdai / circ : 0;
 
-      const wplsPairs = pdaiPairs.filter(r => r.type === "WPLS" && r.verifiedLive);
-      const refPairs = pdaiPairs.filter(r => r.type === "REF" && r.verifiedLive);
+      const pdaiPairsNorm = targetPairsRaw
+        .map(p => normalizePairEntry(p, cfg.TARGET))
+        .filter(Boolean)
+        .sort((a,b) => b.liqUsd - a.liqUsd)
+        .slice(0, cfg.MAX_PDAI_PAIRS);
 
+      const wplsRefNorm = wplsPairsRaw
+        .map(p => normalizePairEntry(p, cfg.WPLS))
+        .filter(Boolean)
+        .filter(p => cfg.REF_SYMBOLS.includes(String(p.otherSymbol || "").toUpperCase()))
+        .sort((a,b) => b.liqUsd - a.liqUsd)
+        .slice(0, cfg.MAX_WPLS_REF_PAIRS);
+
+      const [pdaiPairs, wplsRefPairs] = await Promise.all([
+        hydratePairs(cfg.TARGET, pdaiPairsNorm, targetDecimals),
+        hydratePairs(cfg.WPLS, wplsRefNorm, 18)
+      ]);
+
+      const wplsPairs = pdaiPairs.filter(p => p.type === "WPLS" && p.verifiedLive && p.otherReserve > 0);
+      const refPairs = pdaiPairs.filter(p => p.type === "REF" && p.verifiedLive && p.otherReserve > 0);
       const wplsAgg = ratioFromRows(wplsPairs);
       const refAgg = ratioFromRows(refPairs);
-      const wplsRefAgg = ratioFromRows(wplsRefPairs.filter(r => r.verifiedLive));
+      const refWplsAgg = ratioFromRows(wplsRefPairs.filter(p => p.verifiedLive && p.otherReserve > 0));
 
       const coverage = wplsAgg.otherSum > 0 ? spineWpls / wplsAgg.otherSum : 0;
-      const pdaiPerWpls = wplsAgg.ratio;
-      const refPerPdai = refAgg.ratio;
-      const refPerWpls = wplsRefAgg.ratio;
-      const wplsImpliedRef = (pdaiPerWpls != null && refPerWpls != null) ? (pdaiPerWpls * refPerWpls) : null;
-      const primaryRef = refPerPdai != null ? refPerPdai : wplsImpliedRef;
-      const pegGap = primaryRef != null ? Math.abs(CONFIG.TARGET_PEG - primaryRef) : null;
-      const consistencyGap =
-        (refPerPdai != null && wplsImpliedRef != null)
-          ? Math.abs(refPerPdai - wplsImpliedRef) / Math.max(refPerPdai, wplsImpliedRef, 1e-12)
-          : null;
+      const pwpls = wplsAgg.ratio;
+      const refPrice = refAgg.ratio;
+      const wplsImplied = (pwpls != null && refWplsAgg.ratio != null) ? (pwpls * refWplsAgg.ratio) : null;
+      const primaryRef = refPrice != null ? refPrice : wplsImplied;
+      const pegGap = primaryRef != null ? Math.abs(1 - primaryRef) : null;
+      const consistencyGap = (refPrice != null && wplsImplied != null)
+        ? Math.abs(refPrice - wplsImplied) / Math.max(refPrice, wplsImplied, 1e-12)
+        : null;
 
-      const components = {
-        capture: 30 * clamp(capture / 0.33, 0, 1),
-        coverage: 30 * clamp(coverage / 1.0, 0, 1),
-        price: 25 * (primaryRef != null ? clamp(1 - pegGap, 0, 1) : 0),
-        consistency: 10 * (consistencyGap != null ? clamp(1 - consistencyGap, 0, 1) : 0),
-        breadth: 5 * clamp((wplsAgg.count + refAgg.count) / 4, 0, 1)
+      const scoreParts = {
+        price: primaryRef != null ? 34 * clamp(1 - pegGap, 0, 1) : 0,
+        capture: 22 * clamp(capture / 0.33, 0, 1),
+        coverage: 22 * clamp(coverage / 1.0, 0, 1),
+        consistency: consistencyGap != null ? 12 * clamp(1 - consistencyGap, 0, 1) : 0,
+        breadth: 10 * clamp((wplsAgg.count + refAgg.count) / 4, 0, 1)
       };
+      const score = Object.values(scoreParts).reduce((a,b)=>a+b,0);
+      const verdict = scoreVerdict(score, pegGap, wplsAgg.count, refAgg.count);
 
-      const score = Object.values(components).reduce((a, b) => a + b, 0);
-      const verdict = verdictFromScore(score, pegGap, coverage, capture, pdaiPairs.filter(r => r.verifiedLive).length);
+      const fromBlock = Math.max(0, latestBlock - (cfg.SCAN_BLOCKS || DEFAULTS.SCAN_BLOCKS));
+      const [pdaiTransferLogsRaw, wplsTransferLogsRaw, pdaiApprovalLogsRaw] = await Promise.all([
+        getLogsAdaptive(cfg.TARGET, TRANSFER_TOPIC, fromBlock, latestBlock),
+        getLogsAdaptive(cfg.WPLS, TRANSFER_TOPIC, fromBlock, latestBlock),
+        getLogsAdaptive(cfg.TARGET, APPROVAL_TOPIC, fromBlock, latestBlock)
+      ]);
 
-      const signals = [];
-      const falsifiers = [];
+      const [pdaiDec, wplsDec] = await Promise.all([ercDecimals(cfg.TARGET), ercDecimals(cfg.WPLS)]);
+      const transfersPdai = parseTransferLogs(pdaiTransferLogsRaw, "pDAI", pdaiDec);
+      const transfersWpls = parseTransferLogs(wplsTransferLogsRaw, "WPLS", wplsDec);
+      const approvalsPdai = parseApprovalLogs(pdaiApprovalLogsRaw, "pDAI", pdaiDec);
+      const machine = buildProofs(cfg, transfersPdai, transfersWpls, approvalsPdai);
 
-      if (wplsAgg.count > 0) {
-        signals.push(`Discovered and verified <strong>${wplsAgg.count}</strong> live pDAI/WPLS pool(s) on-chain.`);
-      } else {
-        falsifiers.push(`No live pDAI/WPLS pool was verified from the discovered pair list.`);
+      const verified = [];
+      const hypothesis = [];
+      const truthRows = [];
+
+      verified.push(`Ex-burn supply is measurable live: <strong>${fmtCompact(circ, 3)}</strong> pDAI.`);
+      truthRows.push(truthRow("Ex-burn supply can be measured live", "Verified", `${fmtCompact(circ, 3)} pDAI`, "good"));
+
+      verified.push(`5EF7 currently holds <strong>${fmtCompact(spinePdai, 3)}</strong> pDAI and <strong>${fmtCompact(spineWpls, 3)}</strong> WPLS.`);
+      truthRows.push(truthRow("5EF7 balance can be measured live", "Verified", `${fmtCompact(spinePdai, 3)} pDAI / ${fmtCompact(spineWpls, 3)} WPLS`, "good"));
+
+      if(wplsAgg.count > 0){
+        verified.push(`Found <strong>${wplsAgg.count}</strong> verified pDAI/WPLS pool(s) with a combined WPLS wall of <strong>${fmtCompact(wplsAgg.otherSum, 3)}</strong>.`);
+        truthRows.push(truthRow("There are live pDAI/WPLS pools", "Verified", `${wplsAgg.count} pool(s), WPLS wall ${fmtCompact(wplsAgg.otherSum, 3)}`, "good"));
+      }else{
+        hypothesis.push(`No live pDAI/WPLS pool was verified from the current discovery set.`);
+        truthRows.push(truthRow("There are live pDAI/WPLS pools", "Not seen", `No verified WPLS pool found in current discovery`, "bad"));
       }
 
-      if (refAgg.count > 0) {
-        signals.push(`Discovered and verified <strong>${refAgg.count}</strong> pDAI reference-basket pool(s) using ${CONFIG.REF_SYMBOLS.join(" / ")}.`);
-      } else {
-        falsifiers.push(`No pDAI reference-basket pool was verified. Price evidence is weaker without it.`);
+      if(primaryRef != null){
+        verified.push(`Closest measurable reference price is <strong>${fmtFixed(primaryRef, 6)}</strong>, leaving a peg gap of <strong>${fmtPct01(pegGap, 2)}</strong>.`);
+        truthRows.push(truthRow("A measurable price-to-peg gap exists", "Verified", `${fmtFixed(primaryRef, 6)} vs 1.000000`, "good"));
+      }else{
+        hypothesis.push(`No usable stable-basket reference price could be built from current live pools.`);
+        truthRows.push(truthRow("A measurable price-to-peg gap exists", "Incomplete", `No usable stable-basket reference found`, "warn"));
       }
 
-      if (wplsRefAgg.count > 0) {
-        signals.push(`Discovered and verified <strong>${wplsRefAgg.count}</strong> WPLS reference-basket pool(s).`);
-      } else {
-        falsifiers.push(`No WPLS reference-basket pool was verified, so WPLS-implied pricing is weaker.`);
-      }
-
-      if (capture >= 0.25) {
-        signals.push(`SPINE controls <strong>${fmtPct(capture, 2)}</strong> of ex-burn supply, which is meaningful capture.`);
-      } else {
-        falsifiers.push(`Supply capture is only <strong>${fmtPct(capture, 2)}</strong>; that is not dominant yet.`);
-      }
-
-      if (coverage >= 1) {
-        signals.push(`SPINE WPLS ammo covers the verified WPLS wall at <strong>${fmtX(coverage, 3)}</strong>.`);
-      } else {
-        falsifiers.push(`SPINE WPLS ammo covers only <strong>${fmtX(coverage, 3)}</strong> of the verified WPLS wall.`);
-      }
-
-      if (primaryRef != null) {
-        if (pegGap <= 0.05) {
-          signals.push(`Primary reference price sits <strong>${fmtPct(pegGap, 2)}</strong> from 1.00, which is already tight.`);
-        } else {
-          falsifiers.push(`Primary reference price is <strong>${fmtFixed(primaryRef, 6)}</strong>, which is <strong>${fmtPct(pegGap, 2)}</strong> away from 1.00.`);
+      if(machine.libertyConfigured){
+        if(machine.handshakeTransfers.length > 0){
+          verified.push(`Recent scanned window contains <strong>${machine.handshakeTransfers.length}</strong> machine-to-Liberty intersection(s).`);
+          truthRows.push(truthRow("Machine-to-Liberty intersection exists in scanned window", "Verified", `${machine.handshakeTransfers.length} intersection(s)`, "good"));
+        }else{
+          hypothesis.push(`No machine-to-Liberty token intersection was seen in the recent scanned block window.`);
+          truthRows.push(truthRow("Machine-to-Liberty intersection exists in scanned window", "Not seen", `0 intersections in scanned window`, "bad"));
         }
-      } else {
-        falsifiers.push(`No usable primary reference price could be built from the discovered pools.`);
+      }else{
+        hypothesis.push(`Liberty watcher addresses are not configured, so handshake proof is not testable yet in this page.`);
+        truthRows.push(truthRow("Machine-to-Liberty intersection exists in scanned window", "Unconfigured", `Add Liberty addresses to test`, "warn"));
       }
 
-      if (consistencyGap != null) {
-        if (consistencyGap <= 0.15) {
-          signals.push(`WPLS-implied and reference-basket prices agree within <strong>${fmtPct(consistencyGap, 2)}</strong>.`);
-        } else {
-          falsifiers.push(`WPLS-implied and reference-basket prices disagree by <strong>${fmtPct(consistencyGap, 2)}</strong>.`);
+      if(machine.approvalTargetConfigured){
+        if(machine.approvalHits.length > 0){
+          verified.push(`Recent approval audit found <strong>${machine.approvalHits.length}</strong> approval hit(s) from watched machine addresses into your configured target set.`);
+          truthRows.push(truthRow("Approval trail toward configured targets exists", "Verified", `${machine.approvalHits.length} approval hit(s)`, "good"));
+        }else{
+          hypothesis.push(`No approval hit from watched machine addresses into the configured target set was seen in the recent scanned window.`);
+          truthRows.push(truthRow("Approval trail toward configured targets exists", "Not seen", `0 approval hits in scanned window`, "bad"));
         }
+      }else{
+        hypothesis.push(`3D07 / Liberty approval targets are not configured, so approval-audit proof is not testable yet here.`);
+        truthRows.push(truthRow("Approval trail toward configured targets exists", "Unconfigured", `Add 3D07 or Liberty addresses to test`, "warn"));
       }
+
+      hypothesis.push(`Community theories like pMKR recapitalization are not treated as proof until direct on-chain linkage is actually measured here.`);
+      truthRows.push(truthRow("Community peg narrative proves a peg controller exists", "Hypothesis only", `Not accepted as proof without direct chain evidence`, "warn"));
+
+      hypothesis.push(`Total historical shard count is not auto-proven by this page. This page measures only recent AF4E-style dispersion in the scanned window when AF4E is configured.`);
+      truthRows.push(truthRow("Full historical shard lattice count is proven here", "No", `Only recent-window dispersion can be measured here`, "bad"));
 
       return {
-        total,
-        burned,
-        circ,
-        spinePdai,
-        effectiveFloat,
-        capture,
-        spineWpls,
-        verifiedWplsWall: wplsAgg.otherSum,
-        coverage,
-        pdaiPerWpls,
-        refPerPdai,
-        refPerWpls,
-        wplsImpliedRef,
+        cfg,
+        latestBlock,
+        fromBlock,
+        total, burned, circ,
+        spinePdai, spineWpls,
+        capture, coverage,
+        pwpls,
+        refPrice,
+        wplsImplied,
         pegGap,
         score,
-        components,
+        scoreParts,
         verdict,
         pdaiPairs,
         wplsRefPairs,
-        signals,
-        falsifiers
+        verified,
+        hypothesis,
+        truthRows,
+        machine
       };
     }
 
-    function renderModel(m) {
-      setText("vTotal", fmtCompact(m.total, 3));
-      setText("vBurned", fmtCompact(m.burned, 3));
-      setText("vCirc", fmtCompact(m.circ, 3));
-      setText("vSpinePdai", fmtCompact(m.spinePdai, 3));
-      setText("vFloat", fmtCompact(m.effectiveFloat, 3));
-      setText("vCapture", fmtPct(m.capture, 3));
-      setText("vAmmo", fmtCompact(m.spineWpls, 3) + " WPLS");
-      setText("vWall", fmtCompact(m.verifiedWplsWall, 3) + " WPLS");
-      setText("vCoverage", fmtX(m.coverage, 4));
-      setText("vPwpls", m.pdaiPerWpls != null ? fmtFixed(m.pdaiPerWpls, 8) + " WPLS" : "—");
-      setText("vPref", m.refPerPdai != null ? fmtFixed(m.refPerPdai, 8) : "—");
-      setText("vPwplsRef", m.wplsImpliedRef != null ? fmtFixed(m.wplsImpliedRef, 8) : "—");
-
-      setText("scoreBig", fmtFixed(m.score, 1));
-      setText("pegGap", m.pegGap != null ? fmtPct(m.pegGap, 2) : "—");
-
-      const verdictEl = $("scoreVerdict");
-      verdictEl.textContent = m.verdict;
-      verdictEl.className = "scoreVerdict " + verdictClass(m.score);
-
-      $("scoreBar").style.width = clamp(m.score, 0, 100) + "%";
-
-      setText("cCapture", fmtFixed(m.components.capture, 1) + " / 30");
-      setText("cCoverage", fmtFixed(m.components.coverage, 1) + " / 30");
-      setText("cPrice", fmtFixed(m.components.price, 1) + " / 25");
-      setText("cConsistency", fmtFixed(m.components.consistency, 1) + " / 10");
-      setText("cBreadth", fmtFixed(m.components.breadth, 1) + " / 5");
-
-      renderSignalLists(m.signals, m.falsifiers);
-      renderPdaiPairs(m.pdaiPairs);
-      renderWplsRefs(m.wplsRefPairs);
+    function renderPairs(rows){
+      if(!rows.length){
+        setHTML("pairsBody", `<tr><td colspan="10" class="small">No pairs discovered.</td></tr>`);
+        return;
+      }
+      const html = rows
+        .sort((a,b) => {
+          const rank = t => t === "WPLS" ? 0 : t === "REF" ? 1 : 2;
+          return rank(a.type) - rank(b.type) || b.liqUsd - a.liqUsd;
+        })
+        .map(r => {
+          const tag = r.type === "WPLS"
+            ? `<span class="tag wpls">WPLS</span>`
+            : r.type === "REF"
+              ? `<span class="tag ref">REF</span>`
+              : `<span class="tag other">OTHER</span>`;
+          const implied = r.type === "WPLS"
+            ? (r.impliedPrice != null ? `${fmtFixed(r.impliedPrice, 8)} WPLS` : "—")
+            : r.type === "REF"
+              ? (r.impliedPrice != null ? `${fmtFixed(r.impliedPrice, 8)} REF` : "—")
+              : "—";
+          const flags = [
+            r.verifiedLive ? "verified" : "empty",
+            ...(r.labels || []).slice(0,2),
+            r.error || ""
+          ].filter(Boolean).join(" | ");
+          return `<tr>
+            <td>${tag}</td>
+            <td>${esc(r.dexId)}</td>
+            <td><a href="${esc(r.url || "#")}" target="_blank" rel="noopener">${esc(short(r.pairAddress))}</a></td>
+            <td>${esc(r.otherSymbol)} <span class="small mono">${esc(short(r.otherAddress))}</span></td>
+            <td>${fmtCompact(r.targetReserve, 3)}</td>
+            <td>${r.otherReserve != null ? `${fmtCompact(r.otherReserve, 3)} ${esc(r.otherSymbol)}` : "—"}</td>
+            <td>${implied}</td>
+            <td>${fmtUsd(r.liqUsd, 0)}</td>
+            <td>${fmtUsd(r.volume24, 0)}</td>
+            <td class="small">${esc(flags)}</td>
+          </tr>`;
+        }).join("");
+      setHTML("pairsBody", html);
     }
 
-    async function sync() {
-      if (STATE.syncing) return;
-      STATE.syncing = true;
+    function renderPulseRows(model){
+      const rows = model.machine.recentPulses;
+      if(!rows.length){
+        setHTML("pulseBody", `<tr><td colspan="7" class="small">No recent watched-token pulse found in the scanned window. Add more watch addresses in Settings if needed.</td></tr>`);
+        return;
+      }
+      const html = rows.map(ev => `<tr>
+        <td>${ev.block.toLocaleString()}</td>
+        <td>${esc(ev.token)}</td>
+        <td class="mono">${esc(short(ev.from))}</td>
+        <td class="mono">${esc(short(ev.to))}</td>
+        <td>${fmtCompact(ev.amount, 4)}</td>
+        <td class="mono">${esc(short(ev.txHash, 10, 8))}</td>
+        <td>${esc(classifyPulse(ev, model.cfg))}</td>
+      </tr>`).join("");
+      setHTML("pulseBody", html);
+    }
 
-      setText("syncStatus", "SYNCING...");
-      try {
+    function renderTruthRows(model){
+      setHTML("truthBody", model.truthRows.join(""));
+    }
+
+    function renderLists(model){
+      setHTML("verifiedList", model.verified.map(t => itemHtml(t, "good")).join(""));
+      setHTML("hypothesisList", model.hypothesis.map(t => itemHtml(t, "warn")).join(""));
+    }
+
+    function renderProofs(model){
+      const m = model.machine;
+      const cards = [];
+
+      cards.push(
+        m.af4eConfigured
+          ? (
+            m.af4eRecent.length
+              ? proofCard(
+                  "AF4E recent dispersion",
+                  "Seen",
+                  `${fmtCompact(m.af4eAmount, 3)} pDAI`,
+                  `${m.af4eRecent.length} transfer(s) from AF4E in the scanned window to ${m.af4eUniqueRecipients} unique recipient(s).`,
+                  "ok"
+                )
+              : proofCard(
+                  "AF4E recent dispersion",
+                  "Not seen",
+                  "0 hits",
+                  `AF4E is configured, but no AF4E-origin pDAI transfer was found in the scanned window.`,
+                  "no"
+                )
+          )
+          : proofCard(
+              "AF4E recent dispersion",
+              "Unconfigured",
+              "—",
+              `Add the AF4E address in Settings to test the shard-dispersion hypothesis with live logs.`,
+              "wait"
+            )
+      );
+
+      cards.push(
+        m.d6caConfigured
+          ? (
+            m.d6caWplsOut.length
+              ? proofCard(
+                  "D6CA WPLS outflow",
+                  "Seen",
+                  `${fmtCompact(m.d6caWplsAmount, 3)} WPLS`,
+                  `${m.d6caWplsOut.length} WPLS outflow event(s) from D6CA in the scanned window.`,
+                  "ok"
+                )
+              : proofCard(
+                  "D6CA WPLS outflow",
+                  "Not seen",
+                  "0 hits",
+                  `D6CA is configured, but no WPLS outflow from that address was found in the scanned window.`,
+                  "no"
+                )
+          )
+          : proofCard(
+              "D6CA WPLS outflow",
+              "Unconfigured",
+              "—",
+              `Add the D6CA address in Settings to test the recycler / gas-flow theory with live logs.`,
+              "wait"
+            )
+      );
+
+      cards.push(
+        m.v4fd0Configured
+          ? (
+            m.v4fd0Pulse.length
+              ? proofCard(
+                  "4fd0 buffer pulse",
+                  "Seen",
+                  `${m.v4fd0Pulse.length} hit(s)`,
+                  `The configured 4fd0 address appeared in ${m.v4fd0Pulse.length} recent pDAI transfer log(s).`,
+                  "ok"
+                )
+              : proofCard(
+                  "4fd0 buffer pulse",
+                  "Not seen",
+                  "0 hits",
+                  `The configured 4fd0 address did not appear in recent pDAI transfer logs.`,
+                  "no"
+                )
+          )
+          : proofCard(
+              "4fd0 buffer pulse",
+              "Unconfigured",
+              "—",
+              `Add the 4fd0 / vault address in Settings to test recent buffer behavior.`,
+              "wait"
+            )
+      );
+
+      cards.push(
+        m.approvalTargetConfigured
+          ? (
+            m.approvalHits.length
+              ? proofCard(
+                  "Approval audit",
+                  "Seen",
+                  `${m.approvalHits.length} hit(s)`,
+                  `Watched machine address(es) approved your configured target set in the scanned window.`,
+                  "ok"
+                )
+              : proofCard(
+                  "Approval audit",
+                  "Not seen",
+                  "0 hits",
+                  `No approval trail from watched machine addresses into the configured target set was found in the scanned window.`,
+                  "no"
+                )
+          )
+          : proofCard(
+              "Approval audit",
+              "Unconfigured",
+              "—",
+              `Add 3D07 and/or Liberty addresses to test approval prep for a handshake.`,
+              "wait"
+            )
+      );
+
+      cards.push(
+        m.libertyConfigured
+          ? (
+            m.handshakeTransfers.length
+              ? proofCard(
+                  "Liberty intersection",
+                  "Seen",
+                  `${m.handshakeTransfers.length} hit(s)`,
+                  `Recent watched-machine transfer log(s) intersected your configured Liberty address set.`,
+                  "ok"
+                )
+              : proofCard(
+                  "Liberty intersection",
+                  "Not seen",
+                  "0 hits",
+                  `No watched-machine transfer intersected the configured Liberty addresses in the scanned window.`,
+                  "no"
+                )
+          )
+          : proofCard(
+              "Liberty intersection",
+              "Unconfigured",
+              "—",
+              `Add Liberty balancer and gasless addresses in Settings to test handshake evidence.`,
+              "wait"
+            )
+      );
+
+      setHTML("proofGrid", cards.join(""));
+    }
+
+    function renderScore(model){
+      const score = clamp(model.score, 0, 100);
+      const gapText = model.pegGap != null ? `${fmtPct01(model.pegGap, 2)} from 1.00` : "No direct reference gap";
+      $("reactorRing").style.setProperty("--score", score.toFixed(2));
+      setText("scoreBig", fmtFixed(score, 1));
+      setText("bigVerdict", model.verdict);
+      setText("coreState", model.verdict);
+      setText("coreGap", gapText);
+      setText("verdictExplain", "Score is built from price, capture, coverage, consistency, and pool breadth — not from community stories.");
+      $("scoreFill").style.width = score.toFixed(1) + "%";
+
+      const verdictClass = score >= 90 ? "stable" : score >= 60 ? "warned" : "bad";
+      $("syncStatus").className = `statusPill ${verdictClass}`;
+
+      const gapNum = model.pegGap;
+      if(gapNum != null && gapNum <= 0.02) setText("syncStatus", "Peg window tight");
+      else if(score >= 72) setText("syncStatus", "Evidence building");
+      else if(score >= 45) setText("syncStatus", "Speculative");
+      else setText("syncStatus", "Unproved");
+
+      setText("sPrice", `${fmtFixed(model.scoreParts.price,1)} / 34`);
+      setText("sCapture", `${fmtFixed(model.scoreParts.capture,1)} / 22`);
+      setText("sCoverage", `${fmtFixed(model.scoreParts.coverage,1)} / 22`);
+      setText("sConsistency", `${fmtFixed(model.scoreParts.consistency,1)} / 12`);
+      setText("sBreadth", `${fmtFixed(model.scoreParts.breadth,1)} / 10`);
+    }
+
+    function renderMetrics(model){
+      setText("mTotal", fmtCompact(model.total, 3));
+      setText("mBurned", fmtCompact(model.burned, 3));
+      setText("mCirc", fmtCompact(model.circ, 3));
+      setText("mSpinePdai", fmtCompact(model.spinePdai, 3));
+      setText("mSpineWpls", fmtCompact(model.spineWpls, 3) + " WPLS");
+      setText("mCapture", fmtPct01(model.capture, 3));
+      const wplsRows = model.pdaiPairs.filter(p => p.type === "WPLS" && p.verifiedLive && p.otherReserve > 0);
+      const wplsAgg = ratioFromRows(wplsRows);
+      setText("mWall", fmtCompact(wplsAgg.otherSum, 3) + " WPLS");
+      setText("mCoverage", fmtX(model.coverage, 4));
+      setText("mPwpls", model.pwpls != null ? fmtFixed(model.pwpls, 8) + " WPLS" : "—");
+      setText("mRef", model.refPrice != null ? fmtFixed(model.refPrice, 8) : "—");
+      setText("mImplied", model.wplsImplied != null ? fmtFixed(model.wplsImplied, 8) : "—");
+      setText("mGap", model.pegGap != null ? fmtPct01(model.pegGap, 2) : "—");
+    }
+
+    async function sync(){
+      if(state.syncing) return;
+      state.syncing = true;
+
+      try{
+        state.settings = loadSettings();
+        setText("scanWindow", `Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`);
         const model = await buildModel();
-        renderModel(model);
-        STATE.lastSync = new Date();
-        setText("lastSync", "LAST SYNC: " + nowStamp());
-        setText("syncStatus", "LINK: STABLE");
-      } catch (err) {
+        renderMetrics(model);
+        renderScore(model);
+        renderProofs(model);
+        renderLists(model);
+        renderPairs(model.pdaiPairs);
+        renderPulseRows(model);
+        renderTruthRows(model);
+        setText("lastSync", `Last sync: ${nowStamp()} • block ${model.latestBlock.toLocaleString()}`);
+      }catch(err){
         console.error(err);
-        setText("syncStatus", "SYNC FAILED / ROTATING RPC");
-        setText("lastSync", "LAST ERROR: " + (err?.message || String(err)));
-
-        setHTML("signalsList", itemHTML("Last sync failed before a full model could be built.", "bad"));
-        setHTML("falsifiersList", itemHTML(esc(err?.message || String(err)), "bad"));
-      } finally {
-        STATE.syncing = false;
+        $("syncStatus").className = "statusPill bad";
+        setText("syncStatus", "Sync failed");
+        setText("lastSync", `Last error: ${err?.message || String(err)}`);
+        setHTML("verifiedList", itemHtml("No new verified state because the latest sync failed.", "bad"));
+        setHTML("hypothesisList", itemHtml(esc(err?.message || String(err)), "bad"));
+      }finally{
+        state.syncing = false;
       }
     }
 
+    $("settingsBtn").addEventListener("click", () => {
+      $("settingsBox").classList.toggle("open");
+    });
+    $("saveSettingsBtn").addEventListener("click", () => {
+      saveSettingsFromUI();
+      sync();
+    });
+    $("clearSettingsBtn").addEventListener("click", () => {
+      clearSavedSettings();
+      sync();
+    });
     $("refreshBtn").addEventListener("click", sync);
-    setInterval(sync, CONFIG.AUTO_REFRESH_MS);
+
+    state.settings = loadSettings();
+    pushSettingsToUI(state.settings);
+    setText("scanWindow", `Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`);
     sync();
+    setInterval(sync, DEFAULTS.AUTO_REFRESH_MS);
   </script>
 </body>
 </html>
