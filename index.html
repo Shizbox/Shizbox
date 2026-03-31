@@ -3,169 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pDAI | INTERNAL MACHINE TERMINAL</title>
+    <title>pDAI | INTERNAL MACHINE TERMINAL (FAILOVER)</title>
     <style>
-        :root {
-            --neon: #00ff41;
-            --bg: #020202;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(0, 255, 65, 0.2);
-            --danger: #ff3e3e;
-        }
-
-        body {
-            background-color: var(--bg);
-            background-image: radial-gradient(circle at 50% 50%, #0a1a0a 0%, #020202 100%);
-            color: var(--neon);
-            font-family: 'Segoe UI', 'Courier New', monospace;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .terminal-frame {
-            width: 95%;
-            max-width: 1200px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 255, 65, 0.05);
-            position: relative;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .brand h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px var(--neon);
-        }
-
-        .status-light {
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #888;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background: var(--neon);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon);
-            animation: pulse 2s infinite;
-        }
-
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: var(--neon);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
-        }
-
-        .label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-
-        .value {
-            font-size: 1.8rem;
-            font-weight: 300;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .sub-val {
-            font-size: 0.75rem;
-            color: var(--neon);
-            opacity: 0.7;
-        }
-
-        /* PEG GAUSE */
-        .peg-container {
-            grid-column: 1 / -1;
-            margin-top: 20px;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid var(--border);
-            padding: 25px;
-            border-radius: 8px;
-        }
-
-        .progress-track {
-            width: 100%;
-            height: 4px;
-            background: #111;
-            margin: 20px 0;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, transparent, var(--neon));
-            width: 0%;
-            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--neon);
-        }
-
-        footer {
-            margin-top: 40px;
-            font-size: 0.6rem;
-            color: #444;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .warning-text { color: var(--danger); text-shadow: 0 0 5px var(--danger); }
+        :root { --neon: #00ff41; --bg: #020202; --glass: rgba(255, 255, 255, 0.03); --border: rgba(0, 255, 65, 0.2); --danger: #ff3e3e; --warn: #ffcc00; }
+        body { background-color: var(--bg); background-image: radial-gradient(circle at 50% 50%, #0a1a0a 0%, #020202 100%); color: var(--neon); font-family: 'Segoe UI', 'Courier New', monospace; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        .terminal-frame { width: 95%; max-width: 1200px; background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; padding: 30px; box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+        .brand h1 { margin: 0; font-size: 1.5rem; letter-spacing: 5px; text-transform: uppercase; text-shadow: 0 0 10px var(--neon); }
+        .status-light { font-size: 0.7rem; display: flex; align-items: center; gap: 10px; color: #888; }
+        .dot { width: 8px; height: 8px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); animation: pulse 2s infinite; }
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
+        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #aaa; margin-bottom: 10px; }
+        .value { font-size: 1.8rem; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .sub-val { font-size: 0.75rem; color: var(--neon); opacity: 0.7; }
+        .peg-container { grid-column: 1 / -1; margin-top: 20px; background: rgba(0,0,0,0.6); border: 1px solid var(--border); padding: 25px; border-radius: 8px; }
+        .progress-track { width: 100%; height: 4px; background: #111; margin: 20px 0; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, transparent, var(--neon)); width: 0%; transition: width 2s ease; box-shadow: 0 0 10px var(--neon); }
+        footer { margin-top: 40px; font-size: 0.6rem; color: #444; display: flex; justify-content: space-between; border-top: 1px solid #222; padding-top: 10px; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .offline { color: var(--danger) !important; text-shadow: 0 0 5px var(--danger); }
+        .warning { color: var(--warn) !important; }
     </style>
 </head>
 <body>
 
 <div class="terminal-frame">
     <header>
-        <div class="brand">
-            <h1>pDAI Forensics Terminal</h1>
-        </div>
+        <div class="brand"><h1>pDAI Forensics Terminal</h1></div>
         <div class="status-light">
-            <span id="update-timer">SCANNING...</span>
-            <div class="dot"></div>
+            <span id="update-timer">INITIALIZING...</span>
+            <div id="status-dot" class="dot"></div>
         </div>
     </header>
 
@@ -175,19 +43,16 @@
             <div id="val-supply" class="value">0</div>
             <div class="sub-val">Chainwide Existence</div>
         </div>
-
         <div class="card">
             <div class="label">Market Pressure (Pools)</div>
             <div id="val-pool" class="value">0</div>
             <div class="sub-val">Liquid at External Gate</div>
         </div>
-
         <div class="card">
             <div class="label">Reserves (5EF7)</div>
             <div id="val-spine" class="value">0</div>
             <div class="sub-val">Secured in Native Spine</div>
         </div>
-
         <div class="card">
             <div class="label">Recycler (D6CA)</div>
             <div id="val-recycler" class="value">0</div>
@@ -203,23 +68,27 @@
             </div>
             <div style="text-align: right;">
                 <div class="label">Mechanism Status</div>
-                <div id="val-status" class="warning-text">STANDBY</div>
+                <div id="val-status" class="offline">OFFLINE</div>
             </div>
         </div>
-        <div class="progress-track">
-            <div id="peg-bar" class="progress-fill"></div>
-        </div>
-        <div style="font-size: 0.6rem; color: #555;">Telemetric Data: (Spine / Total Supply) | No Simulation Mode Active</div>
+        <div class="progress-track"><div id="peg-bar" class="progress-fill"></div></div>
+        <div style="font-size: 0.6rem; color: #555;">No Simulation Mode | Multi-Node Failover v4.1</div>
     </div>
 
     <footer>
-        <div>NODE: HTTPS://RPC.PULSECHAIN.COM</div>
+        <div id="active-node">NODE: SCANNING FOR LIVE BACKDOOR...</div>
         <div>CONTRACT: 0x6B175474E89094C44Da98b954EedeAC495271d0F</div>
     </footer>
 </div>
 
 <script>
-    const RPC = "https://rpc.pulsechain.com";
+    // List of alternate backdoors into PulseChain
+    const NODES = [
+        "https://pulsechain-rpc.publicnode.com",
+        "https://rpc-pulsechain.g4mm4.io",
+        "https://rpc.pulsechain.com"
+    ];
+
     const PDAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
     const ADDR = {
         SPINE: "0x5EF786D22e6e6666666666666666666666665EF7",
@@ -227,61 +96,70 @@
         POOL: "0x1b452D6Cb7F975397842457c45812e12868A1B45"
     };
 
+    let currentNodeIndex = 0;
+
     async function query(method, params) {
-        const r = await fetch(RPC, {
+        const url = NODES[currentNodeIndex];
+        const r = await fetch(url, {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jsonrpc: "2.0", method, params, id: Date.now() })
         });
         const d = await r.json();
+        if (d.error) throw new Error(d.error.message);
         return d.result;
     }
 
     async function sync() {
+        const timer = document.getElementById('update-timer');
+        const statusDot = document.getElementById('status-dot');
+        const nodeDisplay = document.getElementById('active-node');
+        const statusText = document.getElementById('val-status');
+
         try {
-            // 1. Total Supply
+            nodeDisplay.innerText = `NODE: ${NODES[currentNodeIndex]}`;
+            
+            // 1. Get Stats
             const sHex = await query("eth_call", [{ to: PDAI, data: "0x18160ddd" }, "latest"]);
-            const supply = BigInt(sHex) / BigInt(10**18);
+            const spineHex = await query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2) }, "latest"]);
+            const recyclerHex = await query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.RECYCLER.substring(2) }, "latest"]);
+            const poolHex = await query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2) }, "latest"]);
+
+            // 2. Format Data
+            const supply = BigInt(sHex || 0) / BigInt(10**18);
+            const spine = BigInt(spineHex || 0) / BigInt(10**18);
+            const recycler = BigInt(recyclerHex || 0) / BigInt(10**18);
+            const pool = BigInt(poolHex || 0) / BigInt(10**18);
+
+            // 3. Update UI
             document.getElementById('val-supply').innerText = Number(supply).toLocaleString();
-
-            // 2. Balances
-            const bals = await Promise.all([
-                query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.SPINE.substring(2) }, "latest"]),
-                query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.RECYCLER.substring(2) }, "latest"]),
-                query("eth_call", [{ to: PDAI, data: "0x70a08231000000000000000000000000" + ADDR.POOL.substring(2) }, "latest"])
-            ]);
-
-            const spine = BigInt(bals[0]) / BigInt(10**18);
-            const recycler = BigInt(bals[1]) / BigInt(10**18);
-            const pool = BigInt(bals[2]) / BigInt(10**18);
-
             document.getElementById('val-spine').innerText = Number(spine).toLocaleString();
             document.getElementById('val-recycler').innerText = Number(recycler).toLocaleString();
             document.getElementById('val-pool').innerText = Number(pool).toLocaleString();
 
-            // 3. Peg Math
-            const progress = (Number(spine) / Number(supply)) * 100;
+            const progress = supply > 0n ? (Number(spine) / Number(supply)) * 100 : 0;
             document.getElementById('val-peg').innerText = progress.toFixed(6) + "%";
-            document.getElementById('peg-bar').style.width = (progress > 0 ? Math.min(progress * 100, 100) : 1) + "%";
+            document.getElementById('peg-bar').style.width = Math.min(progress * 100, 100) + "%";
 
-            // Status Logic
-            const statusEl = document.getElementById('val-status');
-            if (spine > 0n) {
-                statusEl.innerText = "MACHINE ACTIVE";
-                statusEl.style.color = "var(--neon)";
-            } else {
-                statusEl.innerText = "AWAITING BURST";
-                statusEl.style.color = "var(--danger)";
-            }
+            // Mechanism Logic
+            statusText.innerText = spine > 0n ? "MACHINE ACTIVE" : "AWAITING BURST";
+            statusText.className = spine > 0n ? "" : "warning";
+            statusDot.style.background = "var(--neon)";
+            timer.innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
 
-            document.getElementById('update-timer').innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
         } catch (e) {
-            document.getElementById('update-timer').innerText = "RPC CONNECTION OFFLINE";
+            console.warn(`Node ${NODES[currentNodeIndex]} failed, jumping to next...`);
+            currentNodeIndex = (currentNodeIndex + 1) % NODES.length;
+            timer.innerText = "FAILOVER: RE-ROUTING...";
+            statusDot.style.background = "var(--danger)";
+            statusText.innerText = "RE-ROUTING";
+            statusText.className = "offline";
+            setTimeout(sync, 1000); // Try again immediately on the next node
         }
     }
 
     sync();
-    setInterval(sync, 10000); // 10 second refresh
+    setInterval(sync, 10000);
 </script>
-
 </body>
 </html>
