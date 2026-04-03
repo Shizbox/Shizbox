@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover | v7 Adversarial Intelligence</title>
+<title>pDAI Peg Prover | v8 Ultimate Intelligence</title>
 <style>
 :root{--bg:#05070d;--bg2:#101a36;--panel:rgba(10,14,24,.88);--line:rgba(88,255,185,.18);--text:#ebfff5;--muted:#8ca0ad;--green:#58ffb9;--cyan:#48c4ff;--amber:#ffcc52;--red:#ff5d73;--pink:#ff56da;--radius:22px;--shadow:0 0 30px rgba(72,196,255,.12),0 0 60px rgba(88,255,185,.06)}
 *{box-sizing:border-box} html,body{margin:0;padding:0;min-height:100%;background:radial-gradient(circle at top,var(--bg2) 0%,var(--bg) 45%,#020306 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} body{overflow-x:hidden}
@@ -29,7 +29,7 @@
 <div class="app">
   <div class="glass top">
     <div>
-      <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • v7 Adversarial Intelligence</h1>
+      <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • v8 Ultimate Intelligence</h1>
       <div class="sub">v7 stops treating the current interior watcher map like gospel. It learns from history, separates public-surface truth from interior hypotheses, recommends better targets, generates exact proof hunts, and turns contradictions into steering — not embarrassment. This build is about making the tool harder to fool and more useful when the machine stays hidden.</div>
       <div class="chips">
         <span class="chip good">Regime detector</span>
@@ -60,7 +60,7 @@
   </div>
 
   <div id="settingsBox" class="glass section settings">
-    <div class="boxTitle">v7 settings</div>
+    <div class="boxTitle">v8 settings</div>
     <div class="small" style="margin-bottom:10px">Private RPC is optional but strongly recommended for selector scans and pending filters. Public anchors are wired in; watchers are hypotheses and can be changed fast.</div>
     <div class="formGrid">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="https://your-private-rpc" /></div>
@@ -123,7 +123,7 @@
       <div class="verdict">
         <div class="verdictTop">
           <div>
-            <div class="label">v7 verdict</div>
+            <div class="label">v8 verdict</div>
             <div class="bigVerdict" id="bigVerdict">Initializing…</div>
           </div>
           <div class="small" id="verdictExplain">v7 rewards honest discovery and punishes decorative “signals” that never move chain state.</div>
@@ -147,7 +147,7 @@
       </div>
       <div class="triple">
         <div class="listBox"><div class="boxTitle">Verified now</div><div class="list" id="verifiedList"></div></div>
-        <div class="listBox"><div class="boxTitle">v7 insights</div><div class="list" id="insightList"></div></div>
+        <div class="listBox"><div class="boxTitle">v8 insights</div><div class="list" id="insightList"></div></div>
         <div class="listBox"><div class="boxTitle">What changes my mind</div><div class="list" id="mindList"></div></div>
       </div>
     </div>
@@ -452,5 +452,327 @@ async function sync(){ if(state.syncing) return; state.syncing=true; try{const m
 $('refreshBtn').onclick=sync; $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open'); $('saveSettingsBtn').onclick=()=>{saveSettingsFromUI(); sync();}; $('resetSettingsBtn').onclick=()=>{resetSettings(); applySettingsToUI(); sync();}; $('clearImportsBtn').onclick=()=>{clearImports(); sync();}; $('exportConfigBtn').onclick=()=>download('pdai-v7-config.json', JSON.stringify(state.settings,null,2)); $('importHistoryBtn').onclick=()=>$('historyFileInput').click(); $('importCorpusBtn').onclick=()=>$('corpusFileInput').click(); $('historyFileInput').onchange=async e=>{for(const f of [...e.target.files]) await importHistoryFile(f); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); sync();}; $('corpusFileInput').onchange=async e=>{await importCorpusFiles(e.target.files); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); sync();}; $('generateQueriesBtn').onclick=async()=>{const model=await buildModel(); generateQueries(model);}; $('analyzeTxBtn').onclick=async()=>{const rows=await analyzePayload($('txHashInput').value.trim()); renderPayloadRows(rows);}; $('sniffPayloadBtn').onclick=async()=>{const rows=await sniffPayloads($('payloadTarget').value.trim()); renderPayloadRows(rows);}; $('scanSelectorsBtn').onclick=async()=>{const rows=await scanSelectors($('selectorTarget').value.trim()); setHTML('payloadBody', rows.length? rows.map(r=>`<tr><td>selector</td><td class="mono">${esc(r.selector)}</td><td>${esc(r.count+' '+r.direction+' • '+short(r.latest,10,8)+' • '+r.notes)}</td></tr>`).join('') : `<tr><td colspan="3" class="small">No selector rows.</td></tr>`);};
 state.settings=loadSettings(); state.imports=loadImports(); applySettingsToUI(); setText('historyInfo',`History: ${loadLocalHistory().length} local / ${state.imports.history.length} imported`); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); setRefreshTimer(); sync();
 </script>
+
+<script>
+(function(){
+  let latestModelV8 = null;
+
+  function addV8Buttons(){
+    const btns = document.querySelector('.btns');
+    if(!btns || document.getElementById('exportHistoryBtn')) return;
+    const historyBtn = document.createElement('button');
+    historyBtn.id = 'exportHistoryBtn';
+    historyBtn.className = 'secondary';
+    historyBtn.textContent = 'Export history';
+    btns.appendChild(historyBtn);
+
+    const bundleBtn = document.createElement('button');
+    bundleBtn.id = 'exportBundleBtn';
+    bundleBtn.className = 'secondary';
+    bundleBtn.textContent = 'Export bundle';
+    btns.appendChild(bundleBtn);
+  }
+
+  function addV8Panels(){
+    if(document.getElementById('v8HistoryLab')) return;
+    const foot = document.querySelector('.foot');
+    if(!foot) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="duo" id="v8HistoryLab">
+        <div class="glass tableCard">
+          <div class="boxTitle">V8 history lab</div>
+          <div class="small" style="margin-bottom:10px">Use imported and local history as first-class intelligence, not just charts.</div>
+          <div class="tableWrap"><table><thead><tr><th>Metric</th><th>Value</th><th>Why it matters</th></tr></thead><tbody id="v8HistoryBody"></tbody></table></div>
+        </div>
+        <div class="glass tableCard">
+          <div class="boxTitle">Snapshot diff lab</div>
+          <div class="small" style="margin-bottom:10px">Compares the latest two snapshots so drift and false phase changes become obvious.</div>
+          <div class="tableWrap"><table><thead><tr><th>Field</th><th>Previous</th><th>Latest</th><th>Delta / read</th></tr></thead><tbody id="v8DiffBody"></tbody></table></div>
+        </div>
+      </div>
+      <div class="duo" id="v8AnchorLab" style="margin-top:12px">
+        <div class="glass tableCard">
+          <div class="boxTitle">Anchor touch radar</div>
+          <div class="small" style="margin-bottom:10px">Finds counterparties touching live public anchors in recent blocks and promotes them into the hunt.</div>
+          <div class="tableWrap"><table><thead><tr><th>Counterparty</th><th>Touches</th><th>Anchor spread</th><th>Tokens</th><th>Net flow</th><th>Promotion read</th></tr></thead><tbody id="v8AnchorBody"></tbody></table></div>
+        </div>
+        <div class="glass tableCard">
+          <div class="boxTitle">Operator brief</div>
+          <div class="small" style="margin-bottom:10px">This is the compact case report you can export or bring back here for analysis.</div>
+          <div class="btns" style="margin-bottom:12px"><button id="copyBriefBtn">Copy brief</button></div>
+          <div class="field"><label>Auto brief</label><textarea id="operatorBrief" style="min-height:240px"></textarea></div>
+        </div>
+      </div>
+    `;
+    foot.parentNode.insertBefore(wrap, foot);
+  }
+
+  function num(v){ return (v==null || !Number.isFinite(Number(v))) ? 0 : Number(v); }
+
+  function mergedAllHistory(){
+    try { return mergedHistory(); } catch { return []; }
+  }
+
+  function currentHotWatchers(model){
+    return Object.entries(model.watchTiers || {}).filter(([,tier]) => tier === 'hot').map(([k]) => k);
+  }
+
+  function computeHistoryLab(history){
+    const out = [];
+    if(!history.length) return out;
+    const last = history[history.length-1];
+    const prev = history.length > 1 ? history[history.length-2] : null;
+    const avg = (arr, key) => arr.reduce((s,x)=>s+num(x[key]),0) / Math.max(1, arr.length);
+    const phaseCounts = {};
+    history.forEach(h => { phaseCounts[h.stablePhase || h.phase || 'unknown'] = (phaseCounts[h.stablePhase || h.phase || 'unknown'] || 0) + 1; });
+    const topPhase = Object.entries(phaseCounts).sort((a,b)=>b[1]-a[1])[0];
+    let auditStreak = 0;
+    for(let i=history.length-1;i>=0;i--){ const p = history[i].stablePhase || history[i].phase; if(p === 'audit') auditStreak++; else break; }
+    const scoreVals = history.map(h => num(h.score));
+    const publicVals = history.map(h => num(h.publicStrength));
+    const interiorVals = history.map(h => num(h.interiorStrength));
+    const contradictionVals = history.map(h => num(h.contradictionLoad));
+    const allRows = history.flatMap(h => (h.mutationStats && Array.isArray(h.mutationStats.rows)) ? h.mutationStats.rows : []);
+    const dominantAnchor = allRows.sort((a,b)=>num(b.weight)-num(a.weight))[0];
+    const hotCounts = history.map(h => Object.values(h.watchTiers || {}).filter(v => v === 'hot').length);
+    const phaseFlips = history.slice(1).filter((h,i) => (h.stablePhase || h.phase) !== (history[i].stablePhase || history[i].phase)).length;
+
+    out.push(['Snapshots', String(history.length), 'More snapshots means phase and contradiction stats become more trustworthy.']);
+    out.push(['Average score', fmtFixed(avg(history,'score'),2), 'Shows how much usable signal the tool is finding over time.']);
+    out.push(['Average public vs interior', `${fmtPct01(avg(history,'publicStrength'),1)} / ${fmtPct01(avg(history,'interiorStrength'),1)}`, 'This ratio tells us whether the public surface is still outrunning the interior map.']);
+    out.push(['Average contradiction load', fmtPct01(avg(history,'contradictionLoad'),1), 'High contradiction load means the thesis still owes proof.']);
+    out.push(['Current audit streak', `${auditStreak} snapshot(s)`, 'A long audit streak means v7/v8 are refusing to overstate late-phase claims.']);
+    out.push(['Most common stable phase', topPhase ? `${topPhase[0]} (${topPhase[1]})` : '—', 'This is the tool’s true long-run regime, not the most recent raw phase wobble.']);
+    out.push(['Phase flip count', String(phaseFlips), 'Too many flips means the phase model is still too twitchy.']);
+    out.push(['Average hot watcher count', fmtFixed(avg(hotCounts.map(v=>({v})), 'v'),2), 'If this stays near 1, the interior map is still under-discovered.']);
+    out.push(['Dominant anchor by weight', dominantAnchor ? `${dominantAnchor.name} • ${fmtCompact(dominantAnchor.weight,2)}` : '—', 'This is the public rail currently exerting the most observable pressure.']);
+    if(prev){
+      out.push(['Latest score drift', `${fmtFixed(num(last.score)-num(prev.score),2)}`, 'Helps separate real change from noise.']);
+    }
+    return out;
+  }
+
+  function snapshotDiffRows(history){
+    const rows = [];
+    if(history.length < 2) return rows;
+    const a = history[history.length-2];
+    const b = history[history.length-1];
+    const fields = [
+      ['score','Score'],['publicStrength','Public strength'],['interiorStrength','Interior strength'],['contradictionLoad','Contradiction load'],['heatCount','Heat count']
+    ];
+    for(const [key,label] of fields){
+      const av = num(a[key]), bv = num(b[key]), dv = bv-av;
+      rows.push([label, fmtFixed(av,4), fmtFixed(bv,4), `${dv>=0?'+':''}${fmtFixed(dv,4)}`]);
+    }
+    const ah = Object.values(a.watchTiers||{}).filter(v=>v==='hot').length;
+    const bh = Object.values(b.watchTiers||{}).filter(v=>v==='hot').length;
+    rows.push(['Hot watcher count', String(ah), String(bh), `${bh-ah>=0?'+':''}${bh-ah}`]);
+    rows.push(['Stable phase', a.stablePhase||a.phase||'—', b.stablePhase||b.phase||'—', (a.stablePhase||a.phase)===(b.stablePhase||b.phase)?'no change':'phase drift']);
+    rows.push(['Slot probe', a.slotProbe?.summary||'—', b.slotProbe?.summary||'—', b.slotProbe?.allZero?'still null-null':'changed']);
+    rows.push(['DNA slot', a.dnaProbe?.implAddress||'empty', b.dnaProbe?.implAddress||'empty', (a.dnaProbe?.implAddress||'')===(b.dnaProbe?.implAddress||'')?'same':'changed']);
+    return rows;
+  }
+
+  async function scanAnchorTouchesV8(model){
+    try {
+      const anchors = (model.publicAnchors || []).filter(a => isAddr(a.address));
+      const anchorSet = new Set(anchors.map(a => norm(a.address)));
+      const named = new Map(anchors.map(a => [norm(a.address), a.name || short(a.address)]));
+      const tokens = unique([
+        state.settings.TARGET,
+        state.settings.WPLS,
+        ...(anchors.flatMap(a => [a.token0, a.token1]).filter(isAddr))
+      ].filter(isAddr).map(norm)).slice(0, 8);
+      const toScan = Math.max(160, Math.min(600, Math.floor((state.settings.SCAN_BLOCKS || 2500) / 5)));
+      const fromBlock = Math.max(0, model.latest - toScan);
+      const bags = new Map();
+      for(const t of tokens){
+        const token = t;
+        const dec = await ercDecimals(token);
+        const logs = await getLogsAdaptive(token, TRANSFER_TOPIC, fromBlock, model.latest);
+        const parsed = parseTransferLogs(logs, short(token,6,4), dec, token);
+        for(const ev of parsed){
+          const nf = norm(ev.from), nt = norm(ev.to);
+          const fromAnchor = anchorSet.has(nf), toAnchor = anchorSet.has(nt);
+          if(!fromAnchor && !toAnchor) continue;
+          const cp = fromAnchor ? nt : nf;
+          if(anchorSet.has(cp)) continue;
+          if(!isAddr(cp)) continue;
+          if(!bags.has(cp)) bags.set(cp, {address:cp, touches:0, anchors:new Set(), tokens:new Set(), net:0});
+          const b = bags.get(cp);
+          b.touches += 1;
+          b.anchors.add(fromAnchor ? named.get(nf) : named.get(nt));
+          b.tokens.add(ev.token);
+          b.net += fromAnchor ? -num(ev.amount) : num(ev.amount);
+        }
+      }
+      return [...bags.values()].map(b => {
+        const spread = b.anchors.size;
+        const tier = spread >= 2 || b.touches >= 3 ? 'promote' : (b.touches >= 2 ? 'watch' : 'cold');
+        return {...b, spread, tokens:[...b.tokens], anchors:[...b.anchors], tier};
+      }).sort((a,b)=> (b.touches*10 + b.spread*25 + Math.abs(b.net)) - (a.touches*10 + a.spread*25 + Math.abs(a.net))).slice(0, 25);
+    } catch(err){
+      return [{address:'error', touches:0, spread:0, tokens:['scan failed'], anchors:[err.message||String(err)], net:0, tier:'cold'}];
+    }
+  }
+
+  function mergeAnchorCandidates(model){
+    const existing = new Map((model.candidates || []).map(c => [norm(c.address), c]));
+    for(const a of (model.v8AnchorTouches || [])){
+      if(!isAddr(a.address)) continue;
+      const bonus = (a.spread >= 2 ? 3.5 : 1.2) + Math.min(4, a.touches * 0.8);
+      if(existing.has(norm(a.address))){
+        const c = existing.get(norm(a.address));
+        c.score += bonus;
+        c.sources = unique([...(c.sources||[]), 'anchor-radar']);
+        c.roles = unique([...(c.roles||[]), a.spread >= 2 ? 'anchor-crossing counterparty' : 'anchor counterparty']);
+        c.reason = `${c.reason} • anchor radar saw ${a.touches} touch(es)`;
+      } else {
+        const c = {
+          address:a.address,
+          score:bonus,
+          sources:['anchor-radar'],
+          roles:[a.spread >= 2 ? 'anchor-crossing counterparty' : 'anchor counterparty'],
+          reason:`Touched ${a.anchors.join(', ')} via ${a.tokens.join(', ')}.`
+        };
+        existing.set(norm(a.address), c);
+      }
+    }
+    model.candidates = [...existing.values()].sort((a,b)=>num(b.score)-num(a.score)).slice(0, 40);
+    // upgrade rehab suggestions from fresh anchor radar
+    model.rehab = (model.rehab || []).map(r => {
+      if(r.tier !== 'cold' || r.replacement) return r;
+      const repl = model.candidates.find(c => isAddr(c.address) && !Object.values(state.settings.WATCH||{}).map(norm).includes(norm(c.address)) && c.score >= 4.5);
+      return repl ? {...r, replacement: repl} : r;
+    });
+  }
+
+  function computeV8Score(model){
+    const history = mergedAllHistory();
+    const hotCount = currentHotWatchers(model).length;
+    const anchorRadarStrength = clamp((model.v8AnchorTouches || []).filter(a => a.tier !== 'cold').length / 8, 0, 1);
+    const historyConfidence = clamp(history.length / 40, 0, 1);
+    const nullPenalty = model.slotProbe?.allZero ? 0.18 : 0;
+    const dnaPenalty = model.dnaProbe && !model.dnaProbe.implAddress ? 0.1 : 0;
+    const contradictionPenalty = clamp(num(model.contradictionLoad), 0, 1) * 0.42;
+
+    const evidence = (
+      num(model.publicStrength) * 0.33 +
+      num(model.interiorStrength) * 0.27 +
+      anchorRadarStrength * 0.18 +
+      clamp(hotCount / 4, 0, 1) * 0.12 +
+      historyConfidence * 0.10
+    );
+
+    const score = clamp((evidence - contradictionPenalty - nullPenalty - dnaPenalty) * 100, 0, 100);
+    model.v8Evidence = evidence;
+    model.v8AnchorRadarStrength = anchorRadarStrength;
+    model.v8HistoryConfidence = historyConfidence;
+    model.v8Score = score;
+    model.v8ScoreExplain = `evidence ${fmtPct01(evidence,1)} minus contradiction ${fmtPct01(contradictionPenalty,1)} and null penalties`;
+  }
+
+  function operatorBrief(model){
+    const hist = mergedAllHistory();
+    const hot = currentHotWatchers(model);
+    const bestAnchor = (model.mutationStats?.rows || []).slice().sort((a,b)=>num(b.motion)-num(a.motion))[0];
+    const topCandidate = (model.candidates || [])[0];
+    const debt = (model.debts || []).slice(0,3).map(d => `- ${d.task}: ${d.method}`).join('\n');
+    return [
+      `V8 operator brief`,
+      `Time: ${new Date().toLocaleString()}`,
+      `Score: ${fmtFixed(model.v8Score ?? model.score,2)} (${model.regime || model.phase})`,
+      `Stable phase: ${model.phase}; raw phase: ${model.phase}`,
+      `Public vs interior: ${fmtPct01(model.publicStrength,1)} / ${fmtPct01(model.interiorStrength,1)}`,
+      `Contradiction load: ${fmtPct01(model.contradictionLoad,1)}`,
+      `Slots: ${model.slotProbe?.summary || '—'}; DNA: ${model.dnaProbe?.implAddress || 'empty'}`,
+      `Hot watchers: ${hot.length ? hot.join(', ') : 'none'}`,
+      `Top public mover: ${bestAnchor ? `${bestAnchor.name} motion ${fmtFixed(bestAnchor.motion,6)}` : 'none'}`,
+      `Anchor radar hits: ${(model.v8AnchorTouches||[]).filter(a=>a.tier!=='cold').length}`,
+      `Top promoted candidate: ${topCandidate ? `${short(topCandidate.address,10,8)} • ${topCandidate.roles?.[0] || 'candidate'} • score ${fmtFixed(topCandidate.score,1)}` : 'none'}`,
+      `History snapshots loaded: ${hist.length}`,
+      `Best next proof tasks:\n${debt || '- none generated'}`,
+      `Interpretation: ${model.regime}. ${model.v8ScoreExplain || ''}`
+    ].join('\n');
+  }
+
+  function renderV8Panels(model){
+    const history = mergedAllHistory();
+    setHTML('v8HistoryBody', computeHistoryLab(history).map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('') || `<tr><td colspan="3" class="small">No history loaded.</td></tr>`);
+    setHTML('v8DiffBody', snapshotDiffRows(history).map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join('') || `<tr><td colspan="4" class="small">Need at least two snapshots.</td></tr>`);
+    setHTML('v8AnchorBody', (model.v8AnchorTouches || []).map(a => `<tr><td class="mono">${isAddr(a.address)?esc(short(a.address,12,8)):esc(a.address)}</td><td>${a.touches}</td><td>${a.anchors.join(', ') || '—'}</td><td>${a.tokens.join(', ') || '—'}</td><td>${fmtCompact(a.net,3)}</td><td><span class="tag ${a.tier==='promote'?'good':a.tier==='watch'?'ref':'other'}">${esc(a.tier)}</span></td></tr>`).join('') || `<tr><td colspan="6" class="small">No anchor touches yet.</td></tr>`);
+    const brief = operatorBrief(model);
+    const briefBox = document.getElementById('operatorBrief');
+    if(briefBox) briefBox.value = brief;
+    setText('mScore', fmtFixed(model.v8Score ?? model.score, 1));
+    setText('scoreBig', fmtFixed(model.v8Score ?? model.score, 1));
+    setText('sHistory', `${history.length} snapshots`);
+    setText('verdictExplain', `v8 uses anchor radar, history confidence, and contradiction penalties. ${model.v8ScoreExplain || ''}`);
+    const fill = document.getElementById('scoreFill');
+    if(fill) fill.style.width = clamp(model.v8Score ?? model.score,0,100).toFixed(1)+'%';
+    const statusEl = document.getElementById('syncStatus');
+    const score = model.v8Score ?? model.score;
+    if(statusEl){
+      statusEl.className = 'status ' + (score>65 ? 'stable' : score>30 ? 'warned' : 'bad');
+      statusEl.textContent = score>65 ? 'V8 aligned' : score>30 ? 'V8 probing' : 'V8 adversarial audit';
+    }
+  }
+
+  function hookButtons(){
+    const exportHistoryBtn = document.getElementById('exportHistoryBtn');
+    if(exportHistoryBtn && !exportHistoryBtn.dataset.hooked){
+      exportHistoryBtn.dataset.hooked = '1';
+      exportHistoryBtn.onclick = () => download('pdai-v8-history.json', JSON.stringify(mergedAllHistory(), null, 2));
+    }
+    const exportBundleBtn = document.getElementById('exportBundleBtn');
+    if(exportBundleBtn && !exportBundleBtn.dataset.hooked){
+      exportBundleBtn.dataset.hooked = '1';
+      exportBundleBtn.onclick = () => {
+        const payload = {
+          exportedAt: new Date().toISOString(),
+          settings: state.settings,
+          imports: state.imports,
+          localHistory: loadLocalHistory(),
+          mergedHistory: mergedAllHistory(),
+          latestModel: latestModelV8
+        };
+        download('pdai-v8-casebundle.json', JSON.stringify(payload, null, 2));
+      };
+    }
+    const copyBriefBtn = document.getElementById('copyBriefBtn');
+    if(copyBriefBtn && !copyBriefBtn.dataset.hooked){
+      copyBriefBtn.dataset.hooked = '1';
+      copyBriefBtn.onclick = async () => {
+        const txt = document.getElementById('operatorBrief')?.value || '';
+        try { await navigator.clipboard.writeText(txt); copyBriefBtn.textContent = 'Copied'; setTimeout(()=>copyBriefBtn.textContent='Copy brief',1200); }
+        catch { document.getElementById('operatorBrief')?.select(); }
+      };
+    }
+  }
+
+  addV8Buttons();
+  addV8Panels();
+  hookButtons();
+
+  const oldBuildModel = buildModel;
+  buildModel = async function(){
+    const model = await oldBuildModel();
+    model.v8AnchorTouches = await scanAnchorTouchesV8(model);
+    mergeAnchorCandidates(model);
+    computeV8Score(model);
+    latestModelV8 = model;
+    return model;
+  };
+
+  const oldRender = render;
+  render = function(model){
+    oldRender(model);
+    renderV8Panels(model);
+    hookButtons();
+  };
+})();
+</script>
+
 </body>
 </html>
