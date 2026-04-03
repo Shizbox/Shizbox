@@ -774,5 +774,299 @@ state.settings=loadSettings(); state.imports=loadImports(); applySettingsToUI();
 })();
 </script>
 
+
+<script>
+(function(){
+  const V9_THOUGHTS_KEY = 'pdai-v9-thought-journal';
+  const V9_CURIOSITY_KEY = 'pdai-v9-curiosity';
+  let latestModelV9 = null;
+
+  function v9LoadThoughtJournal(){ try{return JSON.parse(localStorage.getItem(V9_THOUGHTS_KEY)||'[]')}catch{return []} }
+  function v9SaveThoughtJournal(arr){ localStorage.setItem(V9_THOUGHTS_KEY, JSON.stringify(arr.slice(-600))); }
+  function v9LoadCuriosity(){ try{return JSON.parse(localStorage.getItem(V9_CURIOSITY_KEY)||'{"hits":{}}')}catch{return {hits:{}}} }
+  function v9SaveCuriosity(v){ localStorage.setItem(V9_CURIOSITY_KEY, JSON.stringify(v)); }
+
+  function addV9Style(){
+    if(document.getElementById('v9Style')) return;
+    const st=document.createElement('style');
+    st.id='v9Style';
+    st.textContent=`
+      .v9dock{margin-top:14px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}
+      .thoughtDock{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+      .bubbleWrap{position:relative;min-height:220px;border-radius:18px;background:radial-gradient(circle at top left, rgba(72,196,255,.09), transparent 25%), radial-gradient(circle at bottom right, rgba(88,255,185,.06), transparent 24%), rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);overflow:hidden;padding:12px}
+      .bubbleCloud{position:relative;min-height:196px}
+      .thoughtBubble{position:absolute;max-width:270px;padding:12px 14px;border-radius:18px 18px 18px 6px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 26px rgba(0,0,0,.18);font-size:.84rem;line-height:1.45;color:var(--text);animation:v9Float 9s ease-in-out infinite}
+      .thoughtBubble.good{border-color:rgba(88,255,185,.18)} .thoughtBubble.warn{border-color:rgba(255,204,82,.22)} .thoughtBubble.bad{border-color:rgba(255,93,115,.18)} .thoughtBubble.info{border-color:rgba(72,196,255,.18)}
+      .thoughtBubble:after{content:'';position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.08);border-left:0}
+      .thinkHead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+      .thinkBadge{padding:6px 10px;border-radius:999px;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;border:1px solid rgba(72,196,255,.18);color:var(--cyan);background:rgba(72,196,255,.06)}
+      .v9miniGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+      .v9mini{border:1px solid rgba(255,255,255,.05);border-radius:16px;background:rgba(255,255,255,.02);padding:12px}
+      .v9List{display:grid;gap:8px}
+      .v9Item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.84rem;line-height:1.45}
+      .v9Item.good{border-color:rgba(88,255,185,.18)} .v9Item.warn{border-color:rgba(255,204,82,.18)} .v9Item.bad{border-color:rgba(255,93,115,.18)}
+      @keyframes v9Float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
+      @media (max-width:1400px){.thoughtDock,.v9miniGrid{grid-template-columns:1fr}}
+    `;
+    document.head.appendChild(st);
+  }
+
+  function addV9Panels(){
+    if(document.getElementById('v9ThinkingPanel')) return;
+    const app=document.querySelector('.app');
+    if(!app) return;
+    const sec=document.createElement('div');
+    sec.id='v9ThinkingPanel';
+    sec.className='glass section';
+    sec.innerHTML=`
+      <div class="thinkHead">
+        <div>
+          <div class="boxTitle">V9 Thought Engine</div>
+          <div class="small">Live thought bubbles, curiosity loops, autonomous next hunts, and export-ready internal reasoning summaries.</div>
+        </div>
+        <div class="btns">
+          <button id="exportThoughtHistoryBtn" class="secondary">Export thoughts</button>
+          <button id="copyThoughtSummaryBtn" class="secondary">Copy thought summary</button>
+        </div>
+      </div>
+      <div class="thoughtDock">
+        <div class="bubbleWrap">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px"><span class="thinkBadge">Thinking</span><span class="small" id="v9ThinkStamp">—</span></div>
+          <div id="v9BubbleCloud" class="bubbleCloud"></div>
+        </div>
+        <div class="v9miniGrid">
+          <div class="v9mini">
+            <div class="boxTitle">Curiosity queue</div>
+            <div id="v9CuriosityList" class="v9List"></div>
+          </div>
+          <div class="v9mini">
+            <div class="boxTitle">Self-correction</div>
+            <div id="v9CorrectionList" class="v9List"></div>
+          </div>
+          <div class="v9mini">
+            <div class="boxTitle">Autonomous hunts</div>
+            <div id="v9HuntsList" class="v9List"></div>
+          </div>
+          <div class="v9mini">
+            <div class="boxTitle">Thought summary</div>
+            <textarea id="v9ThoughtSummary" style="width:100%;min-height:175px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);"></textarea>
+          </div>
+        </div>
+      </div>`;
+    const foot=document.querySelector('.foot');
+    app.insertBefore(sec, foot || null);
+  }
+
+  function classifyThought(text){
+    const t=String(text||'').toLowerCase();
+    if(/dead|empty|null-null|cold|contradiction|missing|no heat|no dna/.test(t)) return 'bad';
+    if(/promote|candidate|hunt|query|look for|trace|watch|discover/.test(t)) return 'info';
+    if(/hot|active|moving|mutating|surface|structural core|5ef7/.test(t)) return 'good';
+    return 'warn';
+  }
+
+  function bubbleLayout(items){
+    const presets=[
+      {left:'2%',top:'8%'},{left:'35%',top:'4%'},{left:'63%',top:'16%'},
+      {left:'8%',top:'46%'},{left:'40%',top:'50%'},{left:'68%',top:'42%'}
+    ];
+    return items.slice(0,6).map((it,i)=>({ ...presets[i%presets.length], text:it, cls:classifyThought(it) }));
+  }
+
+  function v9ModelThoughts(model){
+    const thoughts=[];
+    const hot = Object.entries(model.watchTiers||{}).filter(([,tier])=>tier==='hot').map(([k])=>k);
+    thoughts.push(hot.length ? `${hot.join(', ')} remain the only live watcher lane(s); everything else is still cold.` : `No watcher lane is convincingly alive yet.`);
+    if(model.slotProbe?.allZero) thoughts.push(`Slot probe is still null-null equality. That is absence, not proof of symmetry.`);
+    if(!model.dnaProbe?.implAddress) thoughts.push(`DNA slot is empty, so proxy-hot-swap is not helping the current thesis.`);
+    const rows=(model.mutationStats?.rows||[]).filter(r=>r.motion>0);
+    if(rows.length){
+      const top=rows.slice().sort((a,b)=>(b.motion||0)-(a.motion||0))[0];
+      thoughts.push(`${top.name} is the loudest moving surface rail right now with motion ${fmtFixed(top.motion||0, 6)}.`);
+    } else {
+      thoughts.push(`Public surface is currently calm enough that fresh anomalies may require longer windows or stronger counterparties.`);
+    }
+    const pdai5 = model.nodeBalances?.['5EF7']?.pdai || 0;
+    if(pdai5>0) thoughts.push(`5EF7 still holds ${fmtCompact(pdai5,3)} pDAI, which keeps it in structural-core status.`);
+    if((model.heatCount||0)===0) thoughts.push(`No pending heat has been seen. The next breakthrough likely comes from counterparty discovery, not mempool fireworks.`);
+    if((model.publicStrength||0) > (model.interiorStrength||0)) thoughts.push(`The public surface is still outrunning interior discovery. V9 should hunt the addresses that bridge that gap.`);
+    if((model.contradictionLoad||0) >= 0.6) thoughts.push(`Contradiction load is high enough that dead assumptions must be actively demoted.`);
+    return thoughts;
+  }
+
+  function v9CuriosityQueue(model){
+    const q=[];
+    const mt=(model.mutationStats?.rows||[]).filter(r=>r.motion>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
+    if(mt[0]) q.push(`Trace latest counterparties touching ${mt[0].name}.`);
+    if(model.watchTiers?.['3D07']==='cold') q.push(`Hunt replacements for 3D07 using public-anchor counterparties and trace trees.`);
+    if(model.slotProbe?.allZero) q.push(`Replace symbolic slot fixation with non-null storage discovery around real active callers.`);
+    if(!model.dnaProbe?.implAddress) q.push(`Prioritize route/trace/selector intelligence over proxy theories.`);
+    if((model.heatCount||0)===0) q.push(`Scan for heartbeat payloads and zero-value calls instead of raw gas spikes.`);
+    return q.slice(0,6);
+  }
+
+  function v9Corrections(model){
+    const out=[];
+    if(model.slotProbe?.allZero) out.push('Null-null slot equality now counts as a contradiction, not a positive signal.');
+    if(!model.dnaProbe?.implAddress) out.push('Empty DNA slot now suppresses proxy-based narratives.');
+    const cold=Object.entries(model.watchTiers||{}).filter(([,t])=>t==='cold').map(([k])=>k);
+    if(cold.length) out.push(`Cold watcher set: ${cold.join(', ')}.`);
+    if((model.publicStrength||0) > (model.interiorStrength||0)) out.push('Scores now privilege live surface mutation over silent interior lore.');
+    return out.slice(0,6);
+  }
+
+  function v9AutonomousHunts(model){
+    const hunts=[];
+    const candidates=(model.candidates||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
+    if(candidates[0]) hunts.push(`Promote ${short(candidates[0].address,10,8)} and pull nonce + code + recent touches.`);
+    hunts.push('Compare counterparties of native pDAI/WPLS versus bridged DAI/WPLS for overlap.');
+    hunts.push('Scan recent calldata around active public anchors for selectors and printable words.');
+    hunts.push('Build lane genealogy from the first funder / first outbound / repeated route timing.');
+    hunts.push('Demote any watcher that stays cold across multiple thoughtful cycles.');
+    return hunts.slice(0,6);
+  }
+
+  function renderV9Thinking(model){
+    const thoughts = model.v9Thoughts || [];
+    const bubbleCloud=document.getElementById('v9BubbleCloud');
+    if(bubbleCloud){
+      const bubbles=bubbleLayout(thoughts).map(b=>`<div class="thoughtBubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('');
+      bubbleCloud.innerHTML=bubbles || `<div class="thoughtBubble info" style="left:8%;top:12%">No active thought bubbles yet.</div>`;
+    }
+    setText('v9ThinkStamp', `Thought cycle • ${new Date().toLocaleTimeString()}`);
+    setHTML('v9CuriosityList', (model.v9Curiosity||[]).map(x=>`<div class="v9Item info">${esc(x)}</div>`).join('') || `<div class="v9Item warn">No curiosity tasks yet.</div>`);
+    setHTML('v9CorrectionList', (model.v9Corrections||[]).map(x=>`<div class="v9Item warn">${esc(x)}</div>`).join('') || `<div class="v9Item warn">No correction items yet.</div>`);
+    setHTML('v9HuntsList', (model.v9Hunts||[]).map(x=>`<div class="v9Item good">${esc(x)}</div>`).join('') || `<div class="v9Item warn">No autonomous hunts yet.</div>`);
+    const summary = [
+      `V9 status: ${model.regime || model.phase}.`,
+      `Public strength ${fmtPct01(model.publicStrength,1)} versus interior ${fmtPct01(model.interiorStrength,1)}.`,
+      `Contradiction load ${fmtPct01(model.contradictionLoad,1)}.`,
+      ...thoughts.slice(0,6),
+      `Next hunts: ${(model.v9Hunts||[]).slice(0,3).join(' | ')}`
+    ].join('\n');
+    const box=document.getElementById('v9ThoughtSummary');
+    if(box) box.value=summary;
+  }
+
+  function v9Snapshot(model){
+    const base = snapshot(model);
+    base.thoughts = model.v9Thoughts || [];
+    base.curiosity = model.v9Curiosity || [];
+    base.corrections = model.v9Corrections || [];
+    base.autonomousHunts = model.v9Hunts || [];
+    base.thoughtSummary = document.getElementById('v9ThoughtSummary')?.value || '';
+    base.regime = model.regime;
+    return base;
+  }
+
+  function v9EnrichHistory(history){
+    return (history||[]).map(h => {
+      if(h.thoughts) return h;
+      const thoughts=[];
+      if(h.slotProbe?.allZero || /null-null/i.test(h.slotProbe?.summary||'')) thoughts.push('Historical slot probe was null-null equality.');
+      if(!h.dnaProbe?.implAddress) thoughts.push('Historical DNA slot was empty.');
+      if(h.nodeBalances?.['5EF7']?.pdai>0) thoughts.push(`Historical 5EF7 carried ${fmtCompact(h.nodeBalances['5EF7'].pdai,3)} pDAI.`);
+      if((h.publicStrength||0) > (h.interiorStrength||0)) thoughts.push('Historical surface strength exceeded interior strength.');
+      return { ...h, thoughts, thoughtSummary: thoughts.join(' ') };
+    });
+  }
+
+  function mergedAllHistoryV9(){
+    const raw = (typeof mergedAllHistory==='function' ? mergedAllHistory() : (typeof mergedHistory==='function' ? mergedHistory() : loadLocalHistory()));
+    return v9EnrichHistory(raw);
+  }
+
+  function v9JournalPush(model){
+    const journal=v9LoadThoughtJournal();
+    journal.push({ts:Date.now(), phase:model.phase, regime:model.regime, thoughts:model.v9Thoughts||[], summary:document.getElementById('v9ThoughtSummary')?.value||''});
+    v9SaveThoughtJournal(journal);
+  }
+
+  function v9HookButtons(){
+    const eh=document.getElementById('exportHistoryBtn');
+    if(eh && !eh.dataset.v9){
+      eh.dataset.v9='1';
+      eh.onclick=()=>download('pdai-v9-history.json', JSON.stringify(mergedAllHistoryV9(), null, 2));
+    }
+    const eb=document.getElementById('exportBundleBtn');
+    if(eb && !eb.dataset.v9){
+      eb.dataset.v9='1';
+      eb.onclick=()=>{
+        const payload={
+          exportedAt:new Date().toISOString(),
+          settings:state.settings,
+          imports:state.imports,
+          localHistory:v9EnrichHistory(loadLocalHistory()),
+          mergedHistory:mergedAllHistoryV9(),
+          thoughtJournal:v9LoadThoughtJournal(),
+          latestModel:latestModelV9
+        };
+        download('pdai-v9-casebundle.json', JSON.stringify(payload, null, 2));
+      };
+    }
+    const et=document.getElementById('exportThoughtHistoryBtn');
+    if(et && !et.dataset.v9){
+      et.dataset.v9='1';
+      et.onclick=()=>download('pdai-v9-thoughts.json', JSON.stringify(v9LoadThoughtJournal(), null, 2));
+    }
+    const copy=document.getElementById('copyThoughtSummaryBtn');
+    if(copy && !copy.dataset.v9){
+      copy.dataset.v9='1';
+      copy.onclick=async()=>{
+        const txt=document.getElementById('v9ThoughtSummary')?.value || '';
+        try{ await navigator.clipboard.writeText(txt); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy thought summary',1200); }
+        catch{ document.getElementById('v9ThoughtSummary')?.select(); }
+      };
+    }
+  }
+
+  addV9Style();
+  addV9Panels();
+
+  const oldBuildModelV9 = buildModel;
+  buildModel = async function(){
+    const model = await oldBuildModelV9();
+    const cur = v9LoadCuriosity();
+    model.v9Thoughts = v9ModelThoughts(model);
+    model.v9Curiosity = v9CuriosityQueue(model);
+    model.v9Corrections = v9Corrections(model);
+    model.v9Hunts = v9AutonomousHunts(model);
+    model.v9Curiosity.forEach(q=>{ cur.hits[q]=(cur.hits[q]||0)+1; });
+    v9SaveCuriosity(cur);
+    latestModelV9 = model;
+    return model;
+  };
+
+  const oldRenderV9 = render;
+  render = function(model){
+    oldRenderV9(model);
+    renderV9Thinking(model);
+    v9HookButtons();
+  };
+
+  sync = async function(){
+    if(state.syncing) return;
+    state.syncing=true;
+    try{
+      const model = await buildModel();
+      render(model);
+      const hist = loadLocalHistory();
+      hist.push(v9Snapshot(model));
+      saveLocalHistory(hist);
+      setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`);
+      v9JournalPush(model);
+    } catch(e){
+      $('syncStatus').className='status bad';
+      setText('syncStatus','Sync failed');
+      setText('lastSync',`Last error: ${e.message||String(e)}`);
+    } finally {
+      state.syncing=false;
+    }
+  };
+
+  v9HookButtons();
+})();
+</script>
+
 </body>
 </html>
