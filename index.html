@@ -1,731 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pDAI Peg Prover | Ascended Unified Intelligence</title>
-  <style>
-    :root{
-      --bg:#04060c; --bg2:#0a1326; --panel:rgba(10,14,24,.82); --text:#ebfff5; --muted:#8ca0ad;
-      --line:rgba(88,255,185,.18); --cyan:#48c4ff; --green:#58ffb9; --amber:#ffcc52; --red:#ff5d73; --pink:#ff56da;
-      --shadow:0 0 30px rgba(72,196,255,.12),0 0 60px rgba(88,255,185,.06); --radius:22px;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;min-height:100%;background:radial-gradient(circle at top,var(--bg2) 0%,var(--bg) 45%,#020306 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    body{overflow-x:hidden}
-    .bgfx,.bgfx:before,.bgfx:after{content:"";position:fixed;inset:-10% -10%;pointer-events:none;z-index:-1;background:radial-gradient(circle at 20% 20%,rgba(72,196,255,.11),transparent 24%),radial-gradient(circle at 78% 16%,rgba(88,255,185,.08),transparent 22%),radial-gradient(circle at 50% 80%,rgba(255,86,218,.06),transparent 24%);filter:blur(18px);animation:drift 20s ease-in-out infinite alternate}
-    .bgfx:after{background:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;opacity:.2;filter:none;transform:perspective(800px) rotateX(64deg) translateY(24vh) scale(1.5);animation:gridmove 22s linear infinite}
-    .stars{position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:radial-gradient(2px 2px at 20px 30px,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 80px 120px,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 140px 60px,rgba(255,255,255,.55),transparent),radial-gradient(1px 1px at 200px 180px,rgba(255,255,255,.4),transparent),radial-gradient(2px 2px at 280px 100px,rgba(255,255,255,.35),transparent);background-size:320px 240px;opacity:.22;animation:twinkle 12s linear infinite}
-    @keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(2vw,-2vh,0) scale(1.06)}}
-    @keyframes gridmove{0%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(0) scale(1.5)}100%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(-80px) scale(1.5)}}
-    @keyframes twinkle{0%,100%{opacity:.18}50%{opacity:.32}}
-    @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-    @keyframes pulseGlow{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}50%{opacity:.92;transform:translate(-50%,-50%) scale(1.08)}}
-    @keyframes scan{100%{transform:translateX(120%)}}
-    @keyframes barScan{100%{transform:translateX(130%)}}
-
-    .app{max-width:1680px;margin:0 auto;padding:18px}
-    .glass{background:linear-gradient(180deg,rgba(16,24,38,.88),rgba(8,12,20,.94));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);border-radius:var(--radius)}
-    .top{padding:18px 20px;display:grid;grid-template-columns:1.35fr .85fr;gap:14px;position:relative;overflow:hidden}
-    .top:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);transform:translateX(-100%);animation:scan 10s linear infinite;pointer-events:none}
-    .title{font-size:1.6rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;line-height:1.05;margin:0}
-    .titleGlow{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(88,255,185,.12))}
-    .sub{margin-top:10px;color:var(--muted);font-size:.93rem;line-height:1.58;max-width:1020px}
-    .truthBar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
-    .chip{border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:999px;font-size:.77rem;background:rgba(255,255,255,.03)}
-    .chip.good{color:var(--green);border-color:rgba(88,255,185,.25)} .chip.warn{color:var(--amber);border-color:rgba(255,204,82,.25)} .chip.info{color:var(--cyan);border-color:rgba(72,196,255,.24)}
-    .rightHead{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-    .statusPill{padding:10px 14px;border-radius:999px;font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
-    .stable{color:var(--green);box-shadow:0 0 20px rgba(88,255,185,.14) inset} .warned{color:var(--amber);box-shadow:0 0 20px rgba(255,204,82,.10) inset} .bad{color:var(--red);box-shadow:0 0 20px rgba(255,93,115,.10) inset}
-    .meta{text-align:right;color:var(--muted);font-size:.78rem;line-height:1.55}
-    .btnRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    button{appearance:none;border:none;cursor:pointer;padding:11px 14px;border-radius:14px;font:inherit;font-weight:750;color:var(--text);background:linear-gradient(180deg,rgba(72,196,255,.18),rgba(88,255,185,.08));border:1px solid rgba(72,196,255,.25);box-shadow:0 0 18px rgba(72,196,255,.08)}
-    button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.08)}
-    button.mini{padding:6px 8px;border-radius:10px;font-size:.72rem}
-    button:hover{transform:translateY(-1px);filter:brightness(1.08)}
-
-    .section{margin-top:14px;padding:14px}
-    .metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
-    .card{background:linear-gradient(180deg,rgba(12,18,28,.9),rgba(9,13,21,.97));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:14px;min-height:104px;position:relative;overflow:hidden}
-    .card:before{content:"";position:absolute;inset:auto -40% 0 -40%;height:1px;background:linear-gradient(90deg,transparent,rgba(88,255,185,.45),transparent);opacity:.7}
-    .label{font-size:.70rem;text-transform:uppercase;letter-spacing:.14em;color:#92a3ad;margin-bottom:10px}
-    .value{font-size:1.42rem;font-weight:950;line-height:1.1;text-shadow:0 0 22px rgba(255,255,255,.03)}
-    .hint{margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.45}
-
-    .hero{display:grid;grid-template-columns:430px 1fr;gap:14px;align-items:stretch}
-    .reactor{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate}
-    .reactor:before,.reactor:after{content:"";position:absolute;border-radius:50%;inset:50%;transform:translate(-50%,-50%);pointer-events:none}
-    .reactor:before{width:360px;height:360px;background:radial-gradient(circle,rgba(88,255,185,.12),transparent 55%),radial-gradient(circle at 30% 30%,rgba(72,196,255,.18),transparent 24%),radial-gradient(circle at 70% 70%,rgba(255,86,218,.12),transparent 24%);filter:blur(14px);animation:pulseGlow 5s ease-in-out infinite}
-    .reactor:after{width:520px;height:520px;border:1px dashed rgba(72,196,255,.18);animation:spin 18s linear infinite;opacity:.6}
-    .ringWrap{position:relative;width:320px;height:320px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(5,8,14,.96) 0 48%,transparent 49% 100%),conic-gradient(from -90deg,var(--green),var(--cyan),#4f7cff,var(--pink),var(--green));box-shadow:0 0 26px rgba(72,196,255,.18), inset 0 0 32px rgba(255,255,255,.03);animation:spin 14s linear infinite reverse}
-    .ringWrap::before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at center,rgba(6,10,16,.97) 0 62%,transparent 63% 100%),conic-gradient(from -90deg,rgba(88,255,185,.18) 0 calc(var(--score)*1%),rgba(255,255,255,.05) calc(var(--score)*1%) 100%);box-shadow: inset 0 0 45px rgba(72,196,255,.08)}
-    .ringWrap::after{content:"";position:absolute;inset:30px;border-radius:50%;border:1px solid rgba(255,255,255,.06);box-shadow:0 0 24px rgba(88,255,185,.06) inset}
-    .reactorCore{position:absolute;width:208px;height:208px;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(88,255,185,.13),transparent 22%),radial-gradient(circle at 50% 50%,rgba(12,20,34,.98),rgba(4,7,12,.99));border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;box-shadow:inset 0 0 35px rgba(255,255,255,.03)}
-    .coreKicker{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#9bb1bd}
-    .coreScore{font-size:3.1rem;font-weight:1000;line-height:1;margin-top:8px}
-    .coreState{margin-top:8px;font-size:1rem;font-weight:900;letter-spacing:.06em}
-    .coreGap{margin-top:8px;font-size:.84rem;color:var(--muted)}
-    .heroRight{display:grid;grid-template-rows:auto auto auto 1fr;gap:12px}
-    .verdictBox{padding:16px;border-radius:22px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(12,19,31,.92),rgba(7,11,18,.97))}
-    .verdictTop{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}
-    .bigVerdict{font-size:1.36rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
-    .scoreBar{margin-top:14px;height:16px;border-radius:999px;background:#0b1118;border:1px solid rgba(255,255,255,.06);overflow:hidden;position:relative}
-    .scoreFill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green),var(--cyan));box-shadow:0 0 24px rgba(88,255,185,.18);transition:width .8s ease;position:relative}
-    .scoreFill:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);animation:barScan 2.6s linear infinite}
-    .parts{margin-top:14px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
-    .part{border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.02)}
-    .part .k{font-size:.67rem;color:#95a8b3;text-transform:uppercase;letter-spacing:.12em}.part .v{margin-top:7px;font-size:1.02rem;font-weight:850}
-
-    .chartGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-    .miniChart{border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px;background:rgba(255,255,255,.02)}
-    .miniChart canvas{width:100%;height:90px;display:block}
-
-    .proofGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
-    .proof{border-radius:18px;padding:14px;min-height:154px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(12,18,29,.94),rgba(8,11,18,.97));position:relative;overflow:hidden}
-    .proof:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.1)} .proof.ok:before{background:var(--green)} .proof.wait:before{background:var(--amber)} .proof.no:before{background:var(--red)}
-    .proofTitle{font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:#9bb0bc}.proofState{margin-top:10px;font-size:1rem;font-weight:900}.proofStat{margin-top:7px;font-size:1.45rem;font-weight:1000}.proofText{margin-top:8px;color:var(--muted);font-size:.83rem;line-height:1.48}
-
-    .quad{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
-    .triple{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-    .listBox{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}
-    .boxTitle{font-size:.80rem;text-transform:uppercase;letter-spacing:.14em;color:#9eb2be;margin-bottom:10px}
-    .list{display:grid;gap:8px}
-    .item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.86rem;line-height:1.48}.item.good{border-color:rgba(88,255,185,.18)} .item.warn{border-color:rgba(255,204,82,.18)} .item.bad{border-color:rgba(255,93,115,.18)}
-
-    .settings{display:none;margin-top:12px;padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(9,14,22,.95),rgba(6,10,16,.99));border:1px solid rgba(255,255,255,.06)}
-    .settings.open{display:block}
-    .formGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-    .field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.74rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.field textarea{min-height:86px;resize:vertical}
-    .checkline{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:.84rem}.checkline input{width:auto}
-
-    .tables{display:grid;grid-template-columns:1fr;gap:12px}.tableCard{padding:14px;border-radius:22px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(11,16,26,.94),rgba(8,11,18,.98))}
-    .tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)}
-    table{width:100%;border-collapse:collapse;min-width:1180px;background:#081019} th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top} th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem} tr:hover td{background:rgba(255,255,255,.02)}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-    .tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid rgba(255,255,255,.08)} .tag.good{color:var(--green);border-color:rgba(88,255,185,.22)} .tag.bad{color:var(--red);border-color:rgba(255,93,115,.22)} .tag.ref{color:var(--amber);border-color:rgba(255,204,82,.22)} .tag.wpls{color:var(--cyan);border-color:rgba(72,196,255,.22)} .tag.other{color:#c2ccd2}
-    .small{font-size:.76rem;color:var(--muted)} a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}
-    .foot{margin:14px 0 22px;padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;color:var(--muted);font-size:.78rem}
-
-    @media (max-width:1500px){.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.proofGrid{grid-template-columns:repeat(3,minmax(0,1fr))}.parts{grid-template-columns:repeat(4,minmax(0,1fr))}.formGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.chartGrid,.triple,.quad{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.top{grid-template-columns:1fr}.rightHead{align-items:flex-start}.meta{text-align:left}.btnRow{justify-content:flex-start}}
-    @media (max-width:900px){.metrics,.proofGrid,.parts,.formGrid{grid-template-columns:1fr}.reactor{min-height:360px}.ringWrap{width:280px;height:280px}.reactorCore{width:184px;height:184px}.coreScore{font-size:2.5rem}}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>pDAI Peg Prover | v5 Self-Correcting Intelligence</title>
+<style>
+:root{--bg:#05070d;--bg2:#0c1630;--panel:rgba(10,14,24,.86);--line:rgba(88,255,185,.18);--text:#ebfff5;--muted:#8ca0ad;--green:#58ffb9;--cyan:#48c4ff;--amber:#ffcc52;--red:#ff5d73;--pink:#ff56da;--radius:22px;--shadow:0 0 30px rgba(72,196,255,.12),0 0 60px rgba(88,255,185,.06)}
+*{box-sizing:border-box} html,body{margin:0;padding:0;min-height:100%;background:radial-gradient(circle at top,var(--bg2) 0%,var(--bg) 45%,#020306 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} body{overflow-x:hidden}
+.bg,.bg:before,.bg:after{content:"";position:fixed;inset:-10% -10%;pointer-events:none;z-index:-1;background:radial-gradient(circle at 20% 20%,rgba(72,196,255,.11),transparent 24%),radial-gradient(circle at 78% 16%,rgba(88,255,185,.08),transparent 22%),radial-gradient(circle at 50% 80%,rgba(255,86,218,.06),transparent 24%);filter:blur(18px);animation:drift 20s ease-in-out infinite alternate}.bg:after{background:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;opacity:.2;filter:none;transform:perspective(800px) rotateX(64deg) translateY(24vh) scale(1.5);animation:gridmove 22s linear infinite}
+@keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(2vw,-2vh,0) scale(1.06)}} @keyframes gridmove{0%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(0) scale(1.5)}100%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(-80px) scale(1.5)}} @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}} @keyframes pulse{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}50%{opacity:.92;transform:translate(-50%,-50%) scale(1.08)}} @keyframes bar{100%{transform:translateX(130%)}}
+.app{max-width:1700px;margin:0 auto;padding:18px}.glass{background:linear-gradient(180deg,rgba(16,24,38,.88),rgba(8,12,20,.94));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);border-radius:var(--radius)}
+.top{padding:18px 20px;display:grid;grid-template-columns:1.35fr .85fr;gap:14px}.title{font-size:1.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;line-height:1.05;margin:0}.titleGlow{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}.sub{margin-top:10px;color:var(--muted);font-size:.93rem;line-height:1.58;max-width:1030px}.chips{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:999px;font-size:.77rem;background:rgba(255,255,255,.03)}.chip.good{color:var(--green);border-color:rgba(88,255,185,.25)}.chip.info{color:var(--cyan);border-color:rgba(72,196,255,.24)}.chip.warn{color:var(--amber);border-color:rgba(255,204,82,.25)}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}.status{padding:10px 14px;border-radius:999px;font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}.stable{color:var(--green)}.warned{color:var(--amber)}.bad{color:var(--red)} .meta{text-align:right;color:var(--muted);font-size:.78rem;line-height:1.55}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end} button{appearance:none;border:none;cursor:pointer;padding:11px 14px;border-radius:14px;font:inherit;font-weight:750;color:var(--text);background:linear-gradient(180deg,rgba(72,196,255,.18),rgba(88,255,185,.08));border:1px solid rgba(72,196,255,.25);box-shadow:0 0 18px rgba(72,196,255,.08)} button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.08)} button.mini{padding:6px 8px;border-radius:10px;font-size:.72rem}
+.section{margin-top:14px;padding:14px}.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.card{background:linear-gradient(180deg,rgba(12,18,28,.9),rgba(9,13,21,.97));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:14px;min-height:104px}.label{font-size:.70rem;text-transform:uppercase;letter-spacing:.14em;color:#92a3ad;margin-bottom:10px}.value{font-size:1.42rem;font-weight:950;line-height:1.1}.hint{margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.45}
+.hero{display:grid;grid-template-columns:430px 1fr;gap:14px}.reactor{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate}.reactor:before,.reactor:after{content:"";position:absolute;border-radius:50%;inset:50%;transform:translate(-50%,-50%);pointer-events:none}.reactor:before{width:360px;height:360px;background:radial-gradient(circle,rgba(88,255,185,.12),transparent 55%),radial-gradient(circle at 30% 30%,rgba(72,196,255,.18),transparent 24%),radial-gradient(circle at 70% 70%,rgba(255,86,218,.12),transparent 24%);filter:blur(14px);animation:pulse 5s ease-in-out infinite}.reactor:after{width:520px;height:520px;border:1px dashed rgba(72,196,255,.18);animation:spin 18s linear infinite;opacity:.6}.ring{position:relative;width:320px;height:320px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(5,8,14,.96) 0 48%,transparent 49% 100%),conic-gradient(from -90deg,var(--green),var(--cyan),#4f7cff,var(--pink),var(--green));box-shadow:0 0 26px rgba(72,196,255,.18), inset 0 0 32px rgba(255,255,255,.03);animation:spin 14s linear infinite reverse}.ring:before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at center,rgba(6,10,16,.97) 0 62%,transparent 63% 100%),conic-gradient(from -90deg,rgba(88,255,185,.18) 0 calc(var(--score)*1%),rgba(255,255,255,.05) calc(var(--score)*1%) 100%);box-shadow:inset 0 0 45px rgba(72,196,255,.08)}.core{position:absolute;width:208px;height:208px;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(88,255,185,.13),transparent 22%),radial-gradient(circle at 50% 50%,rgba(12,20,34,.98),rgba(4,7,12,.99));border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px}.core .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#9bb1bd}.core .score{font-size:3.1rem;font-weight:1000;line-height:1;margin-top:8px}.core .state{margin-top:8px;font-size:1rem;font-weight:900;letter-spacing:.06em}.core .substate{margin-top:8px;font-size:.84rem;color:var(--muted)}
+.heroRight{display:grid;grid-template-rows:auto auto auto 1fr;gap:12px}.verdict{padding:16px;border-radius:22px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(12,19,31,.92),rgba(7,11,18,.97))}.verdictTop{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}.bigVerdict{font-size:1.36rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.scoreBar{margin-top:14px;height:16px;border-radius:999px;background:#0b1118;border:1px solid rgba(255,255,255,.06);overflow:hidden;position:relative}.scoreFill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green),var(--cyan));box-shadow:0 0 24px rgba(88,255,185,.18);transition:width .8s ease;position:relative}.scoreFill:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);animation:bar 2.6s linear infinite}.parts{margin-top:14px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}.part{border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.02)}.part .k{font-size:.67rem;color:#95a8b3;text-transform:uppercase;letter-spacing:.12em}.part .v{margin-top:7px;font-size:1.02rem;font-weight:850}
+.chartGrid,.quad,.triple{display:grid;gap:12px}.chartGrid{grid-template-columns:1fr 1fr 1fr}.quad{grid-template-columns:1fr 1fr 1fr 1fr}.triple{grid-template-columns:1fr 1fr 1fr}.mini,.listBox,.tableCard,.settings{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}.boxTitle{font-size:.80rem;text-transform:uppercase;letter-spacing:.14em;color:#9eb2be;margin-bottom:10px}.list{display:grid;gap:8px}.item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.86rem;line-height:1.48}.item.good{border-color:rgba(88,255,185,.18)}.item.warn{border-color:rgba(255,204,82,.18)}.item.bad{border-color:rgba(255,93,115,.18)}
+.settings{display:none}.settings.open{display:block}.formGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.74rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.checkline{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:.84rem}.checkline input{width:auto}
+.tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)}table{width:100%;border-collapse:collapse;min-width:980px;background:#081019}th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem} tr:hover td{background:rgba(255,255,255,.02)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid rgba(255,255,255,.08)}.tag.good{color:var(--green);border-color:rgba(88,255,185,.22)}.tag.bad{color:var(--red);border-color:rgba(255,93,115,.22)}.tag.ref{color:var(--amber);border-color:rgba(255,204,82,.22)}.tag.other{color:#c2ccd2}.small{font-size:.76rem;color:var(--muted)} a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}.foot{margin:14px 0 22px;padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;color:var(--muted);font-size:.78rem}
+@media (max-width:1500px){.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.parts{grid-template-columns:repeat(4,minmax(0,1fr))}.formGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.chartGrid,.triple,.quad{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.top{grid-template-columns:1fr}.right{align-items:flex-start}.meta{text-align:left}.btns{justify-content:flex-start}}
+@media (max-width:900px){.metrics,.parts,.formGrid{grid-template-columns:1fr}.reactor{min-height:360px}.ring{width:280px;height:280px}.core{width:184px;height:184px}.core .score{font-size:2.5rem}}
+</style>
 </head>
 <body>
-  <div class="bgfx"></div>
-  <div class="stars"></div>
-
-  <div class="app">
-    <div class="glass top">
-      <div>
-        <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • Ascended Unified Intelligence</h1>
-        <div class="sub">
-          This build turns the app into a living peg observatory: social harvesting, claim extraction, claim-to-chain validation,
-          public-surface anchors, machine-interior candidates, deep traces, discovered-address scoring, rhythm statistics,
-          contradiction tracking, and a unified phase engine that treats the peg like a synchronization problem.
-        </div>
-        <div class="truthBar">
-          <span class="chip good">Claim hunter</span>
-          <span class="chip info">Chain validator</span>
-          <span class="chip info">Dual-reality map</span>
-          <span class="chip warn">Contradictions are first-class</span>
-        </div>
-      </div>
-      <div class="rightHead">
-        <div id="syncStatus" class="statusPill warned">Booting...</div>
-        <div class="meta">
-          <div id="nodeStatus">RPC: —</div>
-          <div id="lastSync">Last sync: —</div>
-          <div id="scanWindow">Recent log window: —</div>
-          <div id="historyInfo">History: —</div>
-          <div id="pairInfo">Public anchors: —</div>
-          <div id="harvesterInfo">Harvester: —</div>
-        </div>
-        <div class="btnRow">
-          <button id="refreshBtn">Refresh now</button>
-          <button id="settingsBtn" class="secondary">Settings</button>
-          <button id="importHistoryBtn" class="secondary">Import history</button>
-          <button id="exportConfigBtn" class="secondary">Export config</button>
-          <button id="exportHistoryBtn" class="secondary">Export history</button>
-          <input id="importHistoryInput" type="file" accept="application/json" style="display:none" />
-        </div>
+<div class="bg"></div>
+<div class="app">
+  <div class="glass top">
+    <div>
+      <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • v5 Self-Correcting Intelligence</h1>
+      <div class="sub">v5 promotes live addresses, demotes dead ones, distinguishes null-null “symmetry” from real state movement, folds in old pDAI/NineIron/YouTube knowledge as seeds, and arbitrates between public surface, machine interior, social claims, and contradictions.</div>
+      <div class="chips">
+        <span class="chip good">Address promotion</span>
+        <span class="chip info">Historical knowledge seeds</span>
+        <span class="chip info">Public mutation engine</span>
+        <span class="chip warn">Null-null contradictions</span>
       </div>
     </div>
-
-    <div id="settingsBox" class="glass section settings">
-      <div class="boxTitle">Ascended settings</div>
-      <div class="small" style="margin-bottom:12px">Private keys stay in your browser. Social APIs in GitHub Pages are risky; use read-only keys or a proxy you control.</div>
-      <div class="formGrid">
-        <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="https://your-private-rpc.example" /></div>
-        <div class="field"><label>Recent block window</label><input id="sScanBlocks" placeholder="2500" /></div>
-        <div class="field"><label>Auto refresh ms</label><input id="sAutoRefreshMs" placeholder="45000" /></div>
-        <div class="field"><label>ATROPA token</label><input id="sAtropaToken" placeholder="0x..." /></div>
-
-        <div class="field"><label>YouTube API key</label><input id="sYoutubeKey" placeholder="AIza..." /></div>
-        <div class="field"><label>YouTube channel ID</label><input id="sYoutubeChannel" placeholder="UC0ADdeCTOW9Qlai7G3kLLFg" /></div>
-        <div class="field"><label>X bearer token</label><input id="sXBearer" placeholder="Bearer token" /></div>
-        <div class="field"><label>X recent-search query</label><input id="sXQuery" placeholder='(pDAI OR Atropa OR LibertySwap OR Maria OR "Bell") lang:en -is:retweet' /></div>
-
-        <div class="field"><label>AF4E</label><input id="sAf4e" placeholder="0x..." /></div>
-        <div class="field"><label>D6CA</label><input id="sD6ca" placeholder="0x..." /></div>
-        <div class="field"><label>AE84 / primary rail</label><input id="sAe84" placeholder="0x..." /></div>
-        <div class="field"><label>0968 observed node</label><input id="s0968" placeholder="0x..." /></div>
-
-        <div class="field"><label>4fd0 observed node</label><input id="s4fd0" placeholder="0x..." /></div>
-        <div class="field"><label>3D07 observed node</label><input id="s3d07" placeholder="0x..." /></div>
-        <div class="field"><label>Ba86 observed node</label><input id="sBa86" placeholder="0x..." /></div>
-        <div class="field"><label>F2Dc observed node</label><input id="sF2dc" placeholder="0x..." /></div>
-
-        <div class="field"><label>7b12 observed node</label><input id="s7b12" placeholder="0x..." /></div>
-        <div class="field"><label>D84D observed node</label><input id="sD84d" placeholder="0x..." /></div>
-        <div class="field"><label>Liberty balancer</label><input id="sLibertyBalancer" placeholder="0x..." /></div>
-        <div class="field"><label>Liberty gasless</label><input id="sLibertyGasless" placeholder="0x..." /></div>
-
-        <div class="field"><label>Candidate storage slots</label><input id="sSlotList" placeholder="0x7b12,0x0968" /></div>
-        <div class="field"><label>Pending heat threshold (gwei)</label><input id="sHeatGwei" placeholder="0" /></div>
-        <div class="field"><label>Big pDAI delta alert</label><input id="sBigPdaiDelta" placeholder="1000000" /></div>
-        <div class="field"><label>Big WPLS delta alert</label><input id="sBigWplsDelta" placeholder="100000" /></div>
-
-        <div class="field"><label>Trace tx limit / sync</label><input id="sTraceLimit" placeholder="6" /></div>
-        <div class="field"><label>Recent block scan for payloads</label><input id="sRecentBlockScan" placeholder="60" /></div>
-        <div class="field"><label>Harvester keywords</label><input id="sKeywords" placeholder="pdai,atropa,libertyswap,maria,bell,proxy,heat,qwen,alligator" /></div>
-        <div class="field"><label>Notes</label><input id="sNotes" placeholder="optional notes" /></div>
-
-        <div class="field" style="grid-column: span 2;"><label>Use pending heat sensor</label><div class="checkline"><input type="checkbox" id="sUsePending" /><span>Tries <span class="mono">eth_newPendingTransactionFilter</span>. Best with a private node.</span></div></div>
-        <div class="field" style="grid-column: span 2;"><label>Run social harvester</label><div class="checkline"><input type="checkbox" id="sUseHarvester" /><span>Pulls YouTube/X feeds, extracts claims, and validates them.</span></div></div>
+    <div class="right">
+      <div id="syncStatus" class="status warned">Booting...</div>
+      <div class="meta">
+        <div id="nodeStatus">RPC: —</div>
+        <div id="lastSync">Last sync: —</div>
+        <div id="scanWindow">Recent log window: —</div>
+        <div id="historyInfo">History: —</div>
+        <div id="pairInfo">Public anchors: —</div>
+        <div id="harvesterInfo">Harvester: —</div>
       </div>
-      <div class="btnRow" style="margin-top:12px">
-        <button id="saveSettingsBtn">Save settings</button>
-        <button id="clearSettingsBtn" class="secondary">Reset settings</button>
-        <button id="clearHistoryBtn" class="secondary">Clear history</button>
+      <div class="btns">
+        <button id="refreshBtn">Refresh now</button>
+        <button id="settingsBtn" class="secondary">Settings</button>
+        <button id="importHistoryBtn" class="secondary">Import history</button>
+        <button id="exportConfigBtn" class="secondary">Export config</button>
+        <button id="exportHistoryBtn" class="secondary">Export history</button>
+        <input id="importHistoryInput" type="file" accept="application/json" style="display:none" />
       </div>
-    </div>
-
-    <div class="glass section">
-      <div class="metrics">
-        <div class="card"><div class="label">Unified score</div><div class="value" id="mScore">—</div><div class="hint">public + machine + social + contradictions</div></div>
-        <div class="card"><div class="label">Current phase</div><div class="value" id="mPhase">—</div><div class="hint">phase engine output</div></div>
-        <div class="card"><div class="label">Public surface strength</div><div class="value" id="mPublic">—</div><div class="hint">verifiable public rails</div></div>
-        <div class="card"><div class="label">Machine interior strength</div><div class="value" id="mInterior">—</div><div class="hint">candidate body / routes / traces</div></div>
-        <div class="card"><div class="label">Narrative strength</div><div class="value" id="mNarrative">—</div><div class="hint">social grammar / sequence / rhythm</div></div>
-        <div class="card"><div class="label">Contradiction load</div><div class="value" id="mContradictions">—</div><div class="hint">how much is pushing back</div></div>
-
-        <div class="card"><div class="label">5EF7 pDAI</div><div class="value" id="mSpinePdai">—</div><div class="hint">reserve spine hold</div></div>
-        <div class="card"><div class="label">5EF7 WPLS</div><div class="value" id="mSpineWpls">—</div><div class="hint">ammo balance</div></div>
-        <div class="card"><div class="label">Burned</div><div class="value" id="mBurned">—</div><div class="hint">0x…dEaD balance</div></div>
-        <div class="card"><div class="label">Pending heat</div><div class="value" id="mHeat">—</div><div class="hint">pre-block pressure</div></div>
-        <div class="card"><div class="label">State symmetry</div><div class="value" id="mSlotSym">—</div><div class="hint">candidate slot sync</div></div>
-        <div class="card"><div class="label">Bell payloads</div><div class="value" id="mBell">—</div><div class="hint">UTF-8 markers in calldata</div></div>
-      </div>
-    </div>
-
-    <div class="glass section hero">
-      <div class="reactor">
-        <div class="ringWrap" id="reactorRing" style="--score:0">
-          <div class="reactorCore">
-            <div class="coreKicker">Peg intelligence</div>
-            <div class="coreScore" id="scoreBig">0.0</div>
-            <div class="coreState" id="coreState">Calibrating</div>
-            <div class="coreGap" id="coreGap">No live synthesis yet</div>
-          </div>
-        </div>
-      </div>
-      <div class="heroRight">
-        <div class="verdictBox">
-          <div class="verdictTop">
-            <div>
-              <div class="label">Primary verdict</div>
-              <div class="bigVerdict" id="bigVerdict">Initializing...</div>
-            </div>
-            <div class="small" id="verdictExplain">The engine scores claims, supports, contradictions, public anchors, and machine motion.</div>
-          </div>
-          <div class="scoreBar"><div id="scoreFill" class="scoreFill"></div></div>
-          <div class="parts">
-            <div class="part"><div class="k">Public</div><div class="v" id="sPublic">—</div></div>
-            <div class="part"><div class="k">Interior</div><div class="v" id="sInterior">—</div></div>
-            <div class="part"><div class="k">Narrative</div><div class="v" id="sNarrative">—</div></div>
-            <div class="part"><div class="k">Routes</div><div class="v" id="sRoutes">—</div></div>
-            <div class="part"><div class="k">Traces</div><div class="v" id="sTraces">—</div></div>
-            <div class="part"><div class="k">Rhythm</div><div class="v" id="sRhythm">—</div></div>
-            <div class="part"><div class="k">Claims</div><div class="v" id="sClaims">—</div></div>
-            <div class="part"><div class="k">Contradict</div><div class="v" id="sContra">—</div></div>
-          </div>
-        </div>
-        <div class="chartGrid">
-          <div class="miniChart"><div class="boxTitle">Score history</div><canvas id="scoreChart" width="480" height="90"></canvas><div class="small">Local snapshots stored in your browser.</div></div>
-          <div class="miniChart"><div class="boxTitle">Public vs interior</div><canvas id="strengthChart" width="480" height="90"></canvas><div class="small">Public anchors should eventually rhyme with interior events.</div></div>
-          <div class="miniChart"><div class="boxTitle">Contradiction drift</div><canvas id="contraChart" width="480" height="90"></canvas><div class="small">If this rises while score rises, you may be fooling yourself.</div></div>
-        </div>
-        <div class="proofGrid" id="proofGrid"></div>
-        <div class="quad">
-          <div class="listBox"><div class="boxTitle">Supports</div><div class="list" id="supportList"></div></div>
-          <div class="listBox"><div class="boxTitle">Contradictions</div><div class="list" id="contraList"></div></div>
-          <div class="listBox"><div class="boxTitle">Top insights</div><div class="list" id="insightList"></div></div>
-          <div class="listBox"><div class="boxTitle">Next actions</div><div class="list" id="nextList"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass section">
-      <div class="boxTitle">Narrative harvester</div>
-      <div class="small" style="margin-bottom:10px">Manual events and harvested YouTube/X items both feed the same claim queue.</div>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Source</th><th>Time</th><th>Actor</th><th>Title/Text</th><th>Phase</th><th>Duration</th><th>Claims extracted</th><th>Validation summary</th><th>Link</th>
-            </tr>
-          </thead>
-          <tbody id="socialBody"><tr><td colspan="9" class="small">No social items yet.</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="tables">
-      <div class="glass tableCard">
-        <div class="boxTitle">Claim queue + validator</div>
-        <div class="small" style="margin-bottom:10px">Every extracted claim becomes a machine test: confirmed, contradicted, open, or insufficient data.</div>
-        <div class="tableWrap"><table><thead><tr><th>Claim type</th><th>Source item</th><th>Target</th><th>Status</th><th>Evidence</th><th>Notes</th></tr></thead><tbody id="claimBody"><tr><td colspan="6" class="small">No claims yet.</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">Public surface map</div>
-        <div class="small" style="margin-bottom:10px">Verified public anchors. These should keep working even when machine-side addresses are incomplete.</div>
-        <div class="tableWrap"><table><thead><tr><th>Anchor</th><th>Address</th><th>Pair / token order</th><th>Reserve snapshot</th><th>Recent Syncs</th><th>Changed?</th><th>Interpretation</th></tr></thead><tbody id="publicBody"><tr><td colspan="7" class="small">Waiting for public anchors...</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">Machine interior map</div>
-        <div class="small" style="margin-bottom:10px">Candidate machine body, balances, code type, nonce, and confidence. Zeros here should lower confidence, not secretly inflate it.</div>
-        <div class="tableWrap"><table><thead><tr><th>Node</th><th>Role</th><th>Type</th><th>Address</th><th>PLS</th><th>pDAI</th><th>WPLS</th><th>ATROPA</th><th>Nonce</th><th>Confidence</th></tr></thead><tbody id="balanceBody"><tr><td colspan="10" class="small">Waiting for machine body...</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">State probes</div>
-        <div class="small" style="margin-bottom:10px">Candidate manifold slots, EIP-1967 DNA, and other low-level probes.</div>
-        <div class="tableWrap"><table><thead><tr><th>Probe</th><th>Target</th><th>Current</th><th>Decoded</th><th>Changed?</th><th>Interpretation</th></tr></thead><tbody id="probeBody"><tr><td colspan="6" class="small">Waiting for probes...</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">Recent suspicious transactions</div>
-        <div class="small" style="margin-bottom:10px">Recent blocks scanned for zero-value payloads, ASCII markers, watched-address interactions, and weird call candidates.</div>
-        <div class="tableWrap"><table><thead><tr><th>Block</th><th>From</th><th>To</th><th>Value</th><th>Gas / priority</th><th>ASCII markers</th><th>Reason flagged</th><th>Tx</th></tr></thead><tbody id="txBody"><tr><td colspan="8" class="small">Waiting for tx scan...</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">Deep trace engine</div>
-        <div class="small" style="margin-bottom:10px">Runs <span class="mono">debug_traceTransaction</span> on suspicious txs when your provider supports it.</div>
-        <div class="tableWrap"><table><thead><tr><th>Tx</th><th>Status</th><th>Calls</th><th>Delegatecalls</th><th>New edges</th><th>Notable path</th></tr></thead><tbody id="traceBody"><tr><td colspan="6" class="small">No traces yet.</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">Routes + discovered addresses</div>
-        <div class="small" style="margin-bottom:10px">Counterparties, repeated route edges, and promoted discovered addresses from chain + social + traces.</div>
-        <div class="tableWrap"><table><thead><tr><th>Address / edge</th><th>Type</th><th>Score</th><th>Touches / mentions</th><th>Reasons</th><th>Promote?</th></tr></thead><tbody id="discoverBody"><tr><td colspan="6" class="small">No discoveries yet.</td></tr></tbody></table></div>
-      </div>
-
-      <div class="glass tableCard">
-        <div class="boxTitle">Truth ledger</div>
-        <div class="tableWrap"><table><thead><tr><th>Claim</th><th>Status</th><th>Measured result</th></tr></thead><tbody id="truthBody"><tr><td colspan="3" class="small">Waiting for synthesis...</td></tr></tbody></table></div>
-      </div>
-    </div>
-
-    <div class="glass foot">
-      <div>TARGET: <span class="mono">0x6B175474E89094C44Da98b954EedeAC495271d0F</span></div>
-      <div>PUBLIC PAIR (native pDAI/WPLS): <span class="mono">0x947b4633e32e0c7f2c76753b43f008480715416d</span></div>
-      <div>ATROPA/DAI CORE: <span class="mono">0x5ef7aac0de4f2012cb36730da140025b113fada4</span></div>
-      <div>DNA SLOT: <span class="mono">0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc</span></div>
     </div>
   </div>
 
-  <script>
-    const DEFAULTS = {
-      TARGET: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-      WPLS: "0xA1077a294D2D00ca00bb46556459739d482282c6",
-      DEAD: "0x000000000000000000000000000000000000dEaD",
-      SPINE: "0x5EF786D22e6e6666666666666666666666665EF7",
-      EIP1967_SLOT: "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
-      PUBLIC_ANCHORS: [
-        { label:"Native pDAI/WPLS", type:"pair", address:"0x947b4633e32e0c7f2c76753b43f008480715416d" },
-        { label:"ATROPA/DAI core", type:"pair", address:"0x5ef7aac0de4f2012cb36730da140025b113fada4" },
-        { label:"Bridged DAI/WPLS", type:"pair", address:"0xe56043671df55de5cdf8459710433c10324de0ae" },
-        { label:"pDAI token", type:"token", address:"0x6B175474E89094C44Da98b954EedeAC495271d0F" }
-      ],
-      SLOT_LIST: ["0x7b12","0x0968"],
-      SCAN_BLOCKS: 2500,
-      AUTO_REFRESH_MS: 45000,
-      HISTORY_LIMIT: 240,
-      BIG_PDAI_DELTA: 1000000,
-      BIG_WPLS_DELTA: 100000,
-      HEAT_GWEI_THRESHOLD: 0,
-      TRACE_LIMIT: 6,
-      RECENT_BLOCK_SCAN: 60,
-      USE_PENDING_HEAT: true,
-      USE_HARVESTER: false,
-      ATROPA_TOKEN: "",
-      YOUTUBE_CHANNEL: "UC0ADdeCTOW9Qlai7G3kLLFg",
-      YOUTUBE_KEY: "",
-      X_BEARER: "",
-      X_QUERY: '(pDAI OR Atropa OR LibertySwap OR Maria OR Bell OR Proxy OR Heat) -is:retweet',
-      KEYWORDS: ["pdai","atropa","libertyswap","maria","bell","proxy","heat","qwen","alligator","teddy bear","north hollywood","spectacle","trilateral"],
-      NOTES: "",
-      RPCS: [
-        "https://rpc.pulsechain.com",
-        "https://pulsechain.publicnode.com",
-        "https://rpc-pulsechain.g4mm4.io",
-        "https://rpc.pulsechainrpc.com",
-        "https://pulsechain.rpc.thirdweb.com"
-      ],
-      WATCH: {
-        AF4E:"", D6CA:"", NODE_AE84:"", NODE_0968:"0x0000000000000000000000000000000000000968", NODE_4FD0:"0x60032b4b3b3a3b3a3b3a3b3a3b3a3b3a3b3a4fd0",
-        NODE_3D07:"0x19488a0f98363768b449E2D821C8d7747e903D07", NODE_BA86:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc", NODE_F2DC:"0x862247F0E9F77331c470ec75d905CC4240FF3Dc2",
-        NODE_7B12:"0x0000000000000000000000000000000000007b12", NODE_D84D:"", LIBERTY_BALANCER:"", LIBERTY_GASLESS:""
-      },
-      narrativeEvents: [
-        { id:"p1", source:"YouTube", actor:"@靈脅用", title:"The Spectacle", phase:"audit", duration_sec:0, when:"", url:"" },
-        { id:"p2", source:"YouTube", actor:"@靈脅用", title:"靈脅用 is live!", phase:"activation", duration_sec:50, when:"", url:"" },
-        { id:"p3", source:"YouTube", actor:"@靈脅用", title:"the landscape teddy bear", phase:"terminal", duration_sec:115, when:"", url:"" },
-        { id:"p4", source:"YouTube", actor:"@靈脅用", title:"qwen being north hollywood", phase:"terminal", duration_sec:115, when:"", url:"" },
-        { id:"p5", source:"YouTube", actor:"@靈脅用", title:"qwen being qwen", phase:"heat", duration_sec:121, when:"", url:"" },
-        { id:"p6", source:"YouTube", actor:"@靈脅用", title:"The Trilateral Broadcast", phase:"routing", duration_sec:0, when:"", url:"" }
-      ]
-    };
-    const STORAGE_KEY = "pdai-peg-prover-ascended-v4";
-    const HISTORY_KEY = "pdai-peg-prover-ascended-history-v4";
-    const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-    const APPROVAL_TOPIC = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
-    const SYNC_TOPIC = "0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1";
-    const PHASE_ORDER = { orientation:0, audit:1, activation:2, routing:3, manifestation:4, terminal:5, heat:6, settle:7 };
-    const state = { syncing:false, rpcIndex:0, decimalsCache:new Map(), blockTimeCache:new Map(), codeTypeCache:new Map(), pendingFilterId:null, settings:null, timer:null };
-    const $ = id => document.getElementById(id);
-    const norm = a => String(a||"").trim().toLowerCase();
-    const isAddr = a => /^0x[a-fA-F0-9]{40}$/.test(String(a||"").trim());
-    const short = (s,n=6,m=4)=>{ s=String(s||""); return s.length>n+m+3 ? `${s.slice(0,n)}...${s.slice(-m)}` : s; };
-    const esc = v => String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
-    const fmtNum=(v,d=2)=>v==null||!Number.isFinite(v)?"—":Number(v).toLocaleString(undefined,{maximumFractionDigits:d});
-    const fmtCompact=(v,d=2)=>{ if(v==null||!Number.isFinite(v)) return "—"; const a=Math.abs(v); if(a>=1e12) return (v/1e12).toFixed(d)+"T"; if(a>=1e9) return (v/1e9).toFixed(d)+"B"; if(a>=1e6) return (v/1e6).toFixed(d)+"M"; if(a>=1e3) return (v/1e3).toFixed(d)+"K"; return fmtNum(v,d); };
-    const fmtPct01=(v,d=2)=>v==null||!Number.isFinite(v)?"—":(v*100).toFixed(d)+"%";
-    const fmtFixed=(v,d=6)=>v==null||!Number.isFinite(v)?"—":Number(v).toFixed(d);
-    const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
-    const toHex=n=>"0x"+BigInt(n).toString(16);
-    const hexToBigInt=hex=>{ try{return BigInt(hex||"0x0");}catch{return 0n;} };
-    const fromTopic=t=>"0x"+String(t||"").slice(-40);
-    const setText=(id,txt)=>{ const el=$(id); if(el) el.textContent=txt; };
-    const setHTML=(id,html)=>{ const el=$(id); if(el) el.innerHTML=html; };
-    const unique=arr=>[...new Set(arr)];
-    const itemHtml=(text,cls="warn")=>`<div class="item ${cls}">${text}</div>`;
-    function nowStamp(){ return new Date().toLocaleString(); }
-    function units(big, decimals=18){ const neg = big < 0n; const val = neg ? -big : big; let s = val.toString(); if(decimals===0) return Number((neg?"-":"")+s); if(s.length <= decimals) s = "0".repeat(decimals-s.length+1)+s; const int=s.slice(0,-decimals)||"0"; const frac=s.slice(-decimals).replace(/0+$/,'').slice(0,12); return parseFloat((neg?"-":"")+int+(frac?'.'+frac:'')); }
-    function downloadJSON(filename,data){ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
-    function gweiFromHex(hex){ try{return Number(BigInt(hex||"0x0"))/1e9;}catch{return null;} }
-    function addrsEqual(a,b){ return norm(a) === norm(b); }
-    function inferPhaseFromTitle(title){ const t=String(title||"").toLowerCase(); if(/spectacle/.test(t)) return "audit"; if(/is live/.test(t)) return "activation"; if(/teddy bear|north hollywood/.test(t)) return "terminal"; if(/qwen being qwen|heat/.test(t)) return "heat"; if(/trilateral|route|tree|manifold|machine|proxy/.test(t)) return "routing"; return "orientation"; }
-    function phaseLabel(phase){ return ({audit:"Audit / spectacle",activation:"Activation / live",routing:"Routing / manifold",manifestation:"Machine manifestation",terminal:"Terminal lanes / symmetry",heat:"Heat / runtime intensity",settle:"Settle / soft landing",orientation:"Orientation"})[phase] || phase; }
-    function parseKeywords(s){ return unique(String(s||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean)); }
-    function parseSlotList(s){ return unique(String(s||"").split(",").map(x=>x.trim()).filter(Boolean).map(x=>x.startsWith("0x")?x:"0x"+x)); }
+  <div id="settingsBox" class="glass section settings">
+    <div class="boxTitle">v5 settings</div>
+    <div class="small" style="margin-bottom:12px">Historical seeds load by default. API keys stay in your browser.</div>
+    <div class="formGrid">
+      <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="https://your-private-rpc.example" /></div>
+      <div class="field"><label>Recent block window</label><input id="sScanBlocks" placeholder="2500" /></div>
+      <div class="field"><label>Auto refresh ms</label><input id="sAutoRefreshMs" placeholder="45000" /></div>
+      <div class="field"><label>ATROPA token</label><input id="sAtropaToken" placeholder="0x..." /></div>
+      <div class="field"><label>YouTube API key</label><input id="sYoutubeKey" placeholder="AIza..." /></div>
+      <div class="field"><label>YouTube channel ID</label><input id="sYoutubeChannel" placeholder="UC0ADdeCTOW9Qlai7G3kLLFg" /></div>
+      <div class="field"><label>X bearer token</label><input id="sXBearer" placeholder="Bearer token" /></div>
+      <div class="field"><label>X recent-search query</label><input id="sXQuery" placeholder='(pDAI OR Atropa OR LibertySwap OR Maria OR Bell) -is:retweet' /></div>
+      <div class="field"><label>AF4E</label><input id="sAf4e" placeholder="0x..." /></div>
+      <div class="field"><label>D6CA</label><input id="sD6ca" placeholder="0x..." /></div>
+      <div class="field"><label>AE84</label><input id="sAe84" placeholder="0x..." /></div>
+      <div class="field"><label>0968</label><input id="s0968" placeholder="0x..." /></div>
+      <div class="field"><label>4fd0</label><input id="s4fd0" placeholder="0x..." /></div>
+      <div class="field"><label>3D07</label><input id="s3d07" placeholder="0x..." /></div>
+      <div class="field"><label>Ba86</label><input id="sBa86" placeholder="0x..." /></div>
+      <div class="field"><label>F2Dc</label><input id="sF2dc" placeholder="0x..." /></div>
+      <div class="field"><label>7b12</label><input id="s7b12" placeholder="0x..." /></div>
+      <div class="field"><label>D84D</label><input id="sD84d" placeholder="0x..." /></div>
+      <div class="field"><label>Liberty balancer</label><input id="sLibertyBalancer" placeholder="0x..." /></div>
+      <div class="field"><label>Liberty gasless</label><input id="sLibertyGasless" placeholder="0x..." /></div>
+      <div class="field"><label>Candidate storage slots</label><input id="sSlotList" placeholder="0x7b12,0x0968" /></div>
+      <div class="field"><label>Pending heat threshold (gwei)</label><input id="sHeatGwei" placeholder="0" /></div>
+      <div class="field"><label>Trace tx limit / sync</label><input id="sTraceLimit" placeholder="6" /></div>
+      <div class="field"><label>Recent block scan for payloads</label><input id="sRecentBlockScan" placeholder="60" /></div>
+      <div class="field" style="grid-column: span 2;"><label>Harvester keywords</label><input id="sKeywords" placeholder="pdai,atropa,libertyswap,maria,bell,proxy,heat,qwen,alligator" /></div>
+      <div class="field" style="grid-column: span 2;"><label>Notes</label><input id="sNotes" placeholder="optional notes" /></div>
+      <div class="field" style="grid-column: span 2;"><label>Use pending heat sensor</label><div class="checkline"><input type="checkbox" id="sUsePending" /><span>Needs a node/provider that supports pending filters.</span></div></div>
+      <div class="field" style="grid-column: span 2;"><label>Run social harvester</label><div class="checkline"><input type="checkbox" id="sUseHarvester" /><span>Pulls YouTube/X feeds on top of historical seed knowledge.</span></div></div>
+    </div>
+    <div class="btns" style="margin-top:12px">
+      <button id="saveSettingsBtn">Save settings</button>
+      <button id="clearSettingsBtn" class="secondary">Reset settings</button>
+      <button id="clearHistoryBtn" class="secondary">Clear history</button>
+    </div>
+  </div>
 
-    function loadSettings(){ let saved={}; try{ saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); }catch{} const cfg=structuredClone(DEFAULTS); Object.assign(cfg,saved);
-      cfg.WATCH={...DEFAULTS.WATCH,...(saved.watch||saved.WATCH||{})}; cfg.narrativeEvents=Array.isArray(saved.narrativeEvents)&&saved.narrativeEvents.length?saved.narrativeEvents:DEFAULTS.narrativeEvents;
-      cfg.SLOT_LIST=Array.isArray(saved.SLOT_LIST)&&saved.SLOT_LIST.length?saved.SLOT_LIST:DEFAULTS.SLOT_LIST; cfg.KEYWORDS=Array.isArray(saved.KEYWORDS)&&saved.KEYWORDS.length?saved.KEYWORDS:DEFAULTS.KEYWORDS; return cfg; }
-    function persistSettings(){ const s=state.settings; localStorage.setItem(STORAGE_KEY, JSON.stringify({...s, watch:s.WATCH})); }
-    function loadHistory(){ try{ const d=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]"); return Array.isArray(d)?d:[]; }catch{return [];} }
-    function saveHistory(history){ localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-DEFAULTS.HISTORY_LIMIT))); setText("historyInfo",`History: ${history.length} snapshot(s)`); }
+  <div class="glass section">
+    <div class="metrics">
+      <div class="card"><div class="label">Unified score</div><div class="value" id="mScore">—</div><div class="hint">truth arbitration</div></div>
+      <div class="card"><div class="label">Stable phase</div><div class="value" id="mPhase">—</div><div class="hint">with hysteresis</div></div>
+      <div class="card"><div class="label">Public strength</div><div class="value" id="mPublic">—</div><div class="hint">verifiable rails</div></div>
+      <div class="card"><div class="label">Interior strength</div><div class="value" id="mInterior">—</div><div class="hint">active machine body</div></div>
+      <div class="card"><div class="label">Narrative strength</div><div class="value" id="mNarrative">—</div><div class="hint">social + seed grammar</div></div>
+      <div class="card"><div class="label">Contradiction load</div><div class="value" id="mContradictions">—</div><div class="hint">higher = worse</div></div>
+      <div class="card"><div class="label">Public velocity</div><div class="value" id="mVelocity">—</div><div class="hint">reserve mutation</div></div>
+      <div class="card"><div class="label">Pending heat</div><div class="value" id="mHeat">—</div><div class="hint">pre-block pressure</div></div>
+      <div class="card"><div class="label">State symmetry</div><div class="value" id="mSlotSym">—</div><div class="hint">null-null is bad</div></div>
+      <div class="card"><div class="label">DNA slot</div><div class="value" id="mDNA">—</div><div class="hint">proxy mutation</div></div>
+      <div class="card"><div class="label">Bell payloads</div><div class="value" id="mBell">—</div><div class="hint">ASCII markers</div></div>
+      <div class="card"><div class="label">Promotions</div><div class="value" id="mPromotions">—</div><div class="hint">new candidate upgrades</div></div>
+    </div>
+  </div>
 
-    function pushSettingsToUI(cfg){
-      $("sPrivateRpc").value=cfg.privateRpc||""; $("sScanBlocks").value=String(cfg.SCAN_BLOCKS); $("sAutoRefreshMs").value=String(cfg.AUTO_REFRESH_MS); $("sAtropaToken").value=cfg.ATROPA_TOKEN||"";
-      $("sYoutubeKey").value=cfg.YOUTUBE_KEY||""; $("sYoutubeChannel").value=cfg.YOUTUBE_CHANNEL||""; $("sXBearer").value=cfg.X_BEARER||""; $("sXQuery").value=cfg.X_QUERY||"";
-      $("sAf4e").value=cfg.WATCH.AF4E||""; $("sD6ca").value=cfg.WATCH.D6CA||""; $("sAe84").value=cfg.WATCH.NODE_AE84||""; $("s0968").value=cfg.WATCH.NODE_0968||"";
-      $("s4fd0").value=cfg.WATCH.NODE_4FD0||""; $("s3d07").value=cfg.WATCH.NODE_3D07||""; $("sBa86").value=cfg.WATCH.NODE_BA86||""; $("sF2dc").value=cfg.WATCH.NODE_F2DC||"";
-      $("s7b12").value=cfg.WATCH.NODE_7B12||""; $("sD84d").value=cfg.WATCH.NODE_D84D||""; $("sLibertyBalancer").value=cfg.WATCH.LIBERTY_BALANCER||""; $("sLibertyGasless").value=cfg.WATCH.LIBERTY_GASLESS||"";
-      $("sSlotList").value=(cfg.SLOT_LIST||[]).join(","); $("sHeatGwei").value=String(cfg.HEAT_GWEI_THRESHOLD||0); $("sBigPdaiDelta").value=String(cfg.BIG_PDAI_DELTA||DEFAULTS.BIG_PDAI_DELTA); $("sBigWplsDelta").value=String(cfg.BIG_WPLS_DELTA||DEFAULTS.BIG_WPLS_DELTA);
-      $("sTraceLimit").value=String(cfg.TRACE_LIMIT||DEFAULTS.TRACE_LIMIT); $("sRecentBlockScan").value=String(cfg.RECENT_BLOCK_SCAN||DEFAULTS.RECENT_BLOCK_SCAN); $("sKeywords").value=(cfg.KEYWORDS||[]).join(","); $("sNotes").value=cfg.NOTES||"";
-      $("sUsePending").checked=!!cfg.USE_PENDING_HEAT; $("sUseHarvester").checked=!!cfg.USE_HARVESTER;
-    }
-    function saveSettingsFromUI(){ const cfg=state.settings; cfg.privateRpc=$("sPrivateRpc").value.trim(); cfg.SCAN_BLOCKS=Number($("sScanBlocks").value.trim()||DEFAULTS.SCAN_BLOCKS); cfg.AUTO_REFRESH_MS=Number($("sAutoRefreshMs").value.trim()||DEFAULTS.AUTO_REFRESH_MS); cfg.ATROPA_TOKEN=$("sAtropaToken").value.trim();
-      cfg.YOUTUBE_KEY=$("sYoutubeKey").value.trim(); cfg.YOUTUBE_CHANNEL=$("sYoutubeChannel").value.trim(); cfg.X_BEARER=$("sXBearer").value.trim(); cfg.X_QUERY=$("sXQuery").value.trim();
-      cfg.WATCH={...cfg.WATCH,AF4E:$("sAf4e").value.trim(),D6CA:$("sD6ca").value.trim(),NODE_AE84:$("sAe84").value.trim(),NODE_0968:$("s0968").value.trim(),NODE_4FD0:$("s4fd0").value.trim(),NODE_3D07:$("s3d07").value.trim(),NODE_BA86:$("sBa86").value.trim(),NODE_F2DC:$("sF2dc").value.trim(),NODE_7B12:$("s7b12").value.trim(),NODE_D84D:$("sD84d").value.trim(),LIBERTY_BALANCER:$("sLibertyBalancer").value.trim(),LIBERTY_GASLESS:$("sLibertyGasless").value.trim()};
-      cfg.SLOT_LIST=parseSlotList($("sSlotList").value.trim()); cfg.HEAT_GWEI_THRESHOLD=Number($("sHeatGwei").value.trim()||0); cfg.BIG_PDAI_DELTA=Number($("sBigPdaiDelta").value.trim()||DEFAULTS.BIG_PDAI_DELTA); cfg.BIG_WPLS_DELTA=Number($("sBigWplsDelta").value.trim()||DEFAULTS.BIG_WPLS_DELTA); cfg.TRACE_LIMIT=Number($("sTraceLimit").value.trim()||DEFAULTS.TRACE_LIMIT); cfg.RECENT_BLOCK_SCAN=Number($("sRecentBlockScan").value.trim()||DEFAULTS.RECENT_BLOCK_SCAN); cfg.KEYWORDS=parseKeywords($("sKeywords").value.trim()); cfg.NOTES=$("sNotes").value.trim(); cfg.USE_PENDING_HEAT=$("sUsePending").checked; cfg.USE_HARVESTER=$("sUseHarvester").checked;
-      persistSettings(); state.pendingFilterId=null; setRefreshTimer(); setText("scanWindow",`Recent log window: last ${cfg.SCAN_BLOCKS.toLocaleString()} blocks`); }
-    function clearSavedSettings(){ localStorage.removeItem(STORAGE_KEY); state.settings=loadSettings(); pushSettingsToUI(state.settings); state.pendingFilterId=null; setRefreshTimer(); }
-    function clearHistory(){ localStorage.removeItem(HISTORY_KEY); setText("historyInfo","History: 0 snapshot(s)"); drawHistoryCharts([]); }
-    function setRefreshTimer(){ if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000, Number(state.settings.AUTO_REFRESH_MS)||DEFAULTS.AUTO_REFRESH_MS)); }
+  <div class="glass section hero">
+    <div class="reactor">
+      <div class="ring" id="reactorRing" style="--score:0"><div class="core"><div class="k">Unified score</div><div class="score" id="scoreBig">0.0</div><div class="state" id="coreState">Calibrating</div><div class="substate" id="coreSub">No live state yet</div></div></div>
+    </div>
+    <div class="heroRight">
+      <div class="verdict"><div class="verdictTop"><div><div class="label">Primary verdict</div><div class="bigVerdict" id="bigVerdict">Initializing...</div></div><div class="small" id="verdictExplain">v5 rewards verified motion and punishes dead sensors.</div></div><div class="scoreBar"><div id="scoreFill" class="scoreFill"></div></div><div class="parts"><div class="part"><div class="k">Public</div><div class="v" id="sPublic">—</div></div><div class="part"><div class="k">Interior</div><div class="v" id="sInterior">—</div></div><div class="part"><div class="k">Narrative</div><div class="v" id="sNarrative">—</div></div><div class="part"><div class="k">Claims</div><div class="v" id="sClaims">—</div></div><div class="part"><div class="k">Traces</div><div class="v" id="sTraces">—</div></div><div class="part"><div class="k">Rhythm</div><div class="v" id="sRhythm">—</div></div><div class="part"><div class="k">Phase</div><div class="v" id="sPhase">—</div></div><div class="part"><div class="k">Contradictions</div><div class="v" id="sContra">—</div></div></div></div>
+      <div class="triple">
+        <div class="listBox"><div class="boxTitle">Supports</div><div class="list" id="supportList"></div></div>
+        <div class="listBox"><div class="boxTitle">Contradictions</div><div class="list" id="contraList"></div></div>
+        <div class="listBox"><div class="boxTitle">Insights</div><div class="list" id="insightList"></div></div>
+      </div>
+      <div class="mini"><div class="boxTitle">Next actions</div><div class="list" id="nextList"></div></div>
+    </div>
+  </div>
 
-    function activeRpcs(){ const arr=[...DEFAULTS.RPCS]; if(state.settings?.privateRpc) arr.unshift(state.settings.privateRpc); return unique(arr.filter(Boolean)); }
-    async function withTimeout(promise, ms=15000){ let timer; return Promise.race([ promise.finally(()=>clearTimeout(timer)), new Promise((_,reject)=>{ timer=setTimeout(()=>reject(new Error("timeout")), ms); }) ]); }
-    async function rpc(method, params){ const rpcs=activeRpcs(); let lastErr; for(let i=0;i<rpcs.length;i++){ const idx=(state.rpcIndex+i)%rpcs.length; const url=rpcs[idx]; try{ const res=await withTimeout(fetch(url,{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:Date.now()+i,method,params})}),15000); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message || "rpc error"); state.rpcIndex=idx; setText("nodeStatus","RPC: "+url.replace(/^https?:\/\//,"")); return data.result; }catch(err){ lastErr=err; } } throw lastErr || new Error("All RPCs failed"); }
-    async function rpcBlockNumber(){ return parseInt(await rpc("eth_blockNumber",[]),16); }
-    async function rpcBlockTimestamp(blockNumber){ const key=Number(blockNumber); if(state.blockTimeCache.has(key)) return state.blockTimeCache.get(key); const block=await rpc("eth_getBlockByNumber", [toHex(blockNumber), false]); const ts=block?.timestamp?parseInt(block.timestamp,16)*1000:null; state.blockTimeCache.set(key, ts); return ts; }
-    async function ercDecimals(token){ const key=norm(token); if(state.decimalsCache.has(key)) return state.decimalsCache.get(key); const raw=await rpc("eth_call",[{to:token,data:"0x313ce567"},"latest"]); const dec=parseInt(raw,16); const out=Number.isFinite(dec)?dec:18; state.decimalsCache.set(key,out); return out; }
-    async function ercTotalSupply(token){ return hexToBigInt(await rpc("eth_call",[{to:token,data:"0x18160ddd"},"latest"])); }
-    async function ercBalanceOf(token, holder){ const data="0x70a08231"+norm(holder).replace(/^0x/,"").padStart(64,"0"); return hexToBigInt(await rpc("eth_call",[{to:token,data},"latest"])); }
-    async function nativeBalance(holder){ return units(hexToBigInt(await rpc("eth_getBalance",[holder,"latest"])),18); }
-    async function txCount(holder){ return parseInt(await rpc("eth_getTransactionCount",[holder,"latest"]),16); }
-    async function getCodeType(holder){ const key=norm(holder); if(state.codeTypeCache.has(key)) return state.codeTypeCache.get(key); const code=await rpc("eth_getCode",[holder,"latest"]); const t=code&&code!=="0x"?"CONTRACT":"EOA"; state.codeTypeCache.set(key,t); return t; }
-    async function readStorageAt(address,slot){ return await rpc("eth_getStorageAt",[address,slot,"latest"]); }
-    async function fetchJson(url, opts={}){ const res=await withTimeout(fetch(url,opts), 15000); if(!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json(); }
-    async function discoverPairs(token){ const data=await fetchJson(`https://api.dexscreener.com/token-pairs/v1/pulsechain/${token}`, {headers:{accept:"application/json"}}); return Array.isArray(data)?data:(data?.pairs||[]); }
-    function normalizePairEntry(pair,target){ const t=norm(target); const base=norm(pair?.baseToken?.address); const quote=norm(pair?.quoteToken?.address); if(base!==t && quote!==t) return null; const other=base===t?pair.quoteToken:pair.baseToken; return { pairAddress:pair?.pairAddress||"", url:pair?.url||"", dexId:pair?.dexId||"unknown", otherAddress:other?.address||"", otherSymbol:other?.symbol||"UNKNOWN", liqUsd:Number(pair?.liquidity?.usd||0), volume24:Number(pair?.volume?.h24||0), labels:Array.isArray(pair?.labels)?pair.labels:[] }; }
-    async function mapLimit(arr, limit, fn){ const out=new Array(arr.length); let i=0; async function worker(){ while(i<arr.length){ const idx=i++; try{ out[idx]=await fn(arr[idx],idx); }catch(err){ out[idx]={...(arr[idx]||{}), error:err?.message||String(err)}; } } } await Promise.all(Array.from({length:Math.max(1,Math.min(limit,arr.length||1))}, worker)); return out; }
-    async function hydratePairs(target, rows, targetDecimals){ return await mapLimit(rows,4, async row=>{ const targetReserve=units(await ercBalanceOf(target,row.pairAddress), targetDecimals); const otherDecimals=isAddr(row.otherAddress)?await ercDecimals(row.otherAddress):18; const otherReserve=isAddr(row.otherAddress)?units(await ercBalanceOf(row.otherAddress,row.pairAddress),otherDecimals):null; const isWpls=addrsEqual(row.otherAddress,state.settings.WPLS); return {...row,targetReserve,otherReserve,type:isWpls?"WPLS":"OTHER",impliedRatio:targetReserve>0&&otherReserve>0?otherReserve/targetReserve:null,verifiedLive:targetReserve>0}; }); }
-    function decode32Word(hex, startWord){ const h=String(hex||"").replace(/^0x/,""); return "0x"+h.slice(startWord*64,startWord*64+64); }
-    async function pairMeta(pairAddress){ const [token0Raw, token1Raw, reservesRaw]=await Promise.all([rpc("eth_call",[{to:pairAddress,data:"0x0dfe1681"},"latest"]), rpc("eth_call",[{to:pairAddress,data:"0xd21220a7"},"latest"]), rpc("eth_call",[{to:pairAddress,data:"0x0902f1ac"},"latest"])]); const token0="0x"+String(token0Raw||"").slice(-40); const token1="0x"+String(token1Raw||"").slice(-40); return { token0, token1, reserve0:hexToBigInt(decode32Word(reservesRaw,0)), reserve1:hexToBigInt(decode32Word(reservesRaw,1)), tsLast:parseInt(decode32Word(reservesRaw,2),16) }; }
-    async function getLogsAdaptive(address, topic0, fromBlock, toBlock){ let start=fromBlock; while(true){ try{ return await rpc("eth_getLogs",[{address,fromBlock:toHex(start),toBlock:toHex(toBlock),topics:[topic0]}]); }catch(err){ const span=toBlock-start; if(span<=250) throw err; start=toBlock-Math.floor(span/2); } } }
-    async function getLogsMulti(address, topics, fromBlock, toBlock){ let start=fromBlock; while(true){ try{ return await rpc("eth_getLogs",[{address,fromBlock:toHex(start),toBlock:toHex(toBlock),topics}]); }catch(err){ const span=toBlock-start; if(span<=250) throw err; start=toBlock-Math.floor(span/2); } } }
-    function parseTransferLogs(logs, symbol, decimals, tokenAddress){ return (logs||[]).map(log=>({block:parseInt(log.blockNumber,16), txHash:log.transactionHash, from:fromTopic(log.topics[1]), to:fromTopic(log.topics[2]), amount:units(hexToBigInt(log.data),decimals), token:symbol, tokenAddress})); }
-    function parseApprovalLogs(logs, symbol, decimals, tokenAddress){ return (logs||[]).map(log=>({block:parseInt(log.blockNumber,16), txHash:log.transactionHash, owner:fromTopic(log.topics[1]), spender:fromTopic(log.topics[2]), amount:units(hexToBigInt(log.data),decimals), token:symbol, tokenAddress})); }
+  <div class="glass section">
+    <div class="chartGrid">
+      <div class="mini"><div class="boxTitle">Public surface map</div><div class="tableWrap"><table><thead><tr><th>Anchor</th><th>Pair</th><th>Reserves</th><th>Syncs</th><th>Mutation</th><th>Interpretation</th></tr></thead><tbody id="publicBody"><tr><td colspan="6" class="small">No public anchors yet.</td></tr></tbody></table></div></div>
+      <div class="mini"><div class="boxTitle">Machine body</div><div class="tableWrap"><table><thead><tr><th>Node</th><th>Role</th><th>Address</th><th>Balances</th><th>Nonce</th><th>Tier</th></tr></thead><tbody id="balanceBody"><tr><td colspan="6" class="small">No watchers yet.</td></tr></tbody></table></div></div>
+      <div class="mini"><div class="boxTitle">State probes</div><div class="tableWrap"><table><thead><tr><th>Probe</th><th>Value</th><th>Class</th><th>Changed</th><th>Interpretation</th></tr></thead><tbody id="probeBody"><tr><td colspan="5" class="small">No probes yet.</td></tr></tbody></table></div></div>
+    </div>
+  </div>
 
-    async function ensurePendingFilter(){ if(!state.settings.USE_PENDING_HEAT) return {supported:false, reason:"disabled"}; if(state.pendingFilterId) return {supported:true,id:state.pendingFilterId}; try{ const id=await rpc("eth_newPendingTransactionFilter",[]); state.pendingFilterId=id; return {supported:true,id}; }catch(err){ return {supported:false, reason:err?.message||"unsupported"}; } }
-    async function pollPendingHeat(cfg){ const info=await ensurePendingFilter(); if(!info.supported) return {supported:false,reason:info.reason,count:0,hottestGwei:null,matches:[]}; try{ let hashes=await rpc("eth_getFilterChanges",[info.id]); if(!Array.isArray(hashes)) hashes=[]; const targets=unique([cfg.TARGET,cfg.WATCH.NODE_AE84,cfg.WATCH.NODE_4FD0,cfg.WATCH.NODE_3D07,cfg.WATCH.LIBERTY_GASLESS,...Object.values(cfg.WATCH)].filter(isAddr).map(norm)); const txs=[]; for(const h of hashes.slice(-80)){ const tx=await rpc("eth_getTransactionByHash",[h]); if(!tx||!tx.to) continue; if(targets.includes(norm(tx.to)) || targets.includes(norm(tx.from))){ const priority=tx.maxPriorityFeePerGas?gweiFromHex(tx.maxPriorityFeePerGas):null; const gasPrice=tx.gasPrice?gweiFromHex(tx.gasPrice):null; txs.push({hash:tx.hash,to:tx.to,from:tx.from,priority,gasPrice}); } } const hottest=Math.max(0,...txs.map(tx=>tx.priority||tx.gasPrice||0)); return {supported:true,count:txs.length,hottestGwei:Number.isFinite(hottest)?hottest:null,spikeDetected:txs.length>0 && hottest >= (cfg.HEAT_GWEI_THRESHOLD||0),matches:txs.slice(0,10)}; }catch(err){ state.pendingFilterId=null; return {supported:false,reason:err?.message||"filter reset",count:0,hottestGwei:null,matches:[]}; } }
+  <div class="glass section quad">
+    <div class="tableCard"><div class="boxTitle">Historical + live social feed</div><div class="tableWrap"><table><thead><tr><th>Source</th><th>Time</th><th>Actor</th><th>Title</th><th>Phase</th><th>Claims</th><th>Validation</th><th>Link</th></tr></thead><tbody id="socialBody"><tr><td colspan="8" class="small">No social items yet.</td></tr></tbody></table></div></div>
+    <div class="tableCard"><div class="boxTitle">Claim validator</div><div class="tableWrap"><table><thead><tr><th>Claim</th><th>Source</th><th>Target</th><th>Status</th><th>Evidence</th></tr></thead><tbody id="claimBody"><tr><td colspan="5" class="small">No claims yet.</td></tr></tbody></table></div></div>
+    <div class="tableCard"><div class="boxTitle">Suspicious txs + payload intelligence</div><div class="tableWrap"><table><thead><tr><th>Block</th><th>Tx</th><th>From → To</th><th>Gas</th><th>Reasons</th><th>ASCII sample</th></tr></thead><tbody id="txBody"><tr><td colspan="6" class="small">No suspicious txs yet.</td></tr></tbody></table></div></div>
+    <div class="tableCard"><div class="boxTitle">Trace + discoveries</div><div class="tableWrap"><table><thead><tr><th>Item</th><th>Type</th><th>Score</th><th>Touches</th><th>Reasons / path</th><th>Action</th></tr></thead><tbody id="discoverBody"><tr><td colspan="6" class="small">No discoveries yet.</td></tr></tbody></table></div></div>
+  </div>
 
-    function watchNodes(cfg){ const raw=[
-      {label:"5EF7", role:"spine", address:cfg.SPINE, confidence:1},
-      {label:"AF4E", role:"execution hand", address:cfg.WATCH.AF4E, confidence:.8},
-      {label:"D6CA", role:"recycler", address:cfg.WATCH.D6CA, confidence:.8},
-      {label:"AE84", role:"public rail", address:cfg.WATCH.NODE_AE84, confidence:.7},
-      {label:"0968", role:"hammer", address:cfg.WATCH.NODE_0968, confidence:.55},
-      {label:"4fd0", role:"buffer / stealth trigger", address:cfg.WATCH.NODE_4FD0, confidence:.6},
-      {label:"3D07", role:"intake", address:cfg.WATCH.NODE_3D07, confidence:.5},
-      {label:"Ba86", role:"architect", address:cfg.WATCH.NODE_BA86, confidence:.45},
-      {label:"F2Dc", role:"logic", address:cfg.WATCH.NODE_F2DC, confidence:.55},
-      {label:"7b12", role:"terminal lane", address:cfg.WATCH.NODE_7B12, confidence:.45},
-      {label:"D84D", role:"protocol-adjacent hand", address:cfg.WATCH.NODE_D84D, confidence:.45},
-      {label:"Liberty Balancer", role:"gate", address:cfg.WATCH.LIBERTY_BALANCER, confidence:.4},
-      {label:"Liberty Gasless", role:"gate", address:cfg.WATCH.LIBERTY_GASLESS, confidence:.4}
-    ]; return raw.filter(x=>isAddr(x.address)); }
-    function watchAddrSet(cfg){ return new Set(watchNodes(cfg).map(x=>norm(x.address))); }
-    function gateAddrSet(cfg){ return new Set(watchNodes(cfg).filter(x=>/gate/.test(x.role)).map(x=>norm(x.address))); }
-    function labelForAddress(addr,cfg,pairSet){ const n=norm(addr); const node=watchNodes(cfg).find(x=>norm(x.address)===n); if(node) return node.label; if(pairSet&&pairSet.has(n)) return `PAIR:${short(addr,6,4)}`; return short(addr,8,6); }
-    function classifyPulse(ev,cfg,pairSet){ const nFrom=norm(ev.from), nTo=norm(ev.to), watch=watchAddrSet(cfg), gates=gateAddrSet(cfg); const fromWatch=watch.has(nFrom), toWatch=watch.has(nTo), fromGate=gates.has(nFrom), toGate=gates.has(nTo), fromPool=pairSet?.has(nFrom), toPool=pairSet?.has(nTo); if(fromWatch&&toWatch) return "watch↔watch"; if((fromWatch&&toGate)||(fromGate&&toWatch)) return "watch↔gate"; if((fromWatch&&toPool)||(fromPool&&toWatch)) return "watch↔pool"; if((fromGate&&toPool)||(fromPool&&toGate)) return "gate↔pool"; if(fromWatch||toWatch) return "watch↔shadow"; return "other"; }
-    function groupRouteEdges(events,cfg,pairSet){ const buckets=new Map(); for(const ev of events){ const cls=classifyPulse(ev,cfg,pairSet); if(cls==="other") continue; const fromLabel=labelForAddress(ev.from,cfg,pairSet); const toLabel=labelForAddress(ev.to,cfg,pairSet); const key=[cls,norm(ev.from),norm(ev.to),ev.token].join("|"); if(!buckets.has(key)){ buckets.set(key,{className:cls,from:ev.from,to:ev.to,fromLabel,toLabel,token:ev.token,touches:0,totalAmount:0,lastBlock:0,lastTx:""}); } const b=buckets.get(key); b.touches+=1; b.totalAmount+=Number(ev.amount||0); if((ev.block||0)>=b.lastBlock){ b.lastBlock=ev.block||0; b.lastTx=ev.txHash||""; } } return [...buckets.values()].sort((a,b)=>(b.touches+b.totalAmount)-(a.touches+a.totalAmount)).slice(0,60); }
-    function groupShadowCounterparties(events,cfg,pairSet){ const watched=watchAddrSet(cfg), gates=gateAddrSet(cfg), buckets=new Map(); for(const ev of events){ const nFrom=norm(ev.from),nTo=norm(ev.to); const fromObserved=watched.has(nFrom)||gates.has(nFrom); const toObserved=watched.has(nTo)||gates.has(nTo); if(!fromObserved&&!toObserved) continue; const cp=fromObserved?nTo:nFrom; if((watched.has(cp)||gates.has(cp)||pairSet.has(cp))||!isAddr(cp)) continue; if(!buckets.has(cp)) buckets.set(cp,{address:cp,touches:0,outFromObserved:0,intoObserved:0,tokens:new Set(),lastBlock:0}); const b=buckets.get(cp); b.touches++; if(fromObserved) b.outFromObserved+=Number(ev.amount||0); if(toObserved) b.intoObserved+=Number(ev.amount||0); b.tokens.add(ev.token); b.lastBlock=Math.max(b.lastBlock,ev.block||0); } return [...buckets.values()].map(x=>({...x,tokens:[...x.tokens].join(", ")})).sort((a,b)=>(b.touches+b.outFromObserved+b.intoObserved)-(a.touches+a.outFromObserved+a.intoObserved)).slice(0,25); }
-    function buildProximityMatrix(events,cfg){ const nodes=watchNodes(cfg); const addrToLabel=new Map(nodes.map(n=>[norm(n.address), n.label])); const labels=nodes.map(n=>n.label); const matrix={}; labels.forEach(r=>{matrix[r]={}; labels.forEach(c=>matrix[r][c]={touches:0,amount:0});}); for(const ev of events){ const fromLabel=addrToLabel.get(norm(ev.from)); const toLabel=addrToLabel.get(norm(ev.to)); if(!fromLabel||!toLabel) continue; matrix[fromLabel][toLabel].touches++; matrix[fromLabel][toLabel].amount+=Number(ev.amount||0); } return {labels,matrix}; }
-    async function enrichPulseTimes(events){ const blocks=unique(events.map(e=>e.block).filter(Boolean)).slice(0,50); await Promise.all(blocks.map(async b=>{ await rpcBlockTimestamp(b); })); return events.map(ev=>({...ev,timeMs:state.blockTimeCache.get(ev.block)||null})); }
-    async function buildNodeBalances(cfg, prevSnapshot){ const nodes=watchNodes(cfg); const tokens=[{key:"pdai",address:cfg.TARGET},{key:"wpls",address:cfg.WPLS}]; if(isAddr(cfg.ATROPA_TOKEN)) tokens.push({key:"atropa",address:cfg.ATROPA_TOKEN}); const tokenDecimals={}; await Promise.all(tokens.map(async t=>tokenDecimals[t.key]=await ercDecimals(t.address))); return await mapLimit(nodes,4, async node=>{ const [type,nonce]=await Promise.all([getCodeType(node.address),txCount(node.address)]); const balances={pls:await nativeBalance(node.address)}; for(const t of tokens) balances[t.key]=units(await ercBalanceOf(t.address,node.address), tokenDecimals[t.key]); const prevNode=prevSnapshot?.nodeBalances?.[node.label] || {}; return {...node,type,nonce,balances,deltas:{pls:balances.pls-(prevNode.pls||0), pdai:(balances.pdai||0)-(prevNode.pdai||0), wpls:(balances.wpls||0)-(prevNode.wpls||0), atropa:(balances.atropa||0)-(prevNode.atropa||0), nonce:nonce-(prevNode.nonce||0)}}; }); }
+  <div class="glass section">
+    <div class="boxTitle">Truth ledger</div>
+    <div class="tableWrap"><table><thead><tr><th>Claim</th><th>Status</th><th>Measured result</th></tr></thead><tbody id="truthBody"><tr><td colspan="3" class="small">Waiting for evidence model...</td></tr></tbody></table></div>
+  </div>
 
-    async function fetchRecentBlocksTxs(latestBlock, lookback, targets, keywords){ const items=[]; const start=Math.max(0, latestBlock-lookback+1); for(let b=latestBlock;b>=start;b--){ const block=await rpc("eth_getBlockByNumber", [toHex(b), true]); const txs=block?.transactions||[]; for(const tx of txs){ const input=String(tx.input||""); const ascii=hexToAscii(input); const reasons=[]; if(targets.has(norm(tx.to))||targets.has(norm(tx.from))) reasons.push("watched-address"); if((tx.value === "0x0" || tx.value === "0x") && input && input !== "0x") reasons.push("zero-value-payload"); const hitKeywords=keywords.filter(k=>ascii.toLowerCase().includes(k)); if(hitKeywords.length) reasons.push(`ascii:${hitKeywords.join("/")}`); if(reasons.length){ items.push({block:b, hash:tx.hash, from:tx.from, to:tx.to||"", valueWei:hexToBigInt(tx.value||"0x0"), gasPriceGwei:gweiFromHex(tx.gasPrice||"0x0"), priorityGwei:gweiFromHex(tx.maxPriorityFeePerGas||"0x0"), asciiMarkers:hitKeywords, inputSample:ascii.slice(0,120), reasons}); } }
-      if(items.length > 80) break; }
-      return items.slice(0,120);
-    }
-
-    function hexToAscii(hex){ const h=String(hex||"").replace(/^0x/,""); let out=""; for(let i=0;i<h.length;i+=2){ const code=parseInt(h.slice(i,i+2),16); if(!Number.isFinite(code)) continue; if(code>=32 && code<=126) out+=String.fromCharCode(code); else out+=" "; } return out.replace(/\s+/g,' ').trim(); }
-    function extractAddresses(text){ const m=String(text||"").match(/0x[a-fA-F0-9]{40}/g); return m?unique(m):[]; }
-    function extractTxHashes(text){ const m=String(text||"").match(/0x[a-fA-F0-9]{64}/g); return m?unique(m):[]; }
-    function extractClaimsFromSocial(item, cfg){ const text=[item.title||"", item.text||"", item.description||""].join(" \n "); const lower=text.toLowerCase(); const claims=[]; const add=(type,target,notes)=>claims.push({type,target,notes,sourceId:item.id,sourceTitle:item.title||item.text||type});
-      if(/bell/.test(lower)) add("bell_payload", cfg.TARGET, "Search calldata for ASCII Bell marker");
-      if(/proxy|implementation transparent upgradable proxy|transparent upgradable proxy/.test(lower)) add("proxy_artifact", cfg.TARGET, "Check EIP-1967 DNA slot and code type");
-      if(/7b12|0968|symmetry|manifold/.test(lower)) add("slot_symmetry", cfg.TARGET, `Read candidate slots ${cfg.SLOT_LIST.join(", ")}`);
-      if(/heat|2:01|121/.test(lower)) add("heat_window", cfg.WATCH.NODE_4FD0 || cfg.TARGET, "Pending tx pressure / recent bursts / internal activity");
-      if(/1:55|115|teddy bear|north hollywood/.test(lower)) add("terminal_window", cfg.TARGET, "Mirror cadence to chain bursts");
-      if(/4fd0|liberty gasless|libertropa/.test(lower)) add("relayer_activity", cfg.WATCH.NODE_4FD0 || cfg.WATCH.LIBERTY_GASLESS || cfg.TARGET, "Nonce / traces / recent txs");
-      if(/ae84|scribe/.test(lower)) add("rail_activity", cfg.WATCH.NODE_AE84 || cfg.TARGET, "Rail logs / nonce / traces");
-      if(/5ef7|spine/.test(lower)) add("spine_activity", cfg.SPINE, "Supply vault movement");
-      if(/d84d/.test(lower)) add("d84d_activity", cfg.WATCH.NODE_D84D || "", "Protocol-adjacent wallet route");
-      if(/burn|dead|supply contraction|low free directive/.test(lower)) add("supply_contraction", cfg.TARGET, "Dead balance / totalSupply delta / giant burns");
-      for(const a of extractAddresses(text)) add("address_mention", a, "Address mentioned in social content");
-      for(const h of extractTxHashes(text)) add("txhash_mention", h, "Transaction hash mentioned in social content");
-      return claims;
-    }
-    function socialToPhase(item){ return item.phase || inferPhaseFromTitle(item.title || item.text || ""); }
-    async function harvestYouTube(cfg){ if(!cfg.USE_HARVESTER || !cfg.YOUTUBE_KEY || !cfg.YOUTUBE_CHANNEL) return []; const q=`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${encodeURIComponent(cfg.YOUTUBE_CHANNEL)}&maxResults=10&order=date&type=video&key=${encodeURIComponent(cfg.YOUTUBE_KEY)}`; const search=await fetchJson(q); const ids=(search.items||[]).map(x=>x.id?.videoId).filter(Boolean); if(!ids.length) return []; const vq=`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${ids.join(",")}&key=${encodeURIComponent(cfg.YOUTUBE_KEY)}`; const videos=await fetchJson(vq); return (videos.items||[]).map(v=>({ id:`yt-${v.id}`, source:"YouTube", actor:`@${v.snippet?.channelTitle||"channel"}`, title:v.snippet?.title||"", text:v.snippet?.description||"", description:v.snippet?.description||"", when:v.snippet?.publishedAt||"", duration_sec:isoDurationToSeconds(v.contentDetails?.duration||""), url:`https://www.youtube.com/watch?v=${v.id}` })); }
-    function isoDurationToSeconds(iso){ const m=String(iso||"").match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m) return 0; return (Number(m[1]||0)*3600)+(Number(m[2]||0)*60)+(Number(m[3]||0)); }
-    async function harvestX(cfg){ if(!cfg.USE_HARVESTER || !cfg.X_BEARER || !cfg.X_QUERY) return []; const url=`https://api.x.com/2/tweets/search/recent?max_results=10&query=${encodeURIComponent(cfg.X_QUERY)}&tweet.fields=created_at,public_metrics,author_id,text`; try{ const data=await fetchJson(url,{headers:{Authorization:`Bearer ${cfg.X_BEARER}`}}); return (data.data||[]).map(t=>({ id:`x-${t.id}`, source:"X", actor:`author:${t.author_id||"unknown"}`, title:(t.text||"").slice(0,140), text:t.text||"", when:t.created_at||"", duration_sec:0, url:`https://x.com/i/web/status/${t.id}` })); }catch(err){ return [{id:"x-error",source:"X",actor:"api",title:"X harvest failed",text:err?.message||String(err),when:new Date().toISOString(),duration_sec:0,url:""}]; }
-    }
-
-    function narrativeAnalysis(events, chainTimes){ const filled=events.map(e=>({...e, phase:socialToPhase(e)})).filter(e=>e.phase&&PHASE_ORDER[e.phase]!=null); let ordered=0; for(let i=1;i<filled.length;i++) if(PHASE_ORDER[filled[i].phase] >= PHASE_ORDER[filled[i-1].phase]) ordered++; const sequence=filled.length<=1?0:ordered/(filled.length-1); const mirrored115=filled.filter(e=>e.phase==="terminal" && Math.abs((e.duration_sec||0)-115)<=1).length>=2; const impulse121=filled.some(e=>e.phase==="heat" && Math.abs((e.duration_sec||0)-121)<=1);
-      const timed=filled.filter(e=>e.when).map(e=>new Date(e.when).getTime()).filter(Number.isFinite); const chain=chainTimes.filter(Number.isFinite); let avgNearest=null, pValue=null; if(timed.length>=3 && chain.length>=3){ const obs=averageNearestDelta(timed,chain); avgNearest=obs; pValue=monteCarloPValue(timed, chain); }
-      return {sequence, mirrored115, impulse121, avgNearest, pValue, phasesPresent:unique(filled.map(e=>e.phase))}; }
-    function averageNearestDelta(times, chain){ let sum=0; for(const t of times){ let best=Infinity; for(const c of chain){ const d=Math.abs(c-t); if(d<best) best=d; } sum+=best; } return sum/times.length; }
-    function monteCarloPValue(times, chain, iterations=150){ const min=Math.min(...times), max=Math.max(...times); const observed=averageNearestDelta(times,chain); let better=0; for(let i=0;i<iterations;i++){ const shuffled=times.map(()=> min + Math.random()*(max-min)); const val=averageNearestDelta(shuffled,chain); if(val <= observed) better++; } return (better+1)/(iterations+1); }
-
-    async function traceTx(hash){ try{ const result=await rpc("debug_traceTransaction", [hash, {tracer:"callTracer", timeout:"10s"}]); return {supported:true, result}; }catch(err){ return {supported:false, error:err?.message||String(err)}; } }
-    function summarizeTrace(root){ if(!root||typeof root!=="object") return {calls:0,delegatecalls:0,newEdges:[],path:""}; let calls=0, delegatecalls=0; const edges=[]; function walk(node){ if(!node) return; const type=String(node.type||"").toUpperCase(); if(type) calls++; if(type==="DELEGATECALL") delegatecalls++; if(node.from&&node.to) edges.push(`${short(node.from,8,6)}→${short(node.to,8,6)}:${type}`); (node.calls||[]).forEach(walk); } walk(root); return {calls, delegatecalls, newEdges:unique(edges).slice(0,8), path:unique(edges).slice(0,3).join(" | ")}; }
-
-    async function buildModel(){ const cfg=state.settings; const prev=loadHistory().slice(-1)[0] || null; const latestBlock=await rpcBlockNumber(); const targetDecimals=await ercDecimals(cfg.TARGET);
-      const [totalRaw, burnedRaw, spinePdaiRaw, spineWplsRaw, pdaiPairsRaw, pdaiLogsRaw, wplsLogsRaw, pdaiApprovalLogsRaw] = await Promise.all([
-        ercTotalSupply(cfg.TARGET), ercBalanceOf(cfg.TARGET,cfg.DEAD), ercBalanceOf(cfg.TARGET,cfg.SPINE), ercBalanceOf(cfg.WPLS,cfg.SPINE), discoverPairs(cfg.TARGET),
-        getLogsAdaptive(cfg.TARGET, TRANSFER_TOPIC, Math.max(0,latestBlock-cfg.SCAN_BLOCKS), latestBlock), getLogsAdaptive(cfg.WPLS, TRANSFER_TOPIC, Math.max(0,latestBlock-cfg.SCAN_BLOCKS), latestBlock), getLogsAdaptive(cfg.TARGET, APPROVAL_TOPIC, Math.max(0,latestBlock-cfg.SCAN_BLOCKS), latestBlock)
-      ]);
-      const total=units(totalRaw,targetDecimals), burned=units(burnedRaw,targetDecimals), circ=Math.max(total-burned,0), spinePdai=units(spinePdaiRaw,targetDecimals), spineWpls=units(spineWplsRaw,18);
-      const pdaiPairsNorm=pdaiPairsRaw.map(p=>normalizePairEntry(p,cfg.TARGET)).filter(Boolean).sort((a,b)=>b.liqUsd-a.liqUsd).slice(0,12);
-      const pdaiPairs=await hydratePairs(cfg.TARGET,pdaiPairsNorm,targetDecimals);
-      const transfersPdai=parseTransferLogs(pdaiLogsRaw,"pDAI",targetDecimals,cfg.TARGET), transfersWpls=parseTransferLogs(wplsLogsRaw,"WPLS",await ercDecimals(cfg.WPLS),cfg.WPLS), approvalsPdai=parseApprovalLogs(pdaiApprovalLogsRaw,"pDAI",targetDecimals,cfg.TARGET);
-      let transfersAtropa=[]; if(isAddr(cfg.ATROPA_TOKEN)){ const atDec=await ercDecimals(cfg.ATROPA_TOKEN); const atLogs=await getLogsAdaptive(cfg.ATROPA_TOKEN, TRANSFER_TOPIC, Math.max(0,latestBlock-cfg.SCAN_BLOCKS), latestBlock); transfersAtropa=parseTransferLogs(atLogs,"ATROPA",atDec,cfg.ATROPA_TOKEN); }
-      const pairSet=new Set(pdaiPairs.map(p=>norm(p.pairAddress)));
-      const observedTransfers=[...transfersPdai,...transfersWpls,...transfersAtropa].filter(ev=>{ const nFrom=norm(ev.from),nTo=norm(ev.to); const watch=watchAddrSet(cfg), gates=gateAddrSet(cfg); return watch.has(nFrom)||watch.has(nTo)||gates.has(nFrom)||gates.has(nTo); }).sort((a,b)=>b.block-a.block);
-      const machine={ observedTransfers, recentPulses:(await enrichPulseTimes(observedTransfers.slice(0,40))), routeEdges:groupRouteEdges(observedTransfers,cfg,pairSet), shadowCounterparties:groupShadowCounterparties(observedTransfers,cfg,pairSet), proximity:buildProximityMatrix(observedTransfers,cfg) };
-
-      const balanceBoard=await buildNodeBalances(cfg, prev);
-      const slotValues={}; await Promise.all(cfg.SLOT_LIST.map(async slot=>slotValues[slot]=await readStorageAt(cfg.TARGET,slot)));
-      const dnaRaw=await readStorageAt(cfg.TARGET, cfg.EIP1967_SLOT); const dnaImpl="0x"+String(dnaRaw||"").slice(-40); const dnaMeaningful=dnaImpl!=="0x0000000000000000000000000000000000000000";
-      const slotProbe={ values:slotValues, equal:cfg.SLOT_LIST.length>=2 && cfg.SLOT_LIST.every(s=>norm(slotValues[s])===norm(slotValues[cfg.SLOT_LIST[0]])), changed:cfg.SLOT_LIST.some(s=>norm(slotValues[s])!==norm(prev?.slotProbe?.values?.[s]||"")), summary:cfg.SLOT_LIST.length>=2?(cfg.SLOT_LIST.every(s=>norm(slotValues[s])===norm(slotValues[cfg.SLOT_LIST[0]]))?"candidate slots equal":"candidate slots differ"):"single slot" };
-      const dnaProbe={ raw:dnaRaw, implAddress:dnaMeaningful?dnaImpl:"", changed:norm(dnaRaw)!==norm(prev?.dnaProbe?.raw||"") };
-      const pendingHeat=await pollPendingHeat(cfg);
-
-      // Public anchors
-      const publicAnchors=await mapLimit(cfg.PUBLIC_ANCHORS, 3, async anchor=>{
-        if(anchor.type==="token") return { ...anchor, interpretation:"token anchor" };
-        const meta=await pairMeta(anchor.address); const [t0d,t1d]=await Promise.all([ercDecimals(meta.token0), ercDecimals(meta.token1)]); const reserve0=units(meta.reserve0,t0d), reserve1=units(meta.reserve1,t1d); const syncLogs=await getLogsMulti(anchor.address,[SYNC_TOPIC],Math.max(0,latestBlock-500),latestBlock); const prevAnchor=(prev?.publicAnchors||[]).find(x=>norm(x.address)===norm(anchor.address))||{}; const changed=Math.abs((reserve0||0)-(prevAnchor.reserve0||0))>0||Math.abs((reserve1||0)-(prevAnchor.reserve1||0))>0; return {...anchor, token0:meta.token0, token1:meta.token1, reserve0, reserve1, syncCountRecent:syncLogs.length, lastSyncBlock:syncLogs.length?parseInt(syncLogs[syncLogs.length-1].blockNumber,16):null, changed, interpretation:changed?"anchor mutated since last snapshot":"anchor stable"};
-      });
-
-      // Suspicious tx scan / payload hunting
-      const targetSet=new Set([cfg.TARGET, cfg.SPINE, ...Object.values(cfg.WATCH), ...cfg.PUBLIC_ANCHORS.map(x=>x.address)].filter(isAddr).map(norm));
-      const suspiciousTxs=await fetchRecentBlocksTxs(latestBlock, cfg.RECENT_BLOCK_SCAN, targetSet, cfg.KEYWORDS);
-      const bellPayloads=suspiciousTxs.filter(tx=>tx.asciiMarkers.includes("bell"));
-
-      // Deep traces on suspicious txs
-      const traceCandidates=suspiciousTxs.filter(tx=>tx.reasons.includes("watched-address") || tx.asciiMarkers.length).slice(0, cfg.TRACE_LIMIT);
-      const traceResults=await mapLimit(traceCandidates, 2, async tx=>{ const traced=await traceTx(tx.hash); if(!traced.supported) return {hash:tx.hash, supported:false, error:traced.error}; const s=summarizeTrace(traced.result); return {hash:tx.hash, supported:true, ...s}; });
-
-      // Social harvester and claims
-      const harvested = [...cfg.narrativeEvents.map(x=>({...x,id:x.id||`manual-${Math.random()}`, source:x.source||"Manual", actor:x.actor||"manual", text:x.title||"", url:x.url||""})), ...(await harvestYouTube(cfg)), ...(await harvestX(cfg))];
-      const socialItems = unique(harvested.map(x=>x.id)).map(id=>harvested.find(x=>x.id===id)).filter(Boolean).sort((a,b)=>new Date(b.when||0)-new Date(a.when||0));
-      const claims=[]; socialItems.forEach(item=>claims.push(...extractClaimsFromSocial(item,cfg)));
-
-      // Validator
-      const claimRows=[]; const supports=[]; const contradictions=[]; const discoveredReasons=new Map();
-      function truthRow(claim,status,result,cls){ const tagClass=cls==="good"?"good":cls==="warn"?"ref":"bad"; return `<tr><td>${claim}</td><td><span class="tag ${tagClass}">${status}</span></td><td>${result}</td></tr>`; }
-      function addDiscovery(addr, reason, weight=1){ if(!isAddr(addr)) return; const key=norm(addr); if(!discoveredReasons.has(key)) discoveredReasons.set(key,{address:addr, score:0, reasons:new Map()}); const d=discoveredReasons.get(key); d.score+=weight; d.reasons.set(reason,(d.reasons.get(reason)||0)+1); }
-
-      for(const tx of suspiciousTxs){ if(tx.asciiMarkers.length) addDiscovery(tx.from, `ascii:${tx.asciiMarkers.join("/")}`, 1.2); if(targetSet.has(norm(tx.to))||targetSet.has(norm(tx.from))) addDiscovery(tx.from, "touches watched/public", 0.8); }
-      for(const r of machine.shadowCounterparties) addDiscovery(r.address, "shadow counterparty", Math.min(3, r.touches/2));
-      for(const c of claims){ if(c.type==="address_mention") addDiscovery(c.target, "social mention", 1.5); }
-      for(const tr of traceResults.filter(x=>x.supported)) for(const e of tr.newEdges){ /* no direct addr extraction here */ }
-
-      for(const c of claims){
-        let status="open", evidence="Awaiting chain test", notes=c.notes;
-        if(c.type==="bell_payload"){
-          if(bellPayloads.length){ status="confirmed"; evidence=`${bellPayloads.length} recent tx(s) with ASCII Bell marker`; supports.push(`Recent calldata contains Bell marker(s).`); }
-          else { status="open"; evidence="No Bell payload found in recent block scan"; contradictions.push(`No recent Bell payload was found in the scanned block window.`); }
-        } else if(c.type==="proxy_artifact"){
-          if(dnaMeaningful){ status="confirmed"; evidence=`EIP-1967 implementation slot populated: ${short(dnaImpl,10,8)}`; supports.push(`DNA slot is populated, so proxy-style logic remains plausible.`); }
-          else { status="contradicted"; evidence="EIP-1967 implementation slot currently zero"; contradictions.push(`Proxy-artifact claim is not supported by the current DNA slot read.`); }
-        } else if(c.type==="slot_symmetry"){
-          if(slotProbe.equal){ status="confirmed"; evidence=slotProbe.summary; supports.push(`Candidate manifold slots are equal right now.`); }
-          else { status="open"; evidence=slotProbe.summary; }
-        } else if(c.type==="heat_window"){
-          if(pendingHeat.supported && pendingHeat.count>0){ status="confirmed"; evidence=`${pendingHeat.count} pending match(es), hottest ${fmtFixed(pendingHeat.hottestGwei||0,3)} gwei`; supports.push(`Pending heat sensor is seeing candidate pressure.`); }
-          else { status="open"; evidence=pendingHeat.supported?"No pending heat match this poll":`Unsupported: ${pendingHeat.reason}`; }
-        } else if(c.type==="supply_contraction"){
-          const totalDelta = total - (prev?.total||total); const burnDelta = burned - (prev?.burned||burned);
-          if(Math.abs(totalDelta) > 0 || Math.abs(burnDelta) > 0){ status="confirmed"; evidence=`Supply delta ${fmtCompact(totalDelta,3)}, burned delta ${fmtCompact(burnDelta,3)}`; supports.push(`Supply-side values changed since the last snapshot.`); }
-          else { status="open"; evidence="No supply/burn delta in current snapshot"; }
-        } else if(c.type==="rail_activity"){
-          const ae = balanceBoard.find(x=>x.label==="AE84");
-          if(ae && ((ae.deltas.nonce||0)>0 || Math.abs(ae.deltas.pdai||0)>0 || Math.abs(ae.deltas.wpls||0)>0)){ status="confirmed"; evidence=`AE84 nonce/balance moved`; supports.push(`AE84-like rail moved in this snapshot.`); }
-          else { status="open"; evidence="No AE84 movement in current snapshot"; }
-        } else if(c.type==="spine_activity"){
-          const sp = balanceBoard.find(x=>x.label==="5EF7");
-          if(sp && ((sp.deltas.nonce||0)>0 || Math.abs(sp.deltas.pdai||0)>0 || Math.abs(sp.deltas.wpls||0)>0)){ status="confirmed"; evidence=`5EF7 moved`; supports.push(`5EF7 spine moved in this snapshot.`); }
-          else { status="open"; evidence="No 5EF7 movement in current snapshot"; }
-        } else if(c.type==="relayer_activity"){
-          const rel = balanceBoard.find(x=>x.label==="4fd0") || balanceBoard.find(x=>x.label==="Liberty Gasless");
-          if(rel && ((rel.deltas.nonce||0)>0 || Math.abs(rel.deltas.pdai||0)>0 || Math.abs(rel.deltas.wpls||0)>0)){ status="confirmed"; evidence=`4fd0/gasless moved`; supports.push(`Candidate relayer moved in this snapshot.`); }
-          else { status="open"; evidence="No relayer movement in current snapshot"; }
-        } else if(c.type==="d84d_activity"){
-          const d = balanceBoard.find(x=>x.label==="D84D");
-          if(d && ((d.deltas.nonce||0)>0 || Math.abs(d.deltas.pdai||0)>0 || Math.abs(d.deltas.wpls||0)>0)){ status="confirmed"; evidence=`D84D moved`; supports.push(`D84D-like wallet moved in this snapshot.`); }
-          else { status="open"; evidence="No D84D movement in current snapshot"; }
-        } else if(c.type==="txhash_mention"){
-          const inTx = suspiciousTxs.find(tx=>norm(tx.hash)===norm(c.target));
-          if(inTx){ status="confirmed"; evidence=`Mentioned tx is in recent scan`; supports.push(`Mentioned tx hash surfaced in recent scan.`); }
-          else { status="open"; evidence="Mentioned tx hash not in recent block scan"; }
-        } else if(c.type==="address_mention"){
-          const inBody = watchNodes(cfg).some(x=>addrsEqual(x.address,c.target)) || cfg.PUBLIC_ANCHORS.some(x=>addrsEqual(x.address,c.target));
-          status=inBody?"confirmed":"open"; evidence=inBody?"Mentioned address exists in current watch/public sets":"Mentioned address not yet tracked";
-        }
-        claimRows.push({...c,status,evidence,notes});
-      }
-
-      // Public surface score
-      const publicPairs = publicAnchors.filter(x=>x.type==="pair");
-      const publicChangedCount = publicPairs.filter(x=>x.changed).length;
-      const publicSyncCount = publicPairs.reduce((s,x)=>s+(x.syncCountRecent||0),0);
-      const publicStrength = clamp((publicPairs.length/3)*0.3 + (publicChangedCount/3)*0.35 + clamp(publicSyncCount/6,0,1)*0.35, 0, 1);
-      // Interior score
-      const liveNodes = balanceBoard.filter(x=>x.nonce>0 || x.balances.pls>0 || x.balances.pdai>0 || x.balances.wpls>0 || x.balances.atropa>0).length;
-      const interiorStrength = clamp((liveNodes/Math.max(1,balanceBoard.length))*0.35 + clamp(machine.routeEdges.length/20,0,1)*0.25 + clamp(traceResults.filter(x=>x.supported).length/Math.max(1,cfg.TRACE_LIMIT),0,1)*0.2 + (slotProbe.equal?0.1:0) + (pendingHeat.count?0.1:0), 0, 1);
-      // Narrative score
-      const chainTimes = [
-        ...machine.recentPulses.map(x=>x.timeMs).filter(Boolean),
-        ...publicPairs.map(x=>x.lastSyncBlock).filter(Boolean).map(b=>state.blockTimeCache.get(b)).filter(Boolean)
-      ];
-      const na=narrativeAnalysis(socialItems, chainTimes);
-      const narrativeStrength = clamp(na.sequence*0.5 + (na.mirrored115?0.15:0) + (na.impulse121?0.15:0) + (na.pValue!=null ? (1-clamp(na.pValue,0,1))*0.2 : 0), 0, 1);
-      // Contradictions
-      contradictions.push(...buildAutoContradictions({publicPairs,balanceBoard,pendingHeat,slotProbe,dnaMeaningful,machine,na}));
-      const contradictionLoad = clamp(contradictions.length/8, 0, 1);
-      const claimsStrength = clamp(claimRows.filter(x=>x.status==="confirmed").length / Math.max(1,claimRows.length), 0, 1);
-      const traceStrength = clamp(traceResults.filter(x=>x.supported).length / Math.max(1,cfg.TRACE_LIMIT),0,1);
-      const rhythmStrength = na.pValue!=null ? clamp(1-na.pValue,0,1) : (na.sequence||0);
-
-      const scoreParts={ public:15*publicStrength, interior:15*interiorStrength, narrative:14*narrativeStrength, routes:12*clamp(machine.routeEdges.length/20,0,1), traces:10*traceStrength, rhythm:12*rhythmStrength, claims:12*claimsStrength, contradictions:-10*contradictionLoad };
-      let score=Object.values(scoreParts).reduce((a,b)=>a+b,0); score=clamp(score,0,100);
-      const phase = determinePhase({publicStrength,interiorStrength,narrativeStrength,pendingHeat,na,publicChangedCount,traceStrength});
-
-      const discoveries=[...discoveredReasons.values()].map(d=>({address:d.address, score:d.score, reasons:[...d.reasons.entries()].map(([k,v])=>`${k}×${v}`).join(" | ")})).sort((a,b)=>b.score-a.score).slice(0,30);
-      const supportsOut=unique(supports).slice(0,10);
-      const contradictionsOut=unique(contradictions).slice(0,10);
-      const nextActions=buildNextActions({publicPairs,balanceBoard,pendingHeat,dnaMeaningful,claimRows,discoveries,traceResults,na});
-      const insights=buildInsights({publicStrength,interiorStrength,narrativeStrength,contradictionLoad,discoveries,claimRows,na,machine,publicPairs,balanceBoard});
-
-      const truths=[];
-      truths.push(truthRow("Public anchors are live","Verified",`${publicPairs.length} anchor pair(s) checked`,"good"));
-      truths.push(truthRow("Recent snapshots had blind spots","Yes",`Imported/previous report showed zero pair, zero routes, and zeroed candidates; this build uses public anchors first.`,"warn"));
-      truths.push(truthRow("DNA slot currently populated", dnaMeaningful?"Yes":"No", dnaMeaningful?`Implementation ${short(dnaImpl,10,8)}`:"EIP-1967 slot reads zero", dnaMeaningful?"good":"warn"));
-      truths.push(truthRow("Candidate slots are mirrored", slotProbe.equal?"Yes":"No", slotProbe.summary, slotProbe.equal?"good":"warn"));
-      truths.push(truthRow("Pending heat sensor available", pendingHeat.supported?"Yes":"No", pendingHeat.supported?`${pendingHeat.count} match(es) this poll`:`${pendingHeat.reason||"unsupported"}`, pendingHeat.supported?"good":"warn"));
-      truths.push(truthRow("Bell payload found in recent blocks", bellPayloads.length?"Yes":"No", bellPayloads.length?`${bellPayloads.length} tx(s)`:`none in last ${cfg.RECENT_BLOCK_SCAN} block(s)`, bellPayloads.length?"good":"warn"));
-      truths.push(truthRow("Social-phase order remains coherent", na.sequence>=0.6?"Yes":"Weak", `${fmtPct01(na.sequence,0)} ordered`, na.sequence>=0.6?"good":"warn"));
-      truths.push(truthRow("Trace provider support", traceResults.some(x=>x.supported)?"Yes":"No", traceResults.some(x=>x.supported)?`${traceResults.filter(x=>x.supported).length} trace(s) succeeded`:`debug_traceTransaction unsupported or blocked`, traceResults.some(x=>x.supported)?"good":"warn"));
-
-      const model={ cfg, latestBlock, total, burned, circ, spinePdai, spineWpls, slotProbe, dnaProbe:{raw:dnaRaw,implAddress:dnaMeaningful?dnaImpl:"",changed:norm(dnaRaw)!==norm(prev?.dnaProbe?.raw||"")}, pendingHeat, publicAnchors, pdaiPairs, machine, balanceBoard, suspiciousTxs, bellPayloads, traceResults, socialItems, claimRows, discoveries, supports:supportsOut, contradictions:contradictionsOut, nextActions, insights, truths, na, publicStrength, interiorStrength, narrativeStrength, contradictionLoad, claimsStrength, traceStrength, rhythmStrength, scoreParts, score, phase };
-      return model;
-    }
-
-    function buildAutoContradictions(ctx){ const out=[]; if(!ctx.publicPairs.some(x=>x.changed||x.syncCountRecent)) out.push("Public anchors are quiet right now."); if(!ctx.balanceBoard.some(x=>(x.deltas.nonce||0)>0 || Math.abs(x.deltas.pdai||0)>0 || Math.abs(x.deltas.wpls||0)>0)) out.push("Candidate machine body is largely motionless in this snapshot."); if(!ctx.pendingHeat.supported || !ctx.pendingHeat.count) out.push("No pending heat is visible right now."); if(!ctx.dnaMeaningful) out.push("Proxy-mutation narrative is not supported by the current DNA slot read."); if(!ctx.machine.routeEdges.length) out.push("No route edges were observed in the current scan window."); if(ctx.na.pValue != null && ctx.na.pValue > 0.25) out.push("Rhythm alignment is not yet statistically unusual."); return out; }
-    function determinePhase(x){ if((x.pendingHeat.count>0 || x.traceStrength>0.4) && x.na.impulse121) return "heat"; if(x.na.mirrored115 && (x.interiorStrength>0.45 || x.publicChangedCount>0)) return "terminal"; if(x.interiorStrength>0.4 || x.publicStrength>0.45) return "manifestation"; if(x.narrativeStrength>0.35) return "routing"; return "audit"; }
-    function buildNextActions(ctx){ const out=[]; if(!ctx.publicPairs.some(x=>x.changed)) out.push("Wait for a real public-anchor mutation instead of reading the chart emotionally."); if(!ctx.pendingHeat.supported) out.push("Use a private RPC that supports pending filters and debug traces."); if(!ctx.dnaMeaningful) out.push("Treat proxy claims as weak until the DNA slot shows life or the contract proves non-proxy another way."); if(!ctx.traceResults.some(x=>x.supported)) out.push("Trace one suspicious tx on a provider that supports debug_traceTransaction."); if(ctx.discoveries.length) out.push(`Promote ${short(ctx.discoveries[0].address,10,8)} into the watch set if it recurs.`); if(ctx.na.pValue==null) out.push("Add exact timestamps to manual narrative items to enable rhythm stats."); if(!ctx.claimRows.some(x=>x.status==="confirmed")) out.push("Bring one hard tx hash or full address from the latest narrative branch and force a direct check."); return out.slice(0,8); }
-    function buildInsights(ctx){ const out=[]; if(ctx.publicStrength > ctx.interiorStrength) out.push("Public anchors are currently speaking louder than the candidate machine interior."); if(ctx.interiorStrength > ctx.publicStrength) out.push("The machine interior is showing more structure than the public surface right now."); if(ctx.narrativeStrength > 0.6 && ctx.publicStrength < 0.3) out.push("The social layer is ahead of the public chain surface again — classic map-before-manifestation posture."); if(ctx.claimRows.length && ctx.claimRows.filter(x=>x.status==="confirmed").length) out.push(`Confirmed ${ctx.claimRows.filter(x=>x.status==="confirmed").length} social claim(s) this sync.`); if(ctx.discoveries.length) out.push(`Top discovered address this sync: ${short(ctx.discoveries[0].address,10,8)}.`); if(ctx.contradictionLoad > 0.5) out.push("Contradictions are heavy. Slow down conclusions and prioritize falsification."); if(ctx.na.pValue != null) out.push(`Rhythm p-value ≈ ${fmtFixed(ctx.na.pValue,3)} (lower is more interesting).`); return out.slice(0,8); }
-
-    function snapshotFromModel(m){ const nodeBalances={}; m.balanceBoard.forEach(r=>nodeBalances[r.label]={pls:r.balances.pls||0,pdai:r.balances.pdai||0,wpls:r.balances.wpls||0,atropa:r.balances.atropa||0,nonce:r.nonce||0}); return {ts:Date.now(), score:m.score, phase:m.phase, total:m.total, burned:m.burned, heatCount:m.pendingHeat.count||0, publicStrength:m.publicStrength, interiorStrength:m.interiorStrength, contradictionLoad:m.contradictionLoad, slotProbe:m.slotProbe, dnaProbe:m.dnaProbe, publicAnchors:m.publicAnchors.map(x=>({address:x.address,reserve0:x.reserve0,reserve1:x.reserve1})), nodeBalances}; }
-
-    function renderMetrics(m){ setText("mScore",fmtFixed(m.score,1)); setText("mPhase",phaseLabel(m.phase)); setText("mPublic",fmtPct01(m.publicStrength,0)); setText("mInterior",fmtPct01(m.interiorStrength,0)); setText("mNarrative",fmtPct01(m.narrativeStrength,0)); setText("mContradictions",fmtPct01(m.contradictionLoad,0)); setText("mSpinePdai",fmtCompact(m.spinePdai,3)); setText("mSpineWpls",fmtCompact(m.spineWpls,3)); setText("mBurned",fmtCompact(m.burned,3)); setText("mHeat",m.pendingHeat.supported?(m.pendingHeat.count?`${m.pendingHeat.count}`:"quiet"):"N/A"); setText("mSlotSym",m.slotProbe.equal?"LOCKED?":"OPEN"); setText("mBell",m.bellPayloads.length?String(m.bellPayloads.length):"0"); setText("pairInfo",`Public anchors: ${m.publicAnchors.filter(x=>x.type==='pair').length}`); setText("harvesterInfo",`Harvester: ${m.cfg.USE_HARVESTER?'on':'off'} • social items ${m.socialItems.length}`); }
-    function renderScore(m){ const score=clamp(m.score,0,100); $("reactorRing").style.setProperty("--score",score.toFixed(2)); setText("scoreBig",fmtFixed(score,1)); setText("bigVerdict",phaseLabel(m.phase)); setText("coreState",phaseLabel(m.phase)); setText("coreGap",m.supports[0]||m.contradictions[0]||"No synthesis yet"); setText("verdictExplain","The engine hunts claims, tests them, and penalizes contradictions."); $("scoreFill").style.width=score.toFixed(1)+"%";
-      $("syncStatus").className=`statusPill ${score>=75?'stable':score>=45?'warned':'bad'}`; setText("syncStatus",m.phase==='heat'?'Heat phase':m.phase==='terminal'?'Terminal lanes':score>=60?'Machine aligned':score>=35?'Building':'Scanning');
-      setText("sPublic",`${fmtFixed(15*m.publicStrength,1)} / 15`); setText("sInterior",`${fmtFixed(15*m.interiorStrength,1)} / 15`); setText("sNarrative",`${fmtFixed(14*m.narrativeStrength,1)} / 14`); setText("sRoutes",`${fmtFixed(12*clamp(m.machine.routeEdges.length/20,0,1),1)} / 12`); setText("sTraces",`${fmtFixed(10*m.traceStrength,1)} / 10`); setText("sRhythm",`${fmtFixed(12*m.rhythmStrength,1)} / 12`); setText("sClaims",`${fmtFixed(12*m.claimsStrength,1)} / 12`); setText("sContra",`${fmtFixed(10*m.contradictionLoad,1)} / 10`);
-    }
-    function proofCard(title,stateText,stat,detail,cls){ return `<div class="proof ${cls}"><div class="proofTitle">${title}</div><div class="proofState">${stateText}</div><div class="proofStat">${stat}</div><div class="proofText">${detail}</div></div>`; }
-    function renderProofs(m){ const cards=[]; cards.push(proofCard("Public anchor health", m.publicStrength>.45?"Alive":"Weak", fmtPct01(m.publicStrength,0), "The app should never go blind just because candidate machine addresses are incomplete.", m.publicStrength>.45?"ok":"wait")); cards.push(proofCard("Machine interior", m.interiorStrength>.45?"Structured":"Quiet", fmtPct01(m.interiorStrength,0), "Balances, nonces, routes, traces, and candidate state probes together.", m.interiorStrength>.45?"ok":"wait")); cards.push(proofCard("Narrative grammar", m.narrativeStrength>.55?"Coherent":"Loose", fmtPct01(m.narrativeStrength,0), "Ordered phases, mirrored durations, impulse windows, and timing fit.", m.narrativeStrength>.55?"ok":"wait")); cards.push(proofCard("Rhythm statistics", m.na.pValue==null?"Need timestamps":(m.na.pValue<0.1?"Interesting":"Unclear"), m.na.pValue==null?"—":fmtFixed(m.na.pValue,3), "Lower p-values mean social timestamps are landing unusually close to chain events.", m.na.pValue!=null&&m.na.pValue<0.1?"ok":"wait")); cards.push(proofCard("Pending heat", m.pendingHeat.supported?(m.pendingHeat.count?"Active":"Quiet"):"Unsupported", m.pendingHeat.supported?`${m.pendingHeat.count} hit(s)`:"N/A", "Heat is a pre-block clue. You want this before you want a chart candle.", m.pendingHeat.supported?(m.pendingHeat.count?"ok":"wait"):"wait")); cards.push(proofCard("Contradiction discipline", m.contradictionLoad<0.35?"Healthy":m.contradictionLoad<0.6?"Watch":"Heavy", fmtPct01(m.contradictionLoad,0), "A good peg tool makes failed theories visible instead of burying them.", m.contradictionLoad<0.35?"ok":m.contradictionLoad<0.6?"wait":"no")); setHTML("proofGrid",cards.join("")); }
-    function renderLists(m){ setHTML("supportList", m.supports.length?m.supports.map(t=>itemHtml(t,"good")).join(""):itemHtml("No strong supports yet.","warn")); setHTML("contraList", m.contradictions.length?m.contradictions.map(t=>itemHtml(t,/not|no|quiet|unsupported|zero/i.test(t)?"warn":"bad")).join(""):itemHtml("No major contradictions.","good")); setHTML("insightList", m.insights.length?m.insights.map(t=>itemHtml(t,"good")).join(""):itemHtml("No insights yet.","warn")); setHTML("nextList", m.nextActions.length?m.nextActions.map(t=>itemHtml(t,"warn")).join(""):itemHtml("No next actions.","warn")); }
-    function renderSocial(m){ if(!m.socialItems.length){ setHTML("socialBody", `<tr><td colspan="9" class="small">No social items yet.</td></tr>`); return; } const html=m.socialItems.slice(0,40).map(item=>{ const related=m.claimRows.filter(c=>c.sourceId===item.id); const phase=socialToPhase(item); const validation=related.length?`${related.filter(x=>x.status==='confirmed').length} confirmed / ${related.filter(x=>x.status==='contradicted').length} contradicted / ${related.filter(x=>x.status==='open').length} open`:'none'; return `<tr><td>${esc(item.source)}</td><td>${item.when?esc(new Date(item.when).toLocaleString()):'—'}</td><td>${esc(item.actor||'—')}</td><td>${esc(item.title||item.text||'—')}</td><td><span class="tag ref">${esc(phase)}</span></td><td>${item.duration_sec?`${item.duration_sec}s`:'—'}</td><td>${related.slice(0,4).map(c=>esc(c.type)).join(', ')||'—'}</td><td>${esc(validation)}</td><td>${item.url?`<a href="${esc(item.url)}" target="_blank" rel="noopener">open</a>`:'—'}</td></tr>`; }).join(""); setHTML("socialBody",html); }
-    function renderClaims(m){ if(!m.claimRows.length){ setHTML("claimBody", `<tr><td colspan="6" class="small">No claims yet.</td></tr>`); return; } const html=m.claimRows.slice(0,80).map(c=>`<tr><td>${esc(c.type)}</td><td>${esc(c.sourceTitle||'—')}</td><td class="mono">${esc(short(c.target||'',12,8)||'—')}</td><td><span class="tag ${c.status==='confirmed'?'good':c.status==='contradicted'?'bad':'ref'}">${esc(c.status)}</span></td><td>${esc(c.evidence)}</td><td class="small">${esc(c.notes||'')}</td></tr>`).join(""); setHTML("claimBody",html); }
-    function renderPublic(m){ const rows=m.publicAnchors.filter(x=>x.type==='pair'); if(!rows.length){ setHTML("publicBody", `<tr><td colspan="7" class="small">No public anchors.</td></tr>`); return; } const html=rows.map(r=>`<tr><td>${esc(r.label)}</td><td class="mono">${esc(short(r.address,12,8))}</td><td class="mono">${esc(short(r.token0))} / ${esc(short(r.token1))}</td><td>${fmtCompact(r.reserve0,3)} / ${fmtCompact(r.reserve1,3)}</td><td>${r.syncCountRecent||0}</td><td>${r.changed?'<span class="tag ref">changed</span>':'<span class="tag other">same</span>'}</td><td>${esc(r.interpretation||'')}</td></tr>`).join(""); setHTML("publicBody",html); }
-    function renderBalance(m){ if(!m.balanceBoard.length){ setHTML("balanceBody", `<tr><td colspan="10" class="small">No machine body nodes.</td></tr>`); return; } const html=m.balanceBoard.map(r=>{ const live=(r.nonce>0 || r.balances.pls>0 || r.balances.pdai>0 || r.balances.wpls>0 || r.balances.atropa>0); return `<tr><td>${esc(r.label)}</td><td>${esc(r.role)}</td><td>${esc(r.type)}</td><td class="mono">${esc(short(r.address,12,8))}</td><td>${fmtCompact(r.balances.pls,3)}</td><td>${fmtCompact(r.balances.pdai,3)}</td><td>${fmtCompact(r.balances.wpls,3)}</td><td>${fmtCompact(r.balances.atropa,3)}</td><td>${r.nonce}</td><td><span class="tag ${live?'good':'ref'}">${Math.round(r.confidence*100)}%</span></td></tr>`; }).join(""); setHTML("balanceBody",html); }
-    function renderProbes(m){ const prev=loadHistory().slice(-1)[0]||{}; const rows=[]; for(const slot of m.cfg.SLOT_LIST){ const curr=m.slotProbe.values[slot]||"0x"; const prevVal=prev.slotProbe?.values?.[slot]||""; rows.push(`<tr><td>Storage slot</td><td class="mono">${esc(slot)}</td><td class="mono">${esc(short(curr,16,8))}</td><td>${curr==='0x'?'empty':/^0x0+$/.test(curr)?'zero':'non-zero'}</td><td>${norm(curr)!==norm(prevVal)?'<span class="tag ref">changed</span>':'<span class="tag other">same</span>'}</td><td>candidate manifold lens</td></tr>`); }
-      rows.push(`<tr><td>EIP-1967 DNA</td><td class="mono">${esc(short(m.cfg.EIP1967_SLOT,12,8))}</td><td class="mono">${esc(short(m.dnaProbe.raw,16,8))}</td><td>${m.dnaProbe.implAddress?esc(short(m.dnaProbe.implAddress,10,8)):'empty'}</td><td>${m.dnaProbe.changed?'<span class="tag ref">changed</span>':'<span class="tag other">same</span>'}</td><td>${m.dnaProbe.implAddress?'proxy-style implementation slot populated':'slot is zero / not proxy-like by this standard'}</td></tr>`);
-      setHTML("probeBody", rows.join("")); }
-    function renderTxs(m){ if(!m.suspiciousTxs.length){ setHTML("txBody", `<tr><td colspan="8" class="small">No suspicious transactions in recent block scan.</td></tr>`); return; } const html=m.suspiciousTxs.slice(0,60).map(tx=>`<tr><td>${tx.block.toLocaleString()}</td><td class="mono">${esc(short(tx.from,10,8))}</td><td class="mono">${esc(short(tx.to,10,8))}</td><td>${fmtCompact(Number(tx.valueWei)/1e18,6)}</td><td>${tx.gasPriceGwei!=null?`${fmtFixed(tx.gasPriceGwei,3)} gwei`:'—'}${tx.priorityGwei!=null?` / ${fmtFixed(tx.priorityGwei,3)} prio`:''}</td><td>${tx.asciiMarkers.length?esc(tx.asciiMarkers.join(', ')):'—'}</td><td>${esc(tx.reasons.join(' | '))}</td><td class="mono">${esc(short(tx.hash,12,8))}</td></tr>`).join(""); setHTML("txBody",html); }
-    function renderTraces(m){ if(!m.traceResults.length){ setHTML("traceBody", `<tr><td colspan="6" class="small">No trace attempts.</td></tr>`); return; } const html=m.traceResults.map(tr=>`<tr><td class="mono">${esc(short(tr.hash,12,8))}</td><td>${tr.supported?'<span class="tag good">ok</span>':`<span class="tag ref">${esc(tr.error||'unsupported')}</span>`}</td><td>${tr.supported?tr.calls:'—'}</td><td>${tr.supported?tr.delegatecalls:'—'}</td><td>${tr.supported?esc(tr.newEdges.join(' | ')):'—'}</td><td class="small">${tr.supported?esc(tr.path):'—'}</td></tr>`).join(""); setHTML("traceBody",html); }
-    function renderDiscoveries(m){ if(!m.discoveries.length && !m.machine.routeEdges.length){ setHTML("discoverBody", `<tr><td colspan="6" class="small">No discoveries yet.</td></tr>`); return; } const rows=[]; m.discoveries.slice(0,30).forEach(d=>rows.push(`<tr><td class="mono">${esc(short(d.address,12,8))}</td><td>address</td><td>${fmtFixed(d.score,2)}</td><td>—</td><td class="small">${esc(d.reasons)}</td><td>${d.score>=2?'<span class="tag good">promote</span>':'<span class="tag ref">watch</span>'}</td></tr>`)); m.machine.routeEdges.slice(0,20).forEach(r=>rows.push(`<tr><td>${esc(r.fromLabel)} → ${esc(r.toLabel)}</td><td>${esc(r.className)}</td><td>${fmtFixed(Math.min(9.99, r.touches/2 + Math.log10((r.totalAmount||1)+1)),2)}</td><td>${r.touches}</td><td class="small">${esc(r.token)} • ${fmtCompact(r.totalAmount,3)}</td><td><span class="tag other">edge</span></td></tr>`)); setHTML("discoverBody", rows.join("")); }
-    function renderTruth(m){ setHTML("truthBody", m.truths.join("")); }
-
-    function drawSpark(canvasId, values, color, invert=false){ const canvas=$(canvasId); if(!canvas) return; const ctx=canvas.getContext('2d'); const w=canvas.width,h=canvas.height; ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(255,255,255,0.02)'; ctx.fillRect(0,0,w,h); const clean=values.filter(v=>v!=null&&Number.isFinite(v)); if(clean.length<2){ ctx.fillStyle='rgba(140,160,173,0.8)'; ctx.font='12px sans-serif'; ctx.fillText('Need more history',10,20); return; } const min=Math.min(...clean), max=Math.max(...clean), range=max-min||1; ctx.beginPath(); values.forEach((v,i)=>{ if(v==null||!Number.isFinite(v)) return; const x=(i/Math.max(1,values.length-1))*(w-8)+4; const normY=invert?((v-min)/range):(1-(v-min)/range); const y=clamp(normY,0,1)*(h-12)+6; if(i===0||!Number.isFinite(values[i-1])) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.stroke(); const last=values[values.length-1]; if(last!=null&&Number.isFinite(last)){ const x=((values.length-1)/Math.max(1,values.length-1))*(w-8)+4; const normY=invert?((last-min)/range):(1-(last-min)/range); const y=clamp(normY,0,1)*(h-12)+6; ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fillStyle=color; ctx.fill(); } }
-    function drawHistoryCharts(history){ drawSpark('scoreChart', history.map(x=>x.score), '#58ffb9', false); drawSpark('strengthChart', history.map(x=>(x.publicStrength||0)-(x.interiorStrength||0)), '#48c4ff', false); drawSpark('contraChart', history.map(x=>x.contradictionLoad), '#ffcc52', false); }
-
-    async function importHistoryFile(file){ const text=await file.text(); let json=JSON.parse(text); if(!Array.isArray(json)) json=[json]; const current=loadHistory(); saveHistory([...current, ...json]); drawHistoryCharts(loadHistory()); }
-
-    async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); setText('scanWindow',`Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`); const model=await buildModel(); renderMetrics(model); renderScore(model); renderProofs(model); renderLists(model); renderSocial(model); renderClaims(model); renderPublic(model); renderBalance(model); renderProbes(model); renderTxs(model); renderTraces(model); renderDiscoveries(model); renderTruth(model); setText('lastSync',`Last sync: ${nowStamp()} • block ${model.latestBlock.toLocaleString()}`); const history=loadHistory(); history.push(snapshotFromModel(model)); while(history.length>state.settings.HISTORY_LIMIT) history.shift(); saveHistory(history); drawHistoryCharts(history); }catch(err){ console.error(err); $('syncStatus').className='statusPill bad'; setText('syncStatus','Sync failed'); setText('lastSync',`Last error: ${err?.message||String(err)}`); setHTML('supportList', itemHtml('No new verified state because the latest sync failed.','bad')); setHTML('contraList', itemHtml(esc(err?.message||String(err)),'bad')); setHTML('insightList', itemHtml('Fix RPC / CORS / provider capabilities, then retry.','warn')); setHTML('nextList', itemHtml('A private node dramatically improves pending filters and traces.','warn')); } finally{ state.syncing=false; } }
-
-    $('settingsBtn').addEventListener('click', ()=>$('settingsBox').classList.toggle('open'));
-    $('saveSettingsBtn').addEventListener('click', ()=>{ saveSettingsFromUI(); sync(); });
-    $('clearSettingsBtn').addEventListener('click', ()=>{ clearSavedSettings(); sync(); });
-    $('clearHistoryBtn').addEventListener('click', clearHistory);
-    $('refreshBtn').addEventListener('click', sync);
-    $('exportConfigBtn').addEventListener('click', ()=>downloadJSON('pdai-peg-prover-config.json', JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')));
-    $('exportHistoryBtn').addEventListener('click', ()=>downloadJSON('pdai-peg-prover-history.json', loadHistory()));
-    $('importHistoryBtn').addEventListener('click', ()=>$('importHistoryInput').click());
-    $('importHistoryInput').addEventListener('change', async e=>{ const f=e.target.files?.[0]; if(f) await importHistoryFile(f); e.target.value=''; });
-
-    state.settings=loadSettings(); pushSettingsToUI(state.settings); setText('scanWindow',`Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`); setText('historyInfo',`History: ${loadHistory().length} snapshot(s)`); drawHistoryCharts(loadHistory()); setRefreshTimer(); sync();
-  </script>
+  <div class="foot glass">
+    <div>TARGET: <span class="mono">0x6B175474E89094C44Da98b954EedeAC495271d0F</span></div>
+    <div>WPLS: <span class="mono">0xA1077a294D2D00ca00bb46556459739d482282c6</span></div>
+    <div>EIP-1967 slot: <span class="mono">0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc</span></div>
+  </div>
+</div>
+<script>
+const DEFAULTS={
+  TARGET:"0x6B175474E89094C44Da98b954EedeAC495271d0F",
+  WPLS:"0xA1077a294D2D00ca00bb46556459739d482282c6",
+  DEAD:"0x000000000000000000000000000000000000dEaD",
+  SPINE:"0x5EF786D22e6e6666666666666666666666665EF7",
+  EIP1967_SLOT:"0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+  PUBLIC_ANCHORS:[
+    {label:"Native pDAI/WPLS",type:"pair",address:"0x947b4633e32e0c7f2c76753b43f008480715416d"},
+    {label:"ATROPA/DAI core",type:"pair",address:"0x5ef7aac0de4f2012cb36730da140025b113fada4"},
+    {label:"Bridged DAI/WPLS",type:"pair",address:"0xe56043671df55de5cdf8459710433c10324de0ae"},
+    {label:"pDAI token",type:"token",address:"0x6B175474E89094C44Da98b954EedeAC495271d0F"}
+  ],
+  SLOT_LIST:["0x7b12","0x0968"],
+  SCAN_BLOCKS:2500,
+  AUTO_REFRESH_MS:45000,
+  HISTORY_LIMIT:240,
+  BIG_PDAI_DELTA:1000000,
+  BIG_WPLS_DELTA:100000,
+  HEAT_GWEI_THRESHOLD:0,
+  TRACE_LIMIT:6,
+  RECENT_BLOCK_SCAN:60,
+  USE_PENDING_HEAT:true,
+  USE_HARVESTER:false,
+  ATROPA_TOKEN:"",
+  YOUTUBE_CHANNEL:"UC0ADdeCTOW9Qlai7G3kLLFg",
+  YOUTUBE_KEY:"",
+  X_BEARER:"",
+  X_QUERY:'(pDAI OR Atropa OR LibertySwap OR Maria OR Bell OR Proxy OR Heat OR NineIronCapital) -is:retweet',
+  KEYWORDS:["pdai","atropa","libertyswap","maria","bell","proxy","heat","qwen","alligator","teddy bear","north hollywood","spectacle","trilateral","nineironcapital","minting","auction","oracle"],
+  NOTES:"",
+  RPCS:["https://rpc.pulsechain.com","https://pulsechain.publicnode.com","https://rpc-pulsechain.g4mm4.io","https://rpc.pulsechainrpc.com","https://pulsechain.rpc.thirdweb.com"],
+  WATCH:{AF4E:"",D6CA:"",NODE_AE84:"",NODE_0968:"0x0000000000000000000000000000000000000968",NODE_4FD0:"0x60032b4b3b3a3b3a3b3a3b3a3b3a3b3a3b3a4fd0",NODE_3D07:"0x19488a0f98363768b449E2D821C8d7747e903D07",NODE_BA86:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc",NODE_F2DC:"0x862247F0E9F77331c470ec75d905CC4240FF3Dc2",NODE_7B12:"0x0000000000000000000000000000000000007b12",NODE_D84D:"",LIBERTY_BALANCER:"",LIBERTY_GASLESS:""},
+  SEED_SOCIAL:[
+    {id:"seed-maria",source:"YouTube",actor:"@靈脅用",title:"Maria channel motif stream",text:"Spectacle, live, landscape teddy bear, qwen being north hollywood, qwen being qwen, trilateral broadcast",phase:"routing",duration_sec:0,when:"",url:"https://youtube.com/channel/UC0ADdeCTOW9Qlai7G3kLLFg"},
+    {id:"seed-ni-overview",source:"YouTube",actor:"@NineIronCapital",title:"Condensed Info on Minting / Auctions | Laymen's pDAI Guide",text:"pDAI minting, auctions, collateral, overview, PulseChain, Atropa",phase:"audit",duration_sec:0,when:"",url:"https://www.youtube.com/watch?v=eHVKOnlptXU"},
+    {id:"seed-ni-liq",source:"X",actor:"@NineIronCapital",title:"Liquidity will be solved easily",text:"When pDAI is collateralized by OA coins, liquidity will be solved easily.",phase:"routing",duration_sec:0,when:"",url:"https://x.com/NineIronCapital/status/1853895251259502632"},
+    {id:"seed-ni-deficit",source:"X",actor:"@NineIronCapital",title:"Structural deficit thesis",text:"Pre-and-post-fork, pDAI liquidity was removed from every DeFi lending and liquidity pool, creating a structural deficit.",phase:"manifestation",duration_sec:0,when:"",url:"https://x.com/NineIronCapital/status/2039517878639370360"},
+    {id:"seed-ni-oracle",source:"X",actor:"@NineIronCapital",title:"Oracle/liquidity thesis",text:"A consensus based oracle for pDAI is only as strong as the liquidity it commands and the trading volumes routed through it.",phase:"routing",duration_sec:0,when:"",url:"https://x.com/NineIronCapital/status/2035190912653922630"},
+    {id:"seed-dm-market",source:"X",actor:"@DcentraliseMe",title:"Public market-maker marketplace",text:"Next month Liberty Swap opens the public market-maker marketplace for LibertyX.",phase:"manifestation",duration_sec:0,when:"",url:"https://x.com/DcentraliseMe/status/2031519856139350470"},
+    {id:"seed-dm-route",source:"X",actor:"@DcentraliseMe",title:"L1 route and liquidity hub",text:"Liberty swap have now opened the L1 route for WETH and the liquidity hub for pDAI.",phase:"activation",duration_sec:0,when:"",url:"https://x.com/DcentraliseMe/status/1990096794915643407"},
+    {id:"seed-dm-burn",source:"X",actor:"@DcentraliseMe",title:"Burning input token route",text:"pDAI to be swapped from other chains to PulseChain whilst burning the input token.",phase:"terminal",duration_sec:0,when:"",url:"https://x.com/DcentraliseMe/status/1983906579372990722"},
+    {id:"seed-yt-stableswap",source:"YouTube",actor:"community",title:"StableSwap Launch = pStable Peg Puzzle Piece?",text:"Nine Iron Capital research on Pulsechain Curve, Maker, pDAI, pStables, Atropa.",phase:"routing",duration_sec:0,when:"",url:"https://www.youtube.com/watch?v=eQ4LHVQDkjk"},
+    {id:"seed-yt-rh",source:"YouTube",actor:"community",title:"Proof Richard Heart is Behind pDAI? How pDAI Pegs",text:"NineIronCapital breakdown, Richard Heart, pDAI peg logic, Atropa, PulseChain.",phase:"manifestation",duration_sec:0,when:"",url:"https://www.youtube.com/watch?v=Kq3DCUBhD4w"}
+  ]
+};
+const STORAGE_KEY='pdai-peg-prover-v5'; const HISTORY_KEY='pdai-peg-prover-history-v5';
+const TRANSFER_TOPIC='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const APPROVAL_TOPIC='0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
+const SYNC_TOPIC='0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1';
+const PHASE_ORDER={audit:1,activation:2,routing:3,manifestation:4,terminal:5,heat:6,settle:7};
+const state={syncing:false,rpcIndex:0,decimals:new Map(),times:new Map(),code:new Map(),pendingFilterId:null,settings:null,timer:null};
+const $=id=>document.getElementById(id); const norm=a=>String(a||'').trim().toLowerCase(); const isAddr=a=>/^0x[a-fA-F0-9]{40}$/.test(String(a||'').trim()); const unique=a=>[...new Set(a)];
+const short=(s,n=6,m=4)=>{s=String(s||''); return s.length>n+m+3?`${s.slice(0,n)}...${s.slice(-m)}`:s;};
+const esc=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n)); const toHex=n=>'0x'+BigInt(n).toString(16);
+function fmtNum(v,d=2){return v==null||!Number.isFinite(v)?'—':Number(v).toLocaleString(undefined,{maximumFractionDigits:d});}
+function fmtFixed(v,d=3){return v==null||!Number.isFinite(v)?'—':Number(v).toFixed(d);} function fmtPct01(v,d=0){return v==null||!Number.isFinite(v)?'—':(v*100).toFixed(d)+'%';}
+function fmtCompact(v,d=2){if(v==null||!Number.isFinite(v)) return '—'; const a=Math.abs(v); if(a>=1e12) return (v/1e12).toFixed(d)+'T'; if(a>=1e9) return (v/1e9).toFixed(d)+'B'; if(a>=1e6) return (v/1e6).toFixed(d)+'M'; if(a>=1e3) return (v/1e3).toFixed(d)+'K'; return fmtNum(v,d);} 
+function setText(id,txt){const el=$(id); if(el) el.textContent=txt;} function setHTML(id,html){const el=$(id); if(el) el.innerHTML=html;}
+function hexToBigInt(hex){try{return BigInt(hex||'0x0');}catch{return 0n;}} function gweiFromHex(hex){try{return Number(BigInt(hex||'0x0'))/1e9;}catch{return null;}}
+function units(big,dec=18){const neg=big<0n; const val=neg?-big:big; let s=val.toString(); if(dec===0) return Number((neg?'-':'')+s); if(s.length<=dec) s='0'.repeat(dec-s.length+1)+s; const i=s.slice(0,-dec)||'0'; const f=s.slice(-dec).replace(/0+$/,'').slice(0,12); return parseFloat((neg?'-':'')+i+(f?'.'+f:''));}
+function nowStamp(){return new Date().toLocaleString();} function itemHtml(t,c='warn'){return `<div class="item ${c}">${t}</div>`;}
+function inferPhase(title){const t=String(title||'').toLowerCase(); if(/spectacle/.test(t)) return 'audit'; if(/is live/.test(t)) return 'activation'; if(/north hollywood|teddy bear/.test(t)) return 'terminal'; if(/qwen being qwen|heat/.test(t)) return 'heat'; if(/trilateral|route|manifold|proxy|mint|auction/.test(t)) return 'routing'; return 'manifestation';}
+function phaseLabel(p){return ({audit:'Audit / spectacle',activation:'Activation / live',routing:'Routing / manifold',manifestation:'Machine manifestation',terminal:'Terminal lanes / symmetry',heat:'Heat / runtime intensity',settle:'Settle / soft landing'})[p]||p;}
+function saveHistory(h){localStorage.setItem(HISTORY_KEY,JSON.stringify(h.slice(-DEFAULTS.HISTORY_LIMIT))); setText('historyInfo',`History: ${h.length} snapshot(s)`);} function loadHistory(){try{const d=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); return Array.isArray(d)?d:[];}catch{return [];}}
+function persistSettings(){localStorage.setItem(STORAGE_KEY,JSON.stringify({privateRpc:state.settings.privateRpc||'',scanBlocks:state.settings.SCAN_BLOCKS,autoRefreshMs:state.settings.AUTO_REFRESH_MS,atropaToken:state.settings.ATROPA_TOKEN||'',youtubeKey:state.settings.YOUTUBE_KEY||'',youtubeChannel:state.settings.YOUTUBE_CHANNEL||'',xBearer:state.settings.X_BEARER||'',xQuery:state.settings.X_QUERY||'',watch:state.settings.WATCH||{},slotList:state.settings.SLOT_LIST||[],heatGweiThreshold:state.settings.HEAT_GWEI_THRESHOLD||0,traceLimit:state.settings.TRACE_LIMIT||6,recentBlockScan:state.settings.RECENT_BLOCK_SCAN||60,keywords:state.settings.KEYWORDS||[],notes:state.settings.NOTES||'',usePendingHeat:!!state.settings.USE_PENDING_HEAT,useHarvester:!!state.settings.USE_HARVESTER}));}
+function loadSettings(){let saved={}; try{saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');}catch{} const c=structuredClone(DEFAULTS); if(saved.privateRpc) c.privateRpc=saved.privateRpc; if(saved.scanBlocks) c.SCAN_BLOCKS=Number(saved.scanBlocks)||c.SCAN_BLOCKS; if(saved.autoRefreshMs) c.AUTO_REFRESH_MS=Number(saved.autoRefreshMs)||c.AUTO_REFRESH_MS; if(saved.atropaToken) c.ATROPA_TOKEN=saved.atropaToken; if(saved.youtubeKey) c.YOUTUBE_KEY=saved.youtubeKey; if(saved.youtubeChannel) c.YOUTUBE_CHANNEL=saved.youtubeChannel; if(saved.xBearer) c.X_BEARER=saved.xBearer; if(saved.xQuery) c.X_QUERY=saved.xQuery; if(saved.watch) c.WATCH={...c.WATCH,...saved.watch}; if(saved.slotList) c.SLOT_LIST=saved.slotList; if(saved.heatGweiThreshold!=null) c.HEAT_GWEI_THRESHOLD=Number(saved.heatGweiThreshold)||0; if(saved.traceLimit) c.TRACE_LIMIT=Number(saved.traceLimit)||c.TRACE_LIMIT; if(saved.recentBlockScan) c.RECENT_BLOCK_SCAN=Number(saved.recentBlockScan)||c.RECENT_BLOCK_SCAN; if(Array.isArray(saved.keywords)&&saved.keywords.length) c.KEYWORDS=saved.keywords; if(saved.notes) c.NOTES=saved.notes; if(saved.usePendingHeat!=null) c.USE_PENDING_HEAT=!!saved.usePendingHeat; if(saved.useHarvester!=null) c.USE_HARVESTER=!!saved.useHarvester; return c;}
+function pushSettingsToUI(c){$('sPrivateRpc').value=c.privateRpc||''; $('sScanBlocks').value=String(c.SCAN_BLOCKS); $('sAutoRefreshMs').value=String(c.AUTO_REFRESH_MS); $('sAtropaToken').value=c.ATROPA_TOKEN||''; $('sYoutubeKey').value=c.YOUTUBE_KEY||''; $('sYoutubeChannel').value=c.YOUTUBE_CHANNEL||''; $('sXBearer').value=c.X_BEARER||''; $('sXQuery').value=c.X_QUERY||''; $('sAf4e').value=c.WATCH.AF4E||''; $('sD6ca').value=c.WATCH.D6CA||''; $('sAe84').value=c.WATCH.NODE_AE84||''; $('s0968').value=c.WATCH.NODE_0968||''; $('s4fd0').value=c.WATCH.NODE_4FD0||''; $('s3d07').value=c.WATCH.NODE_3D07||''; $('sBa86').value=c.WATCH.NODE_BA86||''; $('sF2dc').value=c.WATCH.NODE_F2DC||''; $('s7b12').value=c.WATCH.NODE_7B12||''; $('sD84d').value=c.WATCH.NODE_D84D||''; $('sLibertyBalancer').value=c.WATCH.LIBERTY_BALANCER||''; $('sLibertyGasless').value=c.WATCH.LIBERTY_GASLESS||''; $('sSlotList').value=(c.SLOT_LIST||[]).join(','); $('sHeatGwei').value=String(c.HEAT_GWEI_THRESHOLD||0); $('sTraceLimit').value=String(c.TRACE_LIMIT||6); $('sRecentBlockScan').value=String(c.RECENT_BLOCK_SCAN||60); $('sKeywords').value=(c.KEYWORDS||[]).join(','); $('sNotes').value=c.NOTES||''; $('sUsePending').checked=!!c.USE_PENDING_HEAT; $('sUseHarvester').checked=!!c.USE_HARVESTER;}
+function saveSettingsFromUI(){const c=state.settings; c.privateRpc=$('sPrivateRpc').value.trim(); c.SCAN_BLOCKS=Number($('sScanBlocks').value.trim()||c.SCAN_BLOCKS); c.AUTO_REFRESH_MS=Number($('sAutoRefreshMs').value.trim()||c.AUTO_REFRESH_MS); c.ATROPA_TOKEN=$('sAtropaToken').value.trim(); c.YOUTUBE_KEY=$('sYoutubeKey').value.trim(); c.YOUTUBE_CHANNEL=$('sYoutubeChannel').value.trim(); c.X_BEARER=$('sXBearer').value.trim(); c.X_QUERY=$('sXQuery').value.trim(); c.WATCH={...c.WATCH,AF4E:$('sAf4e').value.trim(),D6CA:$('sD6ca').value.trim(),NODE_AE84:$('sAe84').value.trim(),NODE_0968:$('s0968').value.trim(),NODE_4FD0:$('s4fd0').value.trim(),NODE_3D07:$('s3d07').value.trim(),NODE_BA86:$('sBa86').value.trim(),NODE_F2DC:$('sF2dc').value.trim(),NODE_7B12:$('s7b12').value.trim(),NODE_D84D:$('sD84d').value.trim(),LIBERTY_BALANCER:$('sLibertyBalancer').value.trim(),LIBERTY_GASLESS:$('sLibertyGasless').value.trim()}; c.SLOT_LIST=unique(String($('sSlotList').value||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>x.startsWith('0x')?x:'0x'+x)); c.HEAT_GWEI_THRESHOLD=Number($('sHeatGwei').value.trim()||0); c.TRACE_LIMIT=Number($('sTraceLimit').value.trim()||6); c.RECENT_BLOCK_SCAN=Number($('sRecentBlockScan').value.trim()||60); c.KEYWORDS=unique(String($('sKeywords').value||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean)); c.NOTES=$('sNotes').value.trim(); c.USE_PENDING_HEAT=$('sUsePending').checked; c.USE_HARVESTER=$('sUseHarvester').checked; persistSettings(); state.pendingFilterId=null; setRefreshTimer();}
+function clearSavedSettings(){localStorage.removeItem(STORAGE_KEY); state.settings=loadSettings(); pushSettingsToUI(state.settings); state.pendingFilterId=null; setRefreshTimer();}
+function setRefreshTimer(){if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(15000,Number(state.settings.AUTO_REFRESH_MS)||45000));}
+function activeRpcs(){const arr=[...DEFAULTS.RPCS]; if(state.settings?.privateRpc) arr.unshift(state.settings.privateRpc); return unique(arr.filter(Boolean));}
+async function withTimeout(promise,ms=15000){let timer; return Promise.race([promise.finally(()=>clearTimeout(timer)), new Promise((_,rej)=>{timer=setTimeout(()=>rej(new Error('timeout')),ms);})]);}
+async function rpc(method,params){const rpcs=activeRpcs(); let lastErr; for(let i=0;i<rpcs.length;i++){const idx=(state.rpcIndex+i)%rpcs.length; const url=rpcs[idx]; try{const res=await withTimeout(fetch(url,{method:'POST',headers:{'content-type':'application/json','accept':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+i,method,params})}),15000); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message||'rpc error'); state.rpcIndex=idx; setText('nodeStatus','RPC: '+url.replace(/^https?:\/\//,'')); return data.result;}catch(err){lastErr=err;}} throw lastErr||new Error('All RPCs failed');}
+async function rpcBlockNumber(){return parseInt(await rpc('eth_blockNumber',[]),16);} async function txCount(addr){return parseInt(await rpc('eth_getTransactionCount',[addr,'latest']),16);} async function getCodeType(addr){const k=norm(addr); if(state.code.has(k)) return state.code.get(k); const code=await rpc('eth_getCode',[addr,'latest']); const t=code&&code!=='0x'?'CONTRACT':'EOA'; state.code.set(k,t); return t;}
+async function ercDecimals(token){const k=norm(token); if(state.decimals.has(k)) return state.decimals.get(k); const raw=await rpc('eth_call',[{to:token,data:'0x313ce567'},'latest']); const dec=parseInt(raw,16); const out=Number.isFinite(dec)?dec:18; state.decimals.set(k,out); return out;}
+async function ercTotalSupply(token){return hexToBigInt(await rpc('eth_call',[{to:token,data:'0x18160ddd'},'latest']));}
+async function ercBalanceOf(token,holder){const data='0x70a08231'+norm(holder).replace(/^0x/,'').padStart(64,'0'); return hexToBigInt(await rpc('eth_call',[{to:token,data},'latest']));}
+async function nativeBalance(holder){return units(hexToBigInt(await rpc('eth_getBalance',[holder,'latest'])),18);} async function readStorageAt(addr,slot){return await rpc('eth_getStorageAt',[addr,slot,'latest']);}
+async function rpcBlockTimestamp(block){const k=Number(block); if(state.times.has(k)) return state.times.get(k); const b=await rpc('eth_getBlockByNumber',[toHex(block),false]); const ts=b?.timestamp?parseInt(b.timestamp,16)*1000:null; state.times.set(k,ts); return ts;}
+async function fetchJson(url,opts={}){const res=await withTimeout(fetch(url,opts),15000); if(!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json();}
+async function discoverPairs(token){const url=`https://api.dexscreener.com/token-pairs/v1/pulsechain/${token}`; const d=await fetchJson(url); return Array.isArray(d)?d:(d?.pairs||[]);} 
+function normalizePair(pair,target){const t=norm(target), base=norm(pair?.baseToken?.address), quote=norm(pair?.quoteToken?.address); if(base!==t&&quote!==t) return null; const other=base===t?pair.quoteToken:pair.baseToken; return {pairAddress:pair?.pairAddress||'', url:pair?.url||'', dexId:pair?.dexId||'unknown', otherAddress:other?.address||'', otherSymbol:other?.symbol||'UNKNOWN', liqUsd:Number(pair?.liquidity?.usd||0), volume24:Number(pair?.volume?.h24||0)};}
+async function mapLimit(arr,limit,fn){const out=new Array(arr.length); let i=0; async function worker(){while(i<arr.length){const idx=i++; try{out[idx]=await fn(arr[idx],idx);}catch(err){out[idx]={...arr[idx],error:err?.message||String(err)};}}} await Promise.all(Array.from({length:Math.max(1,Math.min(limit,arr.length||1))},worker)); return out;}
+async function pairMeta(pairAddress){const [token0Raw,token1Raw,resRaw]=await Promise.all([rpc('eth_call',[{to:pairAddress,data:'0x0dfe1681'},'latest']),rpc('eth_call',[{to:pairAddress,data:'0xd21220a7'},'latest']),rpc('eth_call',[{to:pairAddress,data:'0x0902f1ac'},'latest'])]); const token0='0x'+String(token0Raw||'').slice(-40), token1='0x'+String(token1Raw||'').slice(-40); const h=String(resRaw||'0x').replace(/^0x/,''); const r0=hexToBigInt('0x'+h.slice(0,64)); const r1=hexToBigInt('0x'+h.slice(64,128)); return {token0,token1,reserve0:r0,reserve1:r1};}
+async function getLogs(address,topic0,fromBlock,toBlock){return await rpc('eth_getLogs',[{address,fromBlock:toHex(fromBlock),toBlock:toHex(toBlock),topics:[topic0]}]);}
+function watchNodes(cfg){return [{label:'5EF7',address:cfg.SPINE,role:'spine'},{label:'AF4E',address:cfg.WATCH.AF4E,role:'hand'},{label:'D6CA',address:cfg.WATCH.D6CA,role:'recycler'},{label:'AE84',address:cfg.WATCH.NODE_AE84,role:'rail'},{label:'0968',address:cfg.WATCH.NODE_0968,role:'hammer'},{label:'4fd0',address:cfg.WATCH.NODE_4FD0,role:'buffer'},{label:'3D07',address:cfg.WATCH.NODE_3D07,role:'intake'},{label:'Ba86',address:cfg.WATCH.NODE_BA86,role:'architect'},{label:'F2Dc',address:cfg.WATCH.NODE_F2DC,role:'logic'},{label:'7b12',address:cfg.WATCH.NODE_7B12,role:'terminal'},{label:'D84D',address:cfg.WATCH.NODE_D84D,role:'adjacent'},{label:'Liberty Balancer',address:cfg.WATCH.LIBERTY_BALANCER,role:'gate'},{label:'Liberty Gasless',address:cfg.WATCH.LIBERTY_GASLESS,role:'gate'}].filter(x=>isAddr(x.address));}
+function hexToAscii(hex){const h=String(hex||'').replace(/^0x/,''); let out=''; for(let i=0;i<h.length;i+=2){const code=parseInt(h.slice(i,i+2),16); if(!Number.isFinite(code)) continue; out += code>=32&&code<=126?String.fromCharCode(code):' ';} return out.replace(/\s+/g,' ').trim();}
+function extractAddresses(text){const m=String(text||'').match(/0x[a-fA-F0-9]{40}/g); return m?unique(m):[];} function extractTxHashes(text){const m=String(text||'').match(/0x[a-fA-F0-9]{64}/g); return m?unique(m):[];}
+function socialToPhase(item){return item.phase||inferPhase(item.title||item.text||'');}
+function extractClaims(item,cfg){const text=[item.title||'',item.text||'',item.description||''].join(' \n ').toLowerCase(); const claims=[]; const add=(type,target,notes)=>claims.push({type,target,notes,sourceId:item.id,sourceTitle:item.title||item.text||type}); if(/bell/.test(text)) add('bell_payload',cfg.TARGET,'Search calldata for ASCII Bell marker'); if(/proxy|implementation transparent upgradable proxy|transparent upgradable proxy/.test(text)) add('proxy_artifact',cfg.TARGET,'Check EIP-1967 DNA slot and code type'); if(/7b12|0968|symmetry|manifold/.test(text)) add('slot_symmetry',cfg.TARGET,`Read candidate slots ${cfg.SLOT_LIST.join(', ')}`); if(/heat|2:01|121/.test(text)) add('heat_window',cfg.WATCH.NODE_4FD0||cfg.TARGET,'Pending heat / burst window'); if(/1:55|115|teddy bear|north hollywood/.test(text)) add('terminal_window',cfg.TARGET,'Mirrored cadence'); if(/4fd0|liberty gasless|libertropa/.test(text)) add('relayer_activity',cfg.WATCH.NODE_4FD0||cfg.WATCH.LIBERTY_GASLESS||cfg.TARGET,'Relayer activity'); if(/ae84|scribe/.test(text)) add('rail_activity',cfg.WATCH.NODE_AE84||cfg.TARGET,'Rail activity'); if(/5ef7|spine/.test(text)) add('spine_activity',cfg.SPINE,'Supply vault movement'); if(/d84d/.test(text)) add('d84d_activity',cfg.WATCH.NODE_D84D||'', 'Protocol-adjacent wallet'); if(/burn|dead|supply contraction|low free directive/.test(text)) add('supply_contraction',cfg.TARGET,'Dead balance / totalSupply delta'); extractAddresses(text).forEach(a=>add('address_mention',a,'Address mentioned in social content')); extractTxHashes(text).forEach(h=>add('txhash_mention',h,'Tx hash mentioned in social content')); return claims;}
+async function harvestYouTube(cfg){if(!cfg.USE_HARVESTER||!cfg.YOUTUBE_KEY||!cfg.YOUTUBE_CHANNEL) return []; const q=`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${encodeURIComponent(cfg.YOUTUBE_CHANNEL)}&maxResults=12&order=date&type=video&key=${encodeURIComponent(cfg.YOUTUBE_KEY)}`; const s=await fetchJson(q); const ids=(s.items||[]).map(x=>x.id?.videoId).filter(Boolean); if(!ids.length) return []; const vq=`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${ids.join(',')}&key=${encodeURIComponent(cfg.YOUTUBE_KEY)}`; const vids=await fetchJson(vq); return (vids.items||[]).map(v=>({id:`yt-${v.id}`,source:'YouTube',actor:`@${v.snippet?.channelTitle||'channel'}`,title:v.snippet?.title||'',text:v.snippet?.description||'',description:v.snippet?.description||'',when:v.snippet?.publishedAt||'',duration_sec:isoDurationToSeconds(v.contentDetails?.duration||''),url:`https://www.youtube.com/watch?v=${v.id}`}));}
+function isoDurationToSeconds(iso){const m=String(iso||'').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m) return 0; return Number(m[1]||0)*3600+Number(m[2]||0)*60+Number(m[3]||0);}
+async function harvestX(cfg){if(!cfg.USE_HARVESTER||!cfg.X_BEARER||!cfg.X_QUERY) return []; const url=`https://api.x.com/2/tweets/search/recent?max_results=10&query=${encodeURIComponent(cfg.X_QUERY)}&tweet.fields=created_at,public_metrics,author_id,text`; try{const d=await fetchJson(url,{headers:{Authorization:`Bearer ${cfg.X_BEARER}`}}); return (d.data||[]).map(t=>({id:`x-${t.id}`,source:'X',actor:`author:${t.author_id||'unknown'}`,title:(t.text||'').slice(0,140),text:t.text||'',when:t.created_at||'',duration_sec:0,url:`https://x.com/i/web/status/${t.id}`}));}catch(err){return [{id:'x-error',source:'X',actor:'api',title:'X harvest failed',text:err?.message||String(err),when:new Date().toISOString(),duration_sec:0,url:''}];}}
+function averageNearestDelta(times, chain){let sum=0; for(const t of times){let best=Infinity; for(const c of chain){const d=Math.abs(c-t); if(d<best) best=d;} sum+=best;} return sum/times.length;}
+function monteCarloPValue(times, chain, it=150){const min=Math.min(...times), max=Math.max(...times), obs=averageNearestDelta(times,chain); let better=0; for(let i=0;i<it;i++){const sh=times.map(()=>min+Math.random()*(max-min)); if(averageNearestDelta(sh,chain)<=obs) better++;} return (better+1)/(it+1);}
+function narrativeAnalysis(events, chainTimes){const filled=events.map(e=>({...e,phase:socialToPhase(e)})).filter(e=>e.phase&&PHASE_ORDER[e.phase]!=null); let ordered=0; for(let i=1;i<filled.length;i++) if(PHASE_ORDER[filled[i].phase]>=PHASE_ORDER[filled[i-1].phase]) ordered++; const sequence=filled.length<=1?0:ordered/(filled.length-1); const mirrored115=filled.filter(e=>e.phase==='terminal'&&Math.abs((e.duration_sec||0)-115)<=1).length>=2; const impulse121=filled.some(e=>e.phase==='heat'&&Math.abs((e.duration_sec||0)-121)<=1); const timed=filled.filter(e=>e.when).map(e=>new Date(e.when).getTime()).filter(Number.isFinite); const chain=chainTimes.filter(Number.isFinite); let pValue=null; if(timed.length>=3&&chain.length>=3) pValue=monteCarloPValue(timed,chain); return {sequence,mirrored115,impulse121,pValue};}
+async function ensurePendingFilter(){if(!state.settings.USE_PENDING_HEAT) return {supported:false,reason:'disabled'}; if(state.pendingFilterId) return {supported:true,id:state.pendingFilterId}; try{const id=await rpc('eth_newPendingTransactionFilter',[]); state.pendingFilterId=id; return {supported:true,id};}catch(err){return {supported:false,reason:err?.message||'unsupported'};}}
+async function pollPendingHeat(cfg){const info=await ensurePendingFilter(); if(!info.supported) return {supported:false,reason:info.reason||'unsupported',count:0,hottestGwei:null,matches:[]}; try{let hashes=await rpc('eth_getFilterChanges',[info.id]); if(!Array.isArray(hashes)) hashes=[]; const targets=new Set([cfg.TARGET,cfg.WATCH.NODE_AE84,cfg.WATCH.NODE_4FD0,cfg.WATCH.NODE_3D07,cfg.WATCH.LIBERTY_GASLESS].filter(isAddr).map(norm)); const matches=[]; for(const h of hashes.slice(-50)){const tx=await rpc('eth_getTransactionByHash',[h]); if(!tx||!tx.to) continue; if(targets.has(norm(tx.to))){matches.push({hash:tx.hash,to:tx.to,from:tx.from,priority:gweiFromHex(tx.maxPriorityFeePerGas),gas:gweiFromHex(tx.gasPrice)})}} const hottest=Math.max(0,...matches.map(x=>x.priority||x.gas||0)); return {supported:true,count:matches.length,hottestGwei:hottest,matches,spikeDetected:matches.length>0&&hottest>=(cfg.HEAT_GWEI_THRESHOLD||0)};}catch(err){state.pendingFilterId=null; return {supported:false,reason:err?.message||'filter reset',count:0,hottestGwei:null,matches:[]};}}
+async function traceTx(hash){try{const r=await rpc('debug_traceTransaction',[hash,{tracer:'callTracer',timeout:'8s'}]); return {supported:true,result:r};}catch(err){return {supported:false,error:err?.message||String(err)}}}
+function summarizeTrace(root){if(!root||typeof root!=='object') return {calls:0,delegatecalls:0,path:'',newEdges:[]}; let calls=0,delegatecalls=0; const edges=[]; function walk(n){if(!n) return; const type=String(n.type||'').toUpperCase(); if(type) calls++; if(type==='DELEGATECALL') delegatecalls++; if(n.from&&n.to) edges.push(`${short(n.from,8,6)}→${short(n.to,8,6)}:${type}`); (n.calls||[]).forEach(walk);} walk(root); return {calls,delegatecalls,path:unique(edges).slice(0,3).join(' | '),newEdges:unique(edges).slice(0,8)};}
+async function fetchRecentBlocksTxs(latest,lookback,targets,keywords){const items=[]; const start=Math.max(0,latest-lookback+1); for(let b=latest;b>=start;b--){const block=await rpc('eth_getBlockByNumber',[toHex(b),true]); const txs=block?.transactions||[]; for(const tx of txs){const input=String(tx.input||''); const ascii=hexToAscii(input); const reasons=[]; if(targets.has(norm(tx.to))||targets.has(norm(tx.from))) reasons.push('watched-address'); if((tx.value==='0x0'||tx.value==='0x') && input && input!=='0x') reasons.push('zero-value-payload'); const hit=(keywords||[]).filter(k=>ascii.toLowerCase().includes(k)); if(hit.length) reasons.push(`ascii:${hit.join('/')}`); if(reasons.length){items.push({block:b,hash:tx.hash,from:tx.from,to:tx.to||'',gasPrice:gweiFromHex(tx.gasPrice||'0x0'),priority:gweiFromHex(tx.maxPriorityFeePerGas||'0x0'),ascii,asciiMarkers:hit,reasons,inputLen:input.length});}} if(items.length>90) break;} return items.slice(0,120);}
+function classifySlotProbe(slotValues, slots){const vals=slots.map(s=>norm(slotValues[s]||'0x')); const allZero=vals.every(v=>v==='0x0000000000000000000000000000000000000000000000000000000000000000'||v==='0x'); const allSame=vals.length>1&&vals.every(v=>v===vals[0]); return {allZero, equal:allSame, summary:allZero?'null-null equality':(allSame?'non-zero equality':'candidate slots diverge')};}
+function publicMutationStats(publicPairs, prev, history){const prevMap=new Map((prev?.publicAnchors||[]).map(x=>[norm(x.address),x])); const hist=history.slice(-8); let changed=0, velocity=0, acceleration=0; for(const p of publicPairs){const pr=prevMap.get(norm(p.address)); const delta0=Math.abs((p.reserve0||0)-(pr?.reserve0||p.reserve0||0)); const delta1=Math.abs((p.reserve1||0)-(pr?.reserve1||p.reserve1||0)); const mag=delta0+delta1; if(mag>0) changed++; velocity+=mag; const series=hist.map(h=>(h.publicAnchors||[]).find(x=>norm(x.address)===norm(p.address))||null).filter(Boolean); if(series.length>=2){const mags=[]; for(let i=1;i<series.length;i++) mags.push(Math.abs((series[i].reserve0||0)-(series[i-1].reserve0||0))+Math.abs((series[i].reserve1||0)-(series[i-1].reserve1||0))); if(mags.length>=2) acceleration += Math.abs(mags[mags.length-1]-mags[mags.length-2]);}} return {changedCount:changed,velocity,acceleration};}
+function deriveWatchTiers(balanceBoard,discoveries,prev){const prevTiers=prev?.watchTiers||{}; const map={}; for(const row of balanceBoard){const signal=(row.nonce>0?1:0)+((row.deltas.nonce||0)>0?2:0)+(Math.abs(row.deltas.pdai||0)>0?1:0)+(Math.abs(row.deltas.wpls||0)>0?1:0)+(row.balances.pls>0||row.balances.pdai>0||row.balances.wpls>0||row.balances.atropa>0?1:0); let tier='cold'; if(signal>=4) tier='active'; else if(signal>=2) tier='warm'; if(prevTiers[row.label]==='active' && tier==='warm') tier='warm'; map[row.label]=tier;} const promoted=(discoveries||[]).filter(d=>d.score>=2.5).map(d=>d.address); return {map,promoted};}
+function stablePhase(history, proposedPhase, score, contradictionLoad){const recent=history.slice(-6).map(h=>h.stablePhase||h.phase).filter(Boolean); const last=recent[recent.length-1]||proposedPhase; const counts={}; recent.forEach(p=>counts[p]=(counts[p]||0)+1); const dominant=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0]||proposedPhase; if(score<35||contradictionLoad>0.45) return dominant===proposedPhase?proposedPhase:last; if(recent.length>=3&&recent.slice(-3).every(p=>p===proposedPhase)) return proposedPhase; if(last!==proposedPhase&&score<45) return last; return proposedPhase;}
+function severityTag(text){if(/null-null|no route edges|no pending heat|motionless|not supported/i.test(text)) return 'major'; if(/quiet|weak|unsupported|not yet/i.test(text)) return 'meaningful'; return 'cosmetic';}
+function determinePhase(x){if((x.pendingHeat.count>0||x.traceStrength>0.4)&&x.na.impulse121&&x.publicChangedCount>0) return 'heat'; if(x.na.mirrored115&&(x.interiorStrength>0.5||x.publicChangedCount>1)) return 'terminal'; if(x.interiorStrength>0.35||x.publicStrength>0.55) return 'manifestation'; if(x.narrativeStrength>0.35) return 'routing'; return 'audit';}
+function buildAutoContradictions(ctx){const out=[]; if(!ctx.publicPairs.some(x=>x.changed||x.syncCountRecent)) out.push('Public anchors are quiet right now.'); if(!ctx.balanceBoard.some(x=>(x.deltas.nonce||0)>0||Math.abs(x.deltas.pdai||0)>0||Math.abs(x.deltas.wpls||0)>0)) out.push('Candidate machine body is largely motionless in this snapshot.'); if(!ctx.pendingHeat.supported||!ctx.pendingHeat.count) out.push('No pending heat is visible right now.'); if(!ctx.dnaMeaningful) out.push('Proxy-mutation narrative is not supported by the current DNA slot read.'); if(ctx.slotProbe.allZero) out.push('Candidate slot symmetry is null-null, not positive evidence.'); if(ctx.na.pValue!=null&&ctx.na.pValue>0.25) out.push('Rhythm alignment is not yet statistically unusual.'); if(ctx.watchTiers&&Object.values(ctx.watchTiers.map).every(t=>t==='cold')) out.push('All candidate watchers are cold right now.'); if(ctx.claimRows&&ctx.claimRows.filter(x=>x.status==='contradicted').length>ctx.claimRows.filter(x=>x.status==='confirmed').length) out.push('More social claims are being contradicted than confirmed.'); return out;}
+function buildInsights(ctx){const out=[]; if(ctx.publicStrength>ctx.interiorStrength) out.push('Public anchors are currently speaking louder than the candidate machine interior.'); if(ctx.interiorStrength>ctx.publicStrength) out.push('The machine interior is showing more structure than the public surface right now.'); if(ctx.narrativeStrength>0.6&&ctx.publicStrength<0.3) out.push('The social layer is ahead of the public chain surface again — classic map-before-manifestation posture.'); if(ctx.claimRows.filter(x=>x.status==='confirmed').length) out.push(`Confirmed ${ctx.claimRows.filter(x=>x.status==='confirmed').length} social claim(s) this sync.`); if(ctx.discoveries.length) out.push(`Top discovered address this sync: ${short(ctx.discoveries[0].address,10,8)}.`); if(ctx.contradictionLoad>0.5) out.push('Contradictions are heavy. Slow down conclusions and prioritize falsification.'); if(ctx.na.pValue!=null) out.push(`Rhythm p-value ≈ ${fmtFixed(ctx.na.pValue,3)} (lower is more interesting).`); if(ctx.mutationStats.velocity>0) out.push(`Public-anchor mutation velocity: ${fmtCompact(ctx.mutationStats.velocity,2)}.`); if(ctx.watchTiers.promoted.length) out.push(`Promotable candidate(s): ${ctx.watchTiers.promoted.slice(0,3).map(a=>short(a,8,6)).join(', ')}.`); return out.slice(0,8);}
+function buildNextActions(ctx){const out=[]; if(!ctx.publicPairs.some(x=>x.changed)) out.push('Wait for a real public-anchor mutation instead of reading the chart emotionally.'); if(!ctx.pendingHeat.supported) out.push('Use a private RPC that supports pending filters and debug traces.'); if(!ctx.dnaMeaningful) out.push('Treat proxy claims as weak until the DNA slot shows life.'); if(!ctx.traceResults.some(x=>x.supported)) out.push('Trace one suspicious tx on a provider that supports debug_traceTransaction.'); if(ctx.watchTiers.promoted.length) out.push(`Promote ${short(ctx.watchTiers.promoted[0],10,8)} into the watch set if it recurs.`); if(ctx.na.pValue==null) out.push('Add exact timestamps to manual narrative items to enable rhythm stats.'); if(!ctx.claimRows.some(x=>x.status==='confirmed')) out.push('Bring one hard tx hash or full address from the latest narrative branch and force a direct check.'); if(ctx.claimRows.filter(x=>String(x.sourceId||'').startsWith('seed-')).length) out.push('Historical seed knowledge is loaded — watch where old theses collide with fresh chain anomalies.'); return out.slice(0,8);}
+async function buildNodeBalances(cfg,prev){const nodes=watchNodes(cfg); const toks=[{k:'pdai',a:cfg.TARGET},{k:'wpls',a:cfg.WPLS}]; if(isAddr(cfg.ATROPA_TOKEN)) toks.push({k:'atropa',a:cfg.ATROPA_TOKEN}); const dec={}; await Promise.all(toks.map(async t=>dec[t.k]=await ercDecimals(t.a))); return await mapLimit(nodes,4,async node=>{const [type,nonce]=await Promise.all([getCodeType(node.address),txCount(node.address)]); const balances={pls:await nativeBalance(node.address)}; for(const t of toks) balances[t.k]=units(await ercBalanceOf(t.a,node.address),dec[t.k]); const prevNode=prev?.nodeBalances?.[node.label]||{}; return {...node,type,nonce,balances,deltas:{pdai:(balances.pdai||0)-(prevNode.pdai||0),wpls:(balances.wpls||0)-(prevNode.wpls||0),atropa:(balances.atropa||0)-(prevNode.atropa||0),nonce:nonce-(prevNode.nonce||0)}};});}
+async function buildModel(){const cfg=state.settings; const history=loadHistory(); const prev=history.slice(-1)[0]||null; const latestBlock=await rpcBlockNumber(); const targetDec=await ercDecimals(cfg.TARGET); const [totalRaw,burnedRaw,spinePdaiRaw,spineWplsRaw,targetPairsRaw]=await Promise.all([ercTotalSupply(cfg.TARGET),ercBalanceOf(cfg.TARGET,cfg.DEAD),ercBalanceOf(cfg.TARGET,cfg.SPINE),ercBalanceOf(cfg.WPLS,cfg.SPINE),discoverPairs(cfg.TARGET)]); const total=units(totalRaw,targetDec), burned=units(burnedRaw,targetDec), circ=Math.max(total-burned,0), spinePdai=units(spinePdaiRaw,targetDec), spineWpls=units(spineWplsRaw,18);
+  const pdaiPairs=targetPairsRaw.map(p=>normalizePair(p,cfg.TARGET)).filter(Boolean).sort((a,b)=>b.liqUsd-a.liqUsd).slice(0,10);
+  const publicAnchors=[];
+  for(const anchor of cfg.PUBLIC_ANCHORS){ if(anchor.type==='pair'&&isAddr(anchor.address)){ try{const meta=await pairMeta(anchor.address); const [d0,d1,syncs]=await Promise.all([ercDecimals(meta.token0),ercDecimals(meta.token1), getLogs(anchor.address,SYNC_TOPIC,Math.max(0,latestBlock-200),latestBlock)]); const reserve0=units(meta.reserve0,d0), reserve1=units(meta.reserve1,d1); const prevPair=(prev?.publicAnchors||[]).find(x=>norm(x.address)===norm(anchor.address)); const changed=Math.abs((reserve0||0)-(prevPair?.reserve0||reserve0||0))+Math.abs((reserve1||0)-(prevPair?.reserve1||reserve1||0))>0; publicAnchors.push({...anchor,token0:meta.token0,token1:meta.token1,reserve0,reserve1,syncCountRecent:syncs.length,changed,interpretation:changed?'anchor mutated':'anchor stable'});}catch(err){ publicAnchors.push({...anchor,error:err?.message||String(err)})} } else publicAnchors.push(anchor); }
+  const balanceBoard=await buildNodeBalances(cfg,prev);
+  const slotValues={}; await Promise.all(cfg.SLOT_LIST.map(async s=>slotValues[s]=await readStorageAt(cfg.TARGET,s))); const slotClass=classifySlotProbe(slotValues,cfg.SLOT_LIST); const slotProbe={values:slotValues,allZero:slotClass.allZero,equal:slotClass.equal,changed:cfg.SLOT_LIST.some(s=>norm(slotValues[s])!==norm(prev?.slotProbe?.values?.[s]||'')),summary:slotClass.summary};
+  const dnaRaw=await readStorageAt(cfg.TARGET,cfg.EIP1967_SLOT); const dnaImpl='0x'+String(dnaRaw||'').slice(-40); const dnaMeaningful=dnaImpl!=='0x0000000000000000000000000000000000000000'; const dnaProbe={raw:dnaRaw,implAddress:dnaMeaningful?dnaImpl:'',changed:norm(dnaRaw)!==norm(prev?.dnaProbe?.raw||'')};
+  const pendingHeat=await pollPendingHeat(cfg);
+  const watchedSet=new Set([cfg.TARGET,...watchNodes(cfg).map(x=>x.address),...cfg.PUBLIC_ANCHORS.map(x=>x.address)].filter(isAddr).map(norm));
+  const suspiciousTxs=await fetchRecentBlocksTxs(latestBlock,cfg.RECENT_BLOCK_SCAN,watchedSet,cfg.KEYWORDS||[]); const bellPayloads=suspiciousTxs.filter(tx=>tx.ascii.toLowerCase().includes('bell'));
+  const traceResults=[]; for(const tx of suspiciousTxs.slice(0,cfg.TRACE_LIMIT)){ const tr=await traceTx(tx.hash); traceResults.push({hash:tx.hash,...(tr.supported?summarizeTrace(tr.result):{supported:false,error:tr.error})}); }
+  const harvested=[...(cfg.SEED_SOCIAL||[]),...(await harvestYouTube(cfg)),...(await harvestX(cfg))]; const socialItems=unique(harvested.map(x=>x.id)).map(id=>harvested.find(x=>x.id===id)).filter(Boolean).sort((a,b)=>String(b.when||'').localeCompare(String(a.when||'')));
+  const claimRows=[]; for(const item of socialItems){ for(const c of extractClaims(item,cfg)){ let status='open', evidence='No current match'; if(c.type==='bell_payload'){ if(bellPayloads.length){status='confirmed'; evidence=`${bellPayloads.length} Bell-like payload(s) in recent blocks`; } else status='contradicted'; }
+      else if(c.type==='proxy_artifact'){ if(dnaMeaningful){status='confirmed'; evidence=`DNA slot populated with ${short(dnaImpl,10,8)}`;} else status='contradicted'; }
+      else if(c.type==='slot_symmetry'){ if(slotProbe.equal && !slotProbe.allZero){status='confirmed'; evidence=slotProbe.summary;} else if(slotProbe.allZero){status='contradicted'; evidence='null-null equality only'; } }
+      else if(c.type==='heat_window'){ if(pendingHeat.count){status='confirmed'; evidence=`${pendingHeat.count} pending hit(s)`;} }
+      else if(c.type==='relayer_activity'){ const r=balanceBoard.find(x=>norm(x.address)===norm(c.target)); if(r && ((r.deltas.nonce||0)>0||Math.abs(r.deltas.pdai||0)>0||Math.abs(r.deltas.wpls||0)>0)) {status='confirmed'; evidence='relayer candidate moved';} }
+      else if(c.type==='spine_activity'){ const r=balanceBoard.find(x=>norm(x.address)===norm(cfg.SPINE)); if(r && ((r.deltas.nonce||0)>0||Math.abs(r.deltas.pdai||0)>0||Math.abs(r.deltas.wpls||0)>0)) {status='confirmed'; evidence='spine moved';} }
+      else if(c.type==='address_mention'){ const present=watchedSet.has(norm(c.target)); status=present?'confirmed':'open'; evidence=present?'mentioned address already tracked':'mentioned address not yet tracked'; }
+      else if(c.type==='txhash_mention'){ const present=suspiciousTxs.some(tx=>norm(tx.hash)===norm(c.target)); status=present?'confirmed':'open'; evidence=present?'mentioned tx surfaced in recent scan':'mentioned tx not in recent scan'; }
+      claimRows.push({...c,status,evidence}); }}
+  const discoveriesMap=new Map(); const bump=(addr,why,score=1)=>{ if(!isAddr(addr)) return; const k=norm(addr); if(!discoveriesMap.has(k)) discoveriesMap.set(k,{address:addr,score:0,reasons:new Map()}); const d=discoveriesMap.get(k); d.score+=score; d.reasons.set(why,(d.reasons.get(why)||0)+1); };
+  suspiciousTxs.forEach(tx=>{ if(isAddr(tx.from)&&!watchedSet.has(norm(tx.from))) bump(tx.from,tx.reasons.join('/'),1.0); if(isAddr(tx.to)&&!watchedSet.has(norm(tx.to))) bump(tx.to,tx.reasons.join('/'),1.0); }); claimRows.filter(c=>c.type==='address_mention').forEach(c=>bump(c.target,'social address mention',1.2));
+  const discoveries=[...discoveriesMap.values()].map(d=>({address:d.address,score:d.score,reasons:[...d.reasons.entries()].map(([k,v])=>`${k}×${v}`).join(' | ')})).sort((a,b)=>b.score-a.score).slice(0,30);
+  const watchTiers=deriveWatchTiers(balanceBoard,discoveries,prev);
+  const publicPairs=publicAnchors.filter(x=>x.type==='pair'); const mutationStats=publicMutationStats(publicPairs,prev,history); const publicChangedCount=mutationStats.changedCount; const publicSyncCount=publicPairs.reduce((s,x)=>s+(x.syncCountRecent||0),0); const publicStrength=clamp((publicPairs.length/3)*0.25+(publicChangedCount/3)*0.25+clamp(publicSyncCount/6,0,1)*0.2+clamp(mutationStats.velocity/1e7,0,1)*0.15+clamp(mutationStats.acceleration/1e7,0,1)*0.15,0,1);
+  const chainTimes=[...suspiciousTxs.slice(0,30).map(x=>state.times.get(x.block)).filter(Boolean)]; const na=narrativeAnalysis(socialItems,chainTimes); const narrativeStrength=clamp(na.sequence*0.5+(na.mirrored115?0.15:0)+(na.impulse121?0.15:0)+(na.pValue!=null?(1-clamp(na.pValue,0,1))*0.2:0),0,1);
+  const activeWatchers=Object.values(watchTiers.map).filter(x=>x==='active').length; const liveNodes=balanceBoard.filter(x=>x.nonce>0||x.balances.pls>0||x.balances.pdai>0||x.balances.wpls>0||x.balances.atropa>0).length; const traceStrength=clamp(traceResults.filter(x=>x.supported).length/Math.max(1,cfg.TRACE_LIMIT),0,1); const routeLike=suspiciousTxs.filter(tx=>tx.reasons.includes('watched-address')).length; const interiorStrength=clamp((liveNodes/Math.max(1,balanceBoard.length))*0.25+(activeWatchers/Math.max(1,balanceBoard.length))*0.15+clamp(routeLike/20,0,1)*0.2+traceStrength*0.15+((slotProbe.equal&&!slotProbe.allZero)?0.1:0)+(pendingHeat.count?0.15:0),0,1);
+  const contradictions=buildAutoContradictions({publicPairs,balanceBoard,pendingHeat,slotProbe,dnaMeaningful,na,watchTiers,claimRows}); const contradictionWeights=contradictions.map(c=>severityTag(c)==='major'?1:severityTag(c)==='meaningful'?0.6:0.25); const contradictionLoad=clamp(contradictionWeights.reduce((a,b)=>a+b,0)/6,0,1);
+  const claimsStrength=clamp((claimRows.filter(x=>x.status==='confirmed').length - 0.5*claimRows.filter(x=>x.status==='contradicted').length)/Math.max(1,claimRows.length),0,1); const rhythmStrength=na.pValue!=null?clamp(1-na.pValue,0,1):(na.sequence||0);
+  const scoreParts={public:15*publicStrength,interior:15*interiorStrength,narrative:14*narrativeStrength,claims:12*claimsStrength,traces:10*traceStrength,rhythm:12*rhythmStrength,phase:12*clamp((publicChangedCount+activeWatchers)/4,0,1),contradictions:-10*contradictionLoad}; let score=clamp(Object.values(scoreParts).reduce((a,b)=>a+b,0),0,100);
+  const rawPhase=determinePhase({publicStrength,interiorStrength,narrativeStrength,pendingHeat,na,publicChangedCount,traceStrength}); const phase=stablePhase(history,rawPhase,score,contradictionLoad);
+  const supports=[]; if(publicStrength>0.5) supports.push('Public anchors are alive and measurable.'); if(narrativeStrength>0.5) supports.push('Historical + live narrative grammar remains coherent.'); if(claimRows.filter(x=>x.status==='confirmed').length) supports.push(`Confirmed ${claimRows.filter(x=>x.status==='confirmed').length} claim(s) this sync.`); if(watchTiers.promoted.length) supports.push(`New address promotions ready: ${watchTiers.promoted.slice(0,3).map(a=>short(a,8,6)).join(', ')}.`);
+  const insights=buildInsights({publicStrength,interiorStrength,narrativeStrength,contradictionLoad,discoveries,claimRows,na,mutationStats,watchTiers}); const nextActions=buildNextActions({publicPairs,pendingHeat,dnaMeaningful,traceResults,watchTiers,na,claimRows});
+  const truths=[]; truths.push(truthRow('Public anchors are live','Verified',`${publicPairs.length} anchor pair(s) checked • velocity ${fmtCompact(mutationStats.velocity,2)}`,'good')); truths.push(truthRow('DNA slot currently populated',dnaMeaningful?'Yes':'No',dnaMeaningful?`Implementation ${short(dnaImpl,10,8)}`:'EIP-1967 slot reads zero',dnaMeaningful?'good':'warn')); truths.push(truthRow('Candidate slots are mirrored',slotProbe.equal?'Yes':'No',slotProbe.summary,slotProbe.equal&&!slotProbe.allZero?'good':'warn')); truths.push(truthRow('Pending heat sensor available',pendingHeat.supported?'Yes':'No',pendingHeat.supported?`${pendingHeat.count} hit(s) this poll`:`${pendingHeat.reason||'unsupported'}`,pendingHeat.supported?'good':'warn')); truths.push(truthRow('Bell payload found in recent blocks',bellPayloads.length?'Yes':'No',bellPayloads.length?`${bellPayloads.length} tx(s)`:`none in last ${cfg.RECENT_BLOCK_SCAN} block(s)`,bellPayloads.length?'good':'warn')); truths.push(truthRow('Social-phase order remains coherent',na.sequence>=0.6?'Yes':'Weak',`${fmtPct01(na.sequence,0)} ordered`,na.sequence>=0.6?'good':'warn')); truths.push(truthRow('v4 blind spots are being punished', 'Yes', 'Null-null equality, dead DNA, and cold watchers reduce confidence instead of inflating it.', 'good'));
+  return {cfg,latestBlock,total,burned,circ,spinePdai,spineWpls,slotProbe,dnaProbe,pendingHeat,publicAnchors,mutationStats,balanceBoard,watchTiers,socialItems,claimRows,suspiciousTxs,bellPayloads,traceResults,discoveries,supports:unique(supports).slice(0,10),contradictions:unique(contradictions).slice(0,10),insights,nextActions,truths,na,publicStrength,interiorStrength,narrativeStrength,contradictionLoad,claimsStrength,traceStrength,rhythmStrength,scoreParts,score,rawPhase,phase};}
+function truthRow(claim,status,result,cls){const tag=cls==='good'?'good':cls==='warn'?'ref':'bad'; return `<tr><td>${claim}</td><td><span class="tag ${tag}">${status}</span></td><td>${result}</td></tr>`;}
+function snapshotFromModel(m){const nodeBalances={}; m.balanceBoard.forEach(r=>nodeBalances[r.label]={pdai:r.balances.pdai||0,wpls:r.balances.wpls||0,atropa:r.balances.atropa||0,nonce:r.nonce||0}); return {ts:Date.now(),score:m.score,phase:m.phase,rawPhase:m.rawPhase,stablePhase:m.phase,total:m.total,burned:m.burned,heatCount:m.pendingHeat.count||0,publicStrength:m.publicStrength,interiorStrength:m.interiorStrength,contradictionLoad:m.contradictionLoad,slotProbe:m.slotProbe,dnaProbe:m.dnaProbe,mutationStats:m.mutationStats,watchTiers:m.watchTiers.map,publicAnchors:m.publicAnchors.map(x=>({address:x.address,reserve0:x.reserve0,reserve1:x.reserve1})),nodeBalances};}
+function renderMetrics(m){setText('mScore',fmtFixed(m.score,1)); setText('mPhase',phaseLabel(m.phase)); setText('mPublic',fmtPct01(m.publicStrength,0)); setText('mInterior',fmtPct01(m.interiorStrength,0)); setText('mNarrative',fmtPct01(m.narrativeStrength,0)); setText('mContradictions',fmtPct01(m.contradictionLoad,0)); setText('mVelocity',fmtCompact(m.mutationStats.velocity||0,2)); setText('mHeat',m.pendingHeat.supported?(m.pendingHeat.count?String(m.pendingHeat.count):'quiet'):'N/A'); setText('mSlotSym',m.slotProbe.summary); setText('mDNA',m.dnaProbe.implAddress?'LIVE':'ZERO'); setText('mBell',String(m.bellPayloads.length)); setText('mPromotions',String(m.watchTiers.promoted.length)); setText('pairInfo',`Public anchors: ${m.publicAnchors.filter(x=>x.type==='pair').length} • velocity ${fmtCompact(m.mutationStats.velocity||0,2)}`); setText('harvesterInfo',`Harvester: ${m.cfg.USE_HARVESTER?'on':'off'} • social items ${m.socialItems.length} • seeds ${(m.cfg.SEED_SOCIAL||[]).length}`);}
+function renderScore(m){const s=clamp(m.score,0,100); $('reactorRing').style.setProperty('--score',s.toFixed(2)); setText('scoreBig',fmtFixed(s,1)); setText('bigVerdict',phaseLabel(m.phase)); setText('coreState',phaseLabel(m.phase)); setText('coreSub',`${m.rawPhase} → ${m.phase}`); $('scoreFill').style.width=s.toFixed(1)+'%'; $('syncStatus').className='status '+(s>=70?'stable':s>=40?'warned':'bad'); setText('syncStatus',s>=70?'Machine aligned':s>=40?'Building':'Scanning'); setText('sPublic',fmtFixed(m.scoreParts.public,1)); setText('sInterior',fmtFixed(m.scoreParts.interior,1)); setText('sNarrative',fmtFixed(m.scoreParts.narrative,1)); setText('sClaims',fmtFixed(m.scoreParts.claims,1)); setText('sTraces',fmtFixed(m.scoreParts.traces,1)); setText('sRhythm',fmtFixed(m.scoreParts.rhythm,1)); setText('sPhase',fmtFixed(m.scoreParts.phase,1)); setText('sContra',fmtFixed(Math.abs(m.scoreParts.contradictions),1)); setText('verdictExplain','v5 rewards real motion and punishes null signals.');}
+function renderLists(m){setHTML('supportList',m.supports.length?m.supports.map(t=>itemHtml(t,'good')).join(''):itemHtml('No strong supports yet.','warn')); setHTML('contraList',m.contradictions.length?m.contradictions.map(t=>itemHtml(t,/null-null|motionless|no pending heat|not supported/i.test(t)?'bad':'warn')).join(''):itemHtml('No major contradictions.','good')); setHTML('insightList',m.insights.length?m.insights.map(t=>itemHtml(t,'good')).join(''):itemHtml('No insights yet.','warn')); setHTML('nextList',m.nextActions.length?m.nextActions.map(t=>itemHtml(t,'warn')).join(''):itemHtml('No next actions.','warn'));}
+function renderPublic(m){const rows=m.publicAnchors.filter(x=>x.type==='pair'); if(!rows.length){setHTML('publicBody',`<tr><td colspan="6" class="small">No public anchors.</td></tr>`); return;} const prev=(loadHistory().slice(-1)[0]?.publicAnchors||[]); setHTML('publicBody',rows.map(r=>{const pr=prev.find(x=>norm(x.address)===norm(r.address)); const mag=Math.abs((r.reserve0||0)-(pr?.reserve0||r.reserve0||0))+Math.abs((r.reserve1||0)-(pr?.reserve1||r.reserve1||0)); return `<tr><td>${esc(r.label)}</td><td class="mono">${esc(short(r.token0))} / ${esc(short(r.token1))}</td><td>${fmtCompact(r.reserve0,3)} / ${fmtCompact(r.reserve1,3)}</td><td>${r.syncCountRecent||0}</td><td>${r.changed?'<span class="tag ref">changed</span>':'<span class="tag other">same</span>'} • Δ${fmtCompact(mag,2)}</td><td>${esc(r.interpretation||'')}</td></tr>`;}).join(''));}
+function renderBalance(m){if(!m.balanceBoard.length){setHTML('balanceBody',`<tr><td colspan="6" class="small">No watchers.</td></tr>`); return;} setHTML('balanceBody',m.balanceBoard.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.role||r.type||'watch')}</td><td class="mono">${esc(short(r.address,10,8))}</td><td>${fmtCompact(r.balances.pdai,3)} pDAI / ${fmtCompact(r.balances.wpls,3)} WPLS${r.balances.atropa!=null?` / ${fmtCompact(r.balances.atropa,3)} ATR` : ''}</td><td>${r.nonce}${r.deltas.nonce?` (${r.deltas.nonce>0?'+':''}${r.deltas.nonce})`:''}</td><td><span class="tag ${m.watchTiers.map[r.label]==='active'?'good':m.watchTiers.map[r.label]==='warm'?'ref':'other'}">${m.watchTiers.map[r.label]||'cold'}</span></td></tr>`).join(''));}
+function renderProbes(m){setHTML('probeBody',`<tr><td>Storage slots</td><td class="mono">${esc(m.cfg.SLOT_LIST.map(s=>short(m.slotProbe.values[s],12,8)).join(' | '))}</td><td>${m.slotProbe.summary}</td><td>${m.slotProbe.changed?'<span class="tag ref">changed</span>':'<span class="tag other">same</span>'}</td><td>${m.slotProbe.allZero?'All-zero equality is now treated as contradiction.':'Non-zero probe has meaning.'}</td></tr><tr><td>EIP-1967 DNA</td><td class="mono">${esc(short(m.dnaProbe.raw,16,8))}</td><td>${m.dnaProbe.implAddress?esc(short(m.dnaProbe.implAddress,10,8)):'empty'}</td><td>${m.dnaProbe.changed?'<span class="tag ref">changed</span>':'<span class="tag other">same</span>'}</td><td>${m.dnaProbe.implAddress?'Proxy-like DNA slot appears populated':'No obvious implementation address.'}</td></tr>`);}
+function renderSocial(m){if(!m.socialItems.length){setHTML('socialBody',`<tr><td colspan="8" class="small">No social items yet.</td></tr>`); return;} setHTML('socialBody',m.socialItems.slice(0,50).map(item=>{const rel=m.claimRows.filter(c=>c.sourceId===item.id); const seed=String(item.id||'').startsWith('seed-'); const validation=rel.length?`${rel.filter(x=>x.status==='confirmed').length} confirmed / ${rel.filter(x=>x.status==='contradicted').length} contradicted / ${rel.filter(x=>x.status==='open').length} open`:'none'; return `<tr><td>${esc(item.source)} ${seed?'<span class="tag other">seed</span>':''}</td><td>${item.when?esc(new Date(item.when).toLocaleString()):'—'}</td><td>${esc(item.actor||'—')}</td><td>${esc(item.title||item.text||'—')}</td><td><span class="tag ref">${esc(socialToPhase(item))}</span></td><td>${rel.slice(0,4).map(c=>esc(c.type)).join(', ')||'—'}</td><td>${esc(validation)}</td><td>${item.url?`<a href="${esc(item.url)}" target="_blank" rel="noopener">open</a>`:'—'}</td></tr>`;}).join(''));}
+function renderClaims(m){if(!m.claimRows.length){setHTML('claimBody',`<tr><td colspan="5" class="small">No claims yet.</td></tr>`); return;} setHTML('claimBody',m.claimRows.slice(0,90).map(c=>`<tr><td>${esc(c.type)}</td><td>${esc(c.sourceTitle||'—')}</td><td class="mono">${esc(short(c.target||'',12,8)||'—')}</td><td><span class="tag ${c.status==='confirmed'?'good':c.status==='contradicted'?'bad':'ref'}">${esc(c.status)}</span></td><td>${esc(c.evidence)}</td></tr>`).join(''));}
+function renderTxs(m){if(!m.suspiciousTxs.length){setHTML('txBody',`<tr><td colspan="6" class="small">No suspicious txs yet.</td></tr>`); return;} setHTML('txBody',m.suspiciousTxs.slice(0,80).map(tx=>`<tr><td>${tx.block.toLocaleString()}</td><td class="mono">${esc(short(tx.hash,10,8))}</td><td class="mono">${esc(short(tx.from,8,6))} → ${esc(short(tx.to,8,6))}</td><td>${tx.priority!=null?fmtFixed(tx.priority,3):fmtFixed(tx.gasPrice,3)} gwei</td><td>${esc(tx.reasons.join(' | '))}</td><td class="small">${esc(tx.ascii.slice(0,100)||'—')}</td></tr>`).join(''));}
+function renderDiscoveries(m){const rows=[]; m.discoveries.slice(0,30).forEach(d=>rows.push(`<tr><td class="mono">${esc(short(d.address,12,8))}</td><td>address</td><td>${fmtFixed(d.score,2)}</td><td>—</td><td class="small">${esc(d.reasons)}</td><td>${(m.watchTiers.promoted||[]).some(a=>norm(a)===norm(d.address))?'<span class="tag good">promote now</span>':d.score>=1.5?'<span class="tag ref">watch hot</span>':'<span class="tag other">cold</span>'}</td></tr>`)); m.traceResults.forEach(tr=>rows.push(`<tr><td class="mono">${esc(short(tr.hash,12,8))}</td><td>trace</td><td>${tr.supported?fmtFixed(Math.min(9.99,(tr.calls||0)/4+(tr.delegatecalls||0)/2),2):'0.00'}</td><td>${tr.supported?(tr.calls||0):0}</td><td class="small">${tr.supported?esc(tr.path):esc(tr.error||'unsupported')}</td><td>${tr.supported?'<span class="tag other">trace</span>':'<span class="tag ref">unsupported</span>'}</td></tr>`)); setHTML('discoverBody',rows.length?rows.join(''):`<tr><td colspan="6" class="small">No discoveries yet.</td></tr>`);}
+function renderTruth(m){setHTML('truthBody',m.truths.join(''));}
+function importHistory(json){let arr=[]; try{arr=JSON.parse(json);}catch{return false;} if(!Array.isArray(arr)) return false; const curr=loadHistory(); saveHistory([...curr,...arr]); return true;}
+async function sync(){if(state.syncing) return; state.syncing=true; try{state.settings=loadSettings(); setText('scanWindow',`Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`); const m=await buildModel(); renderMetrics(m); renderScore(m); renderLists(m); renderPublic(m); renderBalance(m); renderProbes(m); renderSocial(m); renderClaims(m); renderTxs(m); renderDiscoveries(m); renderTruth(m); setText('lastSync',`Last sync: ${nowStamp()} • block ${m.latestBlock.toLocaleString()}`); const hist=loadHistory(); hist.push(snapshotFromModel(m)); saveHistory(hist); }catch(err){console.error(err); $('syncStatus').className='status bad'; setText('syncStatus','Sync failed'); setText('lastSync',`Last error: ${err?.message||String(err)}`); setHTML('supportList',itemHtml('No new verified state because the latest sync failed.','bad')); setHTML('contraList',itemHtml(esc(err?.message||String(err)),'bad')); setHTML('insightList',itemHtml('Fix RPC / CORS / provider capabilities, then retry.','warn')); setHTML('nextList',itemHtml('A private node dramatically improves pending filters and traces.','warn'));} finally{state.syncing=false;}}
+$('settingsBtn').addEventListener('click',()=>$('settingsBox').classList.toggle('open')); $('saveSettingsBtn').addEventListener('click',()=>{saveSettingsFromUI(); sync();}); $('clearSettingsBtn').addEventListener('click',()=>{clearSavedSettings(); sync();}); $('clearHistoryBtn').addEventListener('click',()=>{localStorage.removeItem(HISTORY_KEY); setText('historyInfo','History: 0 snapshot(s)');}); $('refreshBtn').addEventListener('click',sync); $('exportConfigBtn').addEventListener('click',()=>{const blob=new Blob([localStorage.getItem(STORAGE_KEY)||'{}'],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-peg-prover-v5-config.json'; a.click();}); $('exportHistoryBtn').addEventListener('click',()=>{const blob=new Blob([localStorage.getItem(HISTORY_KEY)||'[]'],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-peg-prover-v5-history.json'; a.click();}); $('importHistoryBtn').addEventListener('click',()=>$('importHistoryInput').click()); $('importHistoryInput').addEventListener('change',async e=>{const f=e.target.files?.[0]; if(!f) return; const txt=await f.text(); if(importHistory(txt)) sync();});
+state.settings=loadSettings(); pushSettingsToUI(state.settings); setText('scanWindow',`Recent log window: last ${state.settings.SCAN_BLOCKS.toLocaleString()} blocks`); setText('historyInfo',`History: ${loadHistory().length} snapshot(s)`); setRefreshTimer(); sync();
+</script>
 </body>
 </html>
