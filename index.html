@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover | v6 Cartographer Intelligence</title>
+<title>pDAI Peg Prover | v7 Adversarial Intelligence</title>
 <style>
 :root{--bg:#05070d;--bg2:#101a36;--panel:rgba(10,14,24,.88);--line:rgba(88,255,185,.18);--text:#ebfff5;--muted:#8ca0ad;--green:#58ffb9;--cyan:#48c4ff;--amber:#ffcc52;--red:#ff5d73;--pink:#ff56da;--radius:22px;--shadow:0 0 30px rgba(72,196,255,.12),0 0 60px rgba(88,255,185,.06)}
 *{box-sizing:border-box} html,body{margin:0;padding:0;min-height:100%;background:radial-gradient(circle at top,var(--bg2) 0%,var(--bg) 45%,#020306 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} body{overflow-x:hidden}
 .bg,.bg:before,.bg:after{content:"";position:fixed;inset:-10% -10%;pointer-events:none;z-index:-1;background:radial-gradient(circle at 20% 20%,rgba(72,196,255,.11),transparent 24%),radial-gradient(circle at 78% 16%,rgba(88,255,185,.08),transparent 22%),radial-gradient(circle at 50% 80%,rgba(255,86,218,.06),transparent 24%);filter:blur(18px);animation:drift 20s ease-in-out infinite alternate}.bg:after{background:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;opacity:.2;filter:none;transform:perspective(800px) rotateX(64deg) translateY(24vh) scale(1.5);animation:gridmove 22s linear infinite}
 @keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(2vw,-2vh,0) scale(1.06)}} @keyframes gridmove{0%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(0) scale(1.5)}100%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(-80px) scale(1.5)}} @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}} @keyframes pulse{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}50%{opacity:.92;transform:translate(-50%,-50%) scale(1.08)}} @keyframes bar{100%{transform:translateX(130%)}}
-.app{max-width:1720px;margin:0 auto;padding:18px}.glass{background:linear-gradient(180deg,rgba(16,24,38,.88),rgba(8,12,20,.94));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);border-radius:var(--radius)}
-.top{padding:18px 20px;display:grid;grid-template-columns:1.35fr .85fr;gap:14px}.title{font-size:1.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;line-height:1.05;margin:0}.titleGlow{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}.sub{margin-top:10px;color:var(--muted);font-size:.93rem;line-height:1.58;max-width:1060px}.chips{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:999px;font-size:.77rem;background:rgba(255,255,255,.03)}.chip.good{color:var(--green);border-color:rgba(88,255,185,.25)}.chip.info{color:var(--cyan);border-color:rgba(72,196,255,.24)}.chip.warn{color:var(--amber);border-color:rgba(255,204,82,.25)}
+.app{max-width:1760px;margin:0 auto;padding:18px}.glass{background:linear-gradient(180deg,rgba(16,24,38,.88),rgba(8,12,20,.94));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);border-radius:var(--radius)}
+.top{padding:18px 20px;display:grid;grid-template-columns:1.4fr .8fr;gap:14px}.title{font-size:1.7rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;line-height:1.05;margin:0}.titleGlow{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}.sub{margin-top:10px;color:var(--muted);font-size:.93rem;line-height:1.58;max-width:1100px}.chips{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:999px;font-size:.77rem;background:rgba(255,255,255,.03)}.chip.good{color:var(--green);border-color:rgba(88,255,185,.25)}.chip.info{color:var(--cyan);border-color:rgba(72,196,255,.24)}.chip.warn{color:var(--amber);border-color:rgba(255,204,82,.25)}
 .right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}.status{padding:10px 14px;border-radius:999px;font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}.stable{color:var(--green)}.warned{color:var(--amber)}.bad{color:var(--red)} .meta{text-align:right;color:var(--muted);font-size:.78rem;line-height:1.55}
 .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end} button{appearance:none;border:none;cursor:pointer;padding:11px 14px;border-radius:14px;font:inherit;font-weight:750;color:var(--text);background:linear-gradient(180deg,rgba(72,196,255,.18),rgba(88,255,185,.08));border:1px solid rgba(72,196,255,.25);box-shadow:0 0 18px rgba(72,196,255,.08)} button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.08)} button.mini{padding:6px 8px;border-radius:10px;font-size:.72rem}
-.section{margin-top:14px;padding:14px}.metrics{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px}.card{background:linear-gradient(180deg,rgba(12,18,28,.9),rgba(9,13,21,.97));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:14px;min-height:104px}.label{font-size:.70rem;text-transform:uppercase;letter-spacing:.14em;color:#92a3ad;margin-bottom:10px}.value{font-size:1.42rem;font-weight:950;line-height:1.1}.hint{margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.45}
-.hero{display:grid;grid-template-columns:430px 1fr;gap:14px}.reactor{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate}.reactor:before,.reactor:after{content:"";position:absolute;border-radius:50%;inset:50%;transform:translate(-50%,-50%);pointer-events:none}.reactor:before{width:360px;height:360px;background:radial-gradient(circle,rgba(88,255,185,.12),transparent 55%),radial-gradient(circle at 30% 30%,rgba(72,196,255,.18),transparent 24%),radial-gradient(circle at 70% 70%,rgba(255,86,218,.12),transparent 24%);filter:blur(14px);animation:pulse 5s ease-in-out infinite}.reactor:after{width:520px;height:520px;border:1px dashed rgba(72,196,255,.18);animation:spin 18s linear infinite;opacity:.6}.ring{position:relative;width:320px;height:320px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(5,8,14,.96) 0 48%,transparent 49% 100%),conic-gradient(from -90deg,var(--green),var(--cyan),#4f7cff,var(--pink),var(--green));box-shadow:0 0 26px rgba(72,196,255,.18), inset 0 0 32px rgba(255,255,255,.03);animation:spin 14s linear infinite reverse}.ring:before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at center,rgba(6,10,16,.97) 0 62%,transparent 63% 100%),conic-gradient(from -90deg,rgba(88,255,185,.18) 0 calc(var(--score)*1%),rgba(255,255,255,.05) calc(var(--score)*1%) 100%);box-shadow:inset 0 0 45px rgba(72,196,255,.08)}.core{position:absolute;width:208px;height:208px;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(88,255,185,.13),transparent 22%),radial-gradient(circle at 50% 50%,rgba(12,20,34,.98),rgba(4,7,12,.99));border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px}.core .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#9bb1bd}.core .score{font-size:3.1rem;font-weight:1000;line-height:1;margin-top:8px}.core .state{margin-top:8px;font-size:1rem;font-weight:900;letter-spacing:.06em}.core .substate{margin-top:8px;font-size:.84rem;color:var(--muted)}
+.section{margin-top:14px;padding:14px}.metrics{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}.card{background:linear-gradient(180deg,rgba(12,18,28,.9),rgba(9,13,21,.97));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:14px;min-height:104px}.label{font-size:.70rem;text-transform:uppercase;letter-spacing:.14em;color:#92a3ad;margin-bottom:10px}.value{font-size:1.42rem;font-weight:950;line-height:1.1}.hint{margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.45}
+.hero{display:grid;grid-template-columns:420px 1fr;gap:14px}.reactor{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate}.reactor:before,.reactor:after{content:"";position:absolute;border-radius:50%;inset:50%;transform:translate(-50%,-50%);pointer-events:none}.reactor:before{width:360px;height:360px;background:radial-gradient(circle,rgba(88,255,185,.12),transparent 55%),radial-gradient(circle at 30% 30%,rgba(72,196,255,.18),transparent 24%),radial-gradient(circle at 70% 70%,rgba(255,86,218,.12),transparent 24%);filter:blur(14px);animation:pulse 5s ease-in-out infinite}.reactor:after{width:520px;height:520px;border:1px dashed rgba(72,196,255,.18);animation:spin 18s linear infinite;opacity:.6}.ring{position:relative;width:320px;height:320px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(5,8,14,.96) 0 48%,transparent 49% 100%),conic-gradient(from -90deg,var(--red),var(--amber),var(--green),var(--cyan),var(--pink),var(--red));box-shadow:0 0 26px rgba(72,196,255,.18), inset 0 0 32px rgba(255,255,255,.03);animation:spin 14s linear infinite reverse}.ring:before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at center,rgba(6,10,16,.97) 0 62%,transparent 63% 100%),conic-gradient(from -90deg,rgba(88,255,185,.18) 0 calc(var(--score)*1%),rgba(255,255,255,.05) calc(var(--score)*1%) 100%);box-shadow:inset 0 0 45px rgba(72,196,255,.08)}.core{position:absolute;width:208px;height:208px;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(88,255,185,.13),transparent 22%),radial-gradient(circle at 50% 50%,rgba(12,20,34,.98),rgba(4,7,12,.99));border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px}.core .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#9bb1bd}.core .score{font-size:3.1rem;font-weight:1000;line-height:1;margin-top:8px}.core .state{margin-top:8px;font-size:1rem;font-weight:900;letter-spacing:.06em}.core .substate{margin-top:8px;font-size:.84rem;color:var(--muted)}
 .heroRight{display:grid;grid-template-rows:auto auto auto 1fr;gap:12px}.verdict{padding:16px;border-radius:22px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(12,19,31,.92),rgba(7,11,18,.97))}.verdictTop{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}.bigVerdict{font-size:1.36rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.scoreBar{margin-top:14px;height:16px;border-radius:999px;background:#0b1118;border:1px solid rgba(255,255,255,.06);overflow:hidden;position:relative}.scoreFill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green),var(--cyan));box-shadow:0 0 24px rgba(88,255,185,.18);transition:width .8s ease;position:relative}.scoreFill:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);animation:bar 2.6s linear infinite}.parts{margin-top:14px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}.part{border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.02)}.part .k{font-size:.67rem;color:#95a8b3;text-transform:uppercase;letter-spacing:.12em}.part .v{margin-top:7px;font-size:1.02rem;font-weight:850}
 .chartGrid,.quad,.triple,.duo{display:grid;gap:12px}.chartGrid{grid-template-columns:1fr 1fr 1fr}.quad{grid-template-columns:repeat(4,1fr)}.triple{grid-template-columns:repeat(3,1fr)}.duo{grid-template-columns:1fr 1fr}.mini,.listBox,.tableCard,.settings{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}.boxTitle{font-size:.80rem;text-transform:uppercase;letter-spacing:.14em;color:#9eb2be;margin-bottom:10px}.list{display:grid;gap:8px}.item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.86rem;line-height:1.48}.item.good{border-color:rgba(88,255,185,.18)}.item.warn{border-color:rgba(255,204,82,.18)}.item.bad{border-color:rgba(255,93,115,.18)}
-.settings{display:none}.settings.open{display:block}.formGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.74rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.field textarea{min-height:92px;resize:vertical}.checkline{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:.84rem}.checkline input{width:auto}
+.settings{display:none}.settings.open{display:block}.formGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.74rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.field textarea{min-height:86px;resize:vertical}.checkline{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:.84rem}.checkline input{width:auto}
 .tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)}table{width:100%;border-collapse:collapse;min-width:980px;background:#081019}th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem} tr:hover td{background:rgba(255,255,255,.02)} canvas{width:100%;height:90px;display:block}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid rgba(255,255,255,.08)}.tag.good{color:var(--green);border-color:rgba(88,255,185,.22)}.tag.bad{color:var(--red);border-color:rgba(255,93,115,.22)}.tag.ref{color:var(--amber);border-color:rgba(255,204,82,.22)}.tag.other{color:#c2ccd2}.small{font-size:.76rem;color:var(--muted)} a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}.foot{margin:14px 0 22px;padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;color:var(--muted);font-size:.78rem}
 @media (max-width:1600px){.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.parts{grid-template-columns:repeat(4,minmax(0,1fr))}.formGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.chartGrid,.triple,.quad,.duo{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.top{grid-template-columns:1fr}.right{align-items:flex-start}.meta{text-align:left}.btns{justify-content:flex-start}}
@@ -29,25 +29,23 @@
 <div class="app">
   <div class="glass top">
     <div>
-      <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • v6 Cartographer Intelligence</h1>
-      <div class="sub">v6 stops pretending it already knows the interior. It promotes live addresses, demotes dead sensors, fuses old pDAI intelligence with new evidence, scores claims against contradictions, hunts selectors and payload motifs, and treats the peg as a corridor-machine to be mapped rather than a single switch to be guessed.</div>
+      <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • v7 Adversarial Intelligence</h1>
+      <div class="sub">v7 stops treating the current interior watcher map like gospel. It learns from history, separates public-surface truth from interior hypotheses, recommends better targets, generates exact proof hunts, and turns contradictions into steering — not embarrassment. This build is about making the tool harder to fool and more useful when the machine stays hidden.</div>
       <div class="chips">
-        <span class="chip good">Address factory</span>
-        <span class="chip info">Claim tournament</span>
-        <span class="chip info">Selector / payload lab</span>
-        <span class="chip info">Lane genealogy</span>
-        <span class="chip warn">Ruthless contradictions</span>
+        <span class="chip good">Regime detector</span>
+        <span class="chip info">Watcher rehab lab</span>
+        <span class="chip info">Evidence debt queue</span>
+        <span class="chip info">Query pack generator</span>
+        <span class="chip warn">Adversarial scoring</span>
       </div>
     </div>
     <div class="right">
-      <div id="syncStatus" class="status warned">Booting...</div>
+      <div id="syncStatus" class="status warned">Booting…</div>
       <div class="meta">
         <div id="nodeStatus">RPC: —</div>
         <div id="lastSync">Last sync: —</div>
-        <div id="scanWindow">Recent log window: —</div>
         <div id="historyInfo">History: —</div>
-        <div id="pairInfo">Public anchors: —</div>
-        <div id="corpusInfo">Corpus: —</div>
+        <div id="importInfo">Imported corpus: —</div>
       </div>
       <div class="btns">
         <button id="refreshBtn">Refresh now</button>
@@ -55,70 +53,58 @@
         <button id="importHistoryBtn" class="secondary">Import history</button>
         <button id="importCorpusBtn" class="secondary">Import corpus</button>
         <button id="exportConfigBtn" class="secondary">Export config</button>
-        <button id="exportHistoryBtn" class="secondary">Export history</button>
-        <input id="importHistoryInput" type="file" accept="application/json" style="display:none" />
-        <input id="importCorpusInput" type="file" accept=".txt,.json,.csv" style="display:none" />
       </div>
+      <input id="historyFileInput" type="file" accept=".json" style="display:none">
+      <input id="corpusFileInput" type="file" accept=".json,.txt,.md,.csv" multiple style="display:none">
     </div>
   </div>
 
   <div id="settingsBox" class="glass section settings">
-    <div class="boxTitle">v6 settings</div>
-    <div class="small" style="margin-bottom:12px">Browser-only storage. Use imports to feed old histories and notes. Optional YouTube/X keys are here for future harvesting.</div>
+    <div class="boxTitle">v7 settings</div>
+    <div class="small" style="margin-bottom:10px">Private RPC is optional but strongly recommended for selector scans and pending filters. Public anchors are wired in; watchers are hypotheses and can be changed fast.</div>
     <div class="formGrid">
-      <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="https://your-private-rpc.example" /></div>
-      <div class="field"><label>Recent block window</label><input id="sScanBlocks" placeholder="2500" /></div>
-      <div class="field"><label>Selector scan blocks</label><input id="sSelectorBlocks" placeholder="80" /></div>
+      <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="https://your-private-rpc" /></div>
+      <div class="field"><label>Recent block scan</label><input id="sScanBlocks" placeholder="2500" /></div>
+      <div class="field"><label>Selector scan blocks</label><input id="sSelectorBlocks" placeholder="60" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefreshMs" placeholder="45000" /></div>
-      <div class="field"><label>ATROPA token</label><input id="sAtropaToken" placeholder="0x..." /></div>
-      <div class="field"><label>YouTube API key</label><input id="sYoutubeKey" placeholder="AIza..." /></div>
-      <div class="field"><label>YouTube channel ID</label><input id="sYoutubeChannel" placeholder="UC0ADdeCTOW9Qlai7G3kLLFg" /></div>
-      <div class="field"><label>X bearer token</label><input id="sXBearer" placeholder="Bearer token" /></div>
-      <div class="field"><label>X recent-search query</label><input id="sXQuery" placeholder='(pDAI OR Atropa OR LibertySwap OR Maria OR Bell) -is:retweet' /></div>
+
       <div class="field"><label>AF4E</label><input id="sAf4e" placeholder="0x..." /></div>
       <div class="field"><label>D6CA</label><input id="sD6ca" placeholder="0x..." /></div>
-      <div class="field"><label>AE84</label><input id="sAe84" placeholder="0x..." /></div>
-      <div class="field"><label>0968</label><input id="s0968" placeholder="0x..." /></div>
+      <div class="field"><label>D46</label><input id="sD46" placeholder="0x..." /></div>
+      <div class="field"><label>8AC4</label><input id="s8ac4" placeholder="0x..." /></div>
+
       <div class="field"><label>4fd0</label><input id="s4fd0" placeholder="0x..." /></div>
       <div class="field"><label>3D07</label><input id="s3d07" placeholder="0x..." /></div>
       <div class="field"><label>Ba86</label><input id="sBa86" placeholder="0x..." /></div>
       <div class="field"><label>F2Dc</label><input id="sF2dc" placeholder="0x..." /></div>
+
       <div class="field"><label>7b12</label><input id="s7b12" placeholder="0x..." /></div>
-      <div class="field"><label>D46</label><input id="sD46" placeholder="0x..." /></div>
-      <div class="field"><label>8AC4</label><input id="s8ac4" placeholder="0x..." /></div>
+      <div class="field"><label>0968</label><input id="s0968" placeholder="0x..." /></div>
       <div class="field"><label>27dF</label><input id="s27df" placeholder="0x..." /></div>
-      <div class="field"><label>4fd0 full alt</label><input id="s4fd0full" placeholder="0x4fd0..." /></div>
-      <div class="field"><label>Candidate storage slots</label><input id="sSlotList" placeholder="0x7b12,0x0968" /></div>
-      <div class="field"><label>Pending heat threshold gwei</label><input id="sHeatGwei" placeholder="0" /></div>
-      <div class="field"><label>Payload keywords</label><input id="sPayloadKeywords" placeholder="bell,proxy,pi,heat,qwen" /></div>
-      <div class="field"><label>Corpus paste</label><textarea id="sManualCorpus" placeholder="Paste NineIron threads, notes, transcripts, explorer dumps, etc."></textarea></div>
-      <div class="field"><label>Notes</label><textarea id="sNotes" placeholder="optional operator notes"></textarea></div>
-      <div class="field" style="grid-column: span 2;">
-        <label>Use pending heat sensor</label>
-        <div class="checkline"><input type="checkbox" id="sUsePending" /><span>Tries pending tx filters if your provider supports them.</span></div>
-      </div>
-      <div class="field" style="grid-column: span 2;">
-        <label>Use debug trace</label>
-        <div class="checkline"><input type="checkbox" id="sUseTrace" /><span>Tries <span class="mono">debug_traceTransaction</span> for manual tx-hash analysis.</span></div>
-      </div>
+      <div class="field"><label>ATROPA token</label><input id="sAtropa" placeholder="0x..." /></div>
+
+      <div class="field"><label>Candidate slots</label><input id="sSlots" placeholder="0x7b12,0x0968" /></div>
+      <div class="field"><label>Heat threshold gwei</label><input id="sHeat" placeholder="0" /></div>
+      <div class="field"><label>Payload keywords</label><input id="sKeywords" placeholder="bell,proxy,pi,heat,qwen" /></div>
+      <div class="field"><label>Notes</label><input id="sNotes" placeholder="optional" /></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
-      <button id="clearSettingsBtn" class="secondary">Reset settings</button>
-      <button id="clearHistoryBtn" class="secondary">Clear local history</button>
-      <button id="clearCorpusBtn" class="secondary">Clear corpus</button>
+      <button id="resetSettingsBtn" class="secondary">Reset</button>
+      <button id="clearImportsBtn" class="secondary">Clear imports</button>
     </div>
   </div>
 
   <div class="glass section">
     <div class="metrics">
-      <div class="card"><div class="label">Cartographer score</div><div class="value" id="mScore">—</div><div class="hint">truth-weighted map quality</div></div>
-      <div class="card"><div class="label">Stable phase</div><div class="value" id="mPhase">—</div><div class="hint">hysteresis output</div></div>
-      <div class="card"><div class="label">Public strength</div><div class="value" id="mPublic">—</div><div class="hint">surface mutation</div></div>
-      <div class="card"><div class="label">Interior strength</div><div class="value" id="mInterior">—</div><div class="hint">live interior evidence</div></div>
-      <div class="card"><div class="label">Contradiction load</div><div class="value" id="mContradict">—</div><div class="hint">anti-thesis pressure</div></div>
-      <div class="card"><div class="label">Hot candidates</div><div class="value" id="mCandidates">—</div><div class="hint">promoted addresses</div></div>
-      <div class="card"><div class="label">Payload hits</div><div class="value" id="mPayloadHits">—</div><div class="hint">Bell/proxy/etc motifs</div></div>
+      <div class="card"><div class="label">v7 score</div><div class="value" id="mScore">—</div><div class="hint">Harder to fool than v6</div></div>
+      <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">What the machine most resembles now</div></div>
+      <div class="card"><div class="label">Stable phase</div><div class="value" id="mPhase">—</div><div class="hint">Phase after hysteresis</div></div>
+      <div class="card"><div class="label">Public truth</div><div class="value" id="mPublic">—</div><div class="hint">Surface mutation strength</div></div>
+      <div class="card"><div class="label">Interior truth</div><div class="value" id="mInterior">—</div><div class="hint">Live watcher signal</div></div>
+      <div class="card"><div class="label">Contradiction</div><div class="value" id="mContradiction">—</div><div class="hint">Higher means story debt</div></div>
+      <div class="card"><div class="label">Evidence debt</div><div class="value" id="mDebt">—</div><div class="hint">Missing proof tasks</div></div>
+      <div class="card"><div class="label">Promoted candidates</div><div class="value" id="mCandidates">—</div><div class="hint">New targets worth watching</div></div>
     </div>
   </div>
 
@@ -126,10 +112,10 @@
     <div class="reactor">
       <div class="ring" id="reactorRing" style="--score:0">
         <div class="core">
-          <div class="k">Cartographer</div>
+          <div class="k">Adversarial core</div>
           <div class="score" id="scoreBig">0.0</div>
           <div class="state" id="coreState">Calibrating</div>
-          <div class="substate" id="coreSub">No live map yet</div>
+          <div class="substate" id="coreSub">No regime call yet</div>
         </div>
       </div>
     </div>
@@ -137,94 +123,105 @@
       <div class="verdict">
         <div class="verdictTop">
           <div>
-            <div class="label">v6 verdict</div>
-            <div class="bigVerdict" id="bigVerdict">Initializing...</div>
+            <div class="label">v7 verdict</div>
+            <div class="bigVerdict" id="bigVerdict">Initializing…</div>
           </div>
-          <div class="small" id="verdictExplain">v6 scores discovery power, contradiction handling, and corridor mapping.</div>
+          <div class="small" id="verdictExplain">v7 rewards honest discovery and punishes decorative “signals” that never move chain state.</div>
         </div>
         <div class="scoreBar"><div id="scoreFill" class="scoreFill"></div></div>
         <div class="parts">
-          <div class="part"><div class="k">Public</div><div class="v" id="sPublic">—</div></div>
+          <div class="part"><div class="k">Surface</div><div class="v" id="sSurface">—</div></div>
           <div class="part"><div class="k">Interior</div><div class="v" id="sInterior">—</div></div>
-          <div class="part"><div class="k">Contradictions</div><div class="v" id="sContradictions">—</div></div>
-          <div class="part"><div class="k">Promotion</div><div class="v" id="sPromote">—</div></div>
+          <div class="part"><div class="k">Rehab</div><div class="v" id="sRehab">—</div></div>
+          <div class="part"><div class="k">Debt</div><div class="v" id="sDebt">—</div></div>
           <div class="part"><div class="k">Claims</div><div class="v" id="sClaims">—</div></div>
-          <div class="part"><div class="k">Selectors</div><div class="v" id="sSelectors">—</div></div>
           <div class="part"><div class="k">Payloads</div><div class="v" id="sPayloads">—</div></div>
+          <div class="part"><div class="k">Queries</div><div class="v" id="sQueries">—</div></div>
           <div class="part"><div class="k">History</div><div class="v" id="sHistory">—</div></div>
         </div>
       </div>
       <div class="chartGrid">
-        <div class="mini"><div class="boxTitle">Score history</div><canvas id="scoreChart" width="520" height="90"></canvas><div class="small">Imported + local histories.</div></div>
-        <div class="mini"><div class="boxTitle">Public mutation</div><canvas id="publicChart" width="520" height="90"></canvas><div class="small">Velocity of public anchors.</div></div>
-        <div class="mini"><div class="boxTitle">Contradictions</div><canvas id="contradictionChart" width="520" height="90"></canvas><div class="small">High is bad. Audit honesty is good.</div></div>
+        <div class="mini"><div class="boxTitle">Score history</div><canvas id="scoreChart" width="520" height="90"></canvas><div class="small">Imported + local snapshots.</div></div>
+        <div class="mini"><div class="boxTitle">Surface mutation</div><canvas id="surfaceChart" width="520" height="90"></canvas><div class="small">Public anchors only.</div></div>
+        <div class="mini"><div class="boxTitle">Interior truth</div><canvas id="interiorChart" width="520" height="90"></canvas><div class="small">Should rise only when watchers really move.</div></div>
       </div>
       <div class="triple">
         <div class="listBox"><div class="boxTitle">Verified now</div><div class="list" id="verifiedList"></div></div>
-        <div class="listBox"><div class="boxTitle">V6 insights</div><div class="list" id="insightList"></div></div>
-        <div class="listBox"><div class="boxTitle">Action queue</div><div class="list" id="actionList"></div></div>
+        <div class="listBox"><div class="boxTitle">v7 insights</div><div class="list" id="insightList"></div></div>
+        <div class="listBox"><div class="boxTitle">What changes my mind</div><div class="list" id="mindList"></div></div>
       </div>
     </div>
   </div>
 
   <div class="duo">
     <div class="glass tableCard">
-      <div class="boxTitle">Claim tournament</div>
-      <div class="small" style="margin-bottom:10px">Claims gain support from history, corpus, live anchors, and discovered lanes. They lose to contradictions.</div>
-      <div class="tableWrap"><table><thead><tr><th>Claim</th><th>Score</th><th>Support</th><th>Contradictions</th><th>Status</th></tr></thead><tbody id="claimsBody"></tbody></table></div>
+      <div class="boxTitle">Watcher rehab lab</div>
+      <div class="small" style="margin-bottom:10px">Current watchers are graded for usefulness. Cold watchers get demoted and replaced by live candidates from corpus memory, seeded lanes, and block activity.</div>
+      <div class="tableWrap"><table><thead><tr><th>Watcher</th><th>Current tier</th><th>Signal</th><th>Problem</th><th>Replacement suggestion</th></tr></thead><tbody id="rehabBody"></tbody></table></div>
     </div>
     <div class="glass tableCard">
-      <div class="boxTitle">Address factory / promotion lab</div>
-      <div class="small" style="margin-bottom:10px">v6 promotes live, repeated, role-rich addresses and demotes dead ones.</div>
-      <div class="tableWrap"><table><thead><tr><th>Address</th><th>Tier</th><th>Score</th><th>Sources</th><th>Role guess</th><th>Reason</th></tr></thead><tbody id="candidateBody"></tbody></table></div>
+      <div class="boxTitle">Address factory</div>
+      <div class="small" style="margin-bottom:10px">Candidates are promoted from imported corpus memory, seeded research, and recent block touches.</div>
+      <div class="tableWrap"><table><thead><tr><th>Address</th><th>Score</th><th>Tier</th><th>Sources</th><th>Role guess</th><th>Why it matters</th></tr></thead><tbody id="candidateBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="duo">
+    <div class="glass tableCard">
+      <div class="boxTitle">Evidence debt queue</div>
+      <div class="small" style="margin-bottom:10px">The missing proof tasks that would most improve the model.</div>
+      <div class="tableWrap"><table><thead><tr><th>Priority</th><th>Task</th><th>Why</th><th>Method</th></tr></thead><tbody id="debtBody"></tbody></table></div>
+    </div>
+    <div class="glass tableCard">
+      <div class="boxTitle">Query pack generator</div>
+      <div class="small" style="margin-bottom:10px">v7 writes the next exact JSON-RPC hunts based on the current blind spots.</div>
+      <div class="btns" style="margin-bottom:12px"><button id="generateQueriesBtn">Generate query pack</button></div>
+      <div class="tableWrap"><table><thead><tr><th>Target</th><th>Purpose</th><th>RPC / idea</th></tr></thead><tbody id="queryBody"></tbody></table></div>
     </div>
   </div>
 
   <div class="duo">
     <div class="glass tableCard">
       <div class="boxTitle">Corridor dominance map</div>
-      <div class="small" style="margin-bottom:10px">Treat the peg as a corridor machine. Surface rails that move while the interior remains silent.</div>
-      <div class="tableWrap"><table><thead><tr><th>Anchor</th><th>Type</th><th>Reserve A</th><th>Reserve B</th><th>Weight</th><th>Motion</th><th>Role</th></tr></thead><tbody id="corridorBody"></tbody></table></div>
+      <div class="small" style="margin-bottom:10px">If the public surface is moving while the interior is quiet, v7 says so clearly.</div>
+      <div class="tableWrap"><table><thead><tr><th>Anchor</th><th>Type</th><th>Reserve A</th><th>Reserve B</th><th>Motion</th><th>Dominance</th><th>Interpretation</th></tr></thead><tbody id="corridorBody"></tbody></table></div>
     </div>
     <div class="glass tableCard">
-      <div class="boxTitle">Lane genealogy</div>
-      <div class="small" style="margin-bottom:10px">What the machine body looks like when the earlier intelligence is treated as a lane graph, not a legend.</div>
-      <div class="tableWrap"><table><thead><tr><th>Lane</th><th>Address</th><th>Seeded role</th><th>Current status</th><th>Evidence memory</th></tr></thead><tbody id="genealogyBody"></tbody></table></div>
+      <div class="boxTitle">Regime detector</div>
+      <div class="small" style="margin-bottom:10px">This is the hardest call the tool can make honestly.</div>
+      <div class="tableWrap"><table><thead><tr><th>Scenario</th><th>Fit</th><th>Reason</th></tr></thead><tbody id="regimeBody"></tbody></table></div>
     </div>
   </div>
 
   <div class="duo">
     <div class="glass tableCard">
-      <div class="boxTitle">Selector lab</div>
-      <div class="small" style="margin-bottom:10px">Scan recent blocks for tx selectors touching a target address.</div>
-      <div class="duo" style="margin-bottom:12px">
-        <div class="field"><label>Selector target</label><input id="selectorTarget" placeholder="0x..." /></div>
-        <div class="field"><label>Optional recent blocks</label><input id="selectorBlocks" placeholder="80" /></div>
-      </div>
-      <div class="btns" style="margin-bottom:12px"><button id="scanSelectorsBtn">Scan selectors</button></div>
-      <div class="tableWrap"><table><thead><tr><th>Selector</th><th>Count</th><th>Direction</th><th>Latest tx</th><th>Notes</th></tr></thead><tbody id="selectorBody"></tbody></table></div>
+      <div class="boxTitle">Claim tournament</div>
+      <div class="small" style="margin-bottom:10px">Claims are scored against support and contradictions, not vibes.</div>
+      <div class="tableWrap"><table><thead><tr><th>Claim</th><th>Score</th><th>Support</th><th>Contradictions</th><th>Status</th></tr></thead><tbody id="claimsBody"></tbody></table></div>
     </div>
-    <div class="glass tableCard">
-      <div class="boxTitle">Payload motif lab</div>
-      <div class="small" style="margin-bottom:10px">Decode calldata, detect printable markers, optional trace, and track Bell/proxy/pi/heat-like motifs.</div>
-      <div class="duo" style="margin-bottom:12px">
-        <div class="field"><label>Tx hash</label><input id="txHashInput" placeholder="0x..." /></div>
-        <div class="field"><label>Or address for recent payload sniff</label><input id="payloadTarget" placeholder="0x..." /></div>
-      </div>
-      <div class="btns" style="margin-bottom:12px"><button id="analyzeTxBtn">Analyze tx</button><button id="sniffPayloadBtn" class="secondary">Sniff recent payloads</button></div>
-      <div class="tableWrap"><table><thead><tr><th>Type</th><th>Value</th><th>Interpretation</th></tr></thead><tbody id="payloadBody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="duo">
     <div class="glass tableCard">
       <div class="boxTitle">Corpus memory</div>
-      <div class="small" style="margin-bottom:10px">Past insight lives here. Import notes, exports, transcripts, threads, explorer dumps. v6 extracts addresses, tx hashes, and claims.</div>
+      <div class="small" style="margin-bottom:10px">Past notes, exports, transcripts, and threads become structured memory.</div>
       <div class="tableWrap"><table><thead><tr><th>Memory item</th><th>Type</th><th>Addresses</th><th>Claims</th><th>Freshness</th></tr></thead><tbody id="corpusBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="duo">
+    <div class="glass tableCard">
+      <div class="boxTitle">Selector & payload lab</div>
+      <div class="small" style="margin-bottom:10px">Scan recent blocks for selectors touching a target and sniff payload motifs around a watch address.</div>
+      <div class="formGrid" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:12px">
+        <div class="field"><label>Selector target</label><input id="selectorTarget" placeholder="0x..." /></div>
+        <div class="field"><label>Selector blocks</label><input id="selectorBlocks" placeholder="60" /></div>
+        <div class="field"><label>Payload target</label><input id="payloadTarget" placeholder="0x..." /></div>
+        <div class="field"><label>Tx hash</label><input id="txHashInput" placeholder="0x..." /></div>
+      </div>
+      <div class="btns" style="margin-bottom:12px"><button id="scanSelectorsBtn">Scan selectors</button><button id="sniffPayloadBtn" class="secondary">Sniff payloads</button><button id="analyzeTxBtn" class="secondary">Analyze tx</button></div>
+      <div class="tableWrap"><table><thead><tr><th>Type</th><th>Value</th><th>Interpretation</th></tr></thead><tbody id="payloadBody"></tbody></table></div>
     </div>
     <div class="glass tableCard">
       <div class="boxTitle">Contradiction engine</div>
-      <div class="small" style="margin-bottom:10px">v6 punishes dead sensors, null-null symmetry, empty DNA, and unresolved watcher maps.</div>
+      <div class="small" style="margin-bottom:10px">Dead sensors, null-null slot equality, and empty DNA are now steering inputs.</div>
       <div class="tableWrap"><table><thead><tr><th>Contradiction</th><th>Severity</th><th>Effect</th></tr></thead><tbody id="contradictionBody"></tbody></table></div>
     </div>
   </div>
@@ -247,381 +244,213 @@ const DEFAULTS = {
     {address:"0xe56043671df55de5cdf8459710433c10324de0ae", name:"Bridged DAI/WPLS", type:"bridged", role:"surface pressure rail"},
     {address:"0x6B175474E89094C44Da98b954EedeAC495271d0F", name:"pDAI token", type:"token", role:"target token"}
   ],
-  WATCH:{AF4E:"",D6CA:"",NODE_AE84:"",NODE_0968:"0x0000000000000000000000000000000000000968",NODE_4FD0:"",NODE_3D07:"0x19488a0f98363768b449E2D821C8d7747e903D07",NODE_BA86:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc",NODE_F2DC:"0x862247F0E9F77331c470ec75d905CC4240FF3Dc2",NODE_7B12:"0x0000000000000000000000000000000000007b12",NODE_D46:"",NODE_8AC4:"",NODE_27DF:"",NODE_4FD0_FULL:""},
+  WATCH:{AF4E:"",D6CA:"",NODE_AE84:"",NODE_0968:"0x0000000000000000000000000000000000000968",NODE_4FD0:"",NODE_3D07:"0x19488a0f98363768b449E2D821C8d7747e903D07",NODE_BA86:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc",NODE_F2DC:"0x862247F0E9F77331c470ec75d905CC4240FF3Dc2",NODE_7B12:"0x0000000000000000000000000000000000007b12",NODE_D46:"",NODE_8AC4:"",NODE_27DF:"",NODE_91FD:"",NODE_6327:"",NODE_5805:""},
   SCAN_BLOCKS:2500,
-  SELECTOR_BLOCKS:80,
+  SELECTOR_BLOCKS:60,
   AUTO_REFRESH_MS:45000,
   SLOT_LIST:["0x7b12","0x0968"],
   USE_PENDING_HEAT:true,
-  USE_TRACE:false,
   HEAT_GWEI_THRESHOLD:0,
   PAYLOAD_KEYWORDS:["bell","proxy","pi","heat","qwen","maria","atropa","liberty"],
   privateRpc:"",
-  youtubeKey:"",
-  youtubeChannel:"UC0ADdeCTOW9Qlai7G3kLLFg",
-  xBearer:"",
-  xQuery:"(pDAI OR Atropa OR LibertySwap OR Maria OR Bell) -is:retweet",
-  ATROPA_TOKEN:"",
   notes:"",
-  manualCorpus:"",
-  corpusItems:[],
-  importedHistories:[],
-  stablePhase:"audit",
-  phaseConfidence:0,
-  historyLimit:400,
-  narrativeEvents:[
-    {id:"seed-y1", title:"The Spectacle", source:"YouTube", phase:"audit"},
-    {id:"seed-y2", title:"靈脅用 is live!", source:"YouTube", phase:"activation"},
-    {id:"seed-y3", title:"the landscape teddy bear", source:"YouTube", phase:"terminal", duration_sec:115},
-    {id:"seed-y4", title:"qwen being north hollywood", source:"YouTube", phase:"terminal", duration_sec:115},
-    {id:"seed-y5", title:"qwen being qwen", source:"YouTube", phase:"heat", duration_sec:121}
-  ],
-  knowledgeSeeds:[
-    {kind:"claim", id:"c1", text:"Public surface is alive while current interior watcher set is mostly wrong or incomplete.", category:"diagnostic", weight:1.4},
-    {kind:"claim", id:"c2", text:"The peg machine looks like a corridor system, not a one-wallet instant switch.", category:"architecture", weight:1.2},
-    {kind:"claim", id:"c3", text:"Null-null slot equality is anti-signal, not proof.", category:"diagnostic", weight:1.3},
-    {kind:"claim", id:"c4", text:"ATROPA/DAI is structural core; bridged DAI/WPLS is surface pressure rail.", category:"architecture", weight:1.1},
-    {kind:"lane", id:"l1", label:"5EF7", address:"0x5ef7aac0de4f2012cb36730da140025b113fada4", role:"locked liquidity core", evidence:"seeded from prior research"},
-    {kind:"lane", id:"l2", label:"D46", address:"0xD46BD969d995A122AD5B803A45d309021A647B87", role:"active fee/routing rail", evidence:"seeded from prior research"},
-    {kind:"lane", id:"l3", label:"8AC4", address:"0x8AC4ae65b3656e26dC4e0e69108B392283350f55", role:"protocol sink / PLSXBuyAndBurn", evidence:"seeded from prior research"},
-    {kind:"lane", id:"l4", label:"27dF", address:"0x27dF87f5A5eD1b71794bBb9361A33a61e7b8a9cB", role:"active execution EOA candidate", evidence:"seeded from prior research"},
-    {kind:"lane", id:"l5", label:"149B", address:"", role:"LP conversion pair feeding 5805", evidence:"seeded from prior research"},
-    {kind:"lane", id:"l6", label:"5805", address:"", role:"PLSX distribution rail", evidence:"seeded from prior research"},
-    {kind:"note", id:"n1", text:"Past analysis repeatedly separated internal machine from official LibertySwap handshake; that handshake stayed unproven in prior clean-room passes."},
-    {kind:"note", id:"n2", text:"NineIronCapital, DcentraliseMe, Maria channel, and earlier exports form the starting corpus memory, not ground truth."}
-  ],
   RPCS:["https://rpc.pulsechain.com","https://pulsechain.publicnode.com","https://rpc-pulsechain.g4mm4.io","https://rpc.pulsechainrpc.com","https://pulsechain.rpc.thirdweb.com"]
 };
-
-const STORAGE_KEY = "pdai-v6-config";
-const HISTORY_KEY = "pdai-v6-history";
+const SEEDED_LANES = [
+  {label:"5EF7", address:"0x5ef7aac0de4f2012cb36730da140025b113fada4", role:"ATROPA/DAI structural core", source:"public-core"},
+  {label:"D46", address:"", role:"PLP accrual / tollbooth", source:"seed-memory"},
+  {label:"D6CA", address:"", role:"recycler / refinery", source:"seed-memory"},
+  {label:"8AC4", address:"", role:"buy-and-burn / sink candidate", source:"seed-memory"},
+  {label:"4fd0", address:"", role:"settlement bucket / internal vault candidate", source:"seed-memory"},
+  {label:"Ba86", address:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc", role:"basket splitter / architect candidate", source:"seed-memory"},
+  {label:"91fD", address:"", role:"WPLS bridge-fee rail", source:"seed-memory"},
+  {label:"6327", address:"", role:"native PLS rail", source:"seed-memory"},
+  {label:"5805", address:"", role:"PLSX rail", source:"seed-memory"},
+  {label:"AF4E", address:"", role:"execution hand", source:"seed-memory"},
+  {label:"27dF", address:"", role:"execution candidate", source:"seed-memory"}
+];
+const SEEDED_CLAIMS = [
+  {claim:"The machine is a multi-rail reserve corridor, not a single admin switch.", support:3, contradiction:0},
+  {claim:"ATROPA/DAI is the structural core and optical pDAI/WPLS is thinner surface.", support:3, contradiction:0},
+  {claim:"Null-null slot equality is not symmetry; it is absence.", support:3, contradiction:0},
+  {claim:"A public surface can mutate while the interior watcher map is wrong.", support:3, contradiction:0},
+  {claim:"4fd0 as documented LibertySwap router is not proven by default.", support:2, contradiction:0},
+  {claim:"Old giant-supply and ae84-hoard stories should be cut unless raw exports prove them.", support:2, contradiction:0}
+];
+const STORAGE_KEY = "pdai-peg-prover-v7-config";
+const IMPORTS_KEY = "pdai-peg-prover-v7-imports";
+const HISTORY_KEY = "pdai-peg-prover-v7-local-history";
 const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-const SYNC_TOPIC = "0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1";
-const TOPIC_APPROVAL = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
-const PHASE_ORDER = {audit:1,activation:2,routing:3,manifestation:4,terminal:5,heat:6,settle:7};
-const state = {settings:null,syncing:false,rpcIndex:0,decimals:new Map(),timer:null,pendingFilterId:null};
+const APPROVAL_TOPIC = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
+const SIGS = {balanceOf:"0x70a08231", decimals:"0x313ce567", totalSupply:"0x18160ddd", token0:"0x0dfe1681", token1:"0xd21220a7", reserves:"0x0902f1ac"};
+const state = {settings:null, imports:null, timer:null, syncing:false, rpcIndex:0, blockCache:new Map(), decCache:new Map(), pendingFilterId:null};
 const $ = id => document.getElementById(id);
-const norm = s => String(s||"").trim().toLowerCase();
-const isAddr = s => /^0x[a-fA-F0-9]{40}$/.test(String(s||"").trim());
-const short = (s,a=6,b=4) => { s=String(s||""); return s.length>a+b+3?`${s.slice(0,a)}...${s.slice(-b)}`:s; };
-const esc = s => String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
-const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+const norm = x => String(x||"").trim().toLowerCase();
+const isAddr = x => /^0x[a-fA-F0-9]{40}$/.test(String(x||"").trim());
+const short = (s,a=8,b=6)=>{s=String(s||""); return s.length>a+b+3 ? `${s.slice(0,a)}...${s.slice(-b)}` : s;};
+const esc = v => String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
 const toHex = n => "0x" + BigInt(n).toString(16);
 const fromTopic = t => "0x" + String(t||"").slice(-40);
-const setText = (id,v) => { const el=$(id); if(el) el.textContent=v; };
-const setHTML = (id,v) => { const el=$(id); if(el) el.innerHTML=v; };
-const nowStamp = () => new Date().toLocaleString();
-const itemHtml = (text,cls="warn") => `<div class="item ${cls}">${text}</div>`;
-function uniq(arr){ return [...new Set(arr)]; }
-function fmtNum(v,d=2){ if(v==null||!Number.isFinite(v)) return "—"; return Number(v).toLocaleString(undefined,{maximumFractionDigits:d}); }
-function fmtCompact(v,d=2){ if(v==null||!Number.isFinite(v)) return "—"; const a=Math.abs(v); if(a>=1e12) return (v/1e12).toFixed(d)+"T"; if(a>=1e9) return (v/1e9).toFixed(d)+"B"; if(a>=1e6) return (v/1e6).toFixed(d)+"M"; if(a>=1e3) return (v/1e3).toFixed(d)+"K"; return fmtNum(v,d); }
-function fmtPct(v,d=1){ if(v==null||!Number.isFinite(v)) return "—"; return (100*v).toFixed(d)+"%"; }
-function fmtFixed(v,d=3){ if(v==null||!Number.isFinite(v)) return "—"; return Number(v).toFixed(d); }
-function hexToBigInt(hex){ try{return BigInt(hex||"0x0");}catch{return 0n;} }
-function units(big, decimals=18){ const neg=big<0n; const val=neg?-big:big; let s=val.toString(); if(decimals===0) return Number((neg?"-":"")+s); if(s.length<=decimals) s="0".repeat(decimals-s.length+1)+s; const int=s.slice(0,-decimals)||"0"; const frac=s.slice(-decimals).replace(/0+$/,'').slice(0,12); return parseFloat((neg?"-":"")+int+(frac?'.'+frac:'')); }
-function gweiFromWeiHex(hex){ try{return Number(BigInt(hex||"0x0"))/1e9;}catch{return null;} }
-function downloadJSON(name,obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url); }
-function mergeDeep(a,b){ const o=structuredClone(a); for(const k of Object.keys(b||{})){ if(b[k] && typeof b[k]==='object' && !Array.isArray(b[k]) && o[k] && typeof o[k]==='object' && !Array.isArray(o[k])) o[k]=mergeDeep(o[k],b[k]); else o[k]=b[k]; } return o; }
-
-function loadSettings(){ let saved={}; try{ saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); }catch{} return mergeDeep(DEFAULTS,saved); }
-function persistSettings(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings)); }
-function loadLocalHistory(){ try{ const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]"); return Array.isArray(h)?h:[]; }catch{return [];} }
-function saveLocalHistory(arr){ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(-state.settings.historyLimit))); setText('historyInfo',`History: ${arr.length} local + ${(state.settings.importedHistories||[]).length} imported`); }
-
-function pushSettingsToUI(cfg){
-  $('sPrivateRpc').value=cfg.privateRpc||''; $('sScanBlocks').value=cfg.SCAN_BLOCKS; $('sSelectorBlocks').value=cfg.SELECTOR_BLOCKS; $('sAutoRefreshMs').value=cfg.AUTO_REFRESH_MS; $('sAtropaToken').value=cfg.ATROPA_TOKEN||''; $('sYoutubeKey').value=cfg.youtubeKey||''; $('sYoutubeChannel').value=cfg.youtubeChannel||''; $('sXBearer').value=cfg.xBearer||''; $('sXQuery').value=cfg.xQuery||''; $('sAf4e').value=cfg.WATCH.AF4E||''; $('sD6ca').value=cfg.WATCH.D6CA||''; $('sAe84').value=cfg.WATCH.NODE_AE84||''; $('s0968').value=cfg.WATCH.NODE_0968||''; $('s4fd0').value=cfg.WATCH.NODE_4FD0||''; $('s3d07').value=cfg.WATCH.NODE_3D07||''; $('sBa86').value=cfg.WATCH.NODE_BA86||''; $('sF2dc').value=cfg.WATCH.NODE_F2DC||''; $('s7b12').value=cfg.WATCH.NODE_7B12||''; $('sD46').value=cfg.WATCH.NODE_D46||''; $('s8ac4').value=cfg.WATCH.NODE_8AC4||''; $('s27df').value=cfg.WATCH.NODE_27DF||''; $('s4fd0full').value=cfg.WATCH.NODE_4FD0_FULL||''; $('sSlotList').value=(cfg.SLOT_LIST||[]).join(','); $('sHeatGwei').value=cfg.HEAT_GWEI_THRESHOLD||0; $('sPayloadKeywords').value=(cfg.PAYLOAD_KEYWORDS||[]).join(','); $('sManualCorpus').value=cfg.manualCorpus||''; $('sNotes').value=cfg.notes||''; $('sUsePending').checked=!!cfg.USE_PENDING_HEAT; $('sUseTrace').checked=!!cfg.USE_TRACE;
-}
-function parseSlotList(s){ return uniq(String(s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>x.startsWith('0x')?x:'0x'+x)); }
-function parseKeywordList(s){ return uniq(String(s||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean)); }
-function saveSettingsFromUI(){ const s=state.settings; s.privateRpc=$('sPrivateRpc').value.trim(); s.SCAN_BLOCKS=Number($('sScanBlocks').value||DEFAULTS.SCAN_BLOCKS); s.SELECTOR_BLOCKS=Number($('sSelectorBlocks').value||DEFAULTS.SELECTOR_BLOCKS); s.AUTO_REFRESH_MS=Number($('sAutoRefreshMs').value||DEFAULTS.AUTO_REFRESH_MS); s.ATROPA_TOKEN=$('sAtropaToken').value.trim(); s.youtubeKey=$('sYoutubeKey').value.trim(); s.youtubeChannel=$('sYoutubeChannel').value.trim(); s.xBearer=$('sXBearer').value.trim(); s.xQuery=$('sXQuery').value.trim(); s.SLOT_LIST=parseSlotList($('sSlotList').value); s.HEAT_GWEI_THRESHOLD=Number($('sHeatGwei').value||0); s.PAYLOAD_KEYWORDS=parseKeywordList($('sPayloadKeywords').value); s.manualCorpus=$('sManualCorpus').value; s.notes=$('sNotes').value; s.USE_PENDING_HEAT=$('sUsePending').checked; s.USE_TRACE=$('sUseTrace').checked; s.WATCH={...s.WATCH,AF4E:$('sAf4e').value.trim(),D6CA:$('sD6ca').value.trim(),NODE_AE84:$('sAe84').value.trim(),NODE_0968:$('s0968').value.trim(),NODE_4FD0:$('s4fd0').value.trim(),NODE_3D07:$('s3d07').value.trim(),NODE_BA86:$('sBa86').value.trim(),NODE_F2DC:$('sF2dc').value.trim(),NODE_7B12:$('s7b12').value.trim(),NODE_D46:$('sD46').value.trim(),NODE_8AC4:$('s8ac4').value.trim(),NODE_27DF:$('s27df').value.trim(),NODE_4FD0_FULL:$('s4fd0full').value.trim()}; persistSettings(); setRefreshTimer(); }
-
-async function withTimeout(p,ms=15000){ let timer; return Promise.race([p.finally(()=>clearTimeout(timer)),new Promise((_,rej)=>timer=setTimeout(()=>rej(new Error('timeout')),ms))]); }
-function activeRpcs(){ const arr=[...(state.settings.privateRpc?[state.settings.privateRpc]:[]),...DEFAULTS.RPCS]; return uniq(arr.filter(Boolean)); }
-async function rpc(method,params){ const rpcs=activeRpcs(); let lastErr; for(let i=0;i<rpcs.length;i++){ const idx=(state.rpcIndex+i)%rpcs.length; const url=rpcs[idx]; try{ const res=await withTimeout(fetch(url,{method:'POST',headers:{'content-type':'application/json','accept':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+i,method,params})}),15000); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message||'rpc error'); state.rpcIndex=idx; setText('nodeStatus','RPC: '+url.replace(/^https?:\/\//,'')); return data.result; }catch(err){ lastErr=err; } } throw lastErr||new Error('All RPCs failed'); }
-async function rpcBlockNumber(){ return parseInt(await rpc('eth_blockNumber',[]),16); }
-async function rpcBlock(blockNum, full=false){ return await rpc('eth_getBlockByNumber',[typeof blockNum==='string'?blockNum:toHex(blockNum), !!full]); }
-async function ercDecimals(token){ const key=norm(token); if(state.decimals.has(key)) return state.decimals.get(key); const raw=await rpc('eth_call',[{to:token,data:'0x313ce567'},'latest']); const d=parseInt(raw,16); const out=Number.isFinite(d)?d:18; state.decimals.set(key,out); return out; }
-async function ercBalanceOf(token,holder){ const data='0x70a08231'+norm(holder).replace(/^0x/,'').padStart(64,'0'); return hexToBigInt(await rpc('eth_call',[{to:token,data},'latest'])); }
-async function ercTotalSupply(token){ return hexToBigInt(await rpc('eth_call',[{to:token,data:'0x18160ddd'},'latest'])); }
-async function txCount(addr){ return parseInt(await rpc('eth_getTransactionCount',[addr,'latest']),16); }
-async function getCode(addr){ return await rpc('eth_getCode',[addr,'latest']); }
-async function nativeBalance(addr){ return units(hexToBigInt(await rpc('eth_getBalance',[addr,'latest'])),18); }
-async function readStorageAt(addr,slot){ return await rpc('eth_getStorageAt',[addr,slot,'latest']); }
-async function getLogs(filter){ return await rpc('eth_getLogs',[filter]); }
-async function traceTx(hash){ return await rpc('debug_traceTransaction',[hash,{tracer:'callTracer'}]); }
-
-function parseTransferLogs(logs,symbol,decimals,token){ return (logs||[]).map(log=>({block:parseInt(log.blockNumber,16),txHash:log.transactionHash,from:fromTopic(log.topics[1]),to:fromTopic(log.topics[2]),amount:units(hexToBigInt(log.data),decimals),token, symbol})); }
-function ratioMotion(prev,next){ if(!prev||!next) return 0; const p=(prev.reserve0||0)+(prev.reserve1||0); const n=(next.reserve0||0)+(next.reserve1||0); if(!p||!n) return 0; return Math.abs(n-p)/p; }
-function drawSpark(canvasId, values, color){ const c=$(canvasId); if(!c) return; const ctx=c.getContext('2d'); const w=c.width,h=c.height; ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(255,255,255,0.02)'; ctx.fillRect(0,0,w,h); const clean=values.filter(v=>v!=null&&Number.isFinite(v)); if(clean.length<2){ ctx.fillStyle='rgba(140,160,173,.8)'; ctx.font='12px sans-serif'; ctx.fillText('Need more history',10,20); return; } const min=Math.min(...clean), max=Math.max(...clean), range=max-min||1; ctx.beginPath(); values.forEach((v,i)=>{ if(v==null||!Number.isFinite(v)) return; const x=(i/Math.max(1,values.length-1))*(w-8)+4; const y=(1-(v-min)/range)*(h-12)+6; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.stroke(); }
-
-function combinedHistory(){ return [...loadLocalHistory(), ...(state.settings.importedHistories||[])].sort((a,b)=>(a.ts||0)-(b.ts||0)); }
-function saveLocalSnapshot(snap){ const arr=loadLocalHistory(); arr.push(snap); while(arr.length>state.settings.historyLimit) arr.shift(); saveLocalHistory(arr); }
-
-function seededCorpusItems(cfg){
-  const items=[];
-  for(const seed of cfg.knowledgeSeeds||[]){
-    items.push({id:seed.id,type:seed.kind,text:seed.text||seed.role||seed.label||'',addresses:[seed.address].filter(Boolean),claims:[seed.text||seed.role||''],freshness:'seed'});
-  }
-  if(cfg.manualCorpus){ items.push(...parseCorpusText(cfg.manualCorpus,'manual')); }
-  return items;
-}
-function parseCorpusText(text, source='import'){ const addresses=String(text||'').match(/0x[a-fA-F0-9]{40}/g)||[]; const hashes=String(text||'').match(/0x[a-fA-F0-9]{64}/g)||[]; const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,120); const items=[]; let idx=0; for(const line of lines){ const addrs=line.match(/0x[a-fA-F0-9]{40}/g)||[]; const claims=[]; if(/peg|parity|stable/i.test(line)) claims.push('peg / parity'); if(/route|router|liquidity|pair|lp/i.test(line)) claims.push('route / liquidity'); if(/shard|vault|warehouse|distribution/i.test(line)) claims.push('shard / warehousing'); if(/liberty|bridge|gasless/i.test(line)) claims.push('liberty / bridge'); if(/atropa|pmkr|mkr|treasury/i.test(line)) claims.push('treasury / atropa'); if(/af4e|d6ca|5ef7|4fd0|3d07|27df|8ac4|d46/i.test(line.toLowerCase())) claims.push('machine role'); if(addrs.length||claims.length||line.length>40){ items.push({id:`${source}-${idx++}`,type:'corpus',text:line,addresses:addrs,claims:claims.length?claims:['unclassified'],freshness:source}); }
-  }
-  if(hashes.length){ items.push({id:`${source}-hashes`,type:'hashes',text:`${hashes.length} tx hash(es) detected`,addresses:[],hashes,claims:['tx hash memory'],freshness:source}); }
-  return items;
-}
-
-function buildWatchMap(cfg){ const raw=[
-  {label:'5EF7', address:'0x5ef7aac0de4f2012cb36730da140025b113fada4', seeded:true, role:'core'},
-  {label:'AF4E', address:cfg.WATCH.AF4E, role:'execution hand'},
-  {label:'D6CA', address:cfg.WATCH.D6CA, role:'recycler'},
-  {label:'AE84', address:cfg.WATCH.NODE_AE84, role:'public rail'},
-  {label:'0968', address:cfg.WATCH.NODE_0968, role:'hammer'},
-  {label:'4fd0', address:cfg.WATCH.NODE_4FD0, role:'vault'},
-  {label:'3D07', address:cfg.WATCH.NODE_3D07, role:'pivot'},
-  {label:'Ba86', address:cfg.WATCH.NODE_BA86, role:'architect'},
-  {label:'F2Dc', address:cfg.WATCH.NODE_F2DC, role:'logic'},
-  {label:'7b12', address:cfg.WATCH.NODE_7B12, role:'terminal'},
-  {label:'D46', address:cfg.WATCH.NODE_D46, role:'fee rail'},
-  {label:'8AC4', address:cfg.WATCH.NODE_8AC4, role:'sink rail'},
-  {label:'27dF', address:cfg.WATCH.NODE_27DF, role:'execution EOA'},
-  {label:'4fd0 full', address:cfg.WATCH.NODE_4FD0_FULL, role:'full alt'}
-];
-  const out=[]; for(const r of raw){ if(isAddr(r.address)) out.push(r); }
-  return out;
-}
-function inferPhaseFromRaw(rawScore){ if(rawScore>=5.5) return 'heat'; if(rawScore>=4.5) return 'terminal'; if(rawScore>=3.5) return 'manifestation'; if(rawScore>=2.5) return 'routing'; if(rawScore>=1.5) return 'activation'; return 'audit'; }
-function phaseLabel(p){ return ({audit:'Audit',activation:'Activation',routing:'Routing',manifestation:'Manifestation',terminal:'Terminal',heat:'Heat',settle:'Settle'})[p]||p; }
-
-function analyzeHistory(history){
-  if(!history.length) return {avgScore:0,avgPublic:0,avgInterior:0,avgContradiction:0,stablePhase:'audit',phaseConfidence:0,allZeroRate:1,coldRate:1,mutationRate:0};
-  const avg = key => history.reduce((s,x)=>s+(Number(x[key])||0),0)/history.length;
-  const avgPublic = history.reduce((s,x)=>s+(Number(x.publicStrength)||0),0)/history.length;
-  const avgInterior = history.reduce((s,x)=>s+(Number(x.interiorStrength)||0),0)/history.length;
-  const avgContradiction = history.reduce((s,x)=>s+(Number(x.contradictionLoad)||0),0)/history.length;
-  const phases={}; history.forEach(h=>{ const p=h.stablePhase||h.phase||'audit'; phases[p]=(phases[p]||0)+1; });
-  const stablePhase = Object.entries(phases).sort((a,b)=>b[1]-a[1])[0]?.[0]||'audit';
-  const phaseConfidence = (phases[stablePhase]||0)/history.length;
-  const allZeroRate = history.filter(h=>h.slotProbe?.allZero).length/history.length;
-  const coldRate = history.filter(h=>Object.values(h.watchTiers||{}).every(v=>v==='cold')).length/history.length;
-  const mutationRate = history.filter(h=>(h.mutationStats?.changedCount||0)>0).length/history.length;
-  return {avgScore:avg('score'),avgPublic,avgInterior,avgContradiction,stablePhase,phaseConfidence,allZeroRate,coldRate,mutationRate};
-}
-
-async function discoverPublicAnchors(cfg){
-  const out=[]; const pairs=cfg.PUBLIC_ANCHORS.filter(x=>x.type!=='token');
-  for(const p of pairs){
-    try{
-      const token0Raw = await rpc('eth_call',[{to:p.address,data:'0x0dfe1681'},'latest']);
-      const token1Raw = await rpc('eth_call',[{to:p.address,data:'0xd21220a7'},'latest']);
-      const reservesRaw = await rpc('eth_call',[{to:p.address,data:'0x0902f1ac'},'latest']);
-      const token0='0x'+String(token0Raw||'').slice(-40); const token1='0x'+String(token1Raw||'').slice(-40);
-      const reserve0 = hexToBigInt('0x'+String(reservesRaw).replace(/^0x/,'').slice(0,64));
-      const reserve1 = hexToBigInt('0x'+String(reservesRaw).replace(/^0x/,'').slice(64,128));
-      const d0=await ercDecimals(token0); const d1=await ercDecimals(token1);
-      out.push({...p, token0, token1, reserve0:units(reserve0,d0), reserve1:units(reserve1,d1)});
-    }catch(err){ out.push({...p,error:err.message}); }
-  }
-  out.push(cfg.PUBLIC_ANCHORS.find(x=>x.type==='token'));
-  return out;
-}
-
-function publicMutationStats(current, prevHistory){
-  const latestPrev = [...prevHistory].reverse().find(x=>Array.isArray(x.publicAnchors) && x.publicAnchors.length) || null;
-  if(!latestPrev) return {changedCount:0,velocity:0,acceleration:0,rows:current.map(a=>({...a,motion:0,weight:0}))};
-  let changedCount=0,totalMotion=0; const rows=[];
-  for(const a of current){
-    const prev = (latestPrev.publicAnchors||[]).find(p=>norm(p.address)===norm(a.address));
-    const motion = ratioMotion(prev,a);
-    if(motion>0) changedCount++;
-    totalMotion += motion;
-    const weight = (a.reserve0||0)+(a.reserve1||0);
-    rows.push({...a,motion,weight});
-  }
-  const older = [...prevHistory].reverse().slice(1).find(x=>Array.isArray(x.publicAnchors) && x.publicAnchors.length) || null;
-  let acceleration=0;
-  if(older){
-    const olderMotion = current.reduce((s,a)=>{ const prev=(older.publicAnchors||[]).find(p=>norm(p.address)===norm(a.address)); return s+ratioMotion(prev,a); },0);
-    acceleration = Math.max(totalMotion - olderMotion, 0);
-  }
-  return {changedCount, velocity: totalMotion*1e9, acceleration: acceleration*1e9, rows};
-}
-
-function buildContradictions(historyStats, live){
-  const out=[];
-  if(live.slotProbe?.allZero) out.push({text:'Candidate slot symmetry is null-null equality, not real state movement.', severity:'high', effect:'cuts symmetry confidence'});
-  if(!live.dnaProbe?.implAddress) out.push({text:'DNA / EIP-1967 slot is empty.', severity:'medium', effect:'proxy-hot-swap theory not supported'});
-  if((live.pendingHeat?.count||0)===0) out.push({text:'Pending heat remains absent.', severity:'medium', effect:'heat narrative unconfirmed'});
-  if((live.interiorActiveCount||0)===0) out.push({text:'Loaded interior watcher set is cold.', severity:'high', effect:'demote current interior map'});
-  if(historyStats.coldRate > 0.75) out.push({text:'Cold watcher regime persists across most history.', severity:'high', effect:'force address discovery'});
-  if(historyStats.allZeroRate > 0.75) out.push({text:'All-zero slot regime persists across most history.', severity:'high', effect:'stop rewarding slot equality'});
-  if(historyStats.avgInterior < historyStats.avgPublic * 0.2) out.push({text:'Public surface dominates interior evidence.', severity:'high', effect:'treat peg as corridor/public-surface phenomenon until interior map improves'});
-  return out;
-}
-
-function buildClaims(historyStats, live, corpusItems){
-  const claims = [
-    {id:'claim-surface', text:'Public surface is alive.', support:0, contradictions:0},
-    {id:'claim-interior-wrong', text:'Current interior watcher set is wrong or incomplete.', support:0, contradictions:0},
-    {id:'claim-corridor', text:'The peg machine is a corridor system, not a one-wallet switch.', support:0, contradictions:0},
-    {id:'claim-atr', text:'ATROPA/DAI remains structural core.', support:0, contradictions:0},
-    {id:'claim-slots', text:'7b12/0968 slot equality is meaningful.', support:0, contradictions:0},
-    {id:'claim-proxy', text:'Proxy/DNA rewrite is a live path.', support:0, contradictions:0},
-    {id:'claim-waroom', text:'Next progress depends on discovering new interior lanes.', support:0, contradictions:0}
-  ];
-  const byId = Object.fromEntries(claims.map(c=>[c.id,c]));
-  if(historyStats.avgPublic > 0.55 || live.mutationStats.changedCount>0){ byId['claim-surface'].support += 2.2; }
-  if(historyStats.avgInterior < 0.08 && historyStats.coldRate > 0.7){ byId['claim-interior-wrong'].support += 2.4; byId['claim-waroom'].support += 1.8; }
-  if(corpusItems.some(i=>/not a one-wallet|not:|one-wallet|instant peg switch/i.test(i.text||''))){ byId['claim-corridor'].support += 1.6; }
-  if(corpusItems.some(i=>/locked liquidity core|active fee|buy\/burn|corridor/i.test(i.text||''))){ byId['claim-corridor'].support += 1.5; }
-  if((live.publicAnchors||[]).some(a=>norm(a.address)==='0x5ef7aac0de4f2012cb36730da140025b113fada4')) byId['claim-atr'].support += 1.3;
-  if(live.slotProbe?.allZero){ byId['claim-slots'].contradictions += 2.5; }
-  else if(live.slotProbe?.equal){ byId['claim-slots'].support += 1.2; }
-  if(!live.dnaProbe?.implAddress) byId['claim-proxy'].contradictions += 2.0; else byId['claim-proxy'].support += 1.5;
-  if(live.interiorActiveCount===0) byId['claim-waroom'].support += 1.7;
-  if(corpusItems.some(i=>/ATROPA\/DAI|5EF7|structural core/i.test(i.text||''))) byId['claim-atr'].support += 1.2;
-  if(corpusItems.some(i=>/null-null equality|anti-signal/i.test(i.text||''))) byId['claim-slots'].contradictions += 0.8;
-  return claims.map(c=>({
-    ...c,
-    score: clamp(50 + (c.support - c.contradictions)*18, 0, 100),
-    status: c.support > c.contradictions ? (c.score > 70 ? 'favored' : 'live') : (c.contradictions > c.support ? 'stressed' : 'mixed')
-  })).sort((a,b)=>b.score-a.score);
-}
-
-function extractAddressesFromItems(items){ const map=new Map(); for(const item of items){ for(const a of (item.addresses||[])){ const n=norm(a); if(!map.has(n)) map.set(n,{address:a,sources:new Set(),hits:0,texts:[],claims:new Set()}); const m=map.get(n); m.sources.add(item.freshness||item.type||'corpus'); m.hits+=1; if(item.text) m.texts.push(item.text.slice(0,180)); for(const c of (item.claims||[])) m.claims.add(c); } } return [...map.values()]; }
-function roleGuess(entry){ const text=(entry.texts||[]).join(' ').toLowerCase(); if(/router|liquidity|pair|lp/.test(text)) return 'router/pair'; if(/shard|vault|warehouse/.test(text)) return 'shard/vault'; if(/burn|sink|buyandburn/.test(text)) return 'sink'; if(/bridge|gasless|liberty/.test(text)) return 'bridge/gate'; if(/execution|hand|hammer/.test(text)) return 'execution'; return 'unknown'; }
-function buildCandidates(cfg, corpusItems, live){
-  const seeded = buildWatchMap(cfg).map(w=>({address:w.address,label:w.label,sources:new Set(['seed/watch']),hits:2,texts:[w.role||''],claims:new Set([w.role||'']),seeded:true}));
-  const fromCorpus = extractAddressesFromItems(corpusItems);
-  const merged = new Map();
-  for(const e of [...seeded, ...fromCorpus]){ const n=norm(e.address); if(!n) continue; if(!merged.has(n)) merged.set(n,{address:e.address,label:e.label||'',sources:new Set(),hits:0,texts:[],claims:new Set(),seeded:!!e.seeded}); const m=merged.get(n); for(const s of e.sources||[]) m.sources.add(s); m.hits += e.hits||1; m.texts.push(...(e.texts||[])); for(const c of e.claims||[]) m.claims.add(c); m.seeded = m.seeded || !!e.seeded; }
-  const rows=[];
-  for(const m of merged.values()){
-    const addr = m.address; const watched = buildWatchMap(cfg).find(w=>norm(w.address)===norm(addr));
-    let score = (m.seeded?24:8) + (m.hits*4) + (m.sources.size*6);
-    const rg = roleGuess(m);
-    if(['execution','router/pair','bridge/gate','sink'].includes(rg)) score += 8;
-    const tier = watched ? (live.watchTiers?.[watched.label] || 'seed') : (score >= 40 ? 'promote' : score >= 26 ? 'observe' : 'cold');
-    rows.push({address:addr,label:watched?.label||'',tier,score,role:watched?.role||rg,sources:[...m.sources].join(', '),reason:(m.texts[0]||'').slice(0,160)});
-  }
-  return rows.sort((a,b)=>b.score-a.score).slice(0,40);
-}
-
-async function ensurePendingFilter(cfg){ if(!cfg.USE_PENDING_HEAT) return {supported:false, reason:'disabled'}; if(state.pendingFilterId) return {supported:true, id:state.pendingFilterId}; try{ const id = await rpc('eth_newPendingTransactionFilter',[]); state.pendingFilterId = id; return {supported:true, id}; }catch(err){ return {supported:false, reason:err.message||'unsupported'}; } }
-async function pollPendingHeat(cfg){ const info=await ensurePendingFilter(cfg); if(!info.supported) return {supported:false,count:0,matches:[],reason:info.reason}; try{ let hashes = await rpc('eth_getFilterChanges',[info.id]); if(!Array.isArray(hashes)) hashes=[]; const targets=uniq([cfg.TARGET,...buildWatchMap(cfg).map(w=>w.address)].filter(isAddr).map(norm)); const matches=[]; for(const h of hashes.slice(-50)){ const tx=await rpc('eth_getTransactionByHash',[h]); if(!tx||!tx.to) continue; if(targets.includes(norm(tx.to))){ matches.push({hash:tx.hash,to:tx.to,from:tx.from,gasPrice:gweiFromWeiHex(tx.gasPrice),priority:gweiFromWeiHex(tx.maxPriorityFeePerGas)}); } }
-      return {supported:true,count:matches.length,matches,spikeDetected:matches.some(m=>(m.priority||m.gasPrice||0)>=cfg.HEAT_GWEI_THRESHOLD)};
-    }catch(err){ state.pendingFilterId=null; return {supported:false,count:0,matches:[],reason:err.message||'filter reset'}; }
-}
-
-function selectorFromInput(input){ const s=String(input||''); return s.startsWith('0x') && s.length>=10 ? s.slice(0,10) : ''; }
-function printableAsciiFromHex(hex){ try{ const clean=String(hex||'').replace(/^0x/,''); let out=''; for(let i=0;i<clean.length;i+=2){ const v=parseInt(clean.slice(i,i+2),16); if(Number.isNaN(v)) continue; out += (v>=32 && v<=126) ? String.fromCharCode(v) : ' '; } return out.replace(/\s+/g,' ').trim(); }catch{return '';} }
-function keywordHits(text, keywords){ const low=String(text||'').toLowerCase(); return (keywords||[]).filter(k=>low.includes(k)); }
-
-async function scanSelectors(target, blocks){ if(!isAddr(target)) return []; const latest=await rpcBlockNumber(); const start=Math.max(0, latest - blocks); const buckets=new Map(); let inspected=0; for(let b=latest; b>=start; b--){ const block=await rpcBlock(b, true); const txs=block?.transactions || []; for(const tx of txs){ if(norm(tx.to)===norm(target) || norm(tx.from)===norm(target)){ inspected++; const sel=selectorFromInput(tx.input); const key=sel||'0x'; if(!buckets.has(key)) buckets.set(key,{selector:key,count:0,direction:{in:0,out:0},latest:tx.hash}); const m=buckets.get(key); m.count++; if(norm(tx.to)===norm(target)) m.direction.in++; if(norm(tx.from)===norm(target)) m.direction.out++; m.latest=tx.hash; } }
-    }
-    return [...buckets.values()].sort((a,b)=>b.count-a.count).map(x=>({...x, notes:x.selector==='0x'?'plain transfer or empty calldata':'selector cluster'}));
-}
-
-async function analyzeTxHash(hash, cfg){ const rows=[]; if(!/^0x[a-fA-F0-9]{64}$/.test(String(hash||''))) return [{type:'error',value:'Invalid tx hash',note:'Provide a full 32-byte tx hash.'}]; const tx=await rpc('eth_getTransactionByHash',[hash]); if(!tx) return [{type:'error',value:'Tx not found',note:'RPC returned null.'}]; rows.push({type:'to', value:tx.to||'contract create', note:'recipient'}); rows.push({type:'from', value:tx.from, note:'sender'}); rows.push({type:'selector', value:selectorFromInput(tx.input)||'0x', note:'first 4 bytes of calldata'});
-  const ascii = printableAsciiFromHex(tx.input);
-  const hits = keywordHits(ascii, cfg.PAYLOAD_KEYWORDS);
-  rows.push({type:'ascii', value:ascii || 'none', note:hits.length?`keyword hit: ${hits.join(', ')}`:'printable scan'});
-  rows.push({type:'value', value:fmtCompact(units(hexToBigInt(tx.value),18),6)+' PLS', note:'native value'});
-  rows.push({type:'gas', value:fmtNum(parseInt(tx.gas||'0x0',16),0), note:'gas limit'});
-  if(cfg.USE_TRACE){ try{ const tr=await traceTx(hash); const calls=[]; (function walk(node,depth){ if(!node||typeof node!=='object') return; calls.push(`${'·'.repeat(depth)} ${node.type||'call'} ${short(node.from||'',10,6)} → ${short(node.to||'',10,6)}`); (node.calls||[]).forEach(c=>walk(c, depth+1)); })(tr,0); rows.push({type:'trace', value:calls.slice(0,12).join(' | '), note:'debug trace'}); }catch(err){ rows.push({type:'trace', value:'unavailable', note:err.message||'debug trace failed'}); } }
-  return rows;
-}
-
-async function sniffRecentPayloads(target,cfg){ if(!isAddr(target)) return []; const latest=await rpcBlockNumber(); const start=Math.max(0, latest - cfg.SELECTOR_BLOCKS); const out=[]; for(let b=latest; b>=start; b--){ const block=await rpcBlock(b, true); for(const tx of (block?.transactions||[])){
-      if(norm(tx.to)===norm(target) || norm(tx.from)===norm(target)){
-        const ascii=printableAsciiFromHex(tx.input);
-        const hits=keywordHits(ascii,cfg.PAYLOAD_KEYWORDS);
-        if(hits.length || (tx.input && tx.input!=='0x' && ascii.length>3)) out.push({hash:tx.hash, selector:selectorFromInput(tx.input)||'0x', ascii:ascii||'none', hits:hits.join(', '), block:b});
+const unique = arr => [...new Set(arr)];
+const hexToBigInt = hex => { try{return BigInt(hex||"0x0");}catch{return 0n;} };
+const weiHexToNum = hex => Number(hexToBigInt(hex));
+const nowStamp = ()=> new Date().toLocaleString();
+function fmtNum(v,d=2){return v==null||!Number.isFinite(v)?"—":Number(v).toLocaleString(undefined,{maximumFractionDigits:d});}
+function fmtPct01(v,d=1){return v==null||!Number.isFinite(v)?"—":(v*100).toFixed(d)+"%";}
+function fmtCompact(v,d=2){if(v==null||!Number.isFinite(v)) return "—"; const a=Math.abs(v); if(a>=1e12) return (v/1e12).toFixed(d)+"T"; if(a>=1e9) return (v/1e9).toFixed(d)+"B"; if(a>=1e6) return (v/1e6).toFixed(d)+"M"; if(a>=1e3) return (v/1e3).toFixed(d)+"K"; return fmtNum(v,d);} 
+function fmtFixed(v,d=4){return v==null||!Number.isFinite(v)?"—":Number(v).toFixed(d);} 
+function setText(id,txt){const el=$(id); if(el) el.textContent=txt;}
+function setHTML(id,html){const el=$(id); if(el) el.innerHTML=html;}
+function download(name,text,type="application/json"){const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);} 
+function loadSettings(){let s={}; try{s=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");}catch{}; const out=JSON.parse(JSON.stringify(DEFAULTS)); if(s.privateRpc) out.privateRpc=s.privateRpc; if(s.SCAN_BLOCKS) out.SCAN_BLOCKS=Number(s.SCAN_BLOCKS)||out.SCAN_BLOCKS; if(s.SELECTOR_BLOCKS) out.SELECTOR_BLOCKS=Number(s.SELECTOR_BLOCKS)||out.SELECTOR_BLOCKS; if(s.AUTO_REFRESH_MS) out.AUTO_REFRESH_MS=Number(s.AUTO_REFRESH_MS)||out.AUTO_REFRESH_MS; if(Array.isArray(s.SLOT_LIST)&&s.SLOT_LIST.length) out.SLOT_LIST=s.SLOT_LIST; if(Array.isArray(s.PAYLOAD_KEYWORDS)&&s.PAYLOAD_KEYWORDS.length) out.PAYLOAD_KEYWORDS=s.PAYLOAD_KEYWORDS; if(s.HEAT_GWEI_THRESHOLD!=null) out.HEAT_GWEI_THRESHOLD=Number(s.HEAT_GWEI_THRESHOLD)||0; if(s.notes) out.notes=s.notes; out.WATCH={...out.WATCH,...(s.WATCH||{})}; return out;}
+function saveSettings(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state.settings));}
+function loadImports(){let s={}; try{s=JSON.parse(localStorage.getItem(IMPORTS_KEY)||"{}");}catch{}; return {history:Array.isArray(s.history)?s.history:[], corpus:Array.isArray(s.corpus)?s.corpus:[]};}
+function saveImports(){localStorage.setItem(IMPORTS_KEY,JSON.stringify(state.imports));}
+function loadLocalHistory(){let s=[]; try{s=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]");}catch{}; return Array.isArray(s)?s:[];}
+function saveLocalHistory(arr){localStorage.setItem(HISTORY_KEY,JSON.stringify(arr.slice(-250))); setText("historyInfo",`History: ${arr.length} local / ${state.imports.history.length} imported`);}
+function parseSlots(v){return unique(String(v||"").split(",").map(x=>x.trim()).filter(Boolean).map(x=>x.startsWith("0x")?x:"0x"+x));}
+function units(big, decimals=18){const neg=big<0n; const val=neg?-big:big; let s=val.toString(); if(decimals===0) return Number((neg?"-":"")+s); if(s.length<=decimals) s="0".repeat(decimals-s.length+1)+s; const int=s.slice(0,-decimals)||"0"; const frac=s.slice(-decimals).replace(/0+$/,'').slice(0,12); return parseFloat((neg?"-":"")+int+(frac?"."+frac:""));}
+function fileFreshness(ts){if(!ts) return "unknown"; const days=(Date.now()-ts)/86400000; if(days<7) return "fresh"; if(days<30) return "recent"; return "older";}
+function activeRpcs(){const arr=[...DEFAULTS.RPCS]; if(state.settings.privateRpc) arr.unshift(state.settings.privateRpc); return unique(arr.filter(Boolean));}
+async function withTimeout(p,ms=14000){let t; return Promise.race([p.finally(()=>clearTimeout(t)), new Promise((_,rej)=>{t=setTimeout(()=>rej(new Error("timeout")),ms);})]);}
+async function rpc(method,params){const urls=activeRpcs(); let lastErr; for(let i=0;i<urls.length;i++){const idx=(state.rpcIndex+i)%urls.length; const url=urls[idx]; try{const res=await withTimeout(fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:Date.now()+i,method,params})})); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message||"rpc error"); state.rpcIndex=idx; setText("nodeStatus","RPC: "+url.replace(/^https?:\/\//,"")); return data.result;}catch(e){lastErr=e;}} throw lastErr||new Error("All RPCs failed");}
+async function blockNumber(){return parseInt(await rpc("eth_blockNumber",[]),16);} 
+async function blockFull(n){if(state.blockCache.has(n)) return state.blockCache.get(n); const b=await rpc("eth_getBlockByNumber",[toHex(n),true]); state.blockCache.set(n,b); return b;}
+async function timestampFor(n){const b=await blockFull(n); return b?.timestamp? parseInt(b.timestamp,16)*1000 : null;}
+async function tokenDecimals(addr){const k=norm(addr); if(state.decCache.has(k)) return state.decCache.get(k); const raw=await rpc("eth_call",[{to:addr,data:SIGS.decimals},"latest"]); const d=parseInt(raw,16); const val=Number.isFinite(d)?d:18; state.decCache.set(k,val); return val;}
+async function tokenBalance(token,holder){const data=SIGS.balanceOf + norm(holder).replace(/^0x/,"").padStart(64,"0"); const raw=await rpc("eth_call",[{to:token,data},"latest"]); return hexToBigInt(raw);}
+async function tokenSupply(token){return hexToBigInt(await rpc("eth_call",[{to:token,data:SIGS.totalSupply},"latest"]));}
+async function txCount(addr){return parseInt(await rpc("eth_getTransactionCount",[addr,"latest"]),16);}
+async function readSlot(addr,slot){return await rpc("eth_getStorageAt",[addr,slot,"latest"]);}
+async function pairMeta(addr){const [t0r,t1r,resr]=await Promise.all([rpc("eth_call",[{to:addr,data:SIGS.token0},"latest"]),rpc("eth_call",[{to:addr,data:SIGS.token1},"latest"]),rpc("eth_call",[{to:addr,data:SIGS.reserves},"latest"])]); const t0="0x"+String(t0r).slice(-40), t1="0x"+String(t1r).slice(-40); const h=String(resr||"").replace(/^0x/,""); const r0=hexToBigInt("0x"+h.slice(0,64)), r1=hexToBigInt("0x"+h.slice(64,128)); return {token0:t0, token1:t1, reserve0:r0, reserve1:r1};}
+function watchNodes(){const w=state.settings.WATCH; return [
+  {label:"5EF7", address:DEFAULTS.PUBLIC_ANCHORS[1].address, role:"structural core"},
+  {label:"AF4E", address:w.AF4E, role:"execution hand"},
+  {label:"D6CA", address:w.D6CA, role:"recycler"},
+  {label:"D46", address:w.NODE_D46, role:"PLP tollbooth"},
+  {label:"8AC4", address:w.NODE_8AC4, role:"sink rail"},
+  {label:"4fd0", address:w.NODE_4FD0, role:"settlement bucket"},
+  {label:"3D07", address:w.NODE_3D07, role:"route candidate"},
+  {label:"Ba86", address:w.NODE_BA86, role:"splitter"},
+  {label:"F2Dc", address:w.NODE_F2DC, role:"logic gate"},
+  {label:"7b12", address:w.NODE_7B12, role:"terminal manifold"},
+  {label:"0968", address:w.NODE_0968, role:"hammer"},
+  {label:"27dF", address:w.NODE_27DF, role:"execution candidate"},
+  {label:"91fD", address:w.NODE_91FD, role:"bridge-fee rail"},
+  {label:"6327", address:w.NODE_6327, role:"native PLS rail"},
+  {label:"5805", address:w.NODE_5805, role:"PLSX rail"}
+].filter(x=>isAddr(x.address));}
+function applySettingsToUI(){const s=state.settings, w=s.WATCH; $("sPrivateRpc").value=s.privateRpc||""; $("sScanBlocks").value=s.SCAN_BLOCKS; $("sSelectorBlocks").value=s.SELECTOR_BLOCKS; $("sAutoRefreshMs").value=s.AUTO_REFRESH_MS; $("sAf4e").value=w.AF4E||""; $("sD6ca").value=w.D6CA||""; $("sD46").value=w.NODE_D46||""; $("s8ac4").value=w.NODE_8AC4||""; $("s4fd0").value=w.NODE_4FD0||""; $("s3d07").value=w.NODE_3D07||""; $("sBa86").value=w.NODE_BA86||""; $("sF2dc").value=w.NODE_F2DC||""; $("s7b12").value=w.NODE_7B12||""; $("s0968").value=w.NODE_0968||""; $("s27df").value=w.NODE_27DF||""; $("sAtropa").value=w.ATROPA_TOKEN||""; $("sSlots").value=s.SLOT_LIST.join(","); $("sHeat").value=s.HEAT_GWEI_THRESHOLD; $("sKeywords").value=s.PAYLOAD_KEYWORDS.join(","); $("sNotes").value=s.notes||"";}
+function saveSettingsFromUI(){const s=state.settings; s.privateRpc=$("sPrivateRpc").value.trim(); s.SCAN_BLOCKS=Number($("sScanBlocks").value||s.SCAN_BLOCKS); s.SELECTOR_BLOCKS=Number($("sSelectorBlocks").value||s.SELECTOR_BLOCKS); s.AUTO_REFRESH_MS=Number($("sAutoRefreshMs").value||s.AUTO_REFRESH_MS); s.WATCH.AF4E=$("sAf4e").value.trim(); s.WATCH.D6CA=$("sD6ca").value.trim(); s.WATCH.NODE_D46=$("sD46").value.trim(); s.WATCH.NODE_8AC4=$("s8ac4").value.trim(); s.WATCH.NODE_4FD0=$("s4fd0").value.trim(); s.WATCH.NODE_3D07=$("s3d07").value.trim(); s.WATCH.NODE_BA86=$("sBa86").value.trim(); s.WATCH.NODE_F2DC=$("sF2dc").value.trim(); s.WATCH.NODE_7B12=$("s7b12").value.trim(); s.WATCH.NODE_0968=$("s0968").value.trim(); s.WATCH.NODE_27DF=$("s27df").value.trim(); s.WATCH.ATROPA_TOKEN=$("sAtropa").value.trim(); s.SLOT_LIST=parseSlots($("sSlots").value); s.HEAT_GWEI_THRESHOLD=Number($("sHeat").value||0); s.PAYLOAD_KEYWORDS=unique($("sKeywords").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean)); s.notes=$("sNotes").value.trim(); saveSettings(); setRefreshTimer();}
+function resetSettings(){state.settings=loadSettings(); applySettingsToUI(); saveSettings();}
+function clearImports(){state.imports={history:[],corpus:[]}; saveImports(); setText("importInfo","Imported corpus: 0 history, 0 corpus");}
+function setRefreshTimer(){if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000, Number(state.settings.AUTO_REFRESH_MS)||45000));}
+function extractAddresses(text){const m=String(text||"").match(/0x[a-fA-F0-9]{40}/g) || []; return unique(m.map(norm));}
+function extractClaims(text){const lines=String(text||"").split(/\n+/).map(x=>x.trim()).filter(Boolean); return lines.filter(x=>/(claim|conclusion|phase|peg|machine|router|reserve|atropa|pdai|liberty|maker|slot|proxy|alligator|heat|watch|core|rail)/i.test(x)).slice(0,12);}
+function importHistoryFile(file){return file.text().then(t=>{const arr=JSON.parse(t); if(Array.isArray(arr)) state.imports.history = state.imports.history.concat(arr); saveImports();});}
+function importCorpusFiles(files){return Promise.all([...files].map(async f=>{const t=await f.text(); state.imports.corpus.push({name:f.name, type:f.name.split('.').pop().toLowerCase(), importedAt:Date.now(), text:t, addresses:extractAddresses(t), claims:extractClaims(t)});})).then(()=>saveImports());}
+function corpusMemory(){const items=[...state.imports.corpus]; if(!items.length){items.push({name:"Seeded pDAI intelligence", type:"seed", importedAt:Date.now(), addresses:SEEDED_LANES.map(x=>x.address).filter(isAddr), claims:SEEDED_CLAIMS.map(x=>x.claim)});} return items;}
+function mergedHistory(){return [...state.imports.history, ...loadLocalHistory()].sort((a,b)=>(a.ts||0)-(b.ts||0));}
+function chart(canvasId, values, color){const c=$(canvasId), ctx=c.getContext("2d"), w=c.width, h=c.height; ctx.clearRect(0,0,w,h); ctx.fillStyle="rgba(255,255,255,.02)"; ctx.fillRect(0,0,w,h); const vals=values.filter(v=>v!=null&&Number.isFinite(v)); if(vals.length<2){ctx.fillStyle="rgba(140,160,173,.8)"; ctx.font="12px sans-serif"; ctx.fillText("Need more history",10,20); return;} const min=Math.min(...vals), max=Math.max(...vals), range=max-min||1; ctx.beginPath(); values.forEach((v,i)=>{if(v==null||!Number.isFinite(v)) return; const x=(i/Math.max(1,values.length-1))*(w-8)+4; const y=(1-((v-min)/range))*(h-14)+7; if(i===0||!Number.isFinite(values[i-1])) ctx.moveTo(x,y); else ctx.lineTo(x,y);}); ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.stroke();}
+function describeMotion(v){if(v>0.001) return "meaningful"; if(v>0.00005) return "light"; return "quiet";}
+function historyStats(){const hist=mergedHistory(); const latest=hist[hist.length-1]||null; const avg = k => hist.length ? hist.reduce((a,b)=>a+(Number(b[k])||0),0)/hist.length : 0; return {hist, latest, avgScore:avg('score'), avgPublic:avg('publicStrength'), avgInterior:avg('interiorStrength'), avgContradiction:avg('contradictionLoad')};}
+function scenarioRows(model){const rows=[]; const publicOn=model.publicStrength>0.2, interiorOn=model.interiorStrength>0.18, contradictionHigh=model.contradictionLoad>0.55, slotNull=model.slotProbe.allZero, dnaEmpty=!model.dnaProbe.implAddress; rows.push({scenario:"Public-surface-only corridor", fit: clamp((publicOn?0.45:0)+(interiorOn?0:0.25)+(contradictionHigh?0.2:0)+(slotNull?0.1:0)+(dnaEmpty?0.1:0),0,1), reason:"Surface rails mutate while current interior map stays cold."}); rows.push({scenario:"Interior map is wrong / incomplete", fit: clamp((interiorOn?0:0.45)+(contradictionHigh?0.25:0)+(slotNull?0.15:0)+(dnaEmpty?0.15:0),0,1), reason:"Dead watcher set plus repeated contradictions suggests discovery is still needed."}); rows.push({scenario:"Synchronized execution approaching", fit: clamp((publicOn?0.2:0)+(interiorOn?0.35:0)+(model.heatCount>0?0.25:0)+(model.slotProbe.allZero?0:0.1)+(model.dnaProbe.implAddress?0.1:0),0,1), reason:"Needs interior wake-up, non-null probes, or heat — currently weak."}); return rows.sort((a,b)=>b.fit-a.fit);} 
+function deriveRegime(model){const top=scenarioRows(model)[0]; return top ? top.scenario : "Unknown";}
+function watchTier(balance, nonce){if((balance?.pdai||0)>0 || (nonce||0)>0) return "hot"; return "cold";}
+function contradictionRows(model){const rows=[]; if(model.slotProbe.allZero && model.slotProbe.equal) rows.push({text:"Candidate slots are equal only because both are zero.", severity:"high", effect:"Do not score this as manifold lock."}); if(!model.dnaProbe.implAddress) rows.push({text:"DNA slot is empty / zero.", severity:"medium", effect:"Proxy-hot-swap story is unsupported right now."}); if(model.interiorStrength<0.12) rows.push({text:"Interior watcher map is mostly cold.", severity:"high", effect:"Need better addresses or traces."}); if(model.heatCount===0) rows.push({text:"No pending heat detected.", severity:"medium", effect:"Execution-window stories remain unconfirmed."}); if(model.publicStrength>0.2 && model.interiorStrength<0.12) rows.push({text:"Public surface is moving without matching interior proof.", severity:"high", effect:"Treat current machine map as incomplete."}); return rows;}
+function evidenceDebt(model){const tasks=[]; const push=(prio,task,why,method)=>tasks.push({prio,task,why,method}); if(model.interiorStrength<0.15) push(1,"Replace or supplement cold watchers","Current interior map is not earning its keep.","Promote new addresses from corpus and recent block touches."); if(model.slotProbe.allZero) push(2,"Stop over-weighting 0x7b12 / 0x0968 until non-null state appears","Null-null equality is absence, not signal.","Keep probes but reduce phase weight."); if(!model.dnaProbe.implAddress) push(3,"Treat proxy DNA as open question, not live mechanic","Empty EIP-1967 slot is not a positive clue.","Only re-elevate if implementation appears or admin events surface."); if(model.publicStrength>0.2) push(4,"Map counterparties around public anchors","Surface rails are the only active truth currently.","Scan recent blocks for direct touches to 0x947b…, 0x5ef7…, 0xe560…"); push(5,"Get raw AF4E / D6CA transfer exports","These remain the cleanest next proofs from earlier research.","Use eth_getLogs / trace for those addresses when available."); return tasks.sort((a,b)=>a.prio-b.prio);} 
+function claimTournament(model){const claims = SEEDED_CLAIMS.map(c=>({...c})); const add = (claim,support=1,contradiction=0)=>claims.push({claim,support,contradiction}); if(model.publicStrength>0.2 && model.interiorStrength<0.12) add("The public surface is ahead of the currently loaded interior watcher map.",3,0); if(model.nodeBalances["5EF7"]?.pdai>0) add("5EF7 is a real structural core, not decorative lore.",3,0); if(model.slotProbe.allZero) add("Current manifold-slot read is decorative, not evidentiary.",2,0); if(model.heatCount===0) add("Heat-phase execution is not supported by pending activity right now.",0,2); return claims.map(c=>{const raw=c.support - c.contradiction; const score=clamp((raw+3)/6,0,1); return {...c,score,status:score>.72?"strong":score>.45?"open":"weak"};}).sort((a,b)=>b.score-a.score);} 
+function seedCandidateMap(){const map=new Map(); const add=(address,obj)=>{if(!isAddr(address)) return; const k=norm(address); if(!map.has(k)) map.set(k,{address:k,score:0,sources:new Set(),roles:new Set(),reasonParts:[]}); const x=map.get(k); if(obj.score) x.score+=obj.score; if(obj.source) x.sources.add(obj.source); if(obj.role) x.roles.add(obj.role); if(obj.reason) x.reasonParts.push(obj.reason);}; SEEDED_LANES.forEach(l=> add(l.address,{score:3,source:l.source,role:l.role,reason:`seeded lane ${l.label}`})); corpusMemory().forEach(item=> (item.addresses||[]).forEach(a=> add(a,{score:2,source:`corpus:${item.name}`,role:"mentioned in corpus",reason:`seen in ${item.name}`}))); return map;}
+async function recentTouchCandidates(model, latestBlock){const map=seedCandidateMap(); const scan=Math.min(40, Number(state.settings.SELECTOR_BLOCKS)||60); for(let b=latestBlock; b>Math.max(0,latestBlock-scan); b--){let blk; try{blk=await blockFull(b);}catch{continue;} if(!blk||!Array.isArray(blk.transactions)) continue; for(const tx of blk.transactions){const to=norm(tx.to), frm=norm(tx.from), watchSet=new Set([...Object.values(state.settings.WATCH).filter(isAddr).map(norm), ...DEFAULTS.PUBLIC_ANCHORS.map(x=>norm(x.address))]); const touched = watchSet.has(to) || watchSet.has(frm); if(!touched) continue; const cp = watchSet.has(to) ? frm : to; if(isAddr(cp)){
+          if(!map.has(cp)) map.set(cp,{address:cp,score:0,sources:new Set(),roles:new Set(),reasonParts:[]});
+          const x=map.get(cp); x.score += 4; x.sources.add('recent-block-touch'); x.roles.add('counterparty'); x.reasonParts.push(`touched watched/public node in block ${b}`);
+        }
       }
-    } }
-  return out.slice(0,30);
+    }
+  return [...map.values()].map(x=>({...x,sources:[...x.sources],roles:[...x.roles],reason:x.reasonParts.slice(0,3).join('; ')})).sort((a,b)=>b.score-a.score).slice(0,30);
 }
-
-async function buildLiveModel(){ const cfg=state.settings; const history=combinedHistory(); const historyStats=analyzeHistory(history);
-  const publicAnchors=await discoverPublicAnchors(cfg); const mutationStats=publicMutationStats(publicAnchors, history);
-  const total = units(await ercTotalSupply(cfg.TARGET), await ercDecimals(cfg.TARGET)); const burned = units(await ercBalanceOf(cfg.TARGET,cfg.DEAD), await ercDecimals(cfg.TARGET));
-  const slotValues={}; for(const slot of cfg.SLOT_LIST){ slotValues[slot]=await readStorageAt(cfg.TARGET, slot); }
-  const allZero = Object.values(slotValues).every(v=>/^0x0+$/.test(v));
-  const equal = Object.values(slotValues).length>1 && uniq(Object.values(slotValues).map(norm)).length===1;
-  const dnaRaw = await readStorageAt(cfg.TARGET, cfg.EIP1967_SLOT); const dnaImpl = '0x'+String(dnaRaw).slice(-40); const dnaProbe={raw:dnaRaw,implAddress:/^0x0+$/.test(dnaRaw)?'':dnaImpl,changed:norm(dnaRaw)!==norm(history.at(-1)?.dnaProbe?.raw||'')};
-  const slotProbe={values:slotValues, allZero, equal, changed:JSON.stringify(slotValues)!==JSON.stringify(history.at(-1)?.slotProbe?.values||{}), summary: allZero?'null-null equality':(equal?'nonzero equality':'divergent')};
-  const watchMap = buildWatchMap(cfg); const nodeBalances={}; const watchTiers={}; let interiorActiveCount=0;
-  for(const w of watchMap){ try{ const [pdai,wpls,nonce]=await Promise.all([ercBalanceOf(cfg.TARGET,w.address),ercBalanceOf(cfg.WPLS,w.address),txCount(w.address)]); const atropa = isAddr(cfg.ATROPA_TOKEN) ? await ercBalanceOf(cfg.ATROPA_TOKEN,w.address) : 0n; const row={pdai:units(pdai, await ercDecimals(cfg.TARGET)),wpls:units(wpls, await ercDecimals(cfg.WPLS)),atropa:isAddr(cfg.ATROPA_TOKEN)?units(atropa, await ercDecimals(cfg.ATROPA_TOKEN)):0,nonce}; nodeBalances[w.label]=row; const live = (row.pdai>0 || row.wpls>0 || row.atropa>0 || nonce>0); if(live) interiorActiveCount++; watchTiers[w.label]= live ? 'hot' : 'cold'; }catch{ nodeBalances[w.label]={pdai:0,wpls:0,atropa:0,nonce:0}; watchTiers[w.label]='cold'; } }
-  const pendingHeat = await pollPendingHeat(cfg);
-  const corpusItems = [...seededCorpusItems(cfg), ...(cfg.corpusItems||[])];
-  const contradictions = buildContradictions(historyStats,{slotProbe,dnaProbe,pendingHeat,interiorActiveCount});
-  const contradictionLoad = contradictions.length ? clamp(contradictions.reduce((s,c)=>s + (c.severity==='high'?0.18:c.severity==='medium'?0.12:0.06),0),0,0.95) : 0;
-  const publicStrength = clamp((mutationStats.changedCount/publicAnchors.filter(x=>x.type!=='token').length)*0.6 + Math.min(mutationStats.velocity/2e8,0.4),0,1);
-  const interiorStrength = clamp((interiorActiveCount/Math.max(1,watchMap.length))*0.7 + (pendingHeat.count>0?0.3:0),0,1);
-  const claims = buildClaims(historyStats,{publicAnchors,slotProbe,dnaProbe,interiorActiveCount,pendingHeat,mutationStats}, corpusItems);
-  const candidates = buildCandidates(cfg, corpusItems, {watchTiers});
-  const rawPhase = inferPhaseFromRaw((publicStrength*2.8)+(interiorStrength*3.2)- (contradictionLoad*2.2));
-  let stablePhase = cfg.stablePhase || historyStats.stablePhase || 'audit'; let phaseConfidence = Number(cfg.phaseConfidence||0); if(rawPhase===stablePhase) phaseConfidence=clamp(phaseConfidence+0.14,0,1); else phaseConfidence=clamp(phaseConfidence-0.18,0,1); if(phaseConfidence<=0.1){ stablePhase = rawPhase; phaseConfidence=0.3; }
-  cfg.stablePhase=stablePhase; cfg.phaseConfidence=phaseConfidence; persistSettings();
-  const score = clamp((publicStrength*32) + (interiorStrength*30) + (claims[0]?.score||50)/10 + (Math.min(candidates.filter(c=>c.tier==='promote').length,8)*2) - (contradictionLoad*40), 0, 100);
-  return {cfg,total,burned,slotProbe,dnaProbe,publicAnchors,mutationStats,nodeBalances,watchTiers,pendingHeat,corpusItems,contradictions,contradictionLoad,publicStrength,interiorStrength,interiorActiveCount,claims,candidates,rawPhase,stablePhase,phaseConfidence,score,historyStats};
+function watcherRehab(model,candidates){const active=new Map(candidates.map(c=>[norm(c.address),c])); const rows=[]; for(const [label,bals] of Object.entries(model.nodeBalances)){
+  const tier=model.watchTiers[label]||'cold';
+  let problem='';
+  if(tier==='cold') problem='no balance, no nonce, no fresh proof';
+  else if((bals.pdai||0)>0 && (bals.nonce||0)<=1) problem='structural core but not an active execution proof';
+  else problem='active enough';
+  const replacement = tier==='cold' ? candidates.find(c=>!Object.values(state.settings.WATCH).map(norm).includes(norm(c.address))) : null;
+  rows.push({label,tier,signal:`pDAI ${fmtCompact(bals.pdai,3)} • nonce ${bals.nonce||0}`,problem,replacement});
+ }
+ return rows;
 }
-
-function laneGenealogyRows(cfg, model){
-  const seedLanes=(cfg.knowledgeSeeds||[]).filter(x=>x.kind==='lane');
-  return seedLanes.map(l=>{
-    const watcher = buildWatchMap(cfg).find(w=>norm(w.address)===norm(l.address));
-    const status = watcher ? (model.watchTiers[watcher.label]||'cold') : 'unloaded';
-    let mem = l.evidence;
-    if(/27df/i.test(l.label)) mem='Earlier notes upgraded 27dF from noise to active execution EOA candidate.';
-    if(/D46/i.test(l.label)) mem='Earlier notes treated D46 as active fee/routing rail.';
-    if(/8AC4/i.test(l.label)) mem='Earlier notes treated 8AC4 as protocol sink / buy-burn rail.';
-    if(/5EF7/i.test(l.label)) mem='Repeatedly framed as locked ATROPA/pDAI core.';
-    return {...l,status,mem};
-  });
+async function analyzePayload(txHash){const rows=[]; try{const tx=await rpc('eth_getTransactionByHash',[txHash]); if(!tx) return [{type:'error',value:'not found',interpretation:'No tx returned'}]; rows.push({type:'to',value:tx.to||'—',interpretation:'Destination'}); rows.push({type:'selector',value:(tx.input||'0x').slice(0,10),interpretation:'4-byte selector'}); const hex=String(tx.input||'0x').replace(/^0x/,''); const bytes=[]; for(let i=0;i<Math.min(hex.length,800);i+=2){const v=parseInt(hex.slice(i,i+2),16); if(Number.isFinite(v)) bytes.push(v);} const printable=bytes.filter(b=>b>=32&&b<=126).map(b=>String.fromCharCode(b)).join(''); if(printable) rows.push({type:'ascii',value:printable.slice(0,180),interpretation:'Printable payload fragment'}); for(const kw of state.settings.PAYLOAD_KEYWORDS){if(printable.toLowerCase().includes(kw)) rows.push({type:'keyword',value:kw,interpretation:'Payload contains watched motif'});} }
+  catch(e){rows.push({type:'error',value:e.message||String(e),interpretation:'Could not analyze tx'});} return rows;
 }
-
-function renderMetrics(model){ setText('mScore',fmtFixed(model.score,1)); setText('mPhase',phaseLabel(model.stablePhase)); setText('mPublic',fmtPct(model.publicStrength)); setText('mInterior',fmtPct(model.interiorStrength)); setText('mContradict',fmtPct(model.contradictionLoad)); setText('mCandidates',String(model.candidates.filter(c=>c.tier==='promote').length)); setText('mPayloadHits',String(model.pendingHeat.count||0)); setText('pairInfo',`Public anchors: ${model.publicAnchors.filter(a=>a.type!=='token').length}`); }
-function renderScore(model){ $('reactorRing').style.setProperty('--score', model.score.toFixed(2)); setText('scoreBig',fmtFixed(model.score,1)); setText('bigVerdict',`${phaseLabel(model.stablePhase)} • ${model.phaseConfidence>=0.65?'stable':'soft'}`); setText('coreState',phaseLabel(model.stablePhase)); setText('coreSub',`raw ${phaseLabel(model.rawPhase)} • confidence ${fmtPct(model.phaseConfidence)}`); $('scoreFill').style.width=model.score.toFixed(1)+'%'; $('syncStatus').className='status '+(model.score>=70?'stable':model.score>=35?'warned':'bad'); setText('syncStatus', model.score>=70?'Cartographer locked':model.score>=35?'Cartographer live':'Cartographer skeptical'); setText('sPublic',fmtFixed(model.publicStrength*100,1)); setText('sInterior',fmtFixed(model.interiorStrength*100,1)); setText('sContradictions',fmtFixed(model.contradictionLoad*100,1)); setText('sPromote',String(model.candidates.filter(c=>c.tier==='promote').length)); setText('sClaims',String(model.claims.length)); setText('sSelectors','lab'); setText('sPayloads',String(model.pendingHeat.count||0)); setText('sHistory',`${fmtFixed(model.historyStats.avgScore,1)} avg`); }
-function renderLists(model){ const verified=[`Public anchor mutation count: <strong>${model.mutationStats.changedCount}</strong>.`,`Loaded watcher map size: <strong>${buildWatchMap(model.cfg).length}</strong>.`,`History stable phase: <strong>${phaseLabel(model.historyStats.stablePhase)}</strong>.`,`Corpus memory items: <strong>${model.corpusItems.length}</strong>.`]; const insights=[]; if(model.historyStats.avgInterior < model.historyStats.avgPublic*0.2) insights.push('The public surface is alive while the current interior map is mostly cold.'); if(model.slotProbe.allZero) insights.push('Null-null slot equality is correctly being treated as contradiction, not proof.'); if(model.candidates.some(c=>c.tier==='promote' && !c.seeded)) insights.push('New non-seeded candidate addresses are emerging from corpus memory.'); if(model.claims[0]) insights.push(`Top claim: ${model.claims[0].text}`); const actions=[]; actions.push('Import older notes / explorer dumps to give the address factory more raw material.'); if(model.interiorActiveCount===0) actions.push('Replace or expand the cold watcher set with promoted candidates.'); actions.push('Use selector and payload labs on 27dF, D46, 8AC4, 4fd0 full, and any promoted candidates.'); if(!model.pendingHeat.supported) actions.push('Use a private RPC if you want pending-heat and trace features.'); setHTML('verifiedList', verified.map(t=>itemHtml(t,'good')).join('')); setHTML('insightList', insights.map(t=>itemHtml(t,'good')).join('')); setHTML('actionList', actions.map(t=>itemHtml(t,'warn')).join('')); }
-function renderClaims(rows){ setHTML('claimsBody', rows.map(r=>`<tr><td>${esc(r.text)}</td><td>${fmtFixed(r.score,1)}</td><td>${fmtFixed(r.support,2)}</td><td>${fmtFixed(r.contradictions,2)}</td><td><span class="tag ${r.status==='favored'?'good':r.status==='stressed'?'bad':'ref'}">${esc(r.status)}</span></td></tr>`).join('')); }
-function renderCandidates(rows){ setHTML('candidateBody', rows.map(r=>`<tr><td class="mono">${esc(short(r.address,12,8))}</td><td><span class="tag ${r.tier==='promote'?'good':r.tier==='observe'?'ref':'other'}">${esc(r.tier)}</span></td><td>${fmtFixed(r.score,1)}</td><td>${esc(r.sources)}</td><td>${esc(r.role)}</td><td>${esc(r.reason||'—')}</td></tr>`).join('')); }
-function renderCorridors(rows){ const totalWeight=rows.reduce((s,r)=>s+(r.weight||0),0)||1; setHTML('corridorBody', rows.filter(r=>r.type!=='token').sort((a,b)=>b.weight-a.weight).map(r=>`<tr><td class="mono">${esc(short(r.address,10,8))}</td><td>${esc(r.type)}</td><td>${fmtCompact(r.reserve0,3)}</td><td>${fmtCompact(r.reserve1,3)}</td><td>${fmtPct((r.weight||0)/totalWeight)}</td><td>${fmtFixed(r.motion*1e6,1)} ppm</td><td>${esc(r.role)}</td></tr>`).join('')); }
-function renderGenealogy(rows){ setHTML('genealogyBody', rows.map(r=>`<tr><td>${esc(r.label)}</td><td class="mono">${esc(r.address?short(r.address,12,8):'unresolved')}</td><td>${esc(r.role)}</td><td><span class="tag ${r.status==='hot'?'good':r.status==='cold'?'bad':'ref'}">${esc(r.status)}</span></td><td>${esc(r.mem)}</td></tr>`).join('')); }
-function renderCorpus(items){ setHTML('corpusBody', items.slice(0,80).map(i=>`<tr><td>${esc(short(i.text||i.role||i.label||'item',90,0))}</td><td>${esc(i.type||'seed')}</td><td>${esc((i.addresses||[]).map(a=>short(a,10,8)).join(', ')||'—')}</td><td>${esc((i.claims||[]).join(', ')||'—')}</td><td>${esc(i.freshness||'seed')}</td></tr>`).join('')); setText('corpusInfo', `Corpus: ${items.length} item(s)`); }
-function renderContradictions(rows){ setHTML('contradictionBody', rows.map(r=>`<tr><td>${esc(r.text)}</td><td><span class="tag ${r.severity==='high'?'bad':r.severity==='medium'?'ref':'other'}">${esc(r.severity)}</span></td><td>${esc(r.effect)}</td></tr>`).join('')); }
-function drawHistoryCharts(history){ drawSpark('scoreChart', history.map(x=>x.score),'#58ffb9'); drawSpark('publicChart', history.map(x=>x.publicStrength||0),'#48c4ff'); drawSpark('contradictionChart', history.map(x=>x.contradictionLoad||0),'#ff5d73'); }
-function snapshotFromModel(model){ return {ts:Date.now(),score:model.score,phase:model.stablePhase,rawPhase:model.rawPhase,stablePhase:model.stablePhase,total:model.total,burned:model.burned,heatCount:model.pendingHeat.count||0,publicStrength:model.publicStrength,interiorStrength:model.interiorStrength,contradictionLoad:model.contradictionLoad,slotProbe:model.slotProbe,dnaProbe:model.dnaProbe,mutationStats:model.mutationStats,watchTiers:model.watchTiers,publicAnchors:model.publicAnchors,nodeBalances:model.nodeBalances}; }
-
-async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); const model=await buildLiveModel(); renderMetrics(model); renderScore(model); renderLists(model); renderClaims(model.claims); renderCandidates(model.candidates); renderCorridors(model.mutationStats.rows); renderGenealogy(laneGenealogyRows(model.cfg, model)); renderCorpus(model.corpusItems); renderContradictions(model.contradictions); drawHistoryCharts(combinedHistory().concat([snapshotFromModel(model)])); const snap=snapshotFromModel(model); saveLocalSnapshot(snap); setText('lastSync',`Last sync: ${nowStamp()}`); setText('scanWindow',`Log window: ${model.cfg.SCAN_BLOCKS} blocks • selector ${model.cfg.SELECTOR_BLOCKS}`); setText('historyInfo',`History: ${combinedHistory().length}`); }catch(err){ console.error(err); $('syncStatus').className='status bad'; setText('syncStatus','Sync failed'); setText('lastSync',`Last error: ${err.message||String(err)}`); } finally{ state.syncing=false; }}
-
-function setRefreshTimer(){ if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000, Number(state.settings.AUTO_REFRESH_MS)||45000)); }
-function resetSettings(){ localStorage.removeItem(STORAGE_KEY); state.settings=loadSettings(); pushSettingsToUI(state.settings); persistSettings(); }
-function clearCorpus(){ state.settings.corpusItems=[]; state.settings.manualCorpus=''; persistSettings(); pushSettingsToUI(state.settings); }
-function clearLocalHistory(){ localStorage.removeItem(HISTORY_KEY); setText('historyInfo','History: 0'); drawHistoryCharts([]); }
-
-async function maybeHarvestYouTube(){ const cfg=state.settings; if(!cfg.youtubeKey || !cfg.youtubeChannel) return []; try{ const url=`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${encodeURIComponent(cfg.youtubeChannel)}&maxResults=10&order=date&type=video&key=${encodeURIComponent(cfg.youtubeKey)}`; const res=await fetch(url); if(!res.ok) throw new Error(`YouTube ${res.status}`); const data=await res.json(); return (data.items||[]).map((it,idx)=>({id:`yt-${idx}-${it.id?.videoId||Date.now()}`,type:'youtube',text:`${it.snippet?.title||''} ${it.snippet?.description||''}`.trim(),addresses:[],claims:[inferPhaseFromTitle(it.snippet?.title||'')],freshness:'youtube'})); }catch(err){ return [{id:'yt-error',type:'youtube',text:`YouTube harvest failed: ${err.message}`,addresses:[],claims:['harvest error'],freshness:'youtube'}]; } }
-async function maybeHarvestX(){ const cfg=state.settings; if(!cfg.xBearer || !cfg.xQuery) return []; try{ const url=`https://api.x.com/2/tweets/search/recent?max_results=10&tweet.fields=created_at,entities&query=${encodeURIComponent(cfg.xQuery)}`; const res=await fetch(url,{headers:{Authorization:`Bearer ${cfg.xBearer}`}}); if(!res.ok) throw new Error(`X ${res.status}`); const data=await res.json(); return (data.data||[]).map((it,idx)=>({id:`x-${idx}-${it.id}`,type:'x',text:it.text||'',addresses:(it.text||'').match(/0x[a-fA-F0-9]{40}/g)||[],claims:['social mention'],freshness:'x'})); }catch(err){ return [{id:'x-error',type:'x',text:`X harvest failed: ${err.message}`,addresses:[],claims:['harvest error'],freshness:'x'}]; } }
-function inferPhaseFromTitle(title){ const t=String(title||'').toLowerCase(); if(/spectacle/.test(t)) return 'audit'; if(/is live/.test(t)) return 'activation'; if(/teddy bear|north hollywood/.test(t)) return 'terminal'; if(/qwen|heat/.test(t)) return 'heat'; if(/trilateral|route|tree|manifold/.test(t)) return 'routing'; return 'mention'; }
-async function harvestSources(){ const yt=await maybeHarvestYouTube(); const x=await maybeHarvestX(); state.settings.corpusItems = [...(state.settings.corpusItems||[]).filter(i=>!['youtube','x'].includes(i.freshness)), ...yt, ...x]; persistSettings(); sync(); }
-
-$('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
-$('refreshBtn').onclick=sync;
-$('saveSettingsBtn').onclick=()=>{ saveSettingsFromUI(); harvestSources(); setRefreshTimer(); sync(); };
-$('clearSettingsBtn').onclick=()=>{ resetSettings(); pushSettingsToUI(state.settings); setRefreshTimer(); sync(); };
-$('clearHistoryBtn').onclick=clearLocalHistory;
-$('clearCorpusBtn').onclick=()=>{ clearCorpus(); sync(); };
-$('exportConfigBtn').onclick=()=>downloadJSON('pdai-v6-config.json', state.settings);
-$('exportHistoryBtn').onclick=()=>downloadJSON('pdai-v6-history.json', combinedHistory());
-$('importHistoryBtn').onclick=()=>$('importHistoryInput').click();
-$('importCorpusBtn').onclick=()=>$('importCorpusInput').click();
-$('importHistoryInput').onchange=async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ const txt=await file.text(); const data=JSON.parse(txt); if(Array.isArray(data)){ state.settings.importedHistories = [...(state.settings.importedHistories||[]), ...data]; persistSettings(); setText('historyInfo',`History: ${combinedHistory().length}`); sync(); } }catch(err){ alert('History import failed: '+err.message); } e.target.value=''; };
-$('importCorpusInput').onchange=async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ const txt=await file.text(); let items=[]; if(file.name.endsWith('.json')){ const parsed=JSON.parse(txt); if(Array.isArray(parsed)){ items=parsed.flatMap((row,idx)=>parseCorpusText(JSON.stringify(row),`json-${idx}`)); } else items=parseCorpusText(JSON.stringify(parsed),'json'); } else { items=parseCorpusText(txt,file.name); } state.settings.corpusItems=[...(state.settings.corpusItems||[]), ...items]; persistSettings(); sync(); }catch(err){ alert('Corpus import failed: '+err.message); } e.target.value=''; };
-$('scanSelectorsBtn').onclick=async()=>{ const target=$('selectorTarget').value.trim(); const blocks=Number($('selectorBlocks').value||state.settings.SELECTOR_BLOCKS); setHTML('selectorBody','<tr><td colspan="5" class="small">Scanning…</td></tr>'); try{ const rows=await scanSelectors(target, blocks); setHTML('selectorBody', rows.length?rows.map(r=>`<tr><td class="mono">${esc(r.selector)}</td><td>${r.count}</td><td>in ${r.direction.in} / out ${r.direction.out}</td><td class="mono">${esc(short(r.latest,10,8))}</td><td>${esc(r.notes)}</td></tr>`).join(''):'<tr><td colspan="5" class="small">No matching selectors found.</td></tr>'); }catch(err){ setHTML('selectorBody',`<tr><td colspan="5" class="small">${esc(err.message)}</td></tr>`); } };
-$('analyzeTxBtn').onclick=async()=>{ const hash=$('txHashInput').value.trim(); setHTML('payloadBody','<tr><td colspan="3" class="small">Analyzing…</td></tr>'); try{ const rows=await analyzeTxHash(hash, state.settings); setHTML('payloadBody', rows.map(r=>`<tr><td>${esc(r.type)}</td><td class="mono">${esc(short(r.value,120,0))}</td><td>${esc(r.note)}</td></tr>`).join('')); }catch(err){ setHTML('payloadBody',`<tr><td colspan="3" class="small">${esc(err.message)}</td></tr>`); } };
-$('sniffPayloadBtn').onclick=async()=>{ const target=$('payloadTarget').value.trim(); setHTML('payloadBody','<tr><td colspan="3" class="small">Sniffing…</td></tr>'); try{ const rows=await sniffRecentPayloads(target, state.settings); setHTML('payloadBody', rows.length?rows.map(r=>`<tr><td>${esc(r.selector)}</td><td class="mono">${esc(short(r.hash,10,8))} • ${esc(r.hits||'printable')}</td><td>${esc(short(r.ascii,180,0))}</td></tr>`).join(''):'<tr><td colspan="3" class="small">No printable or keyword payloads found.</td></tr>'); }catch(err){ setHTML('payloadBody',`<tr><td colspan="3" class="small">${esc(err.message)}</td></tr>`); } };
-
-state.settings=loadSettings(); pushSettingsToUI(state.settings); setRefreshTimer(); harvestSources(); sync();
+async function sniffPayloads(addr){const out=[]; const latest=await blockNumber(); const span=Math.min(30, Number(state.settings.SELECTOR_BLOCKS)||60); for(let b=latest; b>latest-span; b--){let blk; try{blk=await blockFull(b);}catch{continue;} if(!blk||!Array.isArray(blk.transactions)) continue; for(const tx of blk.transactions){if(norm(tx.to)!==norm(addr)&&norm(tx.from)!==norm(addr)) continue; const rows=await analyzePayload(tx.hash); rows.slice(0,2).forEach(r=> out.push({type:r.type,value:r.value,interpretation:`${r.interpretation} • ${short(tx.hash,10,8)}`})); if(out.length>12) return out;} } return out.length?out:[{type:'info',value:'none',interpretation:'No recent payload motifs found around target.'}]; }
+async function scanSelectors(addr){const latest=await blockNumber(); const span=Math.min(120, Number($("selectorBlocks").value||state.settings.SELECTOR_BLOCKS)||60); const map=new Map(); for(let b=latest; b>latest-span; b--){let blk; try{blk=await blockFull(b);}catch{continue;} if(!blk||!Array.isArray(blk.transactions)) continue; for(const tx of blk.transactions){const dir = norm(tx.to)===norm(addr) ? 'inbound' : norm(tx.from)===norm(addr) ? 'outbound' : ''; if(!dir) continue; const sel=(tx.input||'0x').slice(0,10); if(!map.has(sel)) map.set(sel,{selector:sel,count:0,direction:new Set(),latest:tx.hash}); const x=map.get(sel); x.count++; x.direction.add(dir); x.latest=tx.hash; }} return [...map.values()].map(x=>({...x,direction:[...x.direction].join(', '),notes:x.selector==='0x'?'value transfer / empty input':'selector cluster'})).sort((a,b)=>b.count-a.count).slice(0,20); }
+function renderPayloadRows(rows){setHTML('payloadBody', rows.length? rows.map(r=>`<tr><td>${esc(r.type)}</td><td class="mono">${esc(short(r.value,40,18))}</td><td>${esc(r.interpretation)}</td></tr>`).join('') : `<tr><td colspan="3" class="small">No payload rows.</td></tr>`);} 
+async function buildModel(){const latest=await blockNumber(); const targetDec=18; const [totalRaw,burnedRaw] = await Promise.all([tokenSupply(DEFAULTS.TARGET), tokenBalance(DEFAULTS.TARGET, DEFAULTS.DEAD)]); const total=units(totalRaw,targetDec), burned=units(burnedRaw,targetDec);
+  const anchorRows=[];
+  for(const a of DEFAULTS.PUBLIC_ANCHORS){ if(a.type==='token'){anchorRows.push({...a,motion:0,weight:0}); continue;} const meta=await pairMeta(a.address); const d0=await tokenDecimals(meta.token0), d1=await tokenDecimals(meta.token1); anchorRows.push({...a, token0:meta.token0, token1:meta.token1, reserve0:units(meta.reserve0,d0), reserve1:units(meta.reserve1,d1)}); }
+  const history = mergedHistory(); const prev = history[history.length-1] || null;
+  const mutated = anchorRows.map(r=>{ if(r.type==='token') return {...r,motion:0,weight:0}; const prevRow = prev?.mutationStats?.rows?.find(x=>norm(x.address)===norm(r.address)) || prev?.publicAnchors?.find(x=>norm(x.address)===norm(r.address)); const p0=prevRow?.reserve0||r.reserve0, p1=prevRow?.reserve1||r.reserve1; const motion = (Math.abs(r.reserve0-p0)+Math.abs(r.reserve1-p1))/Math.max(1,Math.abs(p0)+Math.abs(p1)); const weight = (r.reserve0||0)+(r.reserve1||0); return {...r,motion,weight}; });
+  const mutationStats = {changedCount:mutated.filter(r=>r.motion>0).length, velocity:mutated.reduce((s,r)=>s+(r.motion||0)*(r.weight||0),0), acceleration: prev?.mutationStats ? Math.abs((mutated.reduce((s,r)=>s+(r.motion||0)*(r.weight||0),0)) - (prev.mutationStats.velocity||0)) : 0, rows:mutated};
+  const slotValues={}; for(const sl of state.settings.SLOT_LIST){ slotValues[sl]=await readSlot(DEFAULTS.TARGET, sl); }
+  const slotProbe={values:slotValues, allZero:Object.values(slotValues).every(v=>/^0x0+$/.test(v||'')), equal:unique(Object.values(slotValues)).length===1, changed: prev? JSON.stringify(slotValues)!==JSON.stringify(prev.slotProbe?.values||{}):true}; slotProbe.summary = slotProbe.allZero&&slotProbe.equal ? 'null-null equality' : slotProbe.equal ? 'equal non-zero candidate state' : 'divergent';
+  const dnaRaw = await readSlot(DEFAULTS.TARGET, DEFAULTS.EIP1967_SLOT); const dnaProbe={raw:dnaRaw, implAddress:/^0x0+$/.test(dnaRaw||'')?'':'0x'+String(dnaRaw).slice(-40), changed: prev? norm(prev.dnaProbe?.raw)!==norm(dnaRaw):true};
+  const nodeBalances={}; const watchTiers={}; for(const n of watchNodes()){ const pdai=units(await tokenBalance(DEFAULTS.TARGET,n.address),18); const atropa = isAddr(state.settings.WATCH.ATROPA_TOKEN||'') ? units(await tokenBalance(state.settings.WATCH.ATROPA_TOKEN,n.address),18) : 0; const nonce=await txCount(n.address); nodeBalances[n.label]={pdai,wpls:0,atropa,nonce}; watchTiers[n.label]=watchTier(nodeBalances[n.label],nonce); }
+  const publicStrength = clamp(mutationStats.velocity>0 ? Math.log10(1+mutationStats.velocity)/6 : 0, 0, 1);
+  const interiorStrength = clamp((Object.values(nodeBalances).filter(x=>(x.pdai||0)>0 || (x.nonce||0)>0).length / Math.max(6, Object.keys(nodeBalances).length))*0.7 + (Object.values(watchTiers).filter(x=>x==='hot').length?0.1:0),0,1);
+  const heatCount = 0;
+  const contradictionList = contradictionRows({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount});
+  const contradictionLoad = clamp(contradictionList.length/5,0,1);
+  const candidates = await recentTouchCandidates({publicAnchors:anchorRows}, latest);
+  const rehab = watcherRehab({nodeBalances,watchTiers}, candidates);
+  const debts = evidenceDebt({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount});
+  const claims = claimTournament({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount,nodeBalances});
+  const regime = deriveRegime({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount,contradictionLoad});
+  const phase = regime.includes('Synchronized') ? 'execution-watch' : regime.includes('Public-surface-only') ? 'surface-only' : 'audit';
+  const rawScore = (publicStrength*30) + (interiorStrength*25) + (candidates.filter(c=>c.score>=6).length*2) + ((1-contradictionLoad)*25) + (claims.filter(c=>c.status==='strong').length*2);
+  const score = clamp(rawScore,0,100);
+  return {latest,total,burned,publicAnchors:anchorRows,mutationStats,slotProbe,dnaProbe,nodeBalances,watchTiers,publicStrength,interiorStrength,contradictionLoad,contradictionList,candidates,rehab,debts,claims,regime,phase,score,heatCount};
+}
+function snapshot(model){return {ts:Date.now(),score:model.score,phase:model.phase,rawPhase:model.phase,stablePhase:model.phase,total:model.total,burned:model.burned,heatCount:model.heatCount,publicStrength:model.publicStrength,interiorStrength:model.interiorStrength,contradictionLoad:model.contradictionLoad,slotProbe:model.slotProbe,dnaProbe:model.dnaProbe,mutationStats:model.mutationStats,watchTiers:model.watchTiers,publicAnchors:model.publicAnchors,nodeBalances:model.nodeBalances};}
+function render(model){setText('mScore',fmtFixed(model.score,1)); setText('mRegime',model.regime); setText('mPhase',model.phase); setText('mPublic',fmtPct01(model.publicStrength,1)); setText('mInterior',fmtPct01(model.interiorStrength,1)); setText('mContradiction',fmtPct01(model.contradictionLoad,1)); setText('mDebt',String(model.debts.length)); setText('mCandidates',String(model.candidates.filter(c=>c.score>=6).length)); $('reactorRing').style.setProperty('--score',clamp(model.score,0,100).toFixed(1)); setText('scoreBig',fmtFixed(model.score,1)); setText('coreState',model.regime); setText('coreSub',model.slotProbe.summary); setText('bigVerdict',model.regime); $('scoreFill').style.width = clamp(model.score,0,100).toFixed(1)+'%'; setText('sSurface',fmtPct01(model.publicStrength,1)); setText('sInterior',fmtPct01(model.interiorStrength,1)); setText('sRehab',`${model.rehab.filter(r=>r.tier==='cold').length} cold`); setText('sDebt',String(model.debts.length)); setText('sClaims',String(model.claims.filter(c=>c.status==='strong').length)); setText('sPayloads',String(state.settings.PAYLOAD_KEYWORDS.length)); setText('sQueries',String(model.debts.length)); setText('sHistory',String(mergedHistory().length));
+  const statCls = model.score>65 ? 'stable' : model.score>30 ? 'warned' : 'bad'; $('syncStatus').className='status '+statCls; setText('syncStatus', model.score>65?'Aligned':'Adversarial audit'); setText('lastSync',`Last sync: ${nowStamp()} • block ${model.latest}`);
+  setHTML('verifiedList', [
+    `5EF7 currently carries <strong>${fmtCompact(model.nodeBalances['5EF7']?.pdai||0,3)}</strong> pDAI and nonce <strong>${model.nodeBalances['5EF7']?.nonce||0}</strong>.`,
+    `Public anchors are measurable and moving; interior map is not assumed to be correct.`,
+    `Current slot verdict: <strong>${model.slotProbe.summary}</strong>.`
+  ].map(x=>`<div class="item good">${x}</div>`).join(''));
+  setHTML('insightList', [
+    model.publicStrength>model.interiorStrength ? 'Surface is leading interior discovery right now.' : 'Interior discovery is finally catching up.',
+    model.watchTiers['5EF7']==='hot' ? '5EF7 deserves structural-core status, not decorative status.' : 'Even 5EF7 is not proving much yet.',
+    model.slotProbe.allZero ? 'Stop treating slot equality as proof until non-null state appears.' : 'Slot probe finally has non-null content.'
+  ].map(x=>`<div class="item warn">${esc(x)}</div>`).join(''));
+  setHTML('mindList', [
+    'A live AF4E / D6CA export that maps real execution corridors.',
+    'Non-null candidate slot movement that persists over time.',
+    'A rising interiorStrength from promoted candidates, not seeded assumptions.',
+    'Pending heat or trace evidence touching a promoted live candidate.'
+  ].map(x=>`<div class="item ${/Non-null|rising|heat|trace/.test(x)?'good':'warn'}">${esc(x)}</div>`).join(''));
+  setHTML('rehabBody', model.rehab.map(r=>`<tr><td>${esc(r.label)}</td><td><span class="tag ${r.tier==='hot'?'good':'bad'}">${esc(r.tier)}</span></td><td>${esc(r.signal)}</td><td>${esc(r.problem)}</td><td>${r.replacement?`${short(r.replacement.address,10,8)}<br><span class="small">${esc(r.replacement.roles[0]||'candidate')}</span>`:'—'}</td></tr>`).join('') || `<tr><td colspan="5" class="small">No rehab rows.</td></tr>`);
+  setHTML('candidateBody', model.candidates.map(c=>`<tr><td class="mono">${esc(short(c.address,12,8))}</td><td>${fmtFixed(c.score,1)}</td><td><span class="tag ${c.score>=8?'good':c.score>=4?'ref':'other'}">${c.score>=8?'promote':c.score>=4?'watch':'cold'}</span></td><td>${esc(c.sources.join(', '))}</td><td>${esc(c.roles[0]||'unknown')}</td><td>${esc(c.reason)}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No candidates yet.</td></tr>`);
+  setHTML('debtBody', model.debts.map(d=>`<tr><td>${d.prio}</td><td>${esc(d.task)}</td><td>${esc(d.why)}</td><td>${esc(d.method)}</td></tr>`).join(''));
+  setHTML('corridorBody', model.publicAnchors.map(r=>{const dom=r.weight? (r.weight/Math.max(1,model.mutationStats.rows.reduce((s,x)=>s+(x.weight||0),0))) : 0; return `<tr><td>${esc(r.name)}</td><td>${esc(r.type)}</td><td>${r.reserve0!=null?fmtCompact(r.reserve0,3):'—'}</td><td>${r.reserve1!=null?fmtCompact(r.reserve1,3):'—'}</td><td>${r.motion!=null?fmtFixed(r.motion,6):'—'}</td><td>${fmtPct01(dom,1)}</td><td>${describeMotion(r.motion||0)} • ${esc(r.role)}</td></tr>`;}).join(''));
+  setHTML('regimeBody', scenarioRows(model).map(r=>`<tr><td>${esc(r.scenario)}</td><td>${fmtPct01(r.fit,0)}</td><td>${esc(r.reason)}</td></tr>`).join(''));
+  setHTML('claimsBody', model.claims.map(c=>`<tr><td>${esc(c.claim)}</td><td>${fmtPct01(c.score,0)}</td><td>${c.support}</td><td>${c.contradiction}</td><td><span class="tag ${c.status==='strong'?'good':c.status==='open'?'ref':'bad'}">${esc(c.status)}</span></td></tr>`).join(''));
+  setHTML('corpusBody', corpusMemory().map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.type||'text')}</td><td>${(m.addresses||[]).slice(0,4).map(a=>short(a,8,6)).join(', ') || '—'}</td><td>${(m.claims||[]).slice(0,2).map(esc).join(' | ') || '—'}</td><td>${esc(fileFreshness(m.importedAt))}</td></tr>`).join(''));
+  setHTML('contradictionBody', model.contradictionList.map(c=>`<tr><td>${esc(c.text)}</td><td><span class="tag ${c.severity==='high'?'bad':'ref'}">${esc(c.severity)}</span></td><td>${esc(c.effect)}</td></tr>`).join(''));
+  chart('scoreChart', mergedHistory().map(x=>Number(x.score)||0), '#58ffb9'); chart('surfaceChart', mergedHistory().map(x=>Number(x.publicStrength)||0), '#48c4ff'); chart('interiorChart', mergedHistory().map(x=>Number(x.interiorStrength)||0), '#ffcc52');
+}
+function generateQueries(model){const rows=[]; const q=(target,purpose,idea)=>rows.push({target,purpose,idea}); if(model.rehab.some(r=>r.tier==='cold'&&r.replacement)){const r=model.rehab.find(x=>x.tier==='cold'&&x.replacement); q(r.replacement.address,'Promote replacement candidate','eth_getTransactionCount + eth_getCode + recent block touch scan');}
+  if(model.slotProbe.allZero) q(DEFAULTS.TARGET,'Keep slots on probation','eth_getStorageAt on 0x7b12 and 0x0968 over time; do not score until non-null');
+  q('AF4E / D6CA','Kill or prove execution-hand theory','eth_getLogs for Transfer/Approval plus trace on real tx hashes');
+  q(DEFAULTS.PUBLIC_ANCHORS[0].address,'Public optical rail counterparties','Scan recent blocks and pair transfer counterparties around native pDAI/WPLS');
+  q(DEFAULTS.PUBLIC_ANCHORS[2].address,'Bridged pressure rail drift','Track reserve delta, counterparties, and any recurring selector families');
+  setHTML('queryBody', rows.map(r=>`<tr><td class="mono">${esc(short(r.target,18,8))}</td><td>${esc(r.purpose)}</td><td class="mono">${esc(r.idea)}</td></tr>`).join(''));
+}
+async function sync(){ if(state.syncing) return; state.syncing=true; try{const model=await buildModel(); render(model); const hist=loadLocalHistory(); hist.push(snapshot(model)); saveLocalHistory(hist); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`);} catch(e){$('syncStatus').className='status bad'; setText('syncStatus','Sync failed'); setText('lastSync',`Last error: ${e.message||String(e)}`);} finally{state.syncing=false;}}
+$('refreshBtn').onclick=sync; $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open'); $('saveSettingsBtn').onclick=()=>{saveSettingsFromUI(); sync();}; $('resetSettingsBtn').onclick=()=>{resetSettings(); applySettingsToUI(); sync();}; $('clearImportsBtn').onclick=()=>{clearImports(); sync();}; $('exportConfigBtn').onclick=()=>download('pdai-v7-config.json', JSON.stringify(state.settings,null,2)); $('importHistoryBtn').onclick=()=>$('historyFileInput').click(); $('importCorpusBtn').onclick=()=>$('corpusFileInput').click(); $('historyFileInput').onchange=async e=>{for(const f of [...e.target.files]) await importHistoryFile(f); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); sync();}; $('corpusFileInput').onchange=async e=>{await importCorpusFiles(e.target.files); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); sync();}; $('generateQueriesBtn').onclick=async()=>{const model=await buildModel(); generateQueries(model);}; $('analyzeTxBtn').onclick=async()=>{const rows=await analyzePayload($('txHashInput').value.trim()); renderPayloadRows(rows);}; $('sniffPayloadBtn').onclick=async()=>{const rows=await sniffPayloads($('payloadTarget').value.trim()); renderPayloadRows(rows);}; $('scanSelectorsBtn').onclick=async()=>{const rows=await scanSelectors($('selectorTarget').value.trim()); setHTML('payloadBody', rows.length? rows.map(r=>`<tr><td>selector</td><td class="mono">${esc(r.selector)}</td><td>${esc(r.count+' '+r.direction+' • '+short(r.latest,10,8)+' • '+r.notes)}</td></tr>`).join('') : `<tr><td colspan="3" class="small">No selector rows.</td></tr>`);};
+state.settings=loadSettings(); state.imports=loadImports(); applySettingsToUI(); setText('historyInfo',`History: ${loadLocalHistory().length} local / ${state.imports.history.length} imported`); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); setRefreshTimer(); sync();
 </script>
 </body>
 </html>
