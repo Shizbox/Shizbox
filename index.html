@@ -3,353 +3,495 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V13 Clean Agent</title>
+<title>pDAI Peg Prover • V14 Social-First Sync Engine</title>
 <style>
 :root{
-  --bg:#04070d;--panel:#0b111a;--panel2:#0e1622;--line:rgba(255,255,255,.08);--text:#eef8ff;--muted:#93a6b5;
-  --green:#58ffb9;--cyan:#48c4ff;--amber:#ffcc52;--red:#ff667d;--pink:#ff6fe8;
+  --bg:#05070c; --bg2:#08121d; --panel:#0c1522; --panel2:#111b29; --line:#1d3348;
+  --text:#ebf5ff; --muted:#92a3b5; --green:#62ffb3; --cyan:#5cc8ff; --amber:#ffd166; --red:#ff647c; --pink:#ff70e8;
 }
-*{box-sizing:border-box} html,body{margin:0;padding:0;background:radial-gradient(circle at top,#0d1830 0,#060911 42%,#03050a 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-body{min-height:100vh}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,var(--bg2),var(--bg));color:var(--text)}
 .wrap{max-width:1600px;margin:0 auto;padding:18px}
-.glass{background:linear-gradient(180deg,rgba(13,18,28,.92),rgba(7,11,18,.97));border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.18)}
-.top{padding:18px 20px;display:grid;grid-template-columns:1.4fr .9fr;gap:14px}
-.title{font-size:1.7rem;font-weight:950;letter-spacing:.06em;text-transform:uppercase}.title span{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{margin-top:8px;color:var(--muted);line-height:1.55}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.chip{padding:8px 10px;border-radius:999px;font-size:.78rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
-.right{display:flex;flex-direction:column;gap:10px;align-items:flex-end}.status{padding:10px 14px;border-radius:999px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1)}
+.card{background:linear-gradient(180deg,rgba(17,27,41,.96),rgba(10,16,26,.98));border:1px solid var(--line);border-radius:20px;box-shadow:0 0 26px rgba(92,200,255,.08)}
+.top{padding:18px;display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+.title{font-size:1.7rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin:0}
+.sub{color:var(--muted);font-size:.92rem;line-height:1.6;margin-top:8px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pill{padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);font-size:.76rem;background:rgba(255,255,255,.03)}
 .good{color:var(--green)} .warn{color:var(--amber)} .bad{color:var(--red)} .info{color:var(--cyan)}
-.meta{font-size:.8rem;color:var(--muted);line-height:1.6;text-align:right}.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-button{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:14px;color:var(--text);font:inherit;font-weight:700;background:linear-gradient(180deg,rgba(72,196,255,.18),rgba(88,255,185,.08));border:1px solid rgba(72,196,255,.24)}
-button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.09)} button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.right{text-align:right}
+.status{display:inline-block;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+button{appearance:none;border:none;cursor:pointer;padding:11px 14px;border-radius:14px;background:linear-gradient(180deg,rgba(92,200,255,.18),rgba(98,255,179,.1));color:var(--text);font-weight:750;border:1px solid rgba(92,200,255,.25)}
+button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.08)}
 .section{margin-top:14px;padding:14px}
-.grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.card{padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(14,20,31,.94),rgba(8,12,20,.98));border:1px solid rgba(255,255,255,.06)}
-.label{font-size:.7rem;color:#9db0bc;text-transform:uppercase;letter-spacing:.14em}.value{margin-top:10px;font-size:1.45rem;font-weight:950}.hint{margin-top:8px;color:var(--muted);font-size:.8rem;line-height:1.45}
-.hero{display:grid;grid-template-columns:1fr 1fr;gap:12px}.subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.boxTitle{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:#9eb2be;margin-bottom:10px}
-.list{display:grid;gap:8px}.item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.84rem;line-height:1.45}
-.bubbles{min-height:300px;position:relative;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:radial-gradient(circle at 20% 20%,rgba(72,196,255,.12),transparent 22%),radial-gradient(circle at 80% 80%,rgba(88,255,185,.08),transparent 22%),rgba(255,255,255,.02);overflow:hidden;padding:12px}
-.bubble{position:absolute;max-width:300px;padding:12px 14px;border-radius:18px 18px 18px 8px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.09);font-size:.84rem;line-height:1.45;box-shadow:0 10px 28px rgba(0,0,0,.16);animation:float 7s ease-in-out infinite}.bubble:after{content:'';position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.08);border-left:0}
-.bubble.good{border-color:rgba(88,255,185,.2)} .bubble.warn{border-color:rgba(255,204,82,.2)} .bubble.bad{border-color:rgba(255,102,125,.2)} .bubble.info{border-color:rgba(72,196,255,.2)}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.settings{display:none}.settings.open{display:block}.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.72rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field textarea{padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.field textarea{min-height:80px;resize:vertical}
-.tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)} table{width:100%;border-collapse:collapse;min-width:900px;background:#081019} th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top} th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem}
-.small{font-size:.78rem;color:var(--muted)} .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.footer{margin:14px 0 20px;padding:14px 16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;color:var(--muted);font-size:.78rem}
-@media (max-width:1400px){.top,.hero{grid-template-columns:1fr}.right{align-items:flex-start}.meta{text-align:left}.btns{justify-content:flex-start}.grid6,.form,.subgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:900px){.grid6,.form,.subgrid{grid-template-columns:1fr}}
+.grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.stat{padding:14px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
+.value{font-size:1.45rem;font-weight:900;margin-top:9px}
+.hint{font-size:.78rem;color:var(--muted);margin-top:8px;line-height:1.45}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{padding:14px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.bubbleWrap{display:grid;gap:10px}
+.bubble{position:relative;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(92,200,255,.12),rgba(255,255,255,.03));border:1px solid rgba(92,200,255,.18);font-size:.88rem;line-height:1.5}
+.bubble:after{content:"";position:absolute;left:20px;bottom:-9px;border-width:10px 10px 0 0;border-style:solid;border-color:rgba(92,200,255,.18) transparent transparent transparent}
+.list{display:grid;gap:8px}
+.item{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.85rem;line-height:1.45}
+.tableWrap{overflow:auto;border:1px solid rgba(255,255,255,.06);border-radius:16px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}
+th{background:#0d1622;position:sticky;top:0;text-transform:uppercase;letter-spacing:.12em;font-size:.68rem;color:var(--muted)}
+.small{font-size:.76rem;color:var(--muted)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.settings{display:none}
+.settings.open{display:block}
+.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.field input,.field textarea{width:100%;padding:10px 12px;border-radius:14px;background:#09111a;color:var(--text);border:1px solid rgba(255,255,255,.08)}
+.field textarea{min-height:80px;resize:vertical}
+.socialNew{border-color:rgba(98,255,179,.25)!important;background:rgba(98,255,179,.06)}
+@media (max-width:1200px){.top,.hero{grid-template-columns:1fr}.grid6,.form{grid-template-columns:repeat(2,minmax(0,1fr))}.right{text-align:left}.btns{justify-content:flex-start}}
+@media (max-width:700px){.grid6,.form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="glass top">
+  <div class="card top">
     <div>
-      <div class="title"><span>pDAI Peg Prover</span> • V13 Clean Agent</div>
-      <div class="sub">Clean-room rewrite. No legacy wrappers. No stacked monkey patches. V13 fixes the recursion bug, keeps labels/versioning consistent, restores reliable import/export, and forces the agent loop to produce social deltas, thoughts, actions, results, and memory every cycle.</div>
-      <div class="chips">
-        <div class="chip">Sync-safe architecture</div>
-        <div class="chip">Mandatory social delta</div>
-        <div class="chip">Mandatory thought → action</div>
-        <div class="chip">History import works regardless of filename</div>
+      <h1 class="title">pDAI Peg Prover • V14 Social-First Sync Engine</h1>
+      <div class="sub">V14 treats the Maria/靈脅用 channel as a first-class synchronization organ. Social clues are not decoration; they are timing and motif inputs that trigger chain tests, watcher rehab, and counterparty hunts.</div>
+      <div class="pills">
+        <span class="pill good">Social clues are primary sync inputs</span>
+        <span class="pill info">Chain data remains execution truth</span>
+        <span class="pill warn">Null-null slots are contradictions, not proof</span>
+        <span class="pill warn">Empty DNA slot stays a live contradiction</span>
       </div>
     </div>
     <div class="right">
-      <div id="syncStatus" class="status warn">Booting…</div>
-      <div class="meta">
-        <div id="nodeStatus">RPC: —</div>
-        <div id="lastSync">Last sync: —</div>
-        <div id="historyInfo">History: —</div>
-        <div id="socialInfo">Social: —</div>
-      </div>
+      <div id="status" class="status warn">booting</div>
+      <div class="sub" id="meta">RPC: —<br>Last sync: —<br>History: —</div>
       <div class="btns">
         <button id="refreshBtn">Refresh now</button>
         <button id="settingsBtn" class="secondary">Settings</button>
         <button id="importHistoryBtn" class="secondary">Import history</button>
-        <button id="importCorpusBtn" class="secondary">Import corpus</button>
         <button id="exportHistoryBtn" class="secondary">Export history</button>
         <button id="exportBundleBtn" class="secondary">Export bundle</button>
       </div>
     </div>
   </div>
 
-  <div id="settingsBox" class="glass section settings">
-    <div class="boxTitle">V13 settings</div>
-    <div class="form">
-      <div class="field"><label>Private RPC</label><input id="privateRpc" placeholder="https://your-private-rpc" /></div>
-      <div class="field"><label>Refresh ms</label><input id="refreshMs" value="45000" /></div>
-      <div class="field"><label>Recent blocks</label><input id="scanBlocks" value="80" /></div>
-      <div class="field"><label>Social URL</label><input id="socialUrl" placeholder="https://www.youtube.com/@靈脅用/shorts" /></div>
-      <div class="field"><label>Watcher 3D07</label><input id="watch3d07" /></div>
-      <div class="field"><label>Watcher Ba86</label><input id="watchBa86" /></div>
-      <div class="field"><label>Watcher F2Dc</label><input id="watchF2Dc" /></div>
-      <div class="field"><label>Watcher 7b12</label><input id="watch7b12" /></div>
-      <div class="field"><label>Watcher 0968</label><input id="watch0968" /></div>
-      <div class="field"><label>Payload keywords</label><input id="payloadKeywords" placeholder="bell,proxy,heat,qwen,pi" /></div>
-      <div class="field" style="grid-column: span 2;"><label>Notes</label><textarea id="notes"></textarea></div>
+  <div id="settingsBox" class="card section settings">
+    <div class="label">Settings</div>
+    <div class="form" style="margin-top:10px">
+      <div class="field"><label>RPC URLs (one per line)</label><textarea id="rpcUrls"></textarea></div>
+      <div class="field"><label>YouTube channel id</label><input id="channelId" /></div>
+      <div class="field"><label>YouTube handle / shorts URL</label><input id="channelHandle" /></div>
+      <div class="field"><label>Scan blocks</label><input id="scanBlocks" /></div>
+      <div class="field"><label>5EF7 watcher</label><input id="watch5ef7" /></div>
+      <div class="field"><label>3D07 watcher</label><input id="watch3d07" /></div>
+      <div class="field"><label>Ba86 watcher</label><input id="watchBa86" /></div>
+      <div class="field"><label>F2Dc watcher</label><input id="watchF2dc" /></div>
+      <div class="field"><label>7b12 watcher</label><input id="watch7b12" /></div>
+      <div class="field"><label>0968 watcher</label><input id="watch0968" /></div>
+      <div class="field"><label>Manual social items (one per line: title | id | date)</label><textarea id="manualSocial"></textarea></div>
+      <div class="field"><label>Notes</label><textarea id="notes"></textarea></div>
     </div>
-    <div class="btns" style="margin-top:12px">
-      <button id="saveSettingsBtn">Save settings</button>
-      <button id="resetSettingsBtn" class="secondary">Reset settings</button>
-    </div>
+    <div class="btns"><button id="saveSettingsBtn">Save settings</button><button id="clearSettingsBtn" class="secondary">Reset</button></div>
   </div>
 
-  <div class="glass section">
+  <div class="card section">
     <div class="grid6">
-      <div class="card"><div class="label">V13 score</div><div class="value" id="scoreVal">—</div><div class="hint">Adversarial confidence</div></div>
-      <div class="card"><div class="label">Regime</div><div class="value" id="phaseVal">—</div><div class="hint">What the machine most resembles</div></div>
-      <div class="card"><div class="label">Public truth</div><div class="value" id="publicVal">—</div><div class="hint">Surface mutation strength</div></div>
-      <div class="card"><div class="label">Interior truth</div><div class="value" id="interiorVal">—</div><div class="hint">Live watcher signal</div></div>
-      <div class="card"><div class="label">Contradiction</div><div class="value" id="contradictionVal">—</div><div class="hint">Higher means story debt</div></div>
-      <div class="card"><div class="label">Social delta</div><div class="value" id="socialDeltaVal">—</div><div class="hint">New shorts/posts detected</div></div>
+      <div class="stat"><div class="label">V14 score</div><div id="score" class="value">—</div><div class="hint">social + chain combined</div></div>
+      <div class="stat"><div class="label">Regime</div><div id="regime" class="value">—</div><div class="hint">machine resemblance</div></div>
+      <div class="stat"><div class="label">Social delta</div><div id="socialDelta" class="value">—</div><div class="hint">new shorts / items detected</div></div>
+      <div class="stat"><div class="label">Public truth</div><div id="publicTruth" class="value">—</div><div class="hint">surface mutation strength</div></div>
+      <div class="stat"><div class="label">Interior truth</div><div id="interiorTruth" class="value">—</div><div class="hint">watcher signal strength</div></div>
+      <div class="stat"><div class="label">Contradiction</div><div id="contradiction" class="value">—</div><div class="hint">story debt load</div></div>
     </div>
   </div>
 
-  <div class="glass section hero">
-    <div class="bubbles" id="bubbleCloud"></div>
-    <div class="subgrid">
-      <div class="card"><div class="boxTitle">Goal</div><div id="goalBox" class="item info">—</div><div class="list" id="blockerList" style="margin-top:10px"></div></div>
-      <div class="card"><div class="boxTitle">Action log</div><div class="list" id="actionList"></div></div>
-      <div class="card"><div class="boxTitle">Social memory</div><div class="list" id="socialList"></div></div>
-      <div class="card"><div class="boxTitle">Operator brief</div><textarea id="briefBox" style="width:100%;min-height:210px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text)"></textarea><div class="btns" style="margin-top:10px"><button id="copyBriefBtn" class="secondary">Copy brief</button></div></div>
+  <div class="hero section">
+    <div class="card section" style="margin-top:0">
+      <div class="label">Thought bubbles</div>
+      <div id="thoughtBubbles" class="bubbleWrap" style="margin-top:12px"></div>
+      <div class="label" style="margin-top:16px">Goal</div>
+      <div id="goalBox" class="item" style="margin-top:10px">—</div>
+      <div class="label" style="margin-top:16px">Operator brief</div>
+      <div id="briefBox" class="item" style="margin-top:10px; white-space:pre-wrap">—</div>
+    </div>
+    <div class="card section" style="margin-top:0">
+      <div class="label">Actions</div>
+      <div id="actionList" class="list" style="margin-top:12px"></div>
+      <div class="label" style="margin-top:16px">Curiosity</div>
+      <div id="curiosityList" class="list" style="margin-top:12px"></div>
+      <div class="label" style="margin-top:16px">Promoted candidates</div>
+      <div id="promotedList" class="list" style="margin-top:12px"></div>
     </div>
   </div>
 
-  <div class="glass section">
-    <div class="boxTitle">Watcher rehab and promoted candidates</div>
-    <div class="tableWrap">
-      <table>
-        <thead><tr><th>Watcher</th><th>Tier</th><th>Signal</th><th>Problem</th><th>Suggested replacement</th></tr></thead>
-        <tbody id="rehabBody"><tr><td colspan="5" class="small">Waiting…</td></tr></tbody>
-      </table>
-    </div>
+  <div class="card section">
+    <div class="label">Latest harvested social items</div>
+    <div class="small" style="margin:8px 0 12px 0">V14 tries multiple fetchers: RSS feed via channel ID, Jina mirror of the shorts page, and manual social memory. New items trigger mandatory chain actions.</div>
+    <div class="tableWrap"><table><thead><tr><th>New</th><th>Source</th><th>Title</th><th>ID</th><th>Published</th><th>Clues</th></tr></thead><tbody id="socialBody"></tbody></table></div>
   </div>
 
-  <div class="glass section">
-    <div class="boxTitle">Claims and anchors</div>
-    <div class="tableWrap">
-      <table>
-        <thead><tr><th>Anchor / claim</th><th>Status</th><th>Measured result</th></tr></thead>
-        <tbody id="truthBody"><tr><td colspan="3" class="small">Waiting…</td></tr></tbody>
-      </table>
-    </div>
+  <div class="card section">
+    <div class="label">Public anchors</div>
+    <div class="tableWrap"><table><thead><tr><th>Anchor</th><th>Type</th><th>Reserve A</th><th>Reserve B</th><th>Motion</th><th>Interpretation</th></tr></thead><tbody id="anchorBody"></tbody></table></div>
   </div>
 
-  <div class="footer glass">
-    <div>TARGET: <span class="mono">0x6B175474E89094C44Da98b954EedeAC495271d0F</span></div>
-    <div>V13 is a clean rewrite with consistent labels and exports.</div>
+  <div class="card section">
+    <div class="label">Watcher board</div>
+    <div class="tableWrap"><table><thead><tr><th>Watcher</th><th>Tier</th><th>pDAI</th><th>Nonce</th><th>Status</th><th>Replacement cue</th></tr></thead><tbody id="watcherBody"></tbody></table></div>
   </div>
-
-  <input type="file" id="historyFile" multiple hidden accept=".json" />
-  <input type="file" id="corpusFile" multiple hidden accept=".json,.txt,.md" />
 </div>
-
 <script>
-const DEFAULTS = {
-  target: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-  dead: '0x000000000000000000000000000000000000dEaD',
-  publicAnchors: [
-    { address:'0x947b4633e32e0c7f2c76753b43f008480715416d', name:'Native pDAI/WPLS', type:'public-native', role:'optical rail' },
-    { address:'0x5ef7aac0de4f2012cb36730da140025b113fada4', name:'ATROPA/DAI core', type:'core', role:'structural core' },
-    { address:'0xe56043671df55de5cdf8459710433c10324de0ae', name:'Bridged DAI/WPLS', type:'bridged', role:'surface pressure rail' },
-    { address:'0x6B175474E89094C44Da98b954EedeAC495271d0F', name:'pDAI token', type:'token', role:'target token' }
-  ],
-  watchers: {
-    '5EF7': '0x5ef7aac0de4f2012cb36730da140025b113fada4',
-    '3D07': '0x19488a0f98363768b449E2D821C8d7747e903D07',
-    'Ba86': '0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc',
-    'F2Dc': '0x862247F0E9F77331c470ec75d905CC4240FF3Dc2',
-    '7b12': '0x0000000000000000000000000000000000007b12',
-    '0968': '0x0000000000000000000000000000000000000968'
-  },
-  payloadKeywords: ['bell','proxy','heat','qwen','pi'],
-  socialUrl: 'https://www.youtube.com/@%E9%9D%88%E8%84%85%E7%94%A8/shorts',
-  refreshMs: 45000,
-  scanBlocks: 80,
-  rpcs: ['https://rpc.pulsechain.com','https://pulsechain.publicnode.com','https://rpc-pulsechain.g4mm4.io','https://rpc.pulsechainrpc.com']
-};
-const KEYS = { settings:'pdai-v13-settings', imports:'pdai-v13-imports', history:'pdai-v13-history', memory:'pdai-v13-memory' };
-const SIG = {
-  totalSupply:'0x18160ddd', balanceOf:'0x70a08231', token0:'0x0dfe1681', token1:'0xd21220a7', reserves:'0x0902f1ac', txCount:'eth_getTransactionCount', slot:'eth_getStorageAt'
-};
-const state = { settings:null, imports:null, memory:null, syncing:false, timer:null, rpcIndex:0, blockCache:new Map(), latestModel:null };
-const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
-const norm = s => String(s||'').trim().toLowerCase();
-const isAddr = s => /^0x[a-fA-F0-9]{40}$/.test(String(s||'').trim());
-const uniq = a => [...new Set(a)];
-const short = (s,a=8,b=6) => { s=String(s||''); return s.length>a+b+3?`${s.slice(0,a)}...${s.slice(-b)}`:s; };
-const fmt = (n,d=2)=> n==null||!Number.isFinite(n)?'—':Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
-const fmtPct = (n,d=1)=> n==null||!Number.isFinite(n)?'—':(n*100).toFixed(d)+'%';
-const fmtCompact = (v,d=2)=>{ if(v==null||!Number.isFinite(v)) return '—'; const a=Math.abs(v); if(a>=1e12)return (v/1e12).toFixed(d)+'T'; if(a>=1e9)return (v/1e9).toFixed(d)+'B'; if(a>=1e6)return (v/1e6).toFixed(d)+'M'; if(a>=1e3)return (v/1e3).toFixed(d)+'K'; return fmt(v,d);} ;
-const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
-const toHex=n=>'0x'+BigInt(n).toString(16);
-function hexToBigInt(hex){ try{return BigInt(hex||'0x0');}catch{return 0n;} }
-function units(big,dec=18){ let s=(big<0n?-big:big).toString(); if(dec===0) return Number((big<0n?'-':'')+s); if(s.length<=dec) s='0'.repeat(dec-s.length+1)+s; const i=s.slice(0,-dec)||'0'; const f=s.slice(-dec).replace(/0+$/,'').slice(0,8); return parseFloat((big<0n?'-':'')+i+(f?'.'+f:'')); }
-function now(){ return new Date().toLocaleString(); }
-function text(id,v){ const el=$(id); if(el) el.textContent=v; }
-function html(id,v){ const el=$(id); if(el) el.innerHTML=v; }
-function download(name,data){ const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500); }
-function loadJSON(k, fallback){ try{ return JSON.parse(localStorage.getItem(k)||''); }catch{return fallback;} }
-function saveJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
-function defaultsSettings(){ return { privateRpc:'', refreshMs:DEFAULTS.refreshMs, scanBlocks:DEFAULTS.scanBlocks, socialUrl:DEFAULTS.socialUrl, payloadKeywords:[...DEFAULTS.payloadKeywords], notes:'', watchers:{...DEFAULTS.watchers} }; }
-function loadSettings(){ return Object.assign(defaultsSettings(), loadJSON(KEYS.settings,{})||{}); }
-function loadImports(){ return Object.assign({ history:[], corpus:[], socialSeen:[] }, loadJSON(KEYS.imports,{})||{}); }
-function loadHistory(){ const arr=loadJSON(KEYS.history,[])||[]; return Array.isArray(arr)?arr:[]; }
-function loadMemory(){ return Object.assign({ promoted:{}, lastSocialIds:[], lastBrief:'', cycle:0 }, loadJSON(KEYS.memory,{})||{}); }
-function saveSettings(){ saveJSON(KEYS.settings, state.settings); }
-function saveImports(){ saveJSON(KEYS.imports, state.imports); }
-function saveHistory(arr){ saveJSON(KEYS.history, arr.slice(-600)); text('historyInfo', `History: ${arr.length} local / ${state.imports.history.length} imported`); }
-function saveMemory(){ saveJSON(KEYS.memory, state.memory); }
-function activeRpcs(){ return uniq([state.settings.privateRpc, ...DEFAULTS.rpcs].filter(Boolean)); }
-async function withTimeout(p,ms=15000){ let t; return Promise.race([p.finally(()=>clearTimeout(t)), new Promise((_,rej)=>{ t=setTimeout(()=>rej(new Error('timeout')),ms); })]); }
-async function rpc(method, params){ const urls=activeRpcs(); let lastErr; for(let i=0;i<urls.length;i++){ const idx=(state.rpcIndex+i)%urls.length; const url=urls[idx]; try{ const res=await withTimeout(fetch(url,{ method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+i,method,params}) })); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message||'rpc error'); state.rpcIndex=idx; text('nodeStatus', 'RPC: '+url.replace(/^https?:\/\//,'')); return data.result; }catch(e){ lastErr=e; } } throw lastErr||new Error('All RPCs failed'); }
-async function blockNumber(){ return parseInt(await rpc('eth_blockNumber',[]),16); }
-async function blockFull(n){ if(state.blockCache.has(n)) return state.blockCache.get(n); const b=await rpc('eth_getBlockByNumber',[toHex(n), true]); state.blockCache.set(n,b); return b; }
-async function balanceOf(token, holder){ const data=SIG.balanceOf + norm(holder).replace(/^0x/,'').padStart(64,'0'); return hexToBigInt(await rpc('eth_call',[{to:token,data},'latest'])); }
-async function totalSupply(token){ return hexToBigInt(await rpc('eth_call',[{to:token,data:SIG.totalSupply},'latest'])); }
-async function txCount(addr){ return parseInt(await rpc('eth_getTransactionCount',[addr,'latest']),16); }
-async function readSlot(addr, slot){ return await rpc('eth_getStorageAt',[addr,slot,'latest']); }
-async function pairMeta(addr){ const [t0r,t1r,resr]=await Promise.all([rpc('eth_call',[{to:addr,data:SIG.token0},'latest']), rpc('eth_call',[{to:addr,data:SIG.token1},'latest']), rpc('eth_call',[{to:addr,data:SIG.reserves},'latest'])]); const token0='0x'+String(t0r).slice(-40), token1='0x'+String(t1r).slice(-40); const h=String(resr||'').replace(/^0x/,''); const reserve0=units(hexToBigInt('0x'+h.slice(0,64)),18), reserve1=units(hexToBigInt('0x'+h.slice(64,128)),18); return { token0, token1, reserve0, reserve1 }; }
-async function fetchSocial(url){ const items=[]; const warnings=[]; const sources=[]; const target=url||state.settings.socialUrl||DEFAULTS.socialUrl; const tryFetch = async (u,label)=>{ try{ const res=await withTimeout(fetch(u),12000); if(!res.ok) throw new Error(`HTTP ${res.status}`); const t=await res.text(); sources.push(label); return t; }catch(e){ warnings.push(`${label}: ${e.message||e}`); return ''; } };
-  // Strategy 1: jina mirror text
-  const txt = await tryFetch('https://r.jina.ai/http://'+target, 'jina');
-  if(txt){
-    const ids = uniq([...txt.matchAll(/\/shorts\/([A-Za-z0-9_-]{5,20})/g)].map(m=>m[1]));
-    ids.forEach(id=>items.push({id, title:`short ${id}`, source:'jina'}));
-  }
-  // Strategy 2: user-pasted corpus memory
-  for(const c of state.imports.corpus||[]){
-    if(/靈脅用|youtube|shorts/i.test(c.text||'')){
-      const ids = uniq([...String(c.text).matchAll(/\b([A-Za-z0-9_-]{5})\b/g)].map(m=>m[1]).filter(x=>/[a-z]/i.test(x)));
-      ids.slice(0,8).forEach(id=>items.push({id, title:`corpus ${id}`, source:'corpus'}));
-    }
-  }
-  const uniqItems=[]; const seen=new Set();
-  for(const it of items){ if(seen.has(it.id)) continue; seen.add(it.id); uniqItems.push(it); }
-  return { items: uniqItems.slice(0,20), warnings, sources };
-}
-function importedHistory(){ return state.imports.history||[]; }
-function mergedHistory(){ return [...importedHistory(), ...loadHistory()]; }
-function scanAddresses(text){ return uniq((String(text||'').match(/0x[a-fA-F0-9]{40}/g)||[]).map(norm)); }
-function forceThoughts(obs){ const out=[]; out.push(obs.publicStrength > obs.interiorStrength ? 'Public anchors are still the richer truth layer than the current interior map.' : 'Interior and surface are closer than usual.');
-  out.push(obs.slotAllZero ? 'Current slot probe is null-null equality and should be treated as absence, not proof.' : 'Slot probe is non-null and needs extra weight.');
-  out.push(obs.dnaEmpty ? 'DNA slot is empty again; proxy-swap theory cannot carry this cycle.' : 'DNA slot is non-empty and needs investigation.');
-  out.push(obs.hot5 ? `5EF7 still carries ${fmtCompact(obs.hot5.pdai,3)} pDAI and remains the strongest live watcher.` : 'No live watcher is convincingly active.');
-  out.push(obs.socialDeltaCount>0 ? `${obs.socialDeltaCount} new social item(s) were detected and should trigger chain tests.` : 'No new social delta was detected this cycle.');
-  return uniq(out);
-}
-function selectGoal(obs){ if(obs.socialDeltaCount>0) return 'Map new social delta to chain behavior around live anchors and strongest watchers.'; if(obs.publicStrength>obs.interiorStrength) return 'Bridge the live public surface to a better interior watcher map.'; return 'Replace dead watchers and prove or kill the current machine map.'; }
-function actionQueue(obs){ const q=[]; q.push({kind:'social-delta', label:'Social delta analysis'}); q.push({kind:'counterparty-hunt', label:'Counterparty hunt around hottest anchor'}); q.push({kind:'watcher-rehab', label:'Watcher rehab'}); q.push({kind:'payload-sniff', label:'Payload sniff around hottest anchor'}); return q; }
-async function runActions(obs, latestBlock){ const results=[]; const promoted=[];
-  // 1 social delta analysis
-  if(obs.socialDeltaCount>0){ results.push({kind:'social-delta', status:'ok', findings:[`${obs.socialDeltaCount} new social item(s)`, `ids: ${obs.newSocial.map(x=>x.id).join(', ')}`]}); }
-  else { results.push({kind:'social-delta', status:'ok', findings:['no new social items this cycle']}); }
-  // 2 counterparty hunt around hottest anchor
-  const hottest = obs.mutationRows.slice().sort((a,b)=>(b.motion||0)-(a.motion||0) || (b.weight||0)-(a.weight||0))[0] || DEFAULTS.publicAnchors[1];
-  const cps=[]; const watchSet=new Set([...Object.values(state.settings.watchers).map(norm), ...DEFAULTS.publicAnchors.map(a=>norm(a.address))]);
-  const span=Math.max(20, Math.min(120, Number(state.settings.scanBlocks)||80));
-  for(let b=latestBlock; b>Math.max(0, latestBlock-span); b--){ let blk; try{ blk=await blockFull(b); }catch{ continue; } if(!blk?.transactions) continue; for(const tx of blk.transactions){ const to=norm(tx.to), from=norm(tx.from); if(to===norm(hottest.address)){ if(isAddr(from) && !watchSet.has(from)) cps.push(from); } if(from===norm(hottest.address)){ if(isAddr(to) && !watchSet.has(to)) cps.push(to); } } if(cps.length>=8) break; }
-  const uniqCps=uniq(cps).slice(0,8); uniqCps.forEach(a=>promoted.push(a));
-  results.push({kind:'counterparty-hunt', status:'ok', findings: uniqCps.length ? uniqCps.map(a=>`candidate ${short(a,10,8)}`) : ['no fresh counterparties found in scan window']});
-  // 3 watcher rehab
-  const cold = Object.entries(obs.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k);
-  results.push({kind:'watcher-rehab', status:'ok', findings: cold.length ? [`cold watchers: ${cold.join(', ')}`, uniqCps[0] ? `suggest promote ${short(uniqCps[0],10,8)}` : 'no replacement candidate'] : ['no cold watchers']});
-  // 4 payload sniff
-  const sniff=[];
-  const kw=state.settings.payloadKeywords||DEFAULTS.payloadKeywords;
-  for(let b=latestBlock; b>Math.max(0,latestBlock-25); b--){ let blk; try{ blk=await blockFull(b); }catch{ continue; } if(!blk?.transactions) continue; for(const tx of blk.transactions){ if(norm(tx.to)!==norm(hottest.address) && norm(tx.from)!==norm(hottest.address)) continue; const input=String(tx.input||''); if(!input || input==='0x') continue; const bytes=[]; const hex=input.replace(/^0x/,''); for(let i=0;i<Math.min(hex.length,300);i+=2){ const v=parseInt(hex.slice(i,i+2),16); if(Number.isFinite(v)) bytes.push(v); }
-      const ascii=bytes.filter(v=>v>=32&&v<=126).map(v=>String.fromCharCode(v)).join('').toLowerCase();
-      const hit=kw.find(k=>ascii.includes(k)); if(hit){ sniff.push(`tx ${short(tx.hash,10,8)} hit ${hit}`); }
-      else sniff.push(`tx ${short(tx.hash,10,8)} selector ${(input||'0x').slice(0,10)}`);
-      if(sniff.length>=6) break;
-    } if(sniff.length>=6) break; }
-  results.push({kind:'payload-sniff', status:'ok', findings: sniff.length ? sniff : ['no recent payload motifs around hottest anchor']});
-  return { results, promoted: uniq(promoted) };
-}
-function buildBrief(model){ return [
-  `V13 regime: ${model.phase}`,
-  `Score: ${fmt(model.score,1)}`,
-  `Public vs interior: ${fmtPct(model.publicStrength,0)} / ${fmtPct(model.interiorStrength,0)}`,
-  `Hot watcher: ${model.hotWatcher || 'none'}`,
-  `Social delta: ${model.socialDeltaCount}`,
-  `Thoughts: ${(model.v13Thoughts||[]).slice(0,5).join(' | ')}`,
-  `Actions: ${(model.v13Actions||[]).map(a=>`${a.kind}: ${(a.findings||[])[0]||a.status}`).join(' | ')}`,
-  `Promoted: ${(model.v13Promoted||[]).map(a=>short(a,10,8)).join(', ') || 'none'}`
-].join('\n'); }
-async function buildModel(){
-  const latest = await blockNumber();
-  const total = units(await totalSupply(DEFAULTS.target),18);
-  const burned = units(await balanceOf(DEFAULTS.target, DEFAULTS.dead),18);
-  const slot7 = await readSlot(DEFAULTS.target,'0x7b12');
-  const slot9 = await readSlot(DEFAULTS.target,'0x0968');
-  const dna = await readSlot(DEFAULTS.target,'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
-  const rows=[];
-  for(const a of DEFAULTS.publicAnchors){
-    if(a.type==='token'){ rows.push({...a,motion:0,weight:0}); continue; }
-    const pm = await pairMeta(a.address);
-    rows.push({...a, token0:pm.token0, token1:pm.token1, reserve0:pm.reserve0, reserve1:pm.reserve1, motion:0, weight:(pm.reserve0||0)+(pm.reserve1||0)});
-  }
-  const history = mergedHistory();
-  const prev = history[history.length-1] || null;
-  if(prev?.mutationStats?.rows){ for(const row of rows){ const pr = (prev.mutationStats.rows||[]).find(x=>norm(x.address)===norm(row.address)); if(pr && row.reserve0!=null && row.reserve1!=null){ const oldTot=(pr.reserve0||0)+(pr.reserve1||0); const newTot=(row.reserve0||0)+(row.reserve1||0); row.motion = oldTot>0 ? Math.abs(newTot-oldTot)/oldTot : 0; } } }
-  const nodeBalances={}; const watchTiers={};
-  for(const [label,addr] of Object.entries(state.settings.watchers)){
-    const pdai=units(await balanceOf(DEFAULTS.target,addr),18); const nonce=await txCount(addr); nodeBalances[label]={pdai,wpls:0,atropa:0,nonce}; watchTiers[label]=(pdai>0||nonce>0)?'hot':'cold';
-  }
-  const publicStrength = clamp(rows.filter(r=>r.motion>0).length/3 + rows.reduce((s,r)=>s+(r.motion||0),0),0,1);
-  const interiorStrength = clamp((Object.values(watchTiers).filter(v=>v==='hot').length/6)*0.7 + ((nodeBalances['5EF7']?.pdai||0)>0 ? 0.15 : 0),0,1);
-  const contradictionLoad = clamp((/null-null/i.test('null-null equality')?0.3:0) + (!String(dna).match(/[1-9a-f]/i)?0.3:0) + (Object.values(watchTiers).filter(v=>v==='cold').length>=4?0.2:0),0,1);
-  const social = await fetchSocial(state.settings.socialUrl);
-  const socialIds = social.items.map(x=>x.id);
-  const prevIds = state.memory.lastSocialIds || [];
-  const newSocial = social.items.filter(x=>!prevIds.includes(x.id));
-  const socialDeltaCount = newSocial.length;
-  const phase = publicStrength>interiorStrength ? (publicStrength>0.15 ? 'surface-only' : 'audit') : 'interior-awakening';
-  const obs = { publicStrength, interiorStrength, slotAllZero: norm(slot7)===norm(slot9) && /^0x0+$/.test(norm(slot7).replace(/^0x/,'')), dnaEmpty: !String(dna).match(/[1-9a-f]/i), hot5:nodeBalances['5EF7'], socialDeltaCount, newSocial, mutationRows:rows, watchTiers };
-  const v13Thoughts = forceThoughts(obs);
-  const v13Goal = selectGoal(obs);
-  const v13ActionPlan = actionQueue(obs);
-  const actionPack = await runActions(obs, latest);
-  const promoted = actionPack.promoted || [];
-  state.memory.lastSocialIds = socialIds;
-  state.memory.cycle = (state.memory.cycle||0)+1;
-  state.memory.promoted = Object.assign({}, state.memory.promoted||{}, Object.fromEntries(promoted.map(a=>[a,Date.now()])));
-  saveMemory();
-  const score = clamp(35 + publicStrength*35 + interiorStrength*15 - contradictionLoad*25 + (socialDeltaCount>0?10:0),0,100);
-  return {
-    version:'v13', latest, total, burned, score, phase, publicStrength, interiorStrength, contradictionLoad,
-    slotProbe:{values:{'0x7b12':slot7,'0x0968':slot9}, allZero:obs.slotAllZero, equal:norm(slot7)===norm(slot9), changed:true, summary:obs.slotAllZero?'null-null equality':'changed'},
-    dnaProbe:{raw:dna, implAddress:'', changed:true},
-    mutationStats:{ changedCount:rows.filter(r=>r.motion>0).length, velocity:rows.reduce((s,r)=>s+(r.motion||0),0), acceleration:0, rows },
-    watchTiers, publicAnchors:rows, nodeBalances,
-    socialWarnings:social.warnings, socialSources:social.sources, socialItems:social.items, socialDeltaCount, newSocial,
-    v13Thoughts, v13Curiosity:v13ActionPlan.map(x=>x.label), v13Actions:actionPack.results, v13Goal, v13Promoted:promoted, v13Brief:'' , hotWatcher:Object.entries(watchTiers).find(([,v])=>v==='hot')?.[0]||null
+(() => {
+  const STORAGE_KEY = 'pdai-v14-settings';
+  const HISTORY_KEY = 'pdai-v14-history';
+  const BUNDLE_NAME = 'pdai-v14-bundle.json';
+  const PDAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
+  const WPLS = '0xA1077a294dDE1B09bB078844df40758a5D0f9a27';
+  const DEAD = '0x000000000000000000000000000000000000dEaD';
+  const ATROPA = '0xcc78a0acdf847a2c1714d2a925bb4477df5d48a6';
+  const EIP1967 = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
+  const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  const DEFAULTS = {
+    rpcUrls: [
+      'https://rpc.pulsechain.com',
+      'https://pulsechain.publicnode.com',
+      'https://rpc-pulsechain.g4mm4.io',
+      'https://rpc.pulsechainrpc.com'
+    ],
+    channelId: 'UC0ADdeCTOW9Qlai7G3kLLFg',
+    channelHandle: 'https://www.youtube.com/@%E9%9D%88%E8%84%85%E7%94%A8/shorts',
+    scanBlocks: 350,
+    watch: {
+      '5EF7': '0x5ef7aac0de4f2012cb36730da140025b113fada4',
+      '3D07': '0x19488a0f98363768b449e2d821c8d7747e903d07',
+      'Ba86': '0x201efd508c8dfe9de1a13c2452863a78cb2a86cc',
+      'F2Dc': '0x862247f0e9f77331c470ec75d905cc4240ff3dc2',
+      '7b12': '0x0000000000000000000000000000000000007b12',
+      '0968': '0x0000000000000000000000000000000000000968'
+    },
+    manualSocial: '',
+    notes: ''
   };
-}
-function snapshot(model){ return { ts:Date.now(), score:model.score, phase:model.phase, rawPhase:model.phase, stablePhase:model.phase, total:model.total, burned:model.burned, heatCount:0, publicStrength:model.publicStrength, interiorStrength:model.interiorStrength, contradictionLoad:model.contradictionLoad, slotProbe:model.slotProbe, dnaProbe:model.dnaProbe, mutationStats:model.mutationStats, watchTiers:model.watchTiers, publicAnchors:model.publicAnchors, nodeBalances:model.nodeBalances, v13Thoughts:model.v13Thoughts, v13Actions:model.v13Actions, v13Goal:model.v13Goal, v13Promoted:model.v13Promoted, v13Brief:model.v13Brief, socialDeltaCount:model.socialDeltaCount, newSocial:model.newSocial, socialWarnings:model.socialWarnings }; }
-function render(model){
-  state.latestModel=model; model.v13Brief = buildBrief(model); $('briefBox').value=model.v13Brief;
-  text('scoreVal', fmt(model.score,1)); text('phaseVal', model.phase); text('publicVal', fmtPct(model.publicStrength,0)); text('interiorVal', fmtPct(model.interiorStrength,0)); text('contradictionVal', fmtPct(model.contradictionLoad,0)); text('socialDeltaVal', String(model.socialDeltaCount));
-  $('syncStatus').className = 'status '+(model.score>60?'good':model.score>30?'warn':'bad'); text('syncStatus', model.score>60?'Synced':'Adversarial audit'); text('lastSync', `Last sync: ${now()} • block ${model.latest}`); text('socialInfo', `Social: ${model.socialItems.length} seen / ${model.socialDeltaCount} new / ${model.socialSources.join(', ')||'none'}`);
-  const bubbles=[]; [...model.v13Thoughts.map((t,i)=>({cls:'info',text:t,left:(8+(i%2)*42)+'%',top:(8+i*18)+'px'})), ...model.v13Actions.map((a,i)=>({cls:a.findings?.[0]?.includes('no')?'warn':'good',text:`${a.kind}: ${(a.findings||[]).slice(0,2).join(' | ')}`,left:(12+(i%2)*38)+'%',top:(130+i*46)+'px'}))].slice(0,10).forEach(b=>bubbles.push(`<div class="bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`));
-  html('bubbleCloud', bubbles.join('') || '<div class="bubble warn" style="left:8%;top:14px">No thought/action chain yet.</div>');
-  html('goalBox', `<strong>${esc(model.v13Goal)}</strong>`); html('blockerList', [model.slotProbe.summary, model.dnaProbe.implAddress?'dna present':'empty DNA', `cold watchers: ${Object.entries(model.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')||'none'}`].map(x=>`<div class="item warn">${esc(x)}</div>`).join(''));
-  html('actionList', model.v13Actions.map(a=>`<div class="item ${a.findings?.[0]?.includes('no')?'warn':'good'}"><strong>${esc(a.kind)}</strong><br>${esc((a.findings||[]).join(' | '))}</div>`).join(''));
-  html('socialList', [...model.newSocial.map(x=>`<div class="item good">New social: ${esc(x.id)} (${esc(x.source)})</div>`), ...model.socialWarnings.map(x=>`<div class="item warn">${esc(x)}</div>`)].join('') || '<div class="item warn">No social delta or fetch warning only.</div>');
-  html('rehabBody', Object.entries(model.watchTiers).map(([k,v])=>{ const bal=model.nodeBalances[k]; const sugg=model.v13Promoted[0]||DEFAULTS.publicAnchors[1].address; const problem=v==='cold'?'no balance, no nonce, no fresh proof':'structural core but not execution proof'; return `<tr><td>${esc(k)}</td><td>${esc(v)}</td><td>pDAI ${fmtCompact(bal.pdai,3)} • nonce ${bal.nonce}</td><td>${esc(problem)}</td><td class="mono">${esc(short(sugg,10,8))}</td></tr>`; }).join(''));
-  const truths=[]; truths.push(row('5EF7 is the strongest live watcher', 'Verified', `5EF7 carries ${fmtCompact(model.nodeBalances['5EF7']?.pdai||0,3)} pDAI and nonce ${model.nodeBalances['5EF7']?.nonce||0}`)); truths.push(row('Null-null slot equality is not proof', model.slotProbe.allZero?'Yes':'No', model.slotProbe.summary)); truths.push(row('DNA slot is an active clue', model.dnaProbe.implAddress?'Yes':'No', model.dnaProbe.implAddress||'empty DNA slot')); truths.push(row('Social delta engine ran this cycle', 'Yes', `${model.socialItems.length} seen / ${model.socialDeltaCount} new`)); truths.push(row('Promoted candidates found', model.v13Promoted.length?'Yes':'No', model.v13Promoted.map(a=>short(a,10,8)).join(', ')||'none')); html('truthBody', truths.join(''));
-}
-function row(a,b,c){ return `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`; }
-async function sync(){ if(state.syncing) return; state.syncing=true; try{ const model=await buildModel(); render(model); const hist=loadHistory(); hist.push(snapshot(model)); saveHistory(hist); }catch(e){ $('syncStatus').className='status bad'; text('syncStatus','Sync failed'); text('lastSync',`Last error: ${e.message||String(e)}`); } finally{ state.syncing=false; }}
-function setTimer(){ if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000, Number(state.settings.refreshMs)||45000)); }
-function applySettings(){ $('privateRpc').value=state.settings.privateRpc||''; $('refreshMs').value=state.settings.refreshMs; $('scanBlocks').value=state.settings.scanBlocks; $('socialUrl').value=state.settings.socialUrl||''; $('watch3d07').value=state.settings.watchers['3D07']||''; $('watchBa86').value=state.settings.watchers['Ba86']||''; $('watchF2Dc').value=state.settings.watchers['F2Dc']||''; $('watch7b12').value=state.settings.watchers['7b12']||''; $('watch0968').value=state.settings.watchers['0968']||''; $('payloadKeywords').value=(state.settings.payloadKeywords||[]).join(','); $('notes').value=state.settings.notes||''; }
-function readSettings(){ state.settings.privateRpc=$('privateRpc').value.trim(); state.settings.refreshMs=Number($('refreshMs').value||45000); state.settings.scanBlocks=Number($('scanBlocks').value||80); state.settings.socialUrl=$('socialUrl').value.trim()||DEFAULTS.socialUrl; state.settings.watchers['3D07']=$('watch3d07').value.trim()||DEFAULTS.watchers['3D07']; state.settings.watchers['Ba86']=$('watchBa86').value.trim()||DEFAULTS.watchers['Ba86']; state.settings.watchers['F2Dc']=$('watchF2Dc').value.trim()||DEFAULTS.watchers['F2Dc']; state.settings.watchers['7b12']=$('watch7b12').value.trim()||DEFAULTS.watchers['7b12']; state.settings.watchers['0968']=$('watch0968').value.trim()||DEFAULTS.watchers['0968']; state.settings.payloadKeywords=uniq($('payloadKeywords').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean)); state.settings.notes=$('notes').value; saveSettings(); setTimer(); }
-async function importHistoryFiles(files){ for(const f of files){ try{ const txt=await f.text(); const arr=JSON.parse(txt); const rows=Array.isArray(arr)?arr:(Array.isArray(arr.localHistory)?arr.localHistory:[]); state.imports.history.push(...rows); }catch{} } saveImports(); text('historyInfo', `History: ${loadHistory().length} local / ${state.imports.history.length} imported`); }
-async function importCorpusFiles(files){ for(const f of files){ try{ const txt=await f.text(); state.imports.corpus.push({ name:f.name, importedAt:Date.now(), text:txt, addresses:scanAddresses(txt) }); }catch{} } saveImports(); }
-function exportBundle(){ const bundle={ version:'v13', exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, memory:state.memory, localHistory:loadHistory(), mergedHistory:mergedHistory(), latestModel:state.latestModel }; download('pdai-v13-bundle.json', JSON.stringify(bundle,null,2)); }
-$('refreshBtn').onclick=sync; $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open'); $('saveSettingsBtn').onclick=()=>{ readSettings(); sync(); }; $('resetSettingsBtn').onclick=()=>{ state.settings=defaultsSettings(); saveSettings(); applySettings(); sync(); }; $('importHistoryBtn').onclick=()=>$('historyFile').click(); $('importCorpusBtn').onclick=()=>$('corpusFile').click(); $('exportHistoryBtn').onclick=()=>download('pdai-v13-history.json', JSON.stringify(mergedHistory(),null,2)); $('exportBundleBtn').onclick=exportBundle; $('copyBriefBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText($('briefBox').value||''); $('copyBriefBtn').textContent='Copied'; setTimeout(()=>$('copyBriefBtn').textContent='Copy brief',1200);}catch{} };
-$('historyFile').onchange=e=>importHistoryFiles([...e.target.files]); $('corpusFile').onchange=e=>importCorpusFiles([...e.target.files]);
-state.settings=loadSettings(); state.imports=loadImports(); state.memory=loadMemory(); applySettings(); text('historyInfo', `History: ${loadHistory().length} local / ${state.imports.history.length} imported`); setTimer(); sync();
+  let rpcIndex = 0;
+  let syncing = false;
+  const decimalsCache = new Map();
+  const timeCache = new Map();
+
+  const $ = id => document.getElementById(id);
+  const norm = x => String(x || '').trim().toLowerCase();
+  const isAddr = x => /^0x[a-fA-F0-9]{40}$/.test(String(x || '').trim());
+  const short = (s,a=8,b=6) => s ? (s.length > a+b+3 ? s.slice(0,a)+'...'+s.slice(-b) : s) : '—';
+  const fmt = (n,d=2) => Number.isFinite(n) ? Number(n).toLocaleString(undefined,{maximumFractionDigits:d}) : '—';
+  const fmtPct = n => Number.isFinite(n) ? (n*100).toFixed(1)+'%' : '—';
+  const esc = s => String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  const toHex = n => '0x'+BigInt(n).toString(16);
+  const fromHex = h => { try { return BigInt(h || '0x0'); } catch { return 0n; } };
+  const units = (big, dec=18) => { const neg = big < 0n; let s=(neg?-big:big).toString(); if(dec){ if(s.length<=dec) s='0'.repeat(dec-s.length+1)+s; s=s.slice(0,-dec)+'.'+s.slice(-dec).replace(/0+$/,''); s=s.replace(/\.$/,''); } return parseFloat((neg?'-':'')+s); };
+
+  function loadSettings(){ try { return {...DEFAULTS, ...JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'), watch:{...DEFAULTS.watch, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}').watch||{})}}; } catch { return structuredClone(DEFAULTS); } }
+  function saveSettings(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+  function loadHistory(){ try { const x = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); return Array.isArray(x)?x:[]; } catch { return []; } }
+  function saveHistory(h){ localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-500))); }
+
+  function pushSettingsUI(s){
+    $('rpcUrls').value = s.rpcUrls.join('\n'); $('channelId').value=s.channelId; $('channelHandle').value=s.channelHandle; $('scanBlocks').value=s.scanBlocks;
+    $('watch5ef7').value=s.watch['5EF7']; $('watch3d07').value=s.watch['3D07']; $('watchBa86').value=s.watch['Ba86']; $('watchF2dc').value=s.watch['F2Dc']; $('watch7b12').value=s.watch['7b12']; $('watch0968').value=s.watch['0968'];
+    $('manualSocial').value=s.manualSocial||''; $('notes').value=s.notes||'';
+  }
+  function pullSettingsUI(){ const s = loadSettings(); s.rpcUrls = $('rpcUrls').value.split(/\n+/).map(x=>x.trim()).filter(Boolean); s.channelId=$('channelId').value.trim(); s.channelHandle=$('channelHandle').value.trim(); s.scanBlocks=Number($('scanBlocks').value)||350; s.watch['5EF7']=$('watch5ef7').value.trim(); s.watch['3D07']=$('watch3d07').value.trim(); s.watch['Ba86']=$('watchBa86').value.trim(); s.watch['F2Dc']=$('watchF2dc').value.trim(); s.watch['7b12']=$('watch7b12').value.trim(); s.watch['0968']=$('watch0968').value.trim(); s.manualSocial=$('manualSocial').value; s.notes=$('notes').value; saveSettings(s); return s; }
+
+  async function rpc(method, params, settings){
+    const urls = settings.rpcUrls;
+    let lastErr;
+    for(let i=0;i<urls.length;i++){
+      const idx=(rpcIndex+i)%urls.length;
+      const url=urls[idx];
+      try{
+        const res = await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+i,method,params})});
+        const j = await res.json();
+        if(j.error) throw new Error(j.error.message||'rpc error');
+        rpcIndex=idx; $('meta').innerHTML='RPC: '+esc(url.replace(/^https?:\/\//,''))+'<br>Last sync: '+new Date().toLocaleString()+'<br>History: '+loadHistory().length+' local';
+        return j.result;
+      } catch(err){ lastErr=err; }
+    }
+    throw lastErr || new Error('all RPCs failed');
+  }
+
+  async function ercDecimals(token, settings){ const k=norm(token); if(decimalsCache.has(k)) return decimalsCache.get(k); const raw=await rpc('eth_call',[{to:token,data:'0x313ce567'},'latest'],settings); const d=parseInt(raw,16); decimalsCache.set(k, Number.isFinite(d)?d:18); return decimalsCache.get(k); }
+  async function ercBalance(token, holder, settings){ const data='0x70a08231'+norm(holder).replace(/^0x/,'').padStart(64,'0'); const raw=await rpc('eth_call',[{to:token,data},'latest'],settings); return fromHex(raw); }
+  async function totalSupply(token, settings){ return fromHex(await rpc('eth_call',[{to:token,data:'0x18160ddd'},'latest'],settings)); }
+  async function txCount(addr, settings){ return parseInt(await rpc('eth_getTransactionCount',[addr,'latest'],settings),16); }
+  async function storageAt(addr, slot, settings){ return await rpc('eth_getStorageAt',[addr,slot,'latest'],settings); }
+  async function blockNumber(settings){ return parseInt(await rpc('eth_blockNumber',[],settings),16); }
+  async function blockTime(b, settings){ if(timeCache.has(b)) return timeCache.get(b); const x=await rpc('eth_getBlockByNumber',[toHex(b),false],settings); const t=x&&x.timestamp?parseInt(x.timestamp,16)*1000:null; timeCache.set(b,t); return t; }
+
+  async function getLogs(address, fromBlock, toBlock, topics, settings){
+    try { return await rpc('eth_getLogs',[{address,fromBlock:toHex(fromBlock),toBlock:toHex(toBlock),topics}],settings); }
+    catch(e){ return []; }
+  }
+
+  function parseTransfer(log, dec){ return { block: parseInt(log.blockNumber,16), from: '0x'+log.topics[1].slice(-40), to:'0x'+log.topics[2].slice(-40), amount: units(fromHex(log.data), dec), txHash: log.transactionHash }; }
+
+  async function readAnchorState(settings, prev){
+    const pd=await ercDecimals(PDAI, settings); const wd=18; const ad=await ercDecimals(ATROPA, settings);
+    const anchors=[
+      { address:'0x947b4633e32e0c7f2c76753b43f008480715416d', name:'Native pDAI/WPLS', type:'public-native', role:'optical rail', tokenA:PDAI, tokenB:WPLS, decA:pd, decB:wd },
+      { address:settings.watch['5EF7'], name:'ATROPA/DAI core', type:'core', role:'structural core', tokenA:PDAI, tokenB:ATROPA, decA:pd, decB:ad },
+      { address:'0xe56043671df55de5cdf8459710433c10324de0ae', name:'Bridged DAI/WPLS', type:'bridged', role:'surface pressure rail', tokenA:WPLS, tokenB:'0xefd766ccb38eaf1dfd701853bfce31359239f305', decA:wd, decB:18 }
+    ];
+    for(const a of anchors){
+      a.reserveA = units(await ercBalance(a.tokenA, a.address, settings), a.decA);
+      a.reserveB = units(await ercBalance(a.tokenB, a.address, settings), a.decB);
+      const prevA = prev?.anchors?.find(x=>norm(x.address)===norm(a.address));
+      a.motion = prevA ? Math.abs((a.reserveA+a.reserveB) - (prevA.reserveA+prevA.reserveB)) / Math.max(1, (prevA.reserveA+prevA.reserveB)) : 0;
+      a.interpretation = a.motion>0 ? 'active surface rail' : 'quiet surface rail';
+    }
+    return anchors;
+  }
+
+  async function readWatchers(settings){
+    const pd=await ercDecimals(PDAI, settings); const out=[];
+    for(const [label, addr] of Object.entries(settings.watch)){
+      const pdai = isAddr(addr) ? units(await ercBalance(PDAI, addr, settings), pd) : 0;
+      const nonce = isAddr(addr) ? await txCount(addr, settings) : 0;
+      out.push({label, addr, pdai, nonce, tier: label==='5EF7' ? 'hot' : ((pdai>0 || nonce>0) ? 'warm' : 'cold')});
+    }
+    return out;
+  }
+
+  function parseManualSocial(text){
+    return String(text||'').split(/\n+/).map(line=>line.trim()).filter(Boolean).map((line,idx)=>{
+      const parts=line.split('|').map(x=>x.trim());
+      return { id: parts[1] || 'manual-'+idx+'-'+parts[0].slice(0,12), title: parts[0], published: parts[2]||'', source:'manual', url: parts[1]?`https://www.youtube.com/watch?v=${parts[1]}`:'' };
+    });
+  }
+
+  async function fetchJson(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+  async function fetchText(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); }
+
+  async function harvestSocial(settings, prev){
+    const items=[]; const warnings=[];
+    const rssUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id='+encodeURIComponent(settings.channelId);
+    const proxies=[
+      'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(rssUrl),
+      'https://r.jina.ai/http://'+rssUrl.replace(/^https?:\/\//,'')
+    ];
+    try{
+      const j = await fetchJson(proxies[0]);
+      for(const it of (j.items||[]).slice(0,18)){
+        const id = (it.guid||it.link||'').match(/(?:v=|\/)([A-Za-z0-9_-]{11})/)?.[1] || it.guid || it.link;
+        items.push({ id, title: it.title || 'untitled', published: it.pubDate || '', source:'rss', url: it.link || '', raw: it });
+      }
+    } catch(e){ warnings.push('rss2json failed: '+e.message); }
+
+    try{
+      const t = await fetchText('https://r.jina.ai/http://https://www.youtube.com/channel/'+settings.channelId+'/shorts');
+      const re = /youtube\.com\/(?:shorts|watch\?v=)\/??([A-Za-z0-9_-]{11})|\/shorts\/([A-Za-z0-9_-]{11})/g;
+      let m; const ids=[];
+      while((m=re.exec(t))){ ids.push(m[1]||m[2]); }
+      [...new Set(ids)].slice(0,20).forEach((id, idx)=> items.push({ id, title:'short '+id, published:'', source:'jina', url:'https://www.youtube.com/shorts/'+id }));
+    } catch(e){ warnings.push('jina shorts failed: '+e.message); }
+
+    for(const m of parseManualSocial(settings.manualSocial)){ items.push(m); }
+
+    const merged = [];
+    const byId = new Set();
+    for(const item of items){ if(!item.id || byId.has(item.id)) continue; byId.add(item.id); const clues = extractClues(item.title + ' ' + (item.published||'')); merged.push({...item, clues}); }
+    merged.sort((a,b)=> String(b.published).localeCompare(String(a.published)));
+
+    const seen = new Set((prev?.social||[]).map(x=>x.id));
+    const newItems = merged.filter(x=>!seen.has(x.id));
+    return { items: merged.slice(0,30), newItems, warnings };
+  }
+
+  function extractClues(text){
+    const t=String(text||''); const out=[];
+    const dur=[...t.matchAll(/(\d{1,4})s\b/gi)].map(x=>x[1]+'s'); if(dur.length) out.push(...dur);
+    const stamps=[...t.matchAll(/20\d{10}/g)].map(x=>x[0]); if(stamps.length) out.push(...stamps);
+    ['trilateral','terminal','spectacle','qwen','bear','north','aviary','legend','heat','bell','proxy','pm4'].forEach(k=>{ if(new RegExp(k,'i').test(t)) out.push(k); });
+    return [...new Set(out)].slice(0,8);
+  }
+
+  async function recentCounterparties(settings, watchers){
+    const latest = await blockNumber(settings); const from = Math.max(0, latest - settings.scanBlocks); const pd = await ercDecimals(PDAI, settings);
+    const logs = await getLogs(PDAI, from, latest, [TRANSFER_TOPIC], settings);
+    const events = logs.map(l=>parseTransfer(l,pd));
+    const interest = new Set([
+      ...watchers.map(w=>norm(w.addr)),
+      norm('0x947b4633e32e0c7f2c76753b43f008480715416d'), norm(settings.watch['5EF7']), norm('0xe56043671df55de5cdf8459710433c10324de0ae')
+    ]);
+    const counts = new Map();
+    for(const ev of events){
+      const nf=norm(ev.from), nt=norm(ev.to);
+      if(interest.has(nf) && !interest.has(nt) && isAddr(nt)){ counts.set(nt,(counts.get(nt)||0)+1); }
+      if(interest.has(nt) && !interest.has(nf) && isAddr(nf)){ counts.set(nf,(counts.get(nf)||0)+1); }
+    }
+    return [...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8).map(([addr,count])=>({addr,count}));
+  }
+
+  async function payloadSniff(settings){
+    // lightweight placeholder: sniff latest block tx input lengths touching 5EF7 or public anchors
+    const findings=[];
+    try{
+      const latest = await blockNumber(settings);
+      const blk = await rpc('eth_getBlockByNumber',[toHex(latest), true], settings);
+      const targets = new Set([norm(settings.watch['5EF7']), norm('0x947b4633e32e0c7f2c76753b43f008480715416d'), norm('0xe56043671df55de5cdf8459710433c10324de0ae')]);
+      for(const tx of (blk.transactions||[])){
+        if(tx.to && targets.has(norm(tx.to)) && tx.input && tx.input !== '0x'){
+          const len = (tx.input.length-2)/2; findings.push('payload '+short(tx.hash)+' len '+len); if(findings.length>=3) break;
+        }
+      }
+      if(!findings.length) findings.push('no recent payload motifs around hottest anchors');
+    } catch(e){ findings.push('payload sniff unavailable: '+e.message); }
+    return findings;
+  }
+
+  function buildThoughts(model){
+    const thoughts=[];
+    if(model.social.newItems.length) thoughts.push('New social delta detected: '+model.social.newItems.map(x=>x.id).slice(0,3).join(', ')+'.');
+    else thoughts.push('No new social delta was detected this cycle.');
+    thoughts.push(model.watchers.find(w=>w.label==='5EF7')?.pdai ? `5EF7 still carries ${fmt(model.watchers.find(w=>w.label==='5EF7').pdai/1e9,3)}B pDAI and remains the strongest live watcher.` : '5EF7 watcher missing or unreadable.');
+    thoughts.push(model.slotProbe.allZero ? 'Slot probe remains null-null equality; treat as contradiction, not symmetry.' : 'Slot probe is non-null and needs extra weight.');
+    thoughts.push(model.dnaProbe.implAddress ? 'DNA slot is populated; proxy-style behavior deserves attention.' : 'DNA slot is empty again; proxy-swap theory cannot carry this cycle.');
+    if(model.publicStrength > model.interiorStrength) thoughts.push('Public anchors are still the richer truth layer than the current interior map.');
+    else thoughts.push('Interior and surface are closer than usual.');
+    return thoughts.slice(0,6);
+  }
+
+  function buildCuriosity(model){
+    const out=[];
+    if(model.social.newItems.length) out.push('Test new shorts against recent anchor motion windows.');
+    if(model.counterparties.length) out.push('Promote strongest fresh counterparty into watcher rehab.');
+    if(model.watchers.filter(w=>w.tier==='cold').length) out.push('Replace one dead watcher this cycle.');
+    out.push('Keep 5EF7 as structural core and continue bridge-gap hunting.');
+    return out.slice(0,5);
+  }
+
+  function buildGoal(model){
+    return model.social.newItems.length
+      ? 'Map new Maria shorts to chain resonance windows and see which public or interior rails answer.'
+      : 'Bridge the live public surface to a better interior watcher map.';
+  }
+
+  function buildActions(model){
+    const actions=[];
+    actions.push({kind:'social-delta', status:'ok', findings: model.social.newItems.length ? model.social.newItems.map(x=>'new '+x.id+' '+x.title).slice(0,4) : ['no new social items this cycle']});
+    actions.push({kind:'counterparty-hunt', status:'ok', findings: model.counterparties.length ? model.counterparties.map(x=>'candidate '+short(x.addr)+' ×'+x.count).slice(0,4) : ['no fresh counterparties found in scan window']});
+    const cold = model.watchers.filter(w=>w.tier==='cold').map(w=>w.label);
+    actions.push({kind:'watcher-rehab', status:'ok', findings: ['cold watchers: '+(cold.join(', ')||'none'), model.counterparties[0] ? 'suggest promote '+short(model.counterparties[0].addr) : 'no replacement candidate']});
+    actions.push({kind:'payload-sniff', status:'ok', findings: model.payloadFindings});
+    if(model.social.newItems.length){
+      const clues = model.social.newItems.flatMap(x=>x.clues).slice(0,8);
+      actions.push({kind:'resonance-check', status:'ok', findings: clues.length ? ['clues: '+clues.join(', '), 'check recent anchor motion around upload windows'] : ['no useful clue strings parsed']});
+    }
+    return actions;
+  }
+
+  function scoreModel(model){
+    const socialStrength = Math.min(1, model.social.newItems.length * 0.35 + model.social.items.slice(0,5).filter(x=>x.clues.length).length*0.06);
+    const publicStrength = Math.min(1, model.anchors.reduce((s,a)=>s+a.motion,0)*5000);
+    const interiorStrength = Math.min(1, model.watchers.reduce((s,w)=>s + (w.tier==='hot'?0.18:w.tier==='warm'?0.08:0), 0) + (model.counterparties.length?0.08:0));
+    const contradictionLoad = (model.slotProbe.allZero?0.3:0) + (!model.dnaProbe.implAddress?0.3:0) + (model.watchers.filter(w=>w.tier==='cold').length>=4?0.2:0) + (!model.social.newItems.length?0.05:0);
+    const score = Math.max(0, Math.min(100, (socialStrength*24 + publicStrength*28 + interiorStrength*24 + (1-contradictionLoad)*24)*100/100 ));
+    let regime = 'audit';
+    if(model.social.newItems.length && publicStrength>0.02) regime='social-synced';
+    else if(publicStrength > interiorStrength) regime='surface-only';
+    else if(interiorStrength >= publicStrength) regime='interior-awakening';
+    return {socialStrength, publicStrength, interiorStrength, contradictionLoad: Math.min(1,contradictionLoad), score, regime};
+  }
+
+  function render(model){
+    $('score').textContent = fmt(model.scored.score,1);
+    $('regime').textContent = model.scored.regime;
+    $('socialDelta').textContent = String(model.social.newItems.length);
+    $('publicTruth').textContent = fmtPct(model.scored.publicStrength);
+    $('interiorTruth').textContent = fmtPct(model.scored.interiorStrength);
+    $('contradiction').textContent = fmtPct(model.scored.contradictionLoad);
+    $('status').textContent = model.scored.regime; $('status').className='status '+(model.social.newItems.length?'good':'warn');
+    $('thoughtBubbles').innerHTML = model.v14Thoughts.map(t=>`<div class="bubble">${esc(t)}</div>`).join('');
+    $('goalBox').textContent = model.v14Goal;
+    $('briefBox').textContent = model.v14Brief;
+    $('actionList').innerHTML = model.v14Actions.map(a=>`<div class="item"><strong>${esc(a.kind)}</strong><br>${a.findings.map(f=>esc(f)).join('<br>')}</div>`).join('');
+    $('curiosityList').innerHTML = model.v14Curiosity.map(c=>`<div class="item">${esc(c)}</div>`).join('');
+    $('promotedList').innerHTML = model.v14Promoted.length ? model.v14Promoted.map(p=>`<div class="item mono">${esc(p)}</div>`).join('') : '<div class="item">No promoted candidates this cycle.</div>';
+    $('socialBody').innerHTML = model.social.items.map(it=>`<tr class="${model.social.newItems.find(x=>x.id===it.id)?'socialNew':''}"><td>${model.social.newItems.find(x=>x.id===it.id)?'NEW':''}</td><td>${esc(it.source)}</td><td>${esc(it.title)}</td><td class="mono">${esc(it.id)}</td><td>${esc(it.published||'—')}</td><td>${esc(it.clues.join(', ')||'—')}</td></tr>`).join('') || '<tr><td colspan="6" class="small">No social items.</td></tr>';
+    $('anchorBody').innerHTML = model.anchors.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.type)}</td><td>${fmt(a.reserveA,3)}</td><td>${fmt(a.reserveB,3)}</td><td>${a.motion?fmtPct(a.motion):'—'}</td><td>${esc(a.interpretation)}</td></tr>`).join('');
+    $('watcherBody').innerHTML = model.watchers.map(w=>`<tr><td>${esc(w.label)}</td><td>${esc(w.tier)}</td><td>${fmt(w.pdai,3)}</td><td>${w.nonce}</td><td>${w.tier==='cold'?'cold / weak proof':'live / useful'}</td><td>${model.counterparties[0] && w.tier==='cold' ? esc(short(model.counterparties[0].addr)) : '—'}</td></tr>`).join('');
+  }
+
+  function snapshot(model){
+    return {
+      ts: Date.now(), score: model.scored.score, phase: model.scored.regime, rawPhase:model.scored.regime, stablePhase:model.scored.regime,
+      total:model.total, burned:model.burned, heatCount:0, publicStrength:model.scored.publicStrength, interiorStrength:model.scored.interiorStrength, contradictionLoad:model.scored.contradictionLoad,
+      slotProbe:model.slotProbe, dnaProbe:model.dnaProbe, mutationStats:{changedCount:model.anchors.filter(a=>a.motion>0).length, velocity:model.anchors.reduce((s,a)=>s+a.motion,0), acceleration:0, rows:model.anchors.map(a=>({address:a.address,name:a.name,type:a.type,role:a.role,reserve0:a.reserveA,reserve1:a.reserveB,motion:a.motion,weight:a.reserveA+a.reserveB}))},
+      watchTiers:Object.fromEntries(model.watchers.map(w=>[w.label,w.tier])), publicAnchors:model.anchors.map(a=>({address:a.address,name:a.name,type:a.type,role:a.role,reserve0:a.reserveA,reserve1:a.reserveB})),
+      nodeBalances:Object.fromEntries(model.watchers.map(w=>[w.label,{pdai:w.pdai,wpls:0,atropa:0,nonce:w.nonce}])),
+      socialDeltaCount:model.social.newItems.length, newSocial:model.social.newItems, socialWarnings:model.social.warnings,
+      v14Thoughts:model.v14Thoughts, v14Actions:model.v14Actions, v14Curiosity:model.v14Curiosity, v14Goal:model.v14Goal, v14Brief:model.v14Brief, v14Promoted:model.v14Promoted,
+      social:model.social.items
+    };
+  }
+
+  async function buildModel(settings, prev){
+    const latest = await blockNumber(settings);
+    const pd = await ercDecimals(PDAI, settings);
+    const total = units(await totalSupply(PDAI, settings), pd);
+    const burned = units(await ercBalance(PDAI, DEAD, settings), pd);
+    const slotA = await storageAt(PDAI, '0x7b12', settings); const slotB = await storageAt(PDAI, '0x0968', settings); const dna = await storageAt(PDAI, EIP1967, settings);
+    const slotProbe = { values:{'0x7b12':slotA,'0x0968':slotB}, allZero: /^0x0+$/.test(slotA) && /^0x0+$/.test(slotB), equal: norm(slotA)===norm(slotB), changed: !prev || norm(prev.slotProbe?.values?.['0x7b12']||'')!==norm(slotA) || norm(prev.slotProbe?.values?.['0x0968']||'')!==norm(slotB), summary: ( /^0x0+$/.test(slotA) && /^0x0+$/.test(slotB) ) ? 'null-null equality' : (norm(slotA)===norm(slotB)?'non-null equality':'divergent') };
+    const dnaProbe = { raw:dna, implAddress: /^0x0+$/.test(dna)?'':'0x'+dna.slice(-40), changed: !prev || norm(prev.dnaProbe?.raw||'')!==norm(dna) };
+    const anchors = await readAnchorState(settings, prev);
+    const watchers = await readWatchers(settings);
+    const social = await harvestSocial(settings, prev);
+    const counterparties = await recentCounterparties(settings, watchers);
+    const payloadFindings = await payloadSniff(settings);
+    const base = { total, burned, slotProbe, dnaProbe, anchors, watchers, social, counterparties, payloadFindings };
+    const scored = scoreModel(base);
+    const v14Thoughts = buildThoughts({...base, scored});
+    const v14Curiosity = buildCuriosity({...base, scored});
+    const v14Goal = buildGoal({...base, scored});
+    const v14Actions = buildActions({...base, scored});
+    const v14Promoted = counterparties.length ? [counterparties[0].addr] : [];
+    const v14Brief = `V14 regime: ${scored.regime}\nScore: ${fmt(scored.score,1)}\nPublic vs interior: ${fmtPct(scored.publicStrength)} / ${fmtPct(scored.interiorStrength)}\nHot watcher: 5EF7\nSocial delta: ${social.newItems.length}\nThoughts: ${v14Thoughts.join(' | ')}\nActions: ${v14Actions.map(a=>a.kind+': '+a.findings[0]).join(' | ')}${v14Promoted.length?'\nPromoted: '+v14Promoted.join(', '):''}`;
+    return {...base, scored, v14Thoughts, v14Curiosity, v14Goal, v14Actions, v14Promoted, v14Brief, latestBlock: latest};
+  }
+
+  async function sync(){
+    if(syncing) return; syncing=true;
+    const settings = loadSettings();
+    try{
+      const history = loadHistory();
+      const prev = history.length ? history[history.length-1] : null;
+      const model = await buildModel(settings, prev);
+      render(model);
+      const next = [...history, snapshot(model)];
+      saveHistory(next);
+      $('meta').innerHTML = $('meta').innerHTML.split('<br>').slice(0,2).join('<br>') + '<br>History: '+next.length+' local';
+    }catch(err){ $('status').textContent='sync failed'; $('status').className='status bad'; $('meta').innerHTML='RPC: '+esc(loadSettings().rpcUrls[rpcIndex]||'—')+'<br>Last error: '+esc(err.message)+'<br>History: '+loadHistory().length+' local'; }
+    finally{ syncing=false; }
+  }
+
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v14-history.json'; a.click(); }
+  function exportBundle(){ const settings=loadSettings(), history=loadHistory(); const bundle={settings, history, exportedAt:new Date().toISOString()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=BUNDLE_NAME; a.click(); }
+  function importHistory(file){ const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); const hist=Array.isArray(data)?data:(Array.isArray(data.history)?data.history:[]); saveHistory(hist); sync(); }catch(e){ alert('Import failed: '+e.message); } }; r.readAsText(file); }
+
+  $('settingsBtn').onclick=()=> $('settingsBox').classList.toggle('open');
+  $('saveSettingsBtn').onclick=()=>{ pullSettingsUI(); sync(); };
+  $('clearSettingsBtn').onclick=()=>{ saveSettings(structuredClone(DEFAULTS)); pushSettingsUI(loadSettings()); sync(); };
+  $('refreshBtn').onclick=sync;
+  $('exportHistoryBtn').onclick=exportHistory;
+  $('exportBundleBtn').onclick=exportBundle;
+  $('importHistoryBtn').onclick=()=>{ const i=document.createElement('input'); i.type='file'; i.accept='.json'; i.onchange=e=>e.target.files[0]&&importHistory(e.target.files[0]); i.click(); };
+
+  pushSettingsUI(loadSettings());
+  sync();
+  setInterval(sync, 45000);
+})();
 </script>
 </body>
 </html>
