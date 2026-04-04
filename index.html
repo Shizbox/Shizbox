@@ -3,1940 +3,353 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover | v8 Ultimate Intelligence</title>
+<title>pDAI Peg Prover • V13 Clean Agent</title>
 <style>
-:root{--bg:#05070d;--bg2:#101a36;--panel:rgba(10,14,24,.88);--line:rgba(88,255,185,.18);--text:#ebfff5;--muted:#8ca0ad;--green:#58ffb9;--cyan:#48c4ff;--amber:#ffcc52;--red:#ff5d73;--pink:#ff56da;--radius:22px;--shadow:0 0 30px rgba(72,196,255,.12),0 0 60px rgba(88,255,185,.06)}
-*{box-sizing:border-box} html,body{margin:0;padding:0;min-height:100%;background:radial-gradient(circle at top,var(--bg2) 0%,var(--bg) 45%,#020306 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif} body{overflow-x:hidden}
-.bg,.bg:before,.bg:after{content:"";position:fixed;inset:-10% -10%;pointer-events:none;z-index:-1;background:radial-gradient(circle at 20% 20%,rgba(72,196,255,.11),transparent 24%),radial-gradient(circle at 78% 16%,rgba(88,255,185,.08),transparent 22%),radial-gradient(circle at 50% 80%,rgba(255,86,218,.06),transparent 24%);filter:blur(18px);animation:drift 20s ease-in-out infinite alternate}.bg:after{background:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;opacity:.2;filter:none;transform:perspective(800px) rotateX(64deg) translateY(24vh) scale(1.5);animation:gridmove 22s linear infinite}
-@keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(2vw,-2vh,0) scale(1.06)}} @keyframes gridmove{0%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(0) scale(1.5)}100%{transform:perspective(800px) rotateX(64deg) translateY(24vh) translateX(-80px) scale(1.5)}} @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}} @keyframes pulse{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}50%{opacity:.92;transform:translate(-50%,-50%) scale(1.08)}} @keyframes bar{100%{transform:translateX(130%)}}
-.app{max-width:1760px;margin:0 auto;padding:18px}.glass{background:linear-gradient(180deg,rgba(16,24,38,.88),rgba(8,12,20,.94));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(12px);border-radius:var(--radius)}
-.top{padding:18px 20px;display:grid;grid-template-columns:1.4fr .8fr;gap:14px}.title{font-size:1.7rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;line-height:1.05;margin:0}.titleGlow{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}.sub{margin-top:10px;color:var(--muted);font-size:.93rem;line-height:1.58;max-width:1100px}.chips{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:999px;font-size:.77rem;background:rgba(255,255,255,.03)}.chip.good{color:var(--green);border-color:rgba(88,255,185,.25)}.chip.info{color:var(--cyan);border-color:rgba(72,196,255,.24)}.chip.warn{color:var(--amber);border-color:rgba(255,204,82,.25)}
-.right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}.status{padding:10px 14px;border-radius:999px;font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}.stable{color:var(--green)}.warned{color:var(--amber)}.bad{color:var(--red)} .meta{text-align:right;color:var(--muted);font-size:.78rem;line-height:1.55}
-.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end} button{appearance:none;border:none;cursor:pointer;padding:11px 14px;border-radius:14px;font:inherit;font-weight:750;color:var(--text);background:linear-gradient(180deg,rgba(72,196,255,.18),rgba(88,255,185,.08));border:1px solid rgba(72,196,255,.25);box-shadow:0 0 18px rgba(72,196,255,.08)} button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.08)} button.mini{padding:6px 8px;border-radius:10px;font-size:.72rem}
-.section{margin-top:14px;padding:14px}.metrics{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}.card{background:linear-gradient(180deg,rgba(12,18,28,.9),rgba(9,13,21,.97));border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:14px;min-height:104px}.label{font-size:.70rem;text-transform:uppercase;letter-spacing:.14em;color:#92a3ad;margin-bottom:10px}.value{font-size:1.42rem;font-weight:950;line-height:1.1}.hint{margin-top:8px;color:var(--muted);font-size:.78rem;line-height:1.45}
-.hero{display:grid;grid-template-columns:420px 1fr;gap:14px}.reactor{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate}.reactor:before,.reactor:after{content:"";position:absolute;border-radius:50%;inset:50%;transform:translate(-50%,-50%);pointer-events:none}.reactor:before{width:360px;height:360px;background:radial-gradient(circle,rgba(88,255,185,.12),transparent 55%),radial-gradient(circle at 30% 30%,rgba(72,196,255,.18),transparent 24%),radial-gradient(circle at 70% 70%,rgba(255,86,218,.12),transparent 24%);filter:blur(14px);animation:pulse 5s ease-in-out infinite}.reactor:after{width:520px;height:520px;border:1px dashed rgba(72,196,255,.18);animation:spin 18s linear infinite;opacity:.6}.ring{position:relative;width:320px;height:320px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(5,8,14,.96) 0 48%,transparent 49% 100%),conic-gradient(from -90deg,var(--red),var(--amber),var(--green),var(--cyan),var(--pink),var(--red));box-shadow:0 0 26px rgba(72,196,255,.18), inset 0 0 32px rgba(255,255,255,.03);animation:spin 14s linear infinite reverse}.ring:before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at center,rgba(6,10,16,.97) 0 62%,transparent 63% 100%),conic-gradient(from -90deg,rgba(88,255,185,.18) 0 calc(var(--score)*1%),rgba(255,255,255,.05) calc(var(--score)*1%) 100%);box-shadow:inset 0 0 45px rgba(72,196,255,.08)}.core{position:absolute;width:208px;height:208px;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(88,255,185,.13),transparent 22%),radial-gradient(circle at 50% 50%,rgba(12,20,34,.98),rgba(4,7,12,.99));border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px}.core .k{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#9bb1bd}.core .score{font-size:3.1rem;font-weight:1000;line-height:1;margin-top:8px}.core .state{margin-top:8px;font-size:1rem;font-weight:900;letter-spacing:.06em}.core .substate{margin-top:8px;font-size:.84rem;color:var(--muted)}
-.heroRight{display:grid;grid-template-rows:auto auto auto 1fr;gap:12px}.verdict{padding:16px;border-radius:22px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(12,19,31,.92),rgba(7,11,18,.97))}.verdictTop{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}.bigVerdict{font-size:1.36rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.scoreBar{margin-top:14px;height:16px;border-radius:999px;background:#0b1118;border:1px solid rgba(255,255,255,.06);overflow:hidden;position:relative}.scoreFill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green),var(--cyan));box-shadow:0 0 24px rgba(88,255,185,.18);transition:width .8s ease;position:relative}.scoreFill:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transform:translateX(-100%);animation:bar 2.6s linear infinite}.parts{margin-top:14px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}.part{border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.02)}.part .k{font-size:.67rem;color:#95a8b3;text-transform:uppercase;letter-spacing:.12em}.part .v{margin-top:7px;font-size:1.02rem;font-weight:850}
-.chartGrid,.quad,.triple,.duo{display:grid;gap:12px}.chartGrid{grid-template-columns:1fr 1fr 1fr}.quad{grid-template-columns:repeat(4,1fr)}.triple{grid-template-columns:repeat(3,1fr)}.duo{grid-template-columns:1fr 1fr}.mini,.listBox,.tableCard,.settings{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}.boxTitle{font-size:.80rem;text-transform:uppercase;letter-spacing:.14em;color:#9eb2be;margin-bottom:10px}.list{display:grid;gap:8px}.item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.86rem;line-height:1.48}.item.good{border-color:rgba(88,255,185,.18)}.item.warn{border-color:rgba(255,204,82,.18)}.item.bad{border-color:rgba(255,93,115,.18)}
-.settings{display:none}.settings.open{display:block}.formGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.74rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.field textarea{min-height:86px;resize:vertical}.checkline{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);font-size:.84rem}.checkline input{width:auto}
-.tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)}table{width:100%;border-collapse:collapse;min-width:980px;background:#081019}th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top}th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem} tr:hover td{background:rgba(255,255,255,.02)} canvas{width:100%;height:90px;display:block}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid rgba(255,255,255,.08)}.tag.good{color:var(--green);border-color:rgba(88,255,185,.22)}.tag.bad{color:var(--red);border-color:rgba(255,93,115,.22)}.tag.ref{color:var(--amber);border-color:rgba(255,204,82,.22)}.tag.other{color:#c2ccd2}.small{font-size:.76rem;color:var(--muted)} a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}.foot{margin:14px 0 22px;padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;color:var(--muted);font-size:.78rem}
-@media (max-width:1600px){.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.parts{grid-template-columns:repeat(4,minmax(0,1fr))}.formGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.chartGrid,.triple,.quad,.duo{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.top{grid-template-columns:1fr}.right{align-items:flex-start}.meta{text-align:left}.btns{justify-content:flex-start}}
-@media (max-width:900px){.metrics,.parts,.formGrid{grid-template-columns:1fr}.reactor{min-height:360px}.ring{width:280px;height:280px}.core{width:184px;height:184px}.core .score{font-size:2.5rem}}
+:root{
+  --bg:#04070d;--panel:#0b111a;--panel2:#0e1622;--line:rgba(255,255,255,.08);--text:#eef8ff;--muted:#93a6b5;
+  --green:#58ffb9;--cyan:#48c4ff;--amber:#ffcc52;--red:#ff667d;--pink:#ff6fe8;
+}
+*{box-sizing:border-box} html,body{margin:0;padding:0;background:radial-gradient(circle at top,#0d1830 0,#060911 42%,#03050a 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+body{min-height:100vh}
+.wrap{max-width:1600px;margin:0 auto;padding:18px}
+.glass{background:linear-gradient(180deg,rgba(13,18,28,.92),rgba(7,11,18,.97));border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.18)}
+.top{padding:18px 20px;display:grid;grid-template-columns:1.4fr .9fr;gap:14px}
+.title{font-size:1.7rem;font-weight:950;letter-spacing:.06em;text-transform:uppercase}.title span{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin-top:8px;color:var(--muted);line-height:1.55}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.chip{padding:8px 10px;border-radius:999px;font-size:.78rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
+.right{display:flex;flex-direction:column;gap:10px;align-items:flex-end}.status{padding:10px 14px;border-radius:999px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1)}
+.good{color:var(--green)} .warn{color:var(--amber)} .bad{color:var(--red)} .info{color:var(--cyan)}
+.meta{font-size:.8rem;color:var(--muted);line-height:1.6;text-align:right}.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:14px;color:var(--text);font:inherit;font-weight:700;background:linear-gradient(180deg,rgba(72,196,255,.18),rgba(88,255,185,.08));border:1px solid rgba(72,196,255,.24)}
+button.secondary{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border-color:rgba(255,255,255,.09)} button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.section{margin-top:14px;padding:14px}
+.grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.card{padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(14,20,31,.94),rgba(8,12,20,.98));border:1px solid rgba(255,255,255,.06)}
+.label{font-size:.7rem;color:#9db0bc;text-transform:uppercase;letter-spacing:.14em}.value{margin-top:10px;font-size:1.45rem;font-weight:950}.hint{margin-top:8px;color:var(--muted);font-size:.8rem;line-height:1.45}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:12px}.subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.boxTitle{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:#9eb2be;margin-bottom:10px}
+.list{display:grid;gap:8px}.item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.84rem;line-height:1.45}
+.bubbles{min-height:300px;position:relative;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:radial-gradient(circle at 20% 20%,rgba(72,196,255,.12),transparent 22%),radial-gradient(circle at 80% 80%,rgba(88,255,185,.08),transparent 22%),rgba(255,255,255,.02);overflow:hidden;padding:12px}
+.bubble{position:absolute;max-width:300px;padding:12px 14px;border-radius:18px 18px 18px 8px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.09);font-size:.84rem;line-height:1.45;box-shadow:0 10px 28px rgba(0,0,0,.16);animation:float 7s ease-in-out infinite}.bubble:after{content:'';position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.08);border-left:0}
+.bubble.good{border-color:rgba(88,255,185,.2)} .bubble.warn{border-color:rgba(255,204,82,.2)} .bubble.bad{border-color:rgba(255,102,125,.2)} .bubble.info{border-color:rgba(72,196,255,.2)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.settings{display:none}.settings.open{display:block}.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.72rem;color:#9eb0bb;text-transform:uppercase;letter-spacing:.12em}.field input,.field textarea{padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);font:inherit}.field textarea{min-height:80px;resize:vertical}
+.tableWrap{overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.05)} table{width:100%;border-collapse:collapse;min-width:900px;background:#081019} th,td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top} th{position:sticky;top:0;background:#0d1520;color:#9cb0bb;text-transform:uppercase;letter-spacing:.12em;font-size:.69rem}
+.small{font-size:.78rem;color:var(--muted)} .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.footer{margin:14px 0 20px;padding:14px 16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;color:var(--muted);font-size:.78rem}
+@media (max-width:1400px){.top,.hero{grid-template-columns:1fr}.right{align-items:flex-start}.meta{text-align:left}.btns{justify-content:flex-start}.grid6,.form,.subgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.grid6,.form,.subgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="bg"></div>
-<div class="app">
+<div class="wrap">
   <div class="glass top">
     <div>
-      <h1 class="title"><span class="titleGlow">pDAI Peg Prover</span> • v8 Ultimate Intelligence</h1>
-      <div class="sub">v7 stops treating the current interior watcher map like gospel. It learns from history, separates public-surface truth from interior hypotheses, recommends better targets, generates exact proof hunts, and turns contradictions into steering — not embarrassment. This build is about making the tool harder to fool and more useful when the machine stays hidden.</div>
+      <div class="title"><span>pDAI Peg Prover</span> • V13 Clean Agent</div>
+      <div class="sub">Clean-room rewrite. No legacy wrappers. No stacked monkey patches. V13 fixes the recursion bug, keeps labels/versioning consistent, restores reliable import/export, and forces the agent loop to produce social deltas, thoughts, actions, results, and memory every cycle.</div>
       <div class="chips">
-        <span class="chip good">Regime detector</span>
-        <span class="chip info">Watcher rehab lab</span>
-        <span class="chip info">Evidence debt queue</span>
-        <span class="chip info">Query pack generator</span>
-        <span class="chip warn">Adversarial scoring</span>
+        <div class="chip">Sync-safe architecture</div>
+        <div class="chip">Mandatory social delta</div>
+        <div class="chip">Mandatory thought → action</div>
+        <div class="chip">History import works regardless of filename</div>
       </div>
     </div>
     <div class="right">
-      <div id="syncStatus" class="status warned">Booting…</div>
+      <div id="syncStatus" class="status warn">Booting…</div>
       <div class="meta">
         <div id="nodeStatus">RPC: —</div>
         <div id="lastSync">Last sync: —</div>
         <div id="historyInfo">History: —</div>
-        <div id="importInfo">Imported corpus: —</div>
+        <div id="socialInfo">Social: —</div>
       </div>
       <div class="btns">
         <button id="refreshBtn">Refresh now</button>
         <button id="settingsBtn" class="secondary">Settings</button>
         <button id="importHistoryBtn" class="secondary">Import history</button>
         <button id="importCorpusBtn" class="secondary">Import corpus</button>
-        <button id="exportConfigBtn" class="secondary">Export config</button>
+        <button id="exportHistoryBtn" class="secondary">Export history</button>
+        <button id="exportBundleBtn" class="secondary">Export bundle</button>
       </div>
-      <input id="historyFileInput" type="file" accept=".json" style="display:none">
-      <input id="corpusFileInput" type="file" accept=".json,.txt,.md,.csv" multiple style="display:none">
     </div>
   </div>
 
   <div id="settingsBox" class="glass section settings">
-    <div class="boxTitle">v8 settings</div>
-    <div class="small" style="margin-bottom:10px">Private RPC is optional but strongly recommended for selector scans and pending filters. Public anchors are wired in; watchers are hypotheses and can be changed fast.</div>
-    <div class="formGrid">
-      <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="https://your-private-rpc" /></div>
-      <div class="field"><label>Recent block scan</label><input id="sScanBlocks" placeholder="2500" /></div>
-      <div class="field"><label>Selector scan blocks</label><input id="sSelectorBlocks" placeholder="60" /></div>
-      <div class="field"><label>Auto refresh ms</label><input id="sAutoRefreshMs" placeholder="45000" /></div>
-
-      <div class="field"><label>AF4E</label><input id="sAf4e" placeholder="0x..." /></div>
-      <div class="field"><label>D6CA</label><input id="sD6ca" placeholder="0x..." /></div>
-      <div class="field"><label>D46</label><input id="sD46" placeholder="0x..." /></div>
-      <div class="field"><label>8AC4</label><input id="s8ac4" placeholder="0x..." /></div>
-
-      <div class="field"><label>4fd0</label><input id="s4fd0" placeholder="0x..." /></div>
-      <div class="field"><label>3D07</label><input id="s3d07" placeholder="0x..." /></div>
-      <div class="field"><label>Ba86</label><input id="sBa86" placeholder="0x..." /></div>
-      <div class="field"><label>F2Dc</label><input id="sF2dc" placeholder="0x..." /></div>
-
-      <div class="field"><label>7b12</label><input id="s7b12" placeholder="0x..." /></div>
-      <div class="field"><label>0968</label><input id="s0968" placeholder="0x..." /></div>
-      <div class="field"><label>27dF</label><input id="s27df" placeholder="0x..." /></div>
-      <div class="field"><label>ATROPA token</label><input id="sAtropa" placeholder="0x..." /></div>
-
-      <div class="field"><label>Candidate slots</label><input id="sSlots" placeholder="0x7b12,0x0968" /></div>
-      <div class="field"><label>Heat threshold gwei</label><input id="sHeat" placeholder="0" /></div>
-      <div class="field"><label>Payload keywords</label><input id="sKeywords" placeholder="bell,proxy,pi,heat,qwen" /></div>
-      <div class="field"><label>Notes</label><input id="sNotes" placeholder="optional" /></div>
+    <div class="boxTitle">V13 settings</div>
+    <div class="form">
+      <div class="field"><label>Private RPC</label><input id="privateRpc" placeholder="https://your-private-rpc" /></div>
+      <div class="field"><label>Refresh ms</label><input id="refreshMs" value="45000" /></div>
+      <div class="field"><label>Recent blocks</label><input id="scanBlocks" value="80" /></div>
+      <div class="field"><label>Social URL</label><input id="socialUrl" placeholder="https://www.youtube.com/@靈脅用/shorts" /></div>
+      <div class="field"><label>Watcher 3D07</label><input id="watch3d07" /></div>
+      <div class="field"><label>Watcher Ba86</label><input id="watchBa86" /></div>
+      <div class="field"><label>Watcher F2Dc</label><input id="watchF2Dc" /></div>
+      <div class="field"><label>Watcher 7b12</label><input id="watch7b12" /></div>
+      <div class="field"><label>Watcher 0968</label><input id="watch0968" /></div>
+      <div class="field"><label>Payload keywords</label><input id="payloadKeywords" placeholder="bell,proxy,heat,qwen,pi" /></div>
+      <div class="field" style="grid-column: span 2;"><label>Notes</label><textarea id="notes"></textarea></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
-      <button id="resetSettingsBtn" class="secondary">Reset</button>
-      <button id="clearImportsBtn" class="secondary">Clear imports</button>
+      <button id="resetSettingsBtn" class="secondary">Reset settings</button>
     </div>
   </div>
 
   <div class="glass section">
-    <div class="metrics">
-      <div class="card"><div class="label">v7 score</div><div class="value" id="mScore">—</div><div class="hint">Harder to fool than v6</div></div>
-      <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">What the machine most resembles now</div></div>
-      <div class="card"><div class="label">Stable phase</div><div class="value" id="mPhase">—</div><div class="hint">Phase after hysteresis</div></div>
-      <div class="card"><div class="label">Public truth</div><div class="value" id="mPublic">—</div><div class="hint">Surface mutation strength</div></div>
-      <div class="card"><div class="label">Interior truth</div><div class="value" id="mInterior">—</div><div class="hint">Live watcher signal</div></div>
-      <div class="card"><div class="label">Contradiction</div><div class="value" id="mContradiction">—</div><div class="hint">Higher means story debt</div></div>
-      <div class="card"><div class="label">Evidence debt</div><div class="value" id="mDebt">—</div><div class="hint">Missing proof tasks</div></div>
-      <div class="card"><div class="label">Promoted candidates</div><div class="value" id="mCandidates">—</div><div class="hint">New targets worth watching</div></div>
+    <div class="grid6">
+      <div class="card"><div class="label">V13 score</div><div class="value" id="scoreVal">—</div><div class="hint">Adversarial confidence</div></div>
+      <div class="card"><div class="label">Regime</div><div class="value" id="phaseVal">—</div><div class="hint">What the machine most resembles</div></div>
+      <div class="card"><div class="label">Public truth</div><div class="value" id="publicVal">—</div><div class="hint">Surface mutation strength</div></div>
+      <div class="card"><div class="label">Interior truth</div><div class="value" id="interiorVal">—</div><div class="hint">Live watcher signal</div></div>
+      <div class="card"><div class="label">Contradiction</div><div class="value" id="contradictionVal">—</div><div class="hint">Higher means story debt</div></div>
+      <div class="card"><div class="label">Social delta</div><div class="value" id="socialDeltaVal">—</div><div class="hint">New shorts/posts detected</div></div>
     </div>
   </div>
 
   <div class="glass section hero">
-    <div class="reactor">
-      <div class="ring" id="reactorRing" style="--score:0">
-        <div class="core">
-          <div class="k">Adversarial core</div>
-          <div class="score" id="scoreBig">0.0</div>
-          <div class="state" id="coreState">Calibrating</div>
-          <div class="substate" id="coreSub">No regime call yet</div>
-        </div>
-      </div>
-    </div>
-    <div class="heroRight">
-      <div class="verdict">
-        <div class="verdictTop">
-          <div>
-            <div class="label">v8 verdict</div>
-            <div class="bigVerdict" id="bigVerdict">Initializing…</div>
-          </div>
-          <div class="small" id="verdictExplain">v7 rewards honest discovery and punishes decorative “signals” that never move chain state.</div>
-        </div>
-        <div class="scoreBar"><div id="scoreFill" class="scoreFill"></div></div>
-        <div class="parts">
-          <div class="part"><div class="k">Surface</div><div class="v" id="sSurface">—</div></div>
-          <div class="part"><div class="k">Interior</div><div class="v" id="sInterior">—</div></div>
-          <div class="part"><div class="k">Rehab</div><div class="v" id="sRehab">—</div></div>
-          <div class="part"><div class="k">Debt</div><div class="v" id="sDebt">—</div></div>
-          <div class="part"><div class="k">Claims</div><div class="v" id="sClaims">—</div></div>
-          <div class="part"><div class="k">Payloads</div><div class="v" id="sPayloads">—</div></div>
-          <div class="part"><div class="k">Queries</div><div class="v" id="sQueries">—</div></div>
-          <div class="part"><div class="k">History</div><div class="v" id="sHistory">—</div></div>
-        </div>
-      </div>
-      <div class="chartGrid">
-        <div class="mini"><div class="boxTitle">Score history</div><canvas id="scoreChart" width="520" height="90"></canvas><div class="small">Imported + local snapshots.</div></div>
-        <div class="mini"><div class="boxTitle">Surface mutation</div><canvas id="surfaceChart" width="520" height="90"></canvas><div class="small">Public anchors only.</div></div>
-        <div class="mini"><div class="boxTitle">Interior truth</div><canvas id="interiorChart" width="520" height="90"></canvas><div class="small">Should rise only when watchers really move.</div></div>
-      </div>
-      <div class="triple">
-        <div class="listBox"><div class="boxTitle">Verified now</div><div class="list" id="verifiedList"></div></div>
-        <div class="listBox"><div class="boxTitle">v8 insights</div><div class="list" id="insightList"></div></div>
-        <div class="listBox"><div class="boxTitle">What changes my mind</div><div class="list" id="mindList"></div></div>
-      </div>
+    <div class="bubbles" id="bubbleCloud"></div>
+    <div class="subgrid">
+      <div class="card"><div class="boxTitle">Goal</div><div id="goalBox" class="item info">—</div><div class="list" id="blockerList" style="margin-top:10px"></div></div>
+      <div class="card"><div class="boxTitle">Action log</div><div class="list" id="actionList"></div></div>
+      <div class="card"><div class="boxTitle">Social memory</div><div class="list" id="socialList"></div></div>
+      <div class="card"><div class="boxTitle">Operator brief</div><textarea id="briefBox" style="width:100%;min-height:210px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text)"></textarea><div class="btns" style="margin-top:10px"><button id="copyBriefBtn" class="secondary">Copy brief</button></div></div>
     </div>
   </div>
 
-  <div class="duo">
-    <div class="glass tableCard">
-      <div class="boxTitle">Watcher rehab lab</div>
-      <div class="small" style="margin-bottom:10px">Current watchers are graded for usefulness. Cold watchers get demoted and replaced by live candidates from corpus memory, seeded lanes, and block activity.</div>
-      <div class="tableWrap"><table><thead><tr><th>Watcher</th><th>Current tier</th><th>Signal</th><th>Problem</th><th>Replacement suggestion</th></tr></thead><tbody id="rehabBody"></tbody></table></div>
-    </div>
-    <div class="glass tableCard">
-      <div class="boxTitle">Address factory</div>
-      <div class="small" style="margin-bottom:10px">Candidates are promoted from imported corpus memory, seeded research, and recent block touches.</div>
-      <div class="tableWrap"><table><thead><tr><th>Address</th><th>Score</th><th>Tier</th><th>Sources</th><th>Role guess</th><th>Why it matters</th></tr></thead><tbody id="candidateBody"></tbody></table></div>
+  <div class="glass section">
+    <div class="boxTitle">Watcher rehab and promoted candidates</div>
+    <div class="tableWrap">
+      <table>
+        <thead><tr><th>Watcher</th><th>Tier</th><th>Signal</th><th>Problem</th><th>Suggested replacement</th></tr></thead>
+        <tbody id="rehabBody"><tr><td colspan="5" class="small">Waiting…</td></tr></tbody>
+      </table>
     </div>
   </div>
 
-  <div class="duo">
-    <div class="glass tableCard">
-      <div class="boxTitle">Evidence debt queue</div>
-      <div class="small" style="margin-bottom:10px">The missing proof tasks that would most improve the model.</div>
-      <div class="tableWrap"><table><thead><tr><th>Priority</th><th>Task</th><th>Why</th><th>Method</th></tr></thead><tbody id="debtBody"></tbody></table></div>
-    </div>
-    <div class="glass tableCard">
-      <div class="boxTitle">Query pack generator</div>
-      <div class="small" style="margin-bottom:10px">v7 writes the next exact JSON-RPC hunts based on the current blind spots.</div>
-      <div class="btns" style="margin-bottom:12px"><button id="generateQueriesBtn">Generate query pack</button></div>
-      <div class="tableWrap"><table><thead><tr><th>Target</th><th>Purpose</th><th>RPC / idea</th></tr></thead><tbody id="queryBody"></tbody></table></div>
+  <div class="glass section">
+    <div class="boxTitle">Claims and anchors</div>
+    <div class="tableWrap">
+      <table>
+        <thead><tr><th>Anchor / claim</th><th>Status</th><th>Measured result</th></tr></thead>
+        <tbody id="truthBody"><tr><td colspan="3" class="small">Waiting…</td></tr></tbody>
+      </table>
     </div>
   </div>
 
-  <div class="duo">
-    <div class="glass tableCard">
-      <div class="boxTitle">Corridor dominance map</div>
-      <div class="small" style="margin-bottom:10px">If the public surface is moving while the interior is quiet, v7 says so clearly.</div>
-      <div class="tableWrap"><table><thead><tr><th>Anchor</th><th>Type</th><th>Reserve A</th><th>Reserve B</th><th>Motion</th><th>Dominance</th><th>Interpretation</th></tr></thead><tbody id="corridorBody"></tbody></table></div>
-    </div>
-    <div class="glass tableCard">
-      <div class="boxTitle">Regime detector</div>
-      <div class="small" style="margin-bottom:10px">This is the hardest call the tool can make honestly.</div>
-      <div class="tableWrap"><table><thead><tr><th>Scenario</th><th>Fit</th><th>Reason</th></tr></thead><tbody id="regimeBody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="duo">
-    <div class="glass tableCard">
-      <div class="boxTitle">Claim tournament</div>
-      <div class="small" style="margin-bottom:10px">Claims are scored against support and contradictions, not vibes.</div>
-      <div class="tableWrap"><table><thead><tr><th>Claim</th><th>Score</th><th>Support</th><th>Contradictions</th><th>Status</th></tr></thead><tbody id="claimsBody"></tbody></table></div>
-    </div>
-    <div class="glass tableCard">
-      <div class="boxTitle">Corpus memory</div>
-      <div class="small" style="margin-bottom:10px">Past notes, exports, transcripts, and threads become structured memory.</div>
-      <div class="tableWrap"><table><thead><tr><th>Memory item</th><th>Type</th><th>Addresses</th><th>Claims</th><th>Freshness</th></tr></thead><tbody id="corpusBody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="duo">
-    <div class="glass tableCard">
-      <div class="boxTitle">Selector & payload lab</div>
-      <div class="small" style="margin-bottom:10px">Scan recent blocks for selectors touching a target and sniff payload motifs around a watch address.</div>
-      <div class="formGrid" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:12px">
-        <div class="field"><label>Selector target</label><input id="selectorTarget" placeholder="0x..." /></div>
-        <div class="field"><label>Selector blocks</label><input id="selectorBlocks" placeholder="60" /></div>
-        <div class="field"><label>Payload target</label><input id="payloadTarget" placeholder="0x..." /></div>
-        <div class="field"><label>Tx hash</label><input id="txHashInput" placeholder="0x..." /></div>
-      </div>
-      <div class="btns" style="margin-bottom:12px"><button id="scanSelectorsBtn">Scan selectors</button><button id="sniffPayloadBtn" class="secondary">Sniff payloads</button><button id="analyzeTxBtn" class="secondary">Analyze tx</button></div>
-      <div class="tableWrap"><table><thead><tr><th>Type</th><th>Value</th><th>Interpretation</th></tr></thead><tbody id="payloadBody"></tbody></table></div>
-    </div>
-    <div class="glass tableCard">
-      <div class="boxTitle">Contradiction engine</div>
-      <div class="small" style="margin-bottom:10px">Dead sensors, null-null slot equality, and empty DNA are now steering inputs.</div>
-      <div class="tableWrap"><table><thead><tr><th>Contradiction</th><th>Severity</th><th>Effect</th></tr></thead><tbody id="contradictionBody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="glass foot">
+  <div class="footer glass">
     <div>TARGET: <span class="mono">0x6B175474E89094C44Da98b954EedeAC495271d0F</span></div>
-    <div>PUBLIC ANCHORS: <span class="mono">0x947b...416d • 0x5ef7...fada4 • 0xe560...e0ae</span></div>
-    <div>EIP-1967 SLOT: <span class="mono">0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc</span></div>
+    <div>V13 is a clean rewrite with consistent labels and exports.</div>
   </div>
+
+  <input type="file" id="historyFile" multiple hidden accept=".json" />
+  <input type="file" id="corpusFile" multiple hidden accept=".json,.txt,.md" />
 </div>
+
 <script>
 const DEFAULTS = {
-  TARGET:"0x6B175474E89094C44Da98b954EedeAC495271d0F",
-  WPLS:"0xA1077a294D2D00ca00bb46556459739d482282c6",
-  DEAD:"0x000000000000000000000000000000000000dEaD",
-  EIP1967_SLOT:"0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
-  PUBLIC_ANCHORS:[
-    {address:"0x947b4633e32e0c7f2c76753b43f008480715416d", name:"Native pDAI/WPLS", type:"public-native", role:"optical rail"},
-    {address:"0x5ef7aac0de4f2012cb36730da140025b113fada4", name:"ATROPA/DAI core", type:"core", role:"structural core"},
-    {address:"0xe56043671df55de5cdf8459710433c10324de0ae", name:"Bridged DAI/WPLS", type:"bridged", role:"surface pressure rail"},
-    {address:"0x6B175474E89094C44Da98b954EedeAC495271d0F", name:"pDAI token", type:"token", role:"target token"}
+  target: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+  dead: '0x000000000000000000000000000000000000dEaD',
+  publicAnchors: [
+    { address:'0x947b4633e32e0c7f2c76753b43f008480715416d', name:'Native pDAI/WPLS', type:'public-native', role:'optical rail' },
+    { address:'0x5ef7aac0de4f2012cb36730da140025b113fada4', name:'ATROPA/DAI core', type:'core', role:'structural core' },
+    { address:'0xe56043671df55de5cdf8459710433c10324de0ae', name:'Bridged DAI/WPLS', type:'bridged', role:'surface pressure rail' },
+    { address:'0x6B175474E89094C44Da98b954EedeAC495271d0F', name:'pDAI token', type:'token', role:'target token' }
   ],
-  WATCH:{AF4E:"",D6CA:"",NODE_AE84:"",NODE_0968:"0x0000000000000000000000000000000000000968",NODE_4FD0:"",NODE_3D07:"0x19488a0f98363768b449E2D821C8d7747e903D07",NODE_BA86:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc",NODE_F2DC:"0x862247F0E9F77331c470ec75d905CC4240FF3Dc2",NODE_7B12:"0x0000000000000000000000000000000000007b12",NODE_D46:"",NODE_8AC4:"",NODE_27DF:"",NODE_91FD:"",NODE_6327:"",NODE_5805:""},
-  SCAN_BLOCKS:2500,
-  SELECTOR_BLOCKS:60,
-  AUTO_REFRESH_MS:45000,
-  SLOT_LIST:["0x7b12","0x0968"],
-  USE_PENDING_HEAT:true,
-  HEAT_GWEI_THRESHOLD:0,
-  PAYLOAD_KEYWORDS:["bell","proxy","pi","heat","qwen","maria","atropa","liberty"],
-  privateRpc:"",
-  notes:"",
-  RPCS:["https://rpc.pulsechain.com","https://pulsechain.publicnode.com","https://rpc-pulsechain.g4mm4.io","https://rpc.pulsechainrpc.com","https://pulsechain.rpc.thirdweb.com"]
+  watchers: {
+    '5EF7': '0x5ef7aac0de4f2012cb36730da140025b113fada4',
+    '3D07': '0x19488a0f98363768b449E2D821C8d7747e903D07',
+    'Ba86': '0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc',
+    'F2Dc': '0x862247F0E9F77331c470ec75d905CC4240FF3Dc2',
+    '7b12': '0x0000000000000000000000000000000000007b12',
+    '0968': '0x0000000000000000000000000000000000000968'
+  },
+  payloadKeywords: ['bell','proxy','heat','qwen','pi'],
+  socialUrl: 'https://www.youtube.com/@%E9%9D%88%E8%84%85%E7%94%A8/shorts',
+  refreshMs: 45000,
+  scanBlocks: 80,
+  rpcs: ['https://rpc.pulsechain.com','https://pulsechain.publicnode.com','https://rpc-pulsechain.g4mm4.io','https://rpc.pulsechainrpc.com']
 };
-const SEEDED_LANES = [
-  {label:"5EF7", address:"0x5ef7aac0de4f2012cb36730da140025b113fada4", role:"ATROPA/DAI structural core", source:"public-core"},
-  {label:"D46", address:"", role:"PLP accrual / tollbooth", source:"seed-memory"},
-  {label:"D6CA", address:"", role:"recycler / refinery", source:"seed-memory"},
-  {label:"8AC4", address:"", role:"buy-and-burn / sink candidate", source:"seed-memory"},
-  {label:"4fd0", address:"", role:"settlement bucket / internal vault candidate", source:"seed-memory"},
-  {label:"Ba86", address:"0x201efd508c8DfE9DE1a13c2452863A78CB2a86Cc", role:"basket splitter / architect candidate", source:"seed-memory"},
-  {label:"91fD", address:"", role:"WPLS bridge-fee rail", source:"seed-memory"},
-  {label:"6327", address:"", role:"native PLS rail", source:"seed-memory"},
-  {label:"5805", address:"", role:"PLSX rail", source:"seed-memory"},
-  {label:"AF4E", address:"", role:"execution hand", source:"seed-memory"},
-  {label:"27dF", address:"", role:"execution candidate", source:"seed-memory"}
-];
-const SEEDED_CLAIMS = [
-  {claim:"The machine is a multi-rail reserve corridor, not a single admin switch.", support:3, contradiction:0},
-  {claim:"ATROPA/DAI is the structural core and optical pDAI/WPLS is thinner surface.", support:3, contradiction:0},
-  {claim:"Null-null slot equality is not symmetry; it is absence.", support:3, contradiction:0},
-  {claim:"A public surface can mutate while the interior watcher map is wrong.", support:3, contradiction:0},
-  {claim:"4fd0 as documented LibertySwap router is not proven by default.", support:2, contradiction:0},
-  {claim:"Old giant-supply and ae84-hoard stories should be cut unless raw exports prove them.", support:2, contradiction:0}
-];
-const STORAGE_KEY = "pdai-peg-prover-v7-config";
-const IMPORTS_KEY = "pdai-peg-prover-v7-imports";
-const HISTORY_KEY = "pdai-peg-prover-v7-local-history";
-const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-const APPROVAL_TOPIC = "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
-const SIGS = {balanceOf:"0x70a08231", decimals:"0x313ce567", totalSupply:"0x18160ddd", token0:"0x0dfe1681", token1:"0xd21220a7", reserves:"0x0902f1ac"};
-const state = {settings:null, imports:null, timer:null, syncing:false, rpcIndex:0, blockCache:new Map(), decCache:new Map(), pendingFilterId:null};
+const KEYS = { settings:'pdai-v13-settings', imports:'pdai-v13-imports', history:'pdai-v13-history', memory:'pdai-v13-memory' };
+const SIG = {
+  totalSupply:'0x18160ddd', balanceOf:'0x70a08231', token0:'0x0dfe1681', token1:'0xd21220a7', reserves:'0x0902f1ac', txCount:'eth_getTransactionCount', slot:'eth_getStorageAt'
+};
+const state = { settings:null, imports:null, memory:null, syncing:false, timer:null, rpcIndex:0, blockCache:new Map(), latestModel:null };
 const $ = id => document.getElementById(id);
-const norm = x => String(x||"").trim().toLowerCase();
-const isAddr = x => /^0x[a-fA-F0-9]{40}$/.test(String(x||"").trim());
-const short = (s,a=8,b=6)=>{s=String(s||""); return s.length>a+b+3 ? `${s.slice(0,a)}...${s.slice(-b)}` : s;};
-const esc = v => String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
-const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
-const toHex = n => "0x" + BigInt(n).toString(16);
-const fromTopic = t => "0x" + String(t||"").slice(-40);
-const unique = arr => [...new Set(arr)];
-const hexToBigInt = hex => { try{return BigInt(hex||"0x0");}catch{return 0n;} };
-const weiHexToNum = hex => Number(hexToBigInt(hex));
-const nowStamp = ()=> new Date().toLocaleString();
-function fmtNum(v,d=2){return v==null||!Number.isFinite(v)?"—":Number(v).toLocaleString(undefined,{maximumFractionDigits:d});}
-function fmtPct01(v,d=1){return v==null||!Number.isFinite(v)?"—":(v*100).toFixed(d)+"%";}
-function fmtCompact(v,d=2){if(v==null||!Number.isFinite(v)) return "—"; const a=Math.abs(v); if(a>=1e12) return (v/1e12).toFixed(d)+"T"; if(a>=1e9) return (v/1e9).toFixed(d)+"B"; if(a>=1e6) return (v/1e6).toFixed(d)+"M"; if(a>=1e3) return (v/1e3).toFixed(d)+"K"; return fmtNum(v,d);} 
-function fmtFixed(v,d=4){return v==null||!Number.isFinite(v)?"—":Number(v).toFixed(d);} 
-function setText(id,txt){const el=$(id); if(el) el.textContent=txt;}
-function setHTML(id,html){const el=$(id); if(el) el.innerHTML=html;}
-function download(name,text,type="application/json"){const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);} 
-function loadSettings(){let s={}; try{s=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");}catch{}; const out=JSON.parse(JSON.stringify(DEFAULTS)); if(s.privateRpc) out.privateRpc=s.privateRpc; if(s.SCAN_BLOCKS) out.SCAN_BLOCKS=Number(s.SCAN_BLOCKS)||out.SCAN_BLOCKS; if(s.SELECTOR_BLOCKS) out.SELECTOR_BLOCKS=Number(s.SELECTOR_BLOCKS)||out.SELECTOR_BLOCKS; if(s.AUTO_REFRESH_MS) out.AUTO_REFRESH_MS=Number(s.AUTO_REFRESH_MS)||out.AUTO_REFRESH_MS; if(Array.isArray(s.SLOT_LIST)&&s.SLOT_LIST.length) out.SLOT_LIST=s.SLOT_LIST; if(Array.isArray(s.PAYLOAD_KEYWORDS)&&s.PAYLOAD_KEYWORDS.length) out.PAYLOAD_KEYWORDS=s.PAYLOAD_KEYWORDS; if(s.HEAT_GWEI_THRESHOLD!=null) out.HEAT_GWEI_THRESHOLD=Number(s.HEAT_GWEI_THRESHOLD)||0; if(s.notes) out.notes=s.notes; out.WATCH={...out.WATCH,...(s.WATCH||{})}; return out;}
-function saveSettings(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state.settings));}
-function loadImports(){let s={}; try{s=JSON.parse(localStorage.getItem(IMPORTS_KEY)||"{}");}catch{}; return {history:Array.isArray(s.history)?s.history:[], corpus:Array.isArray(s.corpus)?s.corpus:[]};}
-function saveImports(){localStorage.setItem(IMPORTS_KEY,JSON.stringify(state.imports));}
-function loadLocalHistory(){let s=[]; try{s=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]");}catch{}; return Array.isArray(s)?s:[];}
-function saveLocalHistory(arr){localStorage.setItem(HISTORY_KEY,JSON.stringify(arr.slice(-250))); setText("historyInfo",`History: ${arr.length} local / ${state.imports.history.length} imported`);}
-function parseSlots(v){return unique(String(v||"").split(",").map(x=>x.trim()).filter(Boolean).map(x=>x.startsWith("0x")?x:"0x"+x));}
-function units(big, decimals=18){const neg=big<0n; const val=neg?-big:big; let s=val.toString(); if(decimals===0) return Number((neg?"-":"")+s); if(s.length<=decimals) s="0".repeat(decimals-s.length+1)+s; const int=s.slice(0,-decimals)||"0"; const frac=s.slice(-decimals).replace(/0+$/,'').slice(0,12); return parseFloat((neg?"-":"")+int+(frac?"."+frac:""));}
-function fileFreshness(ts){if(!ts) return "unknown"; const days=(Date.now()-ts)/86400000; if(days<7) return "fresh"; if(days<30) return "recent"; return "older";}
-function activeRpcs(){const arr=[...DEFAULTS.RPCS]; if(state.settings.privateRpc) arr.unshift(state.settings.privateRpc); return unique(arr.filter(Boolean));}
-async function withTimeout(p,ms=14000){let t; return Promise.race([p.finally(()=>clearTimeout(t)), new Promise((_,rej)=>{t=setTimeout(()=>rej(new Error("timeout")),ms);})]);}
-async function rpc(method,params){const urls=activeRpcs(); let lastErr; for(let i=0;i<urls.length;i++){const idx=(state.rpcIndex+i)%urls.length; const url=urls[idx]; try{const res=await withTimeout(fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:Date.now()+i,method,params})})); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message||"rpc error"); state.rpcIndex=idx; setText("nodeStatus","RPC: "+url.replace(/^https?:\/\//,"")); return data.result;}catch(e){lastErr=e;}} throw lastErr||new Error("All RPCs failed");}
-async function blockNumber(){return parseInt(await rpc("eth_blockNumber",[]),16);} 
-async function blockFull(n){if(state.blockCache.has(n)) return state.blockCache.get(n); const b=await rpc("eth_getBlockByNumber",[toHex(n),true]); state.blockCache.set(n,b); return b;}
-async function timestampFor(n){const b=await blockFull(n); return b?.timestamp? parseInt(b.timestamp,16)*1000 : null;}
-async function tokenDecimals(addr){const k=norm(addr); if(state.decCache.has(k)) return state.decCache.get(k); const raw=await rpc("eth_call",[{to:addr,data:SIGS.decimals},"latest"]); const d=parseInt(raw,16); const val=Number.isFinite(d)?d:18; state.decCache.set(k,val); return val;}
-async function tokenBalance(token,holder){const data=SIGS.balanceOf + norm(holder).replace(/^0x/,"").padStart(64,"0"); const raw=await rpc("eth_call",[{to:token,data},"latest"]); return hexToBigInt(raw);}
-async function tokenSupply(token){return hexToBigInt(await rpc("eth_call",[{to:token,data:SIGS.totalSupply},"latest"]));}
-async function txCount(addr){return parseInt(await rpc("eth_getTransactionCount",[addr,"latest"]),16);}
-async function readSlot(addr,slot){return await rpc("eth_getStorageAt",[addr,slot,"latest"]);}
-async function pairMeta(addr){const [t0r,t1r,resr]=await Promise.all([rpc("eth_call",[{to:addr,data:SIGS.token0},"latest"]),rpc("eth_call",[{to:addr,data:SIGS.token1},"latest"]),rpc("eth_call",[{to:addr,data:SIGS.reserves},"latest"])]); const t0="0x"+String(t0r).slice(-40), t1="0x"+String(t1r).slice(-40); const h=String(resr||"").replace(/^0x/,""); const r0=hexToBigInt("0x"+h.slice(0,64)), r1=hexToBigInt("0x"+h.slice(64,128)); return {token0:t0, token1:t1, reserve0:r0, reserve1:r1};}
-function watchNodes(){const w=state.settings.WATCH; return [
-  {label:"5EF7", address:DEFAULTS.PUBLIC_ANCHORS[1].address, role:"structural core"},
-  {label:"AF4E", address:w.AF4E, role:"execution hand"},
-  {label:"D6CA", address:w.D6CA, role:"recycler"},
-  {label:"D46", address:w.NODE_D46, role:"PLP tollbooth"},
-  {label:"8AC4", address:w.NODE_8AC4, role:"sink rail"},
-  {label:"4fd0", address:w.NODE_4FD0, role:"settlement bucket"},
-  {label:"3D07", address:w.NODE_3D07, role:"route candidate"},
-  {label:"Ba86", address:w.NODE_BA86, role:"splitter"},
-  {label:"F2Dc", address:w.NODE_F2DC, role:"logic gate"},
-  {label:"7b12", address:w.NODE_7B12, role:"terminal manifold"},
-  {label:"0968", address:w.NODE_0968, role:"hammer"},
-  {label:"27dF", address:w.NODE_27DF, role:"execution candidate"},
-  {label:"91fD", address:w.NODE_91FD, role:"bridge-fee rail"},
-  {label:"6327", address:w.NODE_6327, role:"native PLS rail"},
-  {label:"5805", address:w.NODE_5805, role:"PLSX rail"}
-].filter(x=>isAddr(x.address));}
-function applySettingsToUI(){const s=state.settings, w=s.WATCH; $("sPrivateRpc").value=s.privateRpc||""; $("sScanBlocks").value=s.SCAN_BLOCKS; $("sSelectorBlocks").value=s.SELECTOR_BLOCKS; $("sAutoRefreshMs").value=s.AUTO_REFRESH_MS; $("sAf4e").value=w.AF4E||""; $("sD6ca").value=w.D6CA||""; $("sD46").value=w.NODE_D46||""; $("s8ac4").value=w.NODE_8AC4||""; $("s4fd0").value=w.NODE_4FD0||""; $("s3d07").value=w.NODE_3D07||""; $("sBa86").value=w.NODE_BA86||""; $("sF2dc").value=w.NODE_F2DC||""; $("s7b12").value=w.NODE_7B12||""; $("s0968").value=w.NODE_0968||""; $("s27df").value=w.NODE_27DF||""; $("sAtropa").value=w.ATROPA_TOKEN||""; $("sSlots").value=s.SLOT_LIST.join(","); $("sHeat").value=s.HEAT_GWEI_THRESHOLD; $("sKeywords").value=s.PAYLOAD_KEYWORDS.join(","); $("sNotes").value=s.notes||"";}
-function saveSettingsFromUI(){const s=state.settings; s.privateRpc=$("sPrivateRpc").value.trim(); s.SCAN_BLOCKS=Number($("sScanBlocks").value||s.SCAN_BLOCKS); s.SELECTOR_BLOCKS=Number($("sSelectorBlocks").value||s.SELECTOR_BLOCKS); s.AUTO_REFRESH_MS=Number($("sAutoRefreshMs").value||s.AUTO_REFRESH_MS); s.WATCH.AF4E=$("sAf4e").value.trim(); s.WATCH.D6CA=$("sD6ca").value.trim(); s.WATCH.NODE_D46=$("sD46").value.trim(); s.WATCH.NODE_8AC4=$("s8ac4").value.trim(); s.WATCH.NODE_4FD0=$("s4fd0").value.trim(); s.WATCH.NODE_3D07=$("s3d07").value.trim(); s.WATCH.NODE_BA86=$("sBa86").value.trim(); s.WATCH.NODE_F2DC=$("sF2dc").value.trim(); s.WATCH.NODE_7B12=$("s7b12").value.trim(); s.WATCH.NODE_0968=$("s0968").value.trim(); s.WATCH.NODE_27DF=$("s27df").value.trim(); s.WATCH.ATROPA_TOKEN=$("sAtropa").value.trim(); s.SLOT_LIST=parseSlots($("sSlots").value); s.HEAT_GWEI_THRESHOLD=Number($("sHeat").value||0); s.PAYLOAD_KEYWORDS=unique($("sKeywords").value.split(",").map(x=>x.trim().toLowerCase()).filter(Boolean)); s.notes=$("sNotes").value.trim(); saveSettings(); setRefreshTimer();}
-function resetSettings(){state.settings=loadSettings(); applySettingsToUI(); saveSettings();}
-function clearImports(){state.imports={history:[],corpus:[]}; saveImports(); setText("importInfo","Imported corpus: 0 history, 0 corpus");}
-function setRefreshTimer(){if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000, Number(state.settings.AUTO_REFRESH_MS)||45000));}
-function extractAddresses(text){const m=String(text||"").match(/0x[a-fA-F0-9]{40}/g) || []; return unique(m.map(norm));}
-function extractClaims(text){const lines=String(text||"").split(/\n+/).map(x=>x.trim()).filter(Boolean); return lines.filter(x=>/(claim|conclusion|phase|peg|machine|router|reserve|atropa|pdai|liberty|maker|slot|proxy|alligator|heat|watch|core|rail)/i.test(x)).slice(0,12);}
-function importHistoryFile(file){return file.text().then(t=>{const arr=JSON.parse(t); if(Array.isArray(arr)) state.imports.history = state.imports.history.concat(arr); saveImports();});}
-function importCorpusFiles(files){return Promise.all([...files].map(async f=>{const t=await f.text(); state.imports.corpus.push({name:f.name, type:f.name.split('.').pop().toLowerCase(), importedAt:Date.now(), text:t, addresses:extractAddresses(t), claims:extractClaims(t)});})).then(()=>saveImports());}
-function corpusMemory(){const items=[...state.imports.corpus]; if(!items.length){items.push({name:"Seeded pDAI intelligence", type:"seed", importedAt:Date.now(), addresses:SEEDED_LANES.map(x=>x.address).filter(isAddr), claims:SEEDED_CLAIMS.map(x=>x.claim)});} return items;}
-function mergedHistory(){return [...state.imports.history, ...loadLocalHistory()].sort((a,b)=>(a.ts||0)-(b.ts||0));}
-function chart(canvasId, values, color){const c=$(canvasId), ctx=c.getContext("2d"), w=c.width, h=c.height; ctx.clearRect(0,0,w,h); ctx.fillStyle="rgba(255,255,255,.02)"; ctx.fillRect(0,0,w,h); const vals=values.filter(v=>v!=null&&Number.isFinite(v)); if(vals.length<2){ctx.fillStyle="rgba(140,160,173,.8)"; ctx.font="12px sans-serif"; ctx.fillText("Need more history",10,20); return;} const min=Math.min(...vals), max=Math.max(...vals), range=max-min||1; ctx.beginPath(); values.forEach((v,i)=>{if(v==null||!Number.isFinite(v)) return; const x=(i/Math.max(1,values.length-1))*(w-8)+4; const y=(1-((v-min)/range))*(h-14)+7; if(i===0||!Number.isFinite(values[i-1])) ctx.moveTo(x,y); else ctx.lineTo(x,y);}); ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.stroke();}
-function describeMotion(v){if(v>0.001) return "meaningful"; if(v>0.00005) return "light"; return "quiet";}
-function historyStats(){const hist=mergedHistory(); const latest=hist[hist.length-1]||null; const avg = k => hist.length ? hist.reduce((a,b)=>a+(Number(b[k])||0),0)/hist.length : 0; return {hist, latest, avgScore:avg('score'), avgPublic:avg('publicStrength'), avgInterior:avg('interiorStrength'), avgContradiction:avg('contradictionLoad')};}
-function scenarioRows(model){const rows=[]; const publicOn=model.publicStrength>0.2, interiorOn=model.interiorStrength>0.18, contradictionHigh=model.contradictionLoad>0.55, slotNull=model.slotProbe.allZero, dnaEmpty=!model.dnaProbe.implAddress; rows.push({scenario:"Public-surface-only corridor", fit: clamp((publicOn?0.45:0)+(interiorOn?0:0.25)+(contradictionHigh?0.2:0)+(slotNull?0.1:0)+(dnaEmpty?0.1:0),0,1), reason:"Surface rails mutate while current interior map stays cold."}); rows.push({scenario:"Interior map is wrong / incomplete", fit: clamp((interiorOn?0:0.45)+(contradictionHigh?0.25:0)+(slotNull?0.15:0)+(dnaEmpty?0.15:0),0,1), reason:"Dead watcher set plus repeated contradictions suggests discovery is still needed."}); rows.push({scenario:"Synchronized execution approaching", fit: clamp((publicOn?0.2:0)+(interiorOn?0.35:0)+(model.heatCount>0?0.25:0)+(model.slotProbe.allZero?0:0.1)+(model.dnaProbe.implAddress?0.1:0),0,1), reason:"Needs interior wake-up, non-null probes, or heat — currently weak."}); return rows.sort((a,b)=>b.fit-a.fit);} 
-function deriveRegime(model){const top=scenarioRows(model)[0]; return top ? top.scenario : "Unknown";}
-function watchTier(balance, nonce){if((balance?.pdai||0)>0 || (nonce||0)>0) return "hot"; return "cold";}
-function contradictionRows(model){const rows=[]; if(model.slotProbe.allZero && model.slotProbe.equal) rows.push({text:"Candidate slots are equal only because both are zero.", severity:"high", effect:"Do not score this as manifold lock."}); if(!model.dnaProbe.implAddress) rows.push({text:"DNA slot is empty / zero.", severity:"medium", effect:"Proxy-hot-swap story is unsupported right now."}); if(model.interiorStrength<0.12) rows.push({text:"Interior watcher map is mostly cold.", severity:"high", effect:"Need better addresses or traces."}); if(model.heatCount===0) rows.push({text:"No pending heat detected.", severity:"medium", effect:"Execution-window stories remain unconfirmed."}); if(model.publicStrength>0.2 && model.interiorStrength<0.12) rows.push({text:"Public surface is moving without matching interior proof.", severity:"high", effect:"Treat current machine map as incomplete."}); return rows;}
-function evidenceDebt(model){const tasks=[]; const push=(prio,task,why,method)=>tasks.push({prio,task,why,method}); if(model.interiorStrength<0.15) push(1,"Replace or supplement cold watchers","Current interior map is not earning its keep.","Promote new addresses from corpus and recent block touches."); if(model.slotProbe.allZero) push(2,"Stop over-weighting 0x7b12 / 0x0968 until non-null state appears","Null-null equality is absence, not signal.","Keep probes but reduce phase weight."); if(!model.dnaProbe.implAddress) push(3,"Treat proxy DNA as open question, not live mechanic","Empty EIP-1967 slot is not a positive clue.","Only re-elevate if implementation appears or admin events surface."); if(model.publicStrength>0.2) push(4,"Map counterparties around public anchors","Surface rails are the only active truth currently.","Scan recent blocks for direct touches to 0x947b…, 0x5ef7…, 0xe560…"); push(5,"Get raw AF4E / D6CA transfer exports","These remain the cleanest next proofs from earlier research.","Use eth_getLogs / trace for those addresses when available."); return tasks.sort((a,b)=>a.prio-b.prio);} 
-function claimTournament(model){const claims = SEEDED_CLAIMS.map(c=>({...c})); const add = (claim,support=1,contradiction=0)=>claims.push({claim,support,contradiction}); if(model.publicStrength>0.2 && model.interiorStrength<0.12) add("The public surface is ahead of the currently loaded interior watcher map.",3,0); if(model.nodeBalances["5EF7"]?.pdai>0) add("5EF7 is a real structural core, not decorative lore.",3,0); if(model.slotProbe.allZero) add("Current manifold-slot read is decorative, not evidentiary.",2,0); if(model.heatCount===0) add("Heat-phase execution is not supported by pending activity right now.",0,2); return claims.map(c=>{const raw=c.support - c.contradiction; const score=clamp((raw+3)/6,0,1); return {...c,score,status:score>.72?"strong":score>.45?"open":"weak"};}).sort((a,b)=>b.score-a.score);} 
-function seedCandidateMap(){const map=new Map(); const add=(address,obj)=>{if(!isAddr(address)) return; const k=norm(address); if(!map.has(k)) map.set(k,{address:k,score:0,sources:new Set(),roles:new Set(),reasonParts:[]}); const x=map.get(k); if(obj.score) x.score+=obj.score; if(obj.source) x.sources.add(obj.source); if(obj.role) x.roles.add(obj.role); if(obj.reason) x.reasonParts.push(obj.reason);}; SEEDED_LANES.forEach(l=> add(l.address,{score:3,source:l.source,role:l.role,reason:`seeded lane ${l.label}`})); corpusMemory().forEach(item=> (item.addresses||[]).forEach(a=> add(a,{score:2,source:`corpus:${item.name}`,role:"mentioned in corpus",reason:`seen in ${item.name}`}))); return map;}
-async function recentTouchCandidates(model, latestBlock){const map=seedCandidateMap(); const scan=Math.min(40, Number(state.settings.SELECTOR_BLOCKS)||60); for(let b=latestBlock; b>Math.max(0,latestBlock-scan); b--){let blk; try{blk=await blockFull(b);}catch{continue;} if(!blk||!Array.isArray(blk.transactions)) continue; for(const tx of blk.transactions){const to=norm(tx.to), frm=norm(tx.from), watchSet=new Set([...Object.values(state.settings.WATCH).filter(isAddr).map(norm), ...DEFAULTS.PUBLIC_ANCHORS.map(x=>norm(x.address))]); const touched = watchSet.has(to) || watchSet.has(frm); if(!touched) continue; const cp = watchSet.has(to) ? frm : to; if(isAddr(cp)){
-          if(!map.has(cp)) map.set(cp,{address:cp,score:0,sources:new Set(),roles:new Set(),reasonParts:[]});
-          const x=map.get(cp); x.score += 4; x.sources.add('recent-block-touch'); x.roles.add('counterparty'); x.reasonParts.push(`touched watched/public node in block ${b}`);
-        }
-      }
+const esc = s => String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+const norm = s => String(s||'').trim().toLowerCase();
+const isAddr = s => /^0x[a-fA-F0-9]{40}$/.test(String(s||'').trim());
+const uniq = a => [...new Set(a)];
+const short = (s,a=8,b=6) => { s=String(s||''); return s.length>a+b+3?`${s.slice(0,a)}...${s.slice(-b)}`:s; };
+const fmt = (n,d=2)=> n==null||!Number.isFinite(n)?'—':Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
+const fmtPct = (n,d=1)=> n==null||!Number.isFinite(n)?'—':(n*100).toFixed(d)+'%';
+const fmtCompact = (v,d=2)=>{ if(v==null||!Number.isFinite(v)) return '—'; const a=Math.abs(v); if(a>=1e12)return (v/1e12).toFixed(d)+'T'; if(a>=1e9)return (v/1e9).toFixed(d)+'B'; if(a>=1e6)return (v/1e6).toFixed(d)+'M'; if(a>=1e3)return (v/1e3).toFixed(d)+'K'; return fmt(v,d);} ;
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+const toHex=n=>'0x'+BigInt(n).toString(16);
+function hexToBigInt(hex){ try{return BigInt(hex||'0x0');}catch{return 0n;} }
+function units(big,dec=18){ let s=(big<0n?-big:big).toString(); if(dec===0) return Number((big<0n?'-':'')+s); if(s.length<=dec) s='0'.repeat(dec-s.length+1)+s; const i=s.slice(0,-dec)||'0'; const f=s.slice(-dec).replace(/0+$/,'').slice(0,8); return parseFloat((big<0n?'-':'')+i+(f?'.'+f:'')); }
+function now(){ return new Date().toLocaleString(); }
+function text(id,v){ const el=$(id); if(el) el.textContent=v; }
+function html(id,v){ const el=$(id); if(el) el.innerHTML=v; }
+function download(name,data){ const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500); }
+function loadJSON(k, fallback){ try{ return JSON.parse(localStorage.getItem(k)||''); }catch{return fallback;} }
+function saveJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+function defaultsSettings(){ return { privateRpc:'', refreshMs:DEFAULTS.refreshMs, scanBlocks:DEFAULTS.scanBlocks, socialUrl:DEFAULTS.socialUrl, payloadKeywords:[...DEFAULTS.payloadKeywords], notes:'', watchers:{...DEFAULTS.watchers} }; }
+function loadSettings(){ return Object.assign(defaultsSettings(), loadJSON(KEYS.settings,{})||{}); }
+function loadImports(){ return Object.assign({ history:[], corpus:[], socialSeen:[] }, loadJSON(KEYS.imports,{})||{}); }
+function loadHistory(){ const arr=loadJSON(KEYS.history,[])||[]; return Array.isArray(arr)?arr:[]; }
+function loadMemory(){ return Object.assign({ promoted:{}, lastSocialIds:[], lastBrief:'', cycle:0 }, loadJSON(KEYS.memory,{})||{}); }
+function saveSettings(){ saveJSON(KEYS.settings, state.settings); }
+function saveImports(){ saveJSON(KEYS.imports, state.imports); }
+function saveHistory(arr){ saveJSON(KEYS.history, arr.slice(-600)); text('historyInfo', `History: ${arr.length} local / ${state.imports.history.length} imported`); }
+function saveMemory(){ saveJSON(KEYS.memory, state.memory); }
+function activeRpcs(){ return uniq([state.settings.privateRpc, ...DEFAULTS.rpcs].filter(Boolean)); }
+async function withTimeout(p,ms=15000){ let t; return Promise.race([p.finally(()=>clearTimeout(t)), new Promise((_,rej)=>{ t=setTimeout(()=>rej(new Error('timeout')),ms); })]); }
+async function rpc(method, params){ const urls=activeRpcs(); let lastErr; for(let i=0;i<urls.length;i++){ const idx=(state.rpcIndex+i)%urls.length; const url=urls[idx]; try{ const res=await withTimeout(fetch(url,{ method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+i,method,params}) })); if(!res.ok) throw new Error(`HTTP ${res.status}`); const data=await res.json(); if(data.error) throw new Error(data.error.message||'rpc error'); state.rpcIndex=idx; text('nodeStatus', 'RPC: '+url.replace(/^https?:\/\//,'')); return data.result; }catch(e){ lastErr=e; } } throw lastErr||new Error('All RPCs failed'); }
+async function blockNumber(){ return parseInt(await rpc('eth_blockNumber',[]),16); }
+async function blockFull(n){ if(state.blockCache.has(n)) return state.blockCache.get(n); const b=await rpc('eth_getBlockByNumber',[toHex(n), true]); state.blockCache.set(n,b); return b; }
+async function balanceOf(token, holder){ const data=SIG.balanceOf + norm(holder).replace(/^0x/,'').padStart(64,'0'); return hexToBigInt(await rpc('eth_call',[{to:token,data},'latest'])); }
+async function totalSupply(token){ return hexToBigInt(await rpc('eth_call',[{to:token,data:SIG.totalSupply},'latest'])); }
+async function txCount(addr){ return parseInt(await rpc('eth_getTransactionCount',[addr,'latest']),16); }
+async function readSlot(addr, slot){ return await rpc('eth_getStorageAt',[addr,slot,'latest']); }
+async function pairMeta(addr){ const [t0r,t1r,resr]=await Promise.all([rpc('eth_call',[{to:addr,data:SIG.token0},'latest']), rpc('eth_call',[{to:addr,data:SIG.token1},'latest']), rpc('eth_call',[{to:addr,data:SIG.reserves},'latest'])]); const token0='0x'+String(t0r).slice(-40), token1='0x'+String(t1r).slice(-40); const h=String(resr||'').replace(/^0x/,''); const reserve0=units(hexToBigInt('0x'+h.slice(0,64)),18), reserve1=units(hexToBigInt('0x'+h.slice(64,128)),18); return { token0, token1, reserve0, reserve1 }; }
+async function fetchSocial(url){ const items=[]; const warnings=[]; const sources=[]; const target=url||state.settings.socialUrl||DEFAULTS.socialUrl; const tryFetch = async (u,label)=>{ try{ const res=await withTimeout(fetch(u),12000); if(!res.ok) throw new Error(`HTTP ${res.status}`); const t=await res.text(); sources.push(label); return t; }catch(e){ warnings.push(`${label}: ${e.message||e}`); return ''; } };
+  // Strategy 1: jina mirror text
+  const txt = await tryFetch('https://r.jina.ai/http://'+target, 'jina');
+  if(txt){
+    const ids = uniq([...txt.matchAll(/\/shorts\/([A-Za-z0-9_-]{5,20})/g)].map(m=>m[1]));
+    ids.forEach(id=>items.push({id, title:`short ${id}`, source:'jina'}));
+  }
+  // Strategy 2: user-pasted corpus memory
+  for(const c of state.imports.corpus||[]){
+    if(/靈脅用|youtube|shorts/i.test(c.text||'')){
+      const ids = uniq([...String(c.text).matchAll(/\b([A-Za-z0-9_-]{5})\b/g)].map(m=>m[1]).filter(x=>/[a-z]/i.test(x)));
+      ids.slice(0,8).forEach(id=>items.push({id, title:`corpus ${id}`, source:'corpus'}));
     }
-  return [...map.values()].map(x=>({...x,sources:[...x.sources],roles:[...x.roles],reason:x.reasonParts.slice(0,3).join('; ')})).sort((a,b)=>b.score-a.score).slice(0,30);
+  }
+  const uniqItems=[]; const seen=new Set();
+  for(const it of items){ if(seen.has(it.id)) continue; seen.add(it.id); uniqItems.push(it); }
+  return { items: uniqItems.slice(0,20), warnings, sources };
 }
-function watcherRehab(model,candidates){const active=new Map(candidates.map(c=>[norm(c.address),c])); const rows=[]; for(const [label,bals] of Object.entries(model.nodeBalances)){
-  const tier=model.watchTiers[label]||'cold';
-  let problem='';
-  if(tier==='cold') problem='no balance, no nonce, no fresh proof';
-  else if((bals.pdai||0)>0 && (bals.nonce||0)<=1) problem='structural core but not an active execution proof';
-  else problem='active enough';
-  const replacement = tier==='cold' ? candidates.find(c=>!Object.values(state.settings.WATCH).map(norm).includes(norm(c.address))) : null;
-  rows.push({label,tier,signal:`pDAI ${fmtCompact(bals.pdai,3)} • nonce ${bals.nonce||0}`,problem,replacement});
- }
- return rows;
+function importedHistory(){ return state.imports.history||[]; }
+function mergedHistory(){ return [...importedHistory(), ...loadHistory()]; }
+function scanAddresses(text){ return uniq((String(text||'').match(/0x[a-fA-F0-9]{40}/g)||[]).map(norm)); }
+function forceThoughts(obs){ const out=[]; out.push(obs.publicStrength > obs.interiorStrength ? 'Public anchors are still the richer truth layer than the current interior map.' : 'Interior and surface are closer than usual.');
+  out.push(obs.slotAllZero ? 'Current slot probe is null-null equality and should be treated as absence, not proof.' : 'Slot probe is non-null and needs extra weight.');
+  out.push(obs.dnaEmpty ? 'DNA slot is empty again; proxy-swap theory cannot carry this cycle.' : 'DNA slot is non-empty and needs investigation.');
+  out.push(obs.hot5 ? `5EF7 still carries ${fmtCompact(obs.hot5.pdai,3)} pDAI and remains the strongest live watcher.` : 'No live watcher is convincingly active.');
+  out.push(obs.socialDeltaCount>0 ? `${obs.socialDeltaCount} new social item(s) were detected and should trigger chain tests.` : 'No new social delta was detected this cycle.');
+  return uniq(out);
 }
-async function analyzePayload(txHash){const rows=[]; try{const tx=await rpc('eth_getTransactionByHash',[txHash]); if(!tx) return [{type:'error',value:'not found',interpretation:'No tx returned'}]; rows.push({type:'to',value:tx.to||'—',interpretation:'Destination'}); rows.push({type:'selector',value:(tx.input||'0x').slice(0,10),interpretation:'4-byte selector'}); const hex=String(tx.input||'0x').replace(/^0x/,''); const bytes=[]; for(let i=0;i<Math.min(hex.length,800);i+=2){const v=parseInt(hex.slice(i,i+2),16); if(Number.isFinite(v)) bytes.push(v);} const printable=bytes.filter(b=>b>=32&&b<=126).map(b=>String.fromCharCode(b)).join(''); if(printable) rows.push({type:'ascii',value:printable.slice(0,180),interpretation:'Printable payload fragment'}); for(const kw of state.settings.PAYLOAD_KEYWORDS){if(printable.toLowerCase().includes(kw)) rows.push({type:'keyword',value:kw,interpretation:'Payload contains watched motif'});} }
-  catch(e){rows.push({type:'error',value:e.message||String(e),interpretation:'Could not analyze tx'});} return rows;
+function selectGoal(obs){ if(obs.socialDeltaCount>0) return 'Map new social delta to chain behavior around live anchors and strongest watchers.'; if(obs.publicStrength>obs.interiorStrength) return 'Bridge the live public surface to a better interior watcher map.'; return 'Replace dead watchers and prove or kill the current machine map.'; }
+function actionQueue(obs){ const q=[]; q.push({kind:'social-delta', label:'Social delta analysis'}); q.push({kind:'counterparty-hunt', label:'Counterparty hunt around hottest anchor'}); q.push({kind:'watcher-rehab', label:'Watcher rehab'}); q.push({kind:'payload-sniff', label:'Payload sniff around hottest anchor'}); return q; }
+async function runActions(obs, latestBlock){ const results=[]; const promoted=[];
+  // 1 social delta analysis
+  if(obs.socialDeltaCount>0){ results.push({kind:'social-delta', status:'ok', findings:[`${obs.socialDeltaCount} new social item(s)`, `ids: ${obs.newSocial.map(x=>x.id).join(', ')}`]}); }
+  else { results.push({kind:'social-delta', status:'ok', findings:['no new social items this cycle']}); }
+  // 2 counterparty hunt around hottest anchor
+  const hottest = obs.mutationRows.slice().sort((a,b)=>(b.motion||0)-(a.motion||0) || (b.weight||0)-(a.weight||0))[0] || DEFAULTS.publicAnchors[1];
+  const cps=[]; const watchSet=new Set([...Object.values(state.settings.watchers).map(norm), ...DEFAULTS.publicAnchors.map(a=>norm(a.address))]);
+  const span=Math.max(20, Math.min(120, Number(state.settings.scanBlocks)||80));
+  for(let b=latestBlock; b>Math.max(0, latestBlock-span); b--){ let blk; try{ blk=await blockFull(b); }catch{ continue; } if(!blk?.transactions) continue; for(const tx of blk.transactions){ const to=norm(tx.to), from=norm(tx.from); if(to===norm(hottest.address)){ if(isAddr(from) && !watchSet.has(from)) cps.push(from); } if(from===norm(hottest.address)){ if(isAddr(to) && !watchSet.has(to)) cps.push(to); } } if(cps.length>=8) break; }
+  const uniqCps=uniq(cps).slice(0,8); uniqCps.forEach(a=>promoted.push(a));
+  results.push({kind:'counterparty-hunt', status:'ok', findings: uniqCps.length ? uniqCps.map(a=>`candidate ${short(a,10,8)}`) : ['no fresh counterparties found in scan window']});
+  // 3 watcher rehab
+  const cold = Object.entries(obs.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k);
+  results.push({kind:'watcher-rehab', status:'ok', findings: cold.length ? [`cold watchers: ${cold.join(', ')}`, uniqCps[0] ? `suggest promote ${short(uniqCps[0],10,8)}` : 'no replacement candidate'] : ['no cold watchers']});
+  // 4 payload sniff
+  const sniff=[];
+  const kw=state.settings.payloadKeywords||DEFAULTS.payloadKeywords;
+  for(let b=latestBlock; b>Math.max(0,latestBlock-25); b--){ let blk; try{ blk=await blockFull(b); }catch{ continue; } if(!blk?.transactions) continue; for(const tx of blk.transactions){ if(norm(tx.to)!==norm(hottest.address) && norm(tx.from)!==norm(hottest.address)) continue; const input=String(tx.input||''); if(!input || input==='0x') continue; const bytes=[]; const hex=input.replace(/^0x/,''); for(let i=0;i<Math.min(hex.length,300);i+=2){ const v=parseInt(hex.slice(i,i+2),16); if(Number.isFinite(v)) bytes.push(v); }
+      const ascii=bytes.filter(v=>v>=32&&v<=126).map(v=>String.fromCharCode(v)).join('').toLowerCase();
+      const hit=kw.find(k=>ascii.includes(k)); if(hit){ sniff.push(`tx ${short(tx.hash,10,8)} hit ${hit}`); }
+      else sniff.push(`tx ${short(tx.hash,10,8)} selector ${(input||'0x').slice(0,10)}`);
+      if(sniff.length>=6) break;
+    } if(sniff.length>=6) break; }
+  results.push({kind:'payload-sniff', status:'ok', findings: sniff.length ? sniff : ['no recent payload motifs around hottest anchor']});
+  return { results, promoted: uniq(promoted) };
 }
-async function sniffPayloads(addr){const out=[]; const latest=await blockNumber(); const span=Math.min(30, Number(state.settings.SELECTOR_BLOCKS)||60); for(let b=latest; b>latest-span; b--){let blk; try{blk=await blockFull(b);}catch{continue;} if(!blk||!Array.isArray(blk.transactions)) continue; for(const tx of blk.transactions){if(norm(tx.to)!==norm(addr)&&norm(tx.from)!==norm(addr)) continue; const rows=await analyzePayload(tx.hash); rows.slice(0,2).forEach(r=> out.push({type:r.type,value:r.value,interpretation:`${r.interpretation} • ${short(tx.hash,10,8)}`})); if(out.length>12) return out;} } return out.length?out:[{type:'info',value:'none',interpretation:'No recent payload motifs found around target.'}]; }
-async function scanSelectors(addr){const latest=await blockNumber(); const span=Math.min(120, Number($("selectorBlocks").value||state.settings.SELECTOR_BLOCKS)||60); const map=new Map(); for(let b=latest; b>latest-span; b--){let blk; try{blk=await blockFull(b);}catch{continue;} if(!blk||!Array.isArray(blk.transactions)) continue; for(const tx of blk.transactions){const dir = norm(tx.to)===norm(addr) ? 'inbound' : norm(tx.from)===norm(addr) ? 'outbound' : ''; if(!dir) continue; const sel=(tx.input||'0x').slice(0,10); if(!map.has(sel)) map.set(sel,{selector:sel,count:0,direction:new Set(),latest:tx.hash}); const x=map.get(sel); x.count++; x.direction.add(dir); x.latest=tx.hash; }} return [...map.values()].map(x=>({...x,direction:[...x.direction].join(', '),notes:x.selector==='0x'?'value transfer / empty input':'selector cluster'})).sort((a,b)=>b.count-a.count).slice(0,20); }
-function renderPayloadRows(rows){setHTML('payloadBody', rows.length? rows.map(r=>`<tr><td>${esc(r.type)}</td><td class="mono">${esc(short(r.value,40,18))}</td><td>${esc(r.interpretation)}</td></tr>`).join('') : `<tr><td colspan="3" class="small">No payload rows.</td></tr>`);} 
-async function buildModel(){const latest=await blockNumber(); const targetDec=18; const [totalRaw,burnedRaw] = await Promise.all([tokenSupply(DEFAULTS.TARGET), tokenBalance(DEFAULTS.TARGET, DEFAULTS.DEAD)]); const total=units(totalRaw,targetDec), burned=units(burnedRaw,targetDec);
-  const anchorRows=[];
-  for(const a of DEFAULTS.PUBLIC_ANCHORS){ if(a.type==='token'){anchorRows.push({...a,motion:0,weight:0}); continue;} const meta=await pairMeta(a.address); const d0=await tokenDecimals(meta.token0), d1=await tokenDecimals(meta.token1); anchorRows.push({...a, token0:meta.token0, token1:meta.token1, reserve0:units(meta.reserve0,d0), reserve1:units(meta.reserve1,d1)}); }
-  const history = mergedHistory(); const prev = history[history.length-1] || null;
-  const mutated = anchorRows.map(r=>{ if(r.type==='token') return {...r,motion:0,weight:0}; const prevRow = prev?.mutationStats?.rows?.find(x=>norm(x.address)===norm(r.address)) || prev?.publicAnchors?.find(x=>norm(x.address)===norm(r.address)); const p0=prevRow?.reserve0||r.reserve0, p1=prevRow?.reserve1||r.reserve1; const motion = (Math.abs(r.reserve0-p0)+Math.abs(r.reserve1-p1))/Math.max(1,Math.abs(p0)+Math.abs(p1)); const weight = (r.reserve0||0)+(r.reserve1||0); return {...r,motion,weight}; });
-  const mutationStats = {changedCount:mutated.filter(r=>r.motion>0).length, velocity:mutated.reduce((s,r)=>s+(r.motion||0)*(r.weight||0),0), acceleration: prev?.mutationStats ? Math.abs((mutated.reduce((s,r)=>s+(r.motion||0)*(r.weight||0),0)) - (prev.mutationStats.velocity||0)) : 0, rows:mutated};
-  const slotValues={}; for(const sl of state.settings.SLOT_LIST){ slotValues[sl]=await readSlot(DEFAULTS.TARGET, sl); }
-  const slotProbe={values:slotValues, allZero:Object.values(slotValues).every(v=>/^0x0+$/.test(v||'')), equal:unique(Object.values(slotValues)).length===1, changed: prev? JSON.stringify(slotValues)!==JSON.stringify(prev.slotProbe?.values||{}):true}; slotProbe.summary = slotProbe.allZero&&slotProbe.equal ? 'null-null equality' : slotProbe.equal ? 'equal non-zero candidate state' : 'divergent';
-  const dnaRaw = await readSlot(DEFAULTS.TARGET, DEFAULTS.EIP1967_SLOT); const dnaProbe={raw:dnaRaw, implAddress:/^0x0+$/.test(dnaRaw||'')?'':'0x'+String(dnaRaw).slice(-40), changed: prev? norm(prev.dnaProbe?.raw)!==norm(dnaRaw):true};
-  const nodeBalances={}; const watchTiers={}; for(const n of watchNodes()){ const pdai=units(await tokenBalance(DEFAULTS.TARGET,n.address),18); const atropa = isAddr(state.settings.WATCH.ATROPA_TOKEN||'') ? units(await tokenBalance(state.settings.WATCH.ATROPA_TOKEN,n.address),18) : 0; const nonce=await txCount(n.address); nodeBalances[n.label]={pdai,wpls:0,atropa,nonce}; watchTiers[n.label]=watchTier(nodeBalances[n.label],nonce); }
-  const publicStrength = clamp(mutationStats.velocity>0 ? Math.log10(1+mutationStats.velocity)/6 : 0, 0, 1);
-  const interiorStrength = clamp((Object.values(nodeBalances).filter(x=>(x.pdai||0)>0 || (x.nonce||0)>0).length / Math.max(6, Object.keys(nodeBalances).length))*0.7 + (Object.values(watchTiers).filter(x=>x==='hot').length?0.1:0),0,1);
-  const heatCount = 0;
-  const contradictionList = contradictionRows({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount});
-  const contradictionLoad = clamp(contradictionList.length/5,0,1);
-  const candidates = await recentTouchCandidates({publicAnchors:anchorRows}, latest);
-  const rehab = watcherRehab({nodeBalances,watchTiers}, candidates);
-  const debts = evidenceDebt({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount});
-  const claims = claimTournament({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount,nodeBalances});
-  const regime = deriveRegime({slotProbe,dnaProbe,interiorStrength,publicStrength,heatCount,contradictionLoad});
-  const phase = regime.includes('Synchronized') ? 'execution-watch' : regime.includes('Public-surface-only') ? 'surface-only' : 'audit';
-  const rawScore = (publicStrength*30) + (interiorStrength*25) + (candidates.filter(c=>c.score>=6).length*2) + ((1-contradictionLoad)*25) + (claims.filter(c=>c.status==='strong').length*2);
-  const score = clamp(rawScore,0,100);
-  return {latest,total,burned,publicAnchors:anchorRows,mutationStats,slotProbe,dnaProbe,nodeBalances,watchTiers,publicStrength,interiorStrength,contradictionLoad,contradictionList,candidates,rehab,debts,claims,regime,phase,score,heatCount};
+function buildBrief(model){ return [
+  `V13 regime: ${model.phase}`,
+  `Score: ${fmt(model.score,1)}`,
+  `Public vs interior: ${fmtPct(model.publicStrength,0)} / ${fmtPct(model.interiorStrength,0)}`,
+  `Hot watcher: ${model.hotWatcher || 'none'}`,
+  `Social delta: ${model.socialDeltaCount}`,
+  `Thoughts: ${(model.v13Thoughts||[]).slice(0,5).join(' | ')}`,
+  `Actions: ${(model.v13Actions||[]).map(a=>`${a.kind}: ${(a.findings||[])[0]||a.status}`).join(' | ')}`,
+  `Promoted: ${(model.v13Promoted||[]).map(a=>short(a,10,8)).join(', ') || 'none'}`
+].join('\n'); }
+async function buildModel(){
+  const latest = await blockNumber();
+  const total = units(await totalSupply(DEFAULTS.target),18);
+  const burned = units(await balanceOf(DEFAULTS.target, DEFAULTS.dead),18);
+  const slot7 = await readSlot(DEFAULTS.target,'0x7b12');
+  const slot9 = await readSlot(DEFAULTS.target,'0x0968');
+  const dna = await readSlot(DEFAULTS.target,'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
+  const rows=[];
+  for(const a of DEFAULTS.publicAnchors){
+    if(a.type==='token'){ rows.push({...a,motion:0,weight:0}); continue; }
+    const pm = await pairMeta(a.address);
+    rows.push({...a, token0:pm.token0, token1:pm.token1, reserve0:pm.reserve0, reserve1:pm.reserve1, motion:0, weight:(pm.reserve0||0)+(pm.reserve1||0)});
+  }
+  const history = mergedHistory();
+  const prev = history[history.length-1] || null;
+  if(prev?.mutationStats?.rows){ for(const row of rows){ const pr = (prev.mutationStats.rows||[]).find(x=>norm(x.address)===norm(row.address)); if(pr && row.reserve0!=null && row.reserve1!=null){ const oldTot=(pr.reserve0||0)+(pr.reserve1||0); const newTot=(row.reserve0||0)+(row.reserve1||0); row.motion = oldTot>0 ? Math.abs(newTot-oldTot)/oldTot : 0; } } }
+  const nodeBalances={}; const watchTiers={};
+  for(const [label,addr] of Object.entries(state.settings.watchers)){
+    const pdai=units(await balanceOf(DEFAULTS.target,addr),18); const nonce=await txCount(addr); nodeBalances[label]={pdai,wpls:0,atropa:0,nonce}; watchTiers[label]=(pdai>0||nonce>0)?'hot':'cold';
+  }
+  const publicStrength = clamp(rows.filter(r=>r.motion>0).length/3 + rows.reduce((s,r)=>s+(r.motion||0),0),0,1);
+  const interiorStrength = clamp((Object.values(watchTiers).filter(v=>v==='hot').length/6)*0.7 + ((nodeBalances['5EF7']?.pdai||0)>0 ? 0.15 : 0),0,1);
+  const contradictionLoad = clamp((/null-null/i.test('null-null equality')?0.3:0) + (!String(dna).match(/[1-9a-f]/i)?0.3:0) + (Object.values(watchTiers).filter(v=>v==='cold').length>=4?0.2:0),0,1);
+  const social = await fetchSocial(state.settings.socialUrl);
+  const socialIds = social.items.map(x=>x.id);
+  const prevIds = state.memory.lastSocialIds || [];
+  const newSocial = social.items.filter(x=>!prevIds.includes(x.id));
+  const socialDeltaCount = newSocial.length;
+  const phase = publicStrength>interiorStrength ? (publicStrength>0.15 ? 'surface-only' : 'audit') : 'interior-awakening';
+  const obs = { publicStrength, interiorStrength, slotAllZero: norm(slot7)===norm(slot9) && /^0x0+$/.test(norm(slot7).replace(/^0x/,'')), dnaEmpty: !String(dna).match(/[1-9a-f]/i), hot5:nodeBalances['5EF7'], socialDeltaCount, newSocial, mutationRows:rows, watchTiers };
+  const v13Thoughts = forceThoughts(obs);
+  const v13Goal = selectGoal(obs);
+  const v13ActionPlan = actionQueue(obs);
+  const actionPack = await runActions(obs, latest);
+  const promoted = actionPack.promoted || [];
+  state.memory.lastSocialIds = socialIds;
+  state.memory.cycle = (state.memory.cycle||0)+1;
+  state.memory.promoted = Object.assign({}, state.memory.promoted||{}, Object.fromEntries(promoted.map(a=>[a,Date.now()])));
+  saveMemory();
+  const score = clamp(35 + publicStrength*35 + interiorStrength*15 - contradictionLoad*25 + (socialDeltaCount>0?10:0),0,100);
+  return {
+    version:'v13', latest, total, burned, score, phase, publicStrength, interiorStrength, contradictionLoad,
+    slotProbe:{values:{'0x7b12':slot7,'0x0968':slot9}, allZero:obs.slotAllZero, equal:norm(slot7)===norm(slot9), changed:true, summary:obs.slotAllZero?'null-null equality':'changed'},
+    dnaProbe:{raw:dna, implAddress:'', changed:true},
+    mutationStats:{ changedCount:rows.filter(r=>r.motion>0).length, velocity:rows.reduce((s,r)=>s+(r.motion||0),0), acceleration:0, rows },
+    watchTiers, publicAnchors:rows, nodeBalances,
+    socialWarnings:social.warnings, socialSources:social.sources, socialItems:social.items, socialDeltaCount, newSocial,
+    v13Thoughts, v13Curiosity:v13ActionPlan.map(x=>x.label), v13Actions:actionPack.results, v13Goal, v13Promoted:promoted, v13Brief:'' , hotWatcher:Object.entries(watchTiers).find(([,v])=>v==='hot')?.[0]||null
+  };
 }
-function snapshot(model){return {ts:Date.now(),score:model.score,phase:model.phase,rawPhase:model.phase,stablePhase:model.phase,total:model.total,burned:model.burned,heatCount:model.heatCount,publicStrength:model.publicStrength,interiorStrength:model.interiorStrength,contradictionLoad:model.contradictionLoad,slotProbe:model.slotProbe,dnaProbe:model.dnaProbe,mutationStats:model.mutationStats,watchTiers:model.watchTiers,publicAnchors:model.publicAnchors,nodeBalances:model.nodeBalances};}
-function render(model){setText('mScore',fmtFixed(model.score,1)); setText('mRegime',model.regime); setText('mPhase',model.phase); setText('mPublic',fmtPct01(model.publicStrength,1)); setText('mInterior',fmtPct01(model.interiorStrength,1)); setText('mContradiction',fmtPct01(model.contradictionLoad,1)); setText('mDebt',String(model.debts.length)); setText('mCandidates',String(model.candidates.filter(c=>c.score>=6).length)); $('reactorRing').style.setProperty('--score',clamp(model.score,0,100).toFixed(1)); setText('scoreBig',fmtFixed(model.score,1)); setText('coreState',model.regime); setText('coreSub',model.slotProbe.summary); setText('bigVerdict',model.regime); $('scoreFill').style.width = clamp(model.score,0,100).toFixed(1)+'%'; setText('sSurface',fmtPct01(model.publicStrength,1)); setText('sInterior',fmtPct01(model.interiorStrength,1)); setText('sRehab',`${model.rehab.filter(r=>r.tier==='cold').length} cold`); setText('sDebt',String(model.debts.length)); setText('sClaims',String(model.claims.filter(c=>c.status==='strong').length)); setText('sPayloads',String(state.settings.PAYLOAD_KEYWORDS.length)); setText('sQueries',String(model.debts.length)); setText('sHistory',String(mergedHistory().length));
-  const statCls = model.score>65 ? 'stable' : model.score>30 ? 'warned' : 'bad'; $('syncStatus').className='status '+statCls; setText('syncStatus', model.score>65?'Aligned':'Adversarial audit'); setText('lastSync',`Last sync: ${nowStamp()} • block ${model.latest}`);
-  setHTML('verifiedList', [
-    `5EF7 currently carries <strong>${fmtCompact(model.nodeBalances['5EF7']?.pdai||0,3)}</strong> pDAI and nonce <strong>${model.nodeBalances['5EF7']?.nonce||0}</strong>.`,
-    `Public anchors are measurable and moving; interior map is not assumed to be correct.`,
-    `Current slot verdict: <strong>${model.slotProbe.summary}</strong>.`
-  ].map(x=>`<div class="item good">${x}</div>`).join(''));
-  setHTML('insightList', [
-    model.publicStrength>model.interiorStrength ? 'Surface is leading interior discovery right now.' : 'Interior discovery is finally catching up.',
-    model.watchTiers['5EF7']==='hot' ? '5EF7 deserves structural-core status, not decorative status.' : 'Even 5EF7 is not proving much yet.',
-    model.slotProbe.allZero ? 'Stop treating slot equality as proof until non-null state appears.' : 'Slot probe finally has non-null content.'
-  ].map(x=>`<div class="item warn">${esc(x)}</div>`).join(''));
-  setHTML('mindList', [
-    'A live AF4E / D6CA export that maps real execution corridors.',
-    'Non-null candidate slot movement that persists over time.',
-    'A rising interiorStrength from promoted candidates, not seeded assumptions.',
-    'Pending heat or trace evidence touching a promoted live candidate.'
-  ].map(x=>`<div class="item ${/Non-null|rising|heat|trace/.test(x)?'good':'warn'}">${esc(x)}</div>`).join(''));
-  setHTML('rehabBody', model.rehab.map(r=>`<tr><td>${esc(r.label)}</td><td><span class="tag ${r.tier==='hot'?'good':'bad'}">${esc(r.tier)}</span></td><td>${esc(r.signal)}</td><td>${esc(r.problem)}</td><td>${r.replacement?`${short(r.replacement.address,10,8)}<br><span class="small">${esc(r.replacement.roles[0]||'candidate')}</span>`:'—'}</td></tr>`).join('') || `<tr><td colspan="5" class="small">No rehab rows.</td></tr>`);
-  setHTML('candidateBody', model.candidates.map(c=>`<tr><td class="mono">${esc(short(c.address,12,8))}</td><td>${fmtFixed(c.score,1)}</td><td><span class="tag ${c.score>=8?'good':c.score>=4?'ref':'other'}">${c.score>=8?'promote':c.score>=4?'watch':'cold'}</span></td><td>${esc(c.sources.join(', '))}</td><td>${esc(c.roles[0]||'unknown')}</td><td>${esc(c.reason)}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No candidates yet.</td></tr>`);
-  setHTML('debtBody', model.debts.map(d=>`<tr><td>${d.prio}</td><td>${esc(d.task)}</td><td>${esc(d.why)}</td><td>${esc(d.method)}</td></tr>`).join(''));
-  setHTML('corridorBody', model.publicAnchors.map(r=>{const dom=r.weight? (r.weight/Math.max(1,model.mutationStats.rows.reduce((s,x)=>s+(x.weight||0),0))) : 0; return `<tr><td>${esc(r.name)}</td><td>${esc(r.type)}</td><td>${r.reserve0!=null?fmtCompact(r.reserve0,3):'—'}</td><td>${r.reserve1!=null?fmtCompact(r.reserve1,3):'—'}</td><td>${r.motion!=null?fmtFixed(r.motion,6):'—'}</td><td>${fmtPct01(dom,1)}</td><td>${describeMotion(r.motion||0)} • ${esc(r.role)}</td></tr>`;}).join(''));
-  setHTML('regimeBody', scenarioRows(model).map(r=>`<tr><td>${esc(r.scenario)}</td><td>${fmtPct01(r.fit,0)}</td><td>${esc(r.reason)}</td></tr>`).join(''));
-  setHTML('claimsBody', model.claims.map(c=>`<tr><td>${esc(c.claim)}</td><td>${fmtPct01(c.score,0)}</td><td>${c.support}</td><td>${c.contradiction}</td><td><span class="tag ${c.status==='strong'?'good':c.status==='open'?'ref':'bad'}">${esc(c.status)}</span></td></tr>`).join(''));
-  setHTML('corpusBody', corpusMemory().map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.type||'text')}</td><td>${(m.addresses||[]).slice(0,4).map(a=>short(a,8,6)).join(', ') || '—'}</td><td>${(m.claims||[]).slice(0,2).map(esc).join(' | ') || '—'}</td><td>${esc(fileFreshness(m.importedAt))}</td></tr>`).join(''));
-  setHTML('contradictionBody', model.contradictionList.map(c=>`<tr><td>${esc(c.text)}</td><td><span class="tag ${c.severity==='high'?'bad':'ref'}">${esc(c.severity)}</span></td><td>${esc(c.effect)}</td></tr>`).join(''));
-  chart('scoreChart', mergedHistory().map(x=>Number(x.score)||0), '#58ffb9'); chart('surfaceChart', mergedHistory().map(x=>Number(x.publicStrength)||0), '#48c4ff'); chart('interiorChart', mergedHistory().map(x=>Number(x.interiorStrength)||0), '#ffcc52');
+function snapshot(model){ return { ts:Date.now(), score:model.score, phase:model.phase, rawPhase:model.phase, stablePhase:model.phase, total:model.total, burned:model.burned, heatCount:0, publicStrength:model.publicStrength, interiorStrength:model.interiorStrength, contradictionLoad:model.contradictionLoad, slotProbe:model.slotProbe, dnaProbe:model.dnaProbe, mutationStats:model.mutationStats, watchTiers:model.watchTiers, publicAnchors:model.publicAnchors, nodeBalances:model.nodeBalances, v13Thoughts:model.v13Thoughts, v13Actions:model.v13Actions, v13Goal:model.v13Goal, v13Promoted:model.v13Promoted, v13Brief:model.v13Brief, socialDeltaCount:model.socialDeltaCount, newSocial:model.newSocial, socialWarnings:model.socialWarnings }; }
+function render(model){
+  state.latestModel=model; model.v13Brief = buildBrief(model); $('briefBox').value=model.v13Brief;
+  text('scoreVal', fmt(model.score,1)); text('phaseVal', model.phase); text('publicVal', fmtPct(model.publicStrength,0)); text('interiorVal', fmtPct(model.interiorStrength,0)); text('contradictionVal', fmtPct(model.contradictionLoad,0)); text('socialDeltaVal', String(model.socialDeltaCount));
+  $('syncStatus').className = 'status '+(model.score>60?'good':model.score>30?'warn':'bad'); text('syncStatus', model.score>60?'Synced':'Adversarial audit'); text('lastSync', `Last sync: ${now()} • block ${model.latest}`); text('socialInfo', `Social: ${model.socialItems.length} seen / ${model.socialDeltaCount} new / ${model.socialSources.join(', ')||'none'}`);
+  const bubbles=[]; [...model.v13Thoughts.map((t,i)=>({cls:'info',text:t,left:(8+(i%2)*42)+'%',top:(8+i*18)+'px'})), ...model.v13Actions.map((a,i)=>({cls:a.findings?.[0]?.includes('no')?'warn':'good',text:`${a.kind}: ${(a.findings||[]).slice(0,2).join(' | ')}`,left:(12+(i%2)*38)+'%',top:(130+i*46)+'px'}))].slice(0,10).forEach(b=>bubbles.push(`<div class="bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`));
+  html('bubbleCloud', bubbles.join('') || '<div class="bubble warn" style="left:8%;top:14px">No thought/action chain yet.</div>');
+  html('goalBox', `<strong>${esc(model.v13Goal)}</strong>`); html('blockerList', [model.slotProbe.summary, model.dnaProbe.implAddress?'dna present':'empty DNA', `cold watchers: ${Object.entries(model.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')||'none'}`].map(x=>`<div class="item warn">${esc(x)}</div>`).join(''));
+  html('actionList', model.v13Actions.map(a=>`<div class="item ${a.findings?.[0]?.includes('no')?'warn':'good'}"><strong>${esc(a.kind)}</strong><br>${esc((a.findings||[]).join(' | '))}</div>`).join(''));
+  html('socialList', [...model.newSocial.map(x=>`<div class="item good">New social: ${esc(x.id)} (${esc(x.source)})</div>`), ...model.socialWarnings.map(x=>`<div class="item warn">${esc(x)}</div>`)].join('') || '<div class="item warn">No social delta or fetch warning only.</div>');
+  html('rehabBody', Object.entries(model.watchTiers).map(([k,v])=>{ const bal=model.nodeBalances[k]; const sugg=model.v13Promoted[0]||DEFAULTS.publicAnchors[1].address; const problem=v==='cold'?'no balance, no nonce, no fresh proof':'structural core but not execution proof'; return `<tr><td>${esc(k)}</td><td>${esc(v)}</td><td>pDAI ${fmtCompact(bal.pdai,3)} • nonce ${bal.nonce}</td><td>${esc(problem)}</td><td class="mono">${esc(short(sugg,10,8))}</td></tr>`; }).join(''));
+  const truths=[]; truths.push(row('5EF7 is the strongest live watcher', 'Verified', `5EF7 carries ${fmtCompact(model.nodeBalances['5EF7']?.pdai||0,3)} pDAI and nonce ${model.nodeBalances['5EF7']?.nonce||0}`)); truths.push(row('Null-null slot equality is not proof', model.slotProbe.allZero?'Yes':'No', model.slotProbe.summary)); truths.push(row('DNA slot is an active clue', model.dnaProbe.implAddress?'Yes':'No', model.dnaProbe.implAddress||'empty DNA slot')); truths.push(row('Social delta engine ran this cycle', 'Yes', `${model.socialItems.length} seen / ${model.socialDeltaCount} new`)); truths.push(row('Promoted candidates found', model.v13Promoted.length?'Yes':'No', model.v13Promoted.map(a=>short(a,10,8)).join(', ')||'none')); html('truthBody', truths.join(''));
 }
-function generateQueries(model){const rows=[]; const q=(target,purpose,idea)=>rows.push({target,purpose,idea}); if(model.rehab.some(r=>r.tier==='cold'&&r.replacement)){const r=model.rehab.find(x=>x.tier==='cold'&&x.replacement); q(r.replacement.address,'Promote replacement candidate','eth_getTransactionCount + eth_getCode + recent block touch scan');}
-  if(model.slotProbe.allZero) q(DEFAULTS.TARGET,'Keep slots on probation','eth_getStorageAt on 0x7b12 and 0x0968 over time; do not score until non-null');
-  q('AF4E / D6CA','Kill or prove execution-hand theory','eth_getLogs for Transfer/Approval plus trace on real tx hashes');
-  q(DEFAULTS.PUBLIC_ANCHORS[0].address,'Public optical rail counterparties','Scan recent blocks and pair transfer counterparties around native pDAI/WPLS');
-  q(DEFAULTS.PUBLIC_ANCHORS[2].address,'Bridged pressure rail drift','Track reserve delta, counterparties, and any recurring selector families');
-  setHTML('queryBody', rows.map(r=>`<tr><td class="mono">${esc(short(r.target,18,8))}</td><td>${esc(r.purpose)}</td><td class="mono">${esc(r.idea)}</td></tr>`).join(''));
-}
-async function sync(){ if(state.syncing) return; state.syncing=true; try{const model=await buildModel(); render(model); const hist=loadLocalHistory(); hist.push(snapshot(model)); saveLocalHistory(hist); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`);} catch(e){$('syncStatus').className='status bad'; setText('syncStatus','Sync failed'); setText('lastSync',`Last error: ${e.message||String(e)}`);} finally{state.syncing=false;}}
-$('refreshBtn').onclick=sync; $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open'); $('saveSettingsBtn').onclick=()=>{saveSettingsFromUI(); sync();}; $('resetSettingsBtn').onclick=()=>{resetSettings(); applySettingsToUI(); sync();}; $('clearImportsBtn').onclick=()=>{clearImports(); sync();}; $('exportConfigBtn').onclick=()=>download('pdai-v7-config.json', JSON.stringify(state.settings,null,2)); $('importHistoryBtn').onclick=()=>$('historyFileInput').click(); $('importCorpusBtn').onclick=()=>$('corpusFileInput').click(); $('historyFileInput').onchange=async e=>{for(const f of [...e.target.files]) await importHistoryFile(f); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); sync();}; $('corpusFileInput').onchange=async e=>{await importCorpusFiles(e.target.files); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); sync();}; $('generateQueriesBtn').onclick=async()=>{const model=await buildModel(); generateQueries(model);}; $('analyzeTxBtn').onclick=async()=>{const rows=await analyzePayload($('txHashInput').value.trim()); renderPayloadRows(rows);}; $('sniffPayloadBtn').onclick=async()=>{const rows=await sniffPayloads($('payloadTarget').value.trim()); renderPayloadRows(rows);}; $('scanSelectorsBtn').onclick=async()=>{const rows=await scanSelectors($('selectorTarget').value.trim()); setHTML('payloadBody', rows.length? rows.map(r=>`<tr><td>selector</td><td class="mono">${esc(r.selector)}</td><td>${esc(r.count+' '+r.direction+' • '+short(r.latest,10,8)+' • '+r.notes)}</td></tr>`).join('') : `<tr><td colspan="3" class="small">No selector rows.</td></tr>`);};
-state.settings=loadSettings(); state.imports=loadImports(); applySettingsToUI(); setText('historyInfo',`History: ${loadLocalHistory().length} local / ${state.imports.history.length} imported`); setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`); setRefreshTimer(); sync();
+function row(a,b,c){ return `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`; }
+async function sync(){ if(state.syncing) return; state.syncing=true; try{ const model=await buildModel(); render(model); const hist=loadHistory(); hist.push(snapshot(model)); saveHistory(hist); }catch(e){ $('syncStatus').className='status bad'; text('syncStatus','Sync failed'); text('lastSync',`Last error: ${e.message||String(e)}`); } finally{ state.syncing=false; }}
+function setTimer(){ if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000, Number(state.settings.refreshMs)||45000)); }
+function applySettings(){ $('privateRpc').value=state.settings.privateRpc||''; $('refreshMs').value=state.settings.refreshMs; $('scanBlocks').value=state.settings.scanBlocks; $('socialUrl').value=state.settings.socialUrl||''; $('watch3d07').value=state.settings.watchers['3D07']||''; $('watchBa86').value=state.settings.watchers['Ba86']||''; $('watchF2Dc').value=state.settings.watchers['F2Dc']||''; $('watch7b12').value=state.settings.watchers['7b12']||''; $('watch0968').value=state.settings.watchers['0968']||''; $('payloadKeywords').value=(state.settings.payloadKeywords||[]).join(','); $('notes').value=state.settings.notes||''; }
+function readSettings(){ state.settings.privateRpc=$('privateRpc').value.trim(); state.settings.refreshMs=Number($('refreshMs').value||45000); state.settings.scanBlocks=Number($('scanBlocks').value||80); state.settings.socialUrl=$('socialUrl').value.trim()||DEFAULTS.socialUrl; state.settings.watchers['3D07']=$('watch3d07').value.trim()||DEFAULTS.watchers['3D07']; state.settings.watchers['Ba86']=$('watchBa86').value.trim()||DEFAULTS.watchers['Ba86']; state.settings.watchers['F2Dc']=$('watchF2Dc').value.trim()||DEFAULTS.watchers['F2Dc']; state.settings.watchers['7b12']=$('watch7b12').value.trim()||DEFAULTS.watchers['7b12']; state.settings.watchers['0968']=$('watch0968').value.trim()||DEFAULTS.watchers['0968']; state.settings.payloadKeywords=uniq($('payloadKeywords').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean)); state.settings.notes=$('notes').value; saveSettings(); setTimer(); }
+async function importHistoryFiles(files){ for(const f of files){ try{ const txt=await f.text(); const arr=JSON.parse(txt); const rows=Array.isArray(arr)?arr:(Array.isArray(arr.localHistory)?arr.localHistory:[]); state.imports.history.push(...rows); }catch{} } saveImports(); text('historyInfo', `History: ${loadHistory().length} local / ${state.imports.history.length} imported`); }
+async function importCorpusFiles(files){ for(const f of files){ try{ const txt=await f.text(); state.imports.corpus.push({ name:f.name, importedAt:Date.now(), text:txt, addresses:scanAddresses(txt) }); }catch{} } saveImports(); }
+function exportBundle(){ const bundle={ version:'v13', exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, memory:state.memory, localHistory:loadHistory(), mergedHistory:mergedHistory(), latestModel:state.latestModel }; download('pdai-v13-bundle.json', JSON.stringify(bundle,null,2)); }
+$('refreshBtn').onclick=sync; $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open'); $('saveSettingsBtn').onclick=()=>{ readSettings(); sync(); }; $('resetSettingsBtn').onclick=()=>{ state.settings=defaultsSettings(); saveSettings(); applySettings(); sync(); }; $('importHistoryBtn').onclick=()=>$('historyFile').click(); $('importCorpusBtn').onclick=()=>$('corpusFile').click(); $('exportHistoryBtn').onclick=()=>download('pdai-v13-history.json', JSON.stringify(mergedHistory(),null,2)); $('exportBundleBtn').onclick=exportBundle; $('copyBriefBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText($('briefBox').value||''); $('copyBriefBtn').textContent='Copied'; setTimeout(()=>$('copyBriefBtn').textContent='Copy brief',1200);}catch{} };
+$('historyFile').onchange=e=>importHistoryFiles([...e.target.files]); $('corpusFile').onchange=e=>importCorpusFiles([...e.target.files]);
+state.settings=loadSettings(); state.imports=loadImports(); state.memory=loadMemory(); applySettings(); text('historyInfo', `History: ${loadHistory().length} local / ${state.imports.history.length} imported`); setTimer(); sync();
 </script>
-
-<script>
-(function(){
-  let latestModelV8 = null;
-
-  function addV8Buttons(){
-    const btns = document.querySelector('.btns');
-    if(!btns || document.getElementById('exportHistoryBtn')) return;
-    const historyBtn = document.createElement('button');
-    historyBtn.id = 'exportHistoryBtn';
-    historyBtn.className = 'secondary';
-    historyBtn.textContent = 'Export history';
-    btns.appendChild(historyBtn);
-
-    const bundleBtn = document.createElement('button');
-    bundleBtn.id = 'exportBundleBtn';
-    bundleBtn.className = 'secondary';
-    bundleBtn.textContent = 'Export bundle';
-    btns.appendChild(bundleBtn);
-  }
-
-  function addV8Panels(){
-    if(document.getElementById('v8HistoryLab')) return;
-    const foot = document.querySelector('.foot');
-    if(!foot) return;
-    const wrap = document.createElement('div');
-    wrap.innerHTML = `
-      <div class="duo" id="v8HistoryLab">
-        <div class="glass tableCard">
-          <div class="boxTitle">V8 history lab</div>
-          <div class="small" style="margin-bottom:10px">Use imported and local history as first-class intelligence, not just charts.</div>
-          <div class="tableWrap"><table><thead><tr><th>Metric</th><th>Value</th><th>Why it matters</th></tr></thead><tbody id="v8HistoryBody"></tbody></table></div>
-        </div>
-        <div class="glass tableCard">
-          <div class="boxTitle">Snapshot diff lab</div>
-          <div class="small" style="margin-bottom:10px">Compares the latest two snapshots so drift and false phase changes become obvious.</div>
-          <div class="tableWrap"><table><thead><tr><th>Field</th><th>Previous</th><th>Latest</th><th>Delta / read</th></tr></thead><tbody id="v8DiffBody"></tbody></table></div>
-        </div>
-      </div>
-      <div class="duo" id="v8AnchorLab" style="margin-top:12px">
-        <div class="glass tableCard">
-          <div class="boxTitle">Anchor touch radar</div>
-          <div class="small" style="margin-bottom:10px">Finds counterparties touching live public anchors in recent blocks and promotes them into the hunt.</div>
-          <div class="tableWrap"><table><thead><tr><th>Counterparty</th><th>Touches</th><th>Anchor spread</th><th>Tokens</th><th>Net flow</th><th>Promotion read</th></tr></thead><tbody id="v8AnchorBody"></tbody></table></div>
-        </div>
-        <div class="glass tableCard">
-          <div class="boxTitle">Operator brief</div>
-          <div class="small" style="margin-bottom:10px">This is the compact case report you can export or bring back here for analysis.</div>
-          <div class="btns" style="margin-bottom:12px"><button id="copyBriefBtn">Copy brief</button></div>
-          <div class="field"><label>Auto brief</label><textarea id="operatorBrief" style="min-height:240px"></textarea></div>
-        </div>
-      </div>
-    `;
-    foot.parentNode.insertBefore(wrap, foot);
-  }
-
-  function num(v){ return (v==null || !Number.isFinite(Number(v))) ? 0 : Number(v); }
-
-  function mergedAllHistory(){
-    try { return mergedHistory(); } catch { return []; }
-  }
-
-  function currentHotWatchers(model){
-    return Object.entries(model.watchTiers || {}).filter(([,tier]) => tier === 'hot').map(([k]) => k);
-  }
-
-  function computeHistoryLab(history){
-    const out = [];
-    if(!history.length) return out;
-    const last = history[history.length-1];
-    const prev = history.length > 1 ? history[history.length-2] : null;
-    const avg = (arr, key) => arr.reduce((s,x)=>s+num(x[key]),0) / Math.max(1, arr.length);
-    const phaseCounts = {};
-    history.forEach(h => { phaseCounts[h.stablePhase || h.phase || 'unknown'] = (phaseCounts[h.stablePhase || h.phase || 'unknown'] || 0) + 1; });
-    const topPhase = Object.entries(phaseCounts).sort((a,b)=>b[1]-a[1])[0];
-    let auditStreak = 0;
-    for(let i=history.length-1;i>=0;i--){ const p = history[i].stablePhase || history[i].phase; if(p === 'audit') auditStreak++; else break; }
-    const scoreVals = history.map(h => num(h.score));
-    const publicVals = history.map(h => num(h.publicStrength));
-    const interiorVals = history.map(h => num(h.interiorStrength));
-    const contradictionVals = history.map(h => num(h.contradictionLoad));
-    const allRows = history.flatMap(h => (h.mutationStats && Array.isArray(h.mutationStats.rows)) ? h.mutationStats.rows : []);
-    const dominantAnchor = allRows.sort((a,b)=>num(b.weight)-num(a.weight))[0];
-    const hotCounts = history.map(h => Object.values(h.watchTiers || {}).filter(v => v === 'hot').length);
-    const phaseFlips = history.slice(1).filter((h,i) => (h.stablePhase || h.phase) !== (history[i].stablePhase || history[i].phase)).length;
-
-    out.push(['Snapshots', String(history.length), 'More snapshots means phase and contradiction stats become more trustworthy.']);
-    out.push(['Average score', fmtFixed(avg(history,'score'),2), 'Shows how much usable signal the tool is finding over time.']);
-    out.push(['Average public vs interior', `${fmtPct01(avg(history,'publicStrength'),1)} / ${fmtPct01(avg(history,'interiorStrength'),1)}`, 'This ratio tells us whether the public surface is still outrunning the interior map.']);
-    out.push(['Average contradiction load', fmtPct01(avg(history,'contradictionLoad'),1), 'High contradiction load means the thesis still owes proof.']);
-    out.push(['Current audit streak', `${auditStreak} snapshot(s)`, 'A long audit streak means v7/v8 are refusing to overstate late-phase claims.']);
-    out.push(['Most common stable phase', topPhase ? `${topPhase[0]} (${topPhase[1]})` : '—', 'This is the tool’s true long-run regime, not the most recent raw phase wobble.']);
-    out.push(['Phase flip count', String(phaseFlips), 'Too many flips means the phase model is still too twitchy.']);
-    out.push(['Average hot watcher count', fmtFixed(avg(hotCounts.map(v=>({v})), 'v'),2), 'If this stays near 1, the interior map is still under-discovered.']);
-    out.push(['Dominant anchor by weight', dominantAnchor ? `${dominantAnchor.name} • ${fmtCompact(dominantAnchor.weight,2)}` : '—', 'This is the public rail currently exerting the most observable pressure.']);
-    if(prev){
-      out.push(['Latest score drift', `${fmtFixed(num(last.score)-num(prev.score),2)}`, 'Helps separate real change from noise.']);
-    }
-    return out;
-  }
-
-  function snapshotDiffRows(history){
-    const rows = [];
-    if(history.length < 2) return rows;
-    const a = history[history.length-2];
-    const b = history[history.length-1];
-    const fields = [
-      ['score','Score'],['publicStrength','Public strength'],['interiorStrength','Interior strength'],['contradictionLoad','Contradiction load'],['heatCount','Heat count']
-    ];
-    for(const [key,label] of fields){
-      const av = num(a[key]), bv = num(b[key]), dv = bv-av;
-      rows.push([label, fmtFixed(av,4), fmtFixed(bv,4), `${dv>=0?'+':''}${fmtFixed(dv,4)}`]);
-    }
-    const ah = Object.values(a.watchTiers||{}).filter(v=>v==='hot').length;
-    const bh = Object.values(b.watchTiers||{}).filter(v=>v==='hot').length;
-    rows.push(['Hot watcher count', String(ah), String(bh), `${bh-ah>=0?'+':''}${bh-ah}`]);
-    rows.push(['Stable phase', a.stablePhase||a.phase||'—', b.stablePhase||b.phase||'—', (a.stablePhase||a.phase)===(b.stablePhase||b.phase)?'no change':'phase drift']);
-    rows.push(['Slot probe', a.slotProbe?.summary||'—', b.slotProbe?.summary||'—', b.slotProbe?.allZero?'still null-null':'changed']);
-    rows.push(['DNA slot', a.dnaProbe?.implAddress||'empty', b.dnaProbe?.implAddress||'empty', (a.dnaProbe?.implAddress||'')===(b.dnaProbe?.implAddress||'')?'same':'changed']);
-    return rows;
-  }
-
-  async function scanAnchorTouchesV8(model){
-    try {
-      const anchors = (model.publicAnchors || []).filter(a => isAddr(a.address));
-      const anchorSet = new Set(anchors.map(a => norm(a.address)));
-      const named = new Map(anchors.map(a => [norm(a.address), a.name || short(a.address)]));
-      const tokens = unique([
-        state.settings.TARGET,
-        state.settings.WPLS,
-        ...(anchors.flatMap(a => [a.token0, a.token1]).filter(isAddr))
-      ].filter(isAddr).map(norm)).slice(0, 8);
-      const toScan = Math.max(160, Math.min(600, Math.floor((state.settings.SCAN_BLOCKS || 2500) / 5)));
-      const fromBlock = Math.max(0, model.latest - toScan);
-      const bags = new Map();
-      for(const t of tokens){
-        const token = t;
-        const dec = await ercDecimals(token);
-        const logs = await getLogsAdaptive(token, TRANSFER_TOPIC, fromBlock, model.latest);
-        const parsed = parseTransferLogs(logs, short(token,6,4), dec, token);
-        for(const ev of parsed){
-          const nf = norm(ev.from), nt = norm(ev.to);
-          const fromAnchor = anchorSet.has(nf), toAnchor = anchorSet.has(nt);
-          if(!fromAnchor && !toAnchor) continue;
-          const cp = fromAnchor ? nt : nf;
-          if(anchorSet.has(cp)) continue;
-          if(!isAddr(cp)) continue;
-          if(!bags.has(cp)) bags.set(cp, {address:cp, touches:0, anchors:new Set(), tokens:new Set(), net:0});
-          const b = bags.get(cp);
-          b.touches += 1;
-          b.anchors.add(fromAnchor ? named.get(nf) : named.get(nt));
-          b.tokens.add(ev.token);
-          b.net += fromAnchor ? -num(ev.amount) : num(ev.amount);
-        }
-      }
-      return [...bags.values()].map(b => {
-        const spread = b.anchors.size;
-        const tier = spread >= 2 || b.touches >= 3 ? 'promote' : (b.touches >= 2 ? 'watch' : 'cold');
-        return {...b, spread, tokens:[...b.tokens], anchors:[...b.anchors], tier};
-      }).sort((a,b)=> (b.touches*10 + b.spread*25 + Math.abs(b.net)) - (a.touches*10 + a.spread*25 + Math.abs(a.net))).slice(0, 25);
-    } catch(err){
-      return [{address:'error', touches:0, spread:0, tokens:['scan failed'], anchors:[err.message||String(err)], net:0, tier:'cold'}];
-    }
-  }
-
-  function mergeAnchorCandidates(model){
-    const existing = new Map((model.candidates || []).map(c => [norm(c.address), c]));
-    for(const a of (model.v8AnchorTouches || [])){
-      if(!isAddr(a.address)) continue;
-      const bonus = (a.spread >= 2 ? 3.5 : 1.2) + Math.min(4, a.touches * 0.8);
-      if(existing.has(norm(a.address))){
-        const c = existing.get(norm(a.address));
-        c.score += bonus;
-        c.sources = unique([...(c.sources||[]), 'anchor-radar']);
-        c.roles = unique([...(c.roles||[]), a.spread >= 2 ? 'anchor-crossing counterparty' : 'anchor counterparty']);
-        c.reason = `${c.reason} • anchor radar saw ${a.touches} touch(es)`;
-      } else {
-        const c = {
-          address:a.address,
-          score:bonus,
-          sources:['anchor-radar'],
-          roles:[a.spread >= 2 ? 'anchor-crossing counterparty' : 'anchor counterparty'],
-          reason:`Touched ${a.anchors.join(', ')} via ${a.tokens.join(', ')}.`
-        };
-        existing.set(norm(a.address), c);
-      }
-    }
-    model.candidates = [...existing.values()].sort((a,b)=>num(b.score)-num(a.score)).slice(0, 40);
-    // upgrade rehab suggestions from fresh anchor radar
-    model.rehab = (model.rehab || []).map(r => {
-      if(r.tier !== 'cold' || r.replacement) return r;
-      const repl = model.candidates.find(c => isAddr(c.address) && !Object.values(state.settings.WATCH||{}).map(norm).includes(norm(c.address)) && c.score >= 4.5);
-      return repl ? {...r, replacement: repl} : r;
-    });
-  }
-
-  function computeV8Score(model){
-    const history = mergedAllHistory();
-    const hotCount = currentHotWatchers(model).length;
-    const anchorRadarStrength = clamp((model.v8AnchorTouches || []).filter(a => a.tier !== 'cold').length / 8, 0, 1);
-    const historyConfidence = clamp(history.length / 40, 0, 1);
-    const nullPenalty = model.slotProbe?.allZero ? 0.18 : 0;
-    const dnaPenalty = model.dnaProbe && !model.dnaProbe.implAddress ? 0.1 : 0;
-    const contradictionPenalty = clamp(num(model.contradictionLoad), 0, 1) * 0.42;
-
-    const evidence = (
-      num(model.publicStrength) * 0.33 +
-      num(model.interiorStrength) * 0.27 +
-      anchorRadarStrength * 0.18 +
-      clamp(hotCount / 4, 0, 1) * 0.12 +
-      historyConfidence * 0.10
-    );
-
-    const score = clamp((evidence - contradictionPenalty - nullPenalty - dnaPenalty) * 100, 0, 100);
-    model.v8Evidence = evidence;
-    model.v8AnchorRadarStrength = anchorRadarStrength;
-    model.v8HistoryConfidence = historyConfidence;
-    model.v8Score = score;
-    model.v8ScoreExplain = `evidence ${fmtPct01(evidence,1)} minus contradiction ${fmtPct01(contradictionPenalty,1)} and null penalties`;
-  }
-
-  function operatorBrief(model){
-    const hist = mergedAllHistory();
-    const hot = currentHotWatchers(model);
-    const bestAnchor = (model.mutationStats?.rows || []).slice().sort((a,b)=>num(b.motion)-num(a.motion))[0];
-    const topCandidate = (model.candidates || [])[0];
-    const debt = (model.debts || []).slice(0,3).map(d => `- ${d.task}: ${d.method}`).join('\n');
-    return [
-      `V8 operator brief`,
-      `Time: ${new Date().toLocaleString()}`,
-      `Score: ${fmtFixed(model.v8Score ?? model.score,2)} (${model.regime || model.phase})`,
-      `Stable phase: ${model.phase}; raw phase: ${model.phase}`,
-      `Public vs interior: ${fmtPct01(model.publicStrength,1)} / ${fmtPct01(model.interiorStrength,1)}`,
-      `Contradiction load: ${fmtPct01(model.contradictionLoad,1)}`,
-      `Slots: ${model.slotProbe?.summary || '—'}; DNA: ${model.dnaProbe?.implAddress || 'empty'}`,
-      `Hot watchers: ${hot.length ? hot.join(', ') : 'none'}`,
-      `Top public mover: ${bestAnchor ? `${bestAnchor.name} motion ${fmtFixed(bestAnchor.motion,6)}` : 'none'}`,
-      `Anchor radar hits: ${(model.v8AnchorTouches||[]).filter(a=>a.tier!=='cold').length}`,
-      `Top promoted candidate: ${topCandidate ? `${short(topCandidate.address,10,8)} • ${topCandidate.roles?.[0] || 'candidate'} • score ${fmtFixed(topCandidate.score,1)}` : 'none'}`,
-      `History snapshots loaded: ${hist.length}`,
-      `Best next proof tasks:\n${debt || '- none generated'}`,
-      `Interpretation: ${model.regime}. ${model.v8ScoreExplain || ''}`
-    ].join('\n');
-  }
-
-  function renderV8Panels(model){
-    const history = mergedAllHistory();
-    setHTML('v8HistoryBody', computeHistoryLab(history).map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('') || `<tr><td colspan="3" class="small">No history loaded.</td></tr>`);
-    setHTML('v8DiffBody', snapshotDiffRows(history).map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join('') || `<tr><td colspan="4" class="small">Need at least two snapshots.</td></tr>`);
-    setHTML('v8AnchorBody', (model.v8AnchorTouches || []).map(a => `<tr><td class="mono">${isAddr(a.address)?esc(short(a.address,12,8)):esc(a.address)}</td><td>${a.touches}</td><td>${a.anchors.join(', ') || '—'}</td><td>${a.tokens.join(', ') || '—'}</td><td>${fmtCompact(a.net,3)}</td><td><span class="tag ${a.tier==='promote'?'good':a.tier==='watch'?'ref':'other'}">${esc(a.tier)}</span></td></tr>`).join('') || `<tr><td colspan="6" class="small">No anchor touches yet.</td></tr>`);
-    const brief = operatorBrief(model);
-    const briefBox = document.getElementById('operatorBrief');
-    if(briefBox) briefBox.value = brief;
-    setText('mScore', fmtFixed(model.v8Score ?? model.score, 1));
-    setText('scoreBig', fmtFixed(model.v8Score ?? model.score, 1));
-    setText('sHistory', `${history.length} snapshots`);
-    setText('verdictExplain', `v8 uses anchor radar, history confidence, and contradiction penalties. ${model.v8ScoreExplain || ''}`);
-    const fill = document.getElementById('scoreFill');
-    if(fill) fill.style.width = clamp(model.v8Score ?? model.score,0,100).toFixed(1)+'%';
-    const statusEl = document.getElementById('syncStatus');
-    const score = model.v8Score ?? model.score;
-    if(statusEl){
-      statusEl.className = 'status ' + (score>65 ? 'stable' : score>30 ? 'warned' : 'bad');
-      statusEl.textContent = score>65 ? 'V8 aligned' : score>30 ? 'V8 probing' : 'V8 adversarial audit';
-    }
-  }
-
-  function hookButtons(){
-    const exportHistoryBtn = document.getElementById('exportHistoryBtn');
-    if(exportHistoryBtn && !exportHistoryBtn.dataset.hooked){
-      exportHistoryBtn.dataset.hooked = '1';
-      exportHistoryBtn.onclick = () => download('pdai-v8-history.json', JSON.stringify(mergedAllHistory(), null, 2));
-    }
-    const exportBundleBtn = document.getElementById('exportBundleBtn');
-    if(exportBundleBtn && !exportBundleBtn.dataset.hooked){
-      exportBundleBtn.dataset.hooked = '1';
-      exportBundleBtn.onclick = () => {
-        const payload = {
-          exportedAt: new Date().toISOString(),
-          settings: state.settings,
-          imports: state.imports,
-          localHistory: loadLocalHistory(),
-          mergedHistory: mergedAllHistory(),
-          latestModel: latestModelV8
-        };
-        download('pdai-v8-casebundle.json', JSON.stringify(payload, null, 2));
-      };
-    }
-    const copyBriefBtn = document.getElementById('copyBriefBtn');
-    if(copyBriefBtn && !copyBriefBtn.dataset.hooked){
-      copyBriefBtn.dataset.hooked = '1';
-      copyBriefBtn.onclick = async () => {
-        const txt = document.getElementById('operatorBrief')?.value || '';
-        try { await navigator.clipboard.writeText(txt); copyBriefBtn.textContent = 'Copied'; setTimeout(()=>copyBriefBtn.textContent='Copy brief',1200); }
-        catch { document.getElementById('operatorBrief')?.select(); }
-      };
-    }
-  }
-
-  addV8Buttons();
-  addV8Panels();
-  hookButtons();
-
-  const oldBuildModel = buildModel;
-  buildModel = async function(){
-    const model = await oldBuildModel();
-    model.v8AnchorTouches = await scanAnchorTouchesV8(model);
-    mergeAnchorCandidates(model);
-    computeV8Score(model);
-    latestModelV8 = model;
-    return model;
-  };
-
-  const oldRender = render;
-  render = function(model){
-    oldRender(model);
-    renderV8Panels(model);
-    hookButtons();
-  };
-})();
-</script>
-
-
-<script>
-(function(){
-  const V9_THOUGHTS_KEY = 'pdai-v9-thought-journal';
-  const V9_CURIOSITY_KEY = 'pdai-v9-curiosity';
-  let latestModelV9 = null;
-
-  function v9LoadThoughtJournal(){ try{return JSON.parse(localStorage.getItem(V9_THOUGHTS_KEY)||'[]')}catch{return []} }
-  function v9SaveThoughtJournal(arr){ localStorage.setItem(V9_THOUGHTS_KEY, JSON.stringify(arr.slice(-600))); }
-  function v9LoadCuriosity(){ try{return JSON.parse(localStorage.getItem(V9_CURIOSITY_KEY)||'{"hits":{}}')}catch{return {hits:{}}} }
-  function v9SaveCuriosity(v){ localStorage.setItem(V9_CURIOSITY_KEY, JSON.stringify(v)); }
-
-  function addV9Style(){
-    if(document.getElementById('v9Style')) return;
-    const st=document.createElement('style');
-    st.id='v9Style';
-    st.textContent=`
-      .v9dock{margin-top:14px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}
-      .thoughtDock{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
-      .bubbleWrap{position:relative;min-height:220px;border-radius:18px;background:radial-gradient(circle at top left, rgba(72,196,255,.09), transparent 25%), radial-gradient(circle at bottom right, rgba(88,255,185,.06), transparent 24%), rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);overflow:hidden;padding:12px}
-      .bubbleCloud{position:relative;min-height:196px}
-      .thoughtBubble{position:absolute;max-width:270px;padding:12px 14px;border-radius:18px 18px 18px 6px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 26px rgba(0,0,0,.18);font-size:.84rem;line-height:1.45;color:var(--text);animation:v9Float 9s ease-in-out infinite}
-      .thoughtBubble.good{border-color:rgba(88,255,185,.18)} .thoughtBubble.warn{border-color:rgba(255,204,82,.22)} .thoughtBubble.bad{border-color:rgba(255,93,115,.18)} .thoughtBubble.info{border-color:rgba(72,196,255,.18)}
-      .thoughtBubble:after{content:'';position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.08);border-left:0}
-      .thinkHead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
-      .thinkBadge{padding:6px 10px;border-radius:999px;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;border:1px solid rgba(72,196,255,.18);color:var(--cyan);background:rgba(72,196,255,.06)}
-      .v9miniGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-      .v9mini{border:1px solid rgba(255,255,255,.05);border-radius:16px;background:rgba(255,255,255,.02);padding:12px}
-      .v9List{display:grid;gap:8px}
-      .v9Item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.84rem;line-height:1.45}
-      .v9Item.good{border-color:rgba(88,255,185,.18)} .v9Item.warn{border-color:rgba(255,204,82,.18)} .v9Item.bad{border-color:rgba(255,93,115,.18)}
-      @keyframes v9Float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
-      @media (max-width:1400px){.thoughtDock,.v9miniGrid{grid-template-columns:1fr}}
-    `;
-    document.head.appendChild(st);
-  }
-
-  function addV9Panels(){
-    if(document.getElementById('v9ThinkingPanel')) return;
-    const app=document.querySelector('.app');
-    if(!app) return;
-    const sec=document.createElement('div');
-    sec.id='v9ThinkingPanel';
-    sec.className='glass section';
-    sec.innerHTML=`
-      <div class="thinkHead">
-        <div>
-          <div class="boxTitle">V9 Thought Engine</div>
-          <div class="small">Live thought bubbles, curiosity loops, autonomous next hunts, and export-ready internal reasoning summaries.</div>
-        </div>
-        <div class="btns">
-          <button id="exportThoughtHistoryBtn" class="secondary">Export thoughts</button>
-          <button id="copyThoughtSummaryBtn" class="secondary">Copy thought summary</button>
-        </div>
-      </div>
-      <div class="thoughtDock">
-        <div class="bubbleWrap">
-          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px"><span class="thinkBadge">Thinking</span><span class="small" id="v9ThinkStamp">—</span></div>
-          <div id="v9BubbleCloud" class="bubbleCloud"></div>
-        </div>
-        <div class="v9miniGrid">
-          <div class="v9mini">
-            <div class="boxTitle">Curiosity queue</div>
-            <div id="v9CuriosityList" class="v9List"></div>
-          </div>
-          <div class="v9mini">
-            <div class="boxTitle">Self-correction</div>
-            <div id="v9CorrectionList" class="v9List"></div>
-          </div>
-          <div class="v9mini">
-            <div class="boxTitle">Autonomous hunts</div>
-            <div id="v9HuntsList" class="v9List"></div>
-          </div>
-          <div class="v9mini">
-            <div class="boxTitle">Thought summary</div>
-            <textarea id="v9ThoughtSummary" style="width:100%;min-height:175px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);"></textarea>
-          </div>
-        </div>
-      </div>`;
-    const foot=document.querySelector('.foot');
-    app.insertBefore(sec, foot || null);
-  }
-
-  function classifyThought(text){
-    const t=String(text||'').toLowerCase();
-    if(/dead|empty|null-null|cold|contradiction|missing|no heat|no dna/.test(t)) return 'bad';
-    if(/promote|candidate|hunt|query|look for|trace|watch|discover/.test(t)) return 'info';
-    if(/hot|active|moving|mutating|surface|structural core|5ef7/.test(t)) return 'good';
-    return 'warn';
-  }
-
-  function bubbleLayout(items){
-    const presets=[
-      {left:'2%',top:'8%'},{left:'35%',top:'4%'},{left:'63%',top:'16%'},
-      {left:'8%',top:'46%'},{left:'40%',top:'50%'},{left:'68%',top:'42%'}
-    ];
-    return items.slice(0,6).map((it,i)=>({ ...presets[i%presets.length], text:it, cls:classifyThought(it) }));
-  }
-
-  function v9ModelThoughts(model){
-    const thoughts=[];
-    const hot = Object.entries(model.watchTiers||{}).filter(([,tier])=>tier==='hot').map(([k])=>k);
-    thoughts.push(hot.length ? `${hot.join(', ')} remain the only live watcher lane(s); everything else is still cold.` : `No watcher lane is convincingly alive yet.`);
-    if(model.slotProbe?.allZero) thoughts.push(`Slot probe is still null-null equality. That is absence, not proof of symmetry.`);
-    if(!model.dnaProbe?.implAddress) thoughts.push(`DNA slot is empty, so proxy-hot-swap is not helping the current thesis.`);
-    const rows=(model.mutationStats?.rows||[]).filter(r=>r.motion>0);
-    if(rows.length){
-      const top=rows.slice().sort((a,b)=>(b.motion||0)-(a.motion||0))[0];
-      thoughts.push(`${top.name} is the loudest moving surface rail right now with motion ${fmtFixed(top.motion||0, 6)}.`);
-    } else {
-      thoughts.push(`Public surface is currently calm enough that fresh anomalies may require longer windows or stronger counterparties.`);
-    }
-    const pdai5 = model.nodeBalances?.['5EF7']?.pdai || 0;
-    if(pdai5>0) thoughts.push(`5EF7 still holds ${fmtCompact(pdai5,3)} pDAI, which keeps it in structural-core status.`);
-    if((model.heatCount||0)===0) thoughts.push(`No pending heat has been seen. The next breakthrough likely comes from counterparty discovery, not mempool fireworks.`);
-    if((model.publicStrength||0) > (model.interiorStrength||0)) thoughts.push(`The public surface is still outrunning interior discovery. V9 should hunt the addresses that bridge that gap.`);
-    if((model.contradictionLoad||0) >= 0.6) thoughts.push(`Contradiction load is high enough that dead assumptions must be actively demoted.`);
-    return thoughts;
-  }
-
-  function v9CuriosityQueue(model){
-    const q=[];
-    const mt=(model.mutationStats?.rows||[]).filter(r=>r.motion>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
-    if(mt[0]) q.push(`Trace latest counterparties touching ${mt[0].name}.`);
-    if(model.watchTiers?.['3D07']==='cold') q.push(`Hunt replacements for 3D07 using public-anchor counterparties and trace trees.`);
-    if(model.slotProbe?.allZero) q.push(`Replace symbolic slot fixation with non-null storage discovery around real active callers.`);
-    if(!model.dnaProbe?.implAddress) q.push(`Prioritize route/trace/selector intelligence over proxy theories.`);
-    if((model.heatCount||0)===0) q.push(`Scan for heartbeat payloads and zero-value calls instead of raw gas spikes.`);
-    return q.slice(0,6);
-  }
-
-  function v9Corrections(model){
-    const out=[];
-    if(model.slotProbe?.allZero) out.push('Null-null slot equality now counts as a contradiction, not a positive signal.');
-    if(!model.dnaProbe?.implAddress) out.push('Empty DNA slot now suppresses proxy-based narratives.');
-    const cold=Object.entries(model.watchTiers||{}).filter(([,t])=>t==='cold').map(([k])=>k);
-    if(cold.length) out.push(`Cold watcher set: ${cold.join(', ')}.`);
-    if((model.publicStrength||0) > (model.interiorStrength||0)) out.push('Scores now privilege live surface mutation over silent interior lore.');
-    return out.slice(0,6);
-  }
-
-  function v9AutonomousHunts(model){
-    const hunts=[];
-    const candidates=(model.candidates||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0));
-    if(candidates[0]) hunts.push(`Promote ${short(candidates[0].address,10,8)} and pull nonce + code + recent touches.`);
-    hunts.push('Compare counterparties of native pDAI/WPLS versus bridged DAI/WPLS for overlap.');
-    hunts.push('Scan recent calldata around active public anchors for selectors and printable words.');
-    hunts.push('Build lane genealogy from the first funder / first outbound / repeated route timing.');
-    hunts.push('Demote any watcher that stays cold across multiple thoughtful cycles.');
-    return hunts.slice(0,6);
-  }
-
-  function renderV9Thinking(model){
-    const thoughts = model.v9Thoughts || [];
-    const bubbleCloud=document.getElementById('v9BubbleCloud');
-    if(bubbleCloud){
-      const bubbles=bubbleLayout(thoughts).map(b=>`<div class="thoughtBubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('');
-      bubbleCloud.innerHTML=bubbles || `<div class="thoughtBubble info" style="left:8%;top:12%">No active thought bubbles yet.</div>`;
-    }
-    setText('v9ThinkStamp', `Thought cycle • ${new Date().toLocaleTimeString()}`);
-    setHTML('v9CuriosityList', (model.v9Curiosity||[]).map(x=>`<div class="v9Item info">${esc(x)}</div>`).join('') || `<div class="v9Item warn">No curiosity tasks yet.</div>`);
-    setHTML('v9CorrectionList', (model.v9Corrections||[]).map(x=>`<div class="v9Item warn">${esc(x)}</div>`).join('') || `<div class="v9Item warn">No correction items yet.</div>`);
-    setHTML('v9HuntsList', (model.v9Hunts||[]).map(x=>`<div class="v9Item good">${esc(x)}</div>`).join('') || `<div class="v9Item warn">No autonomous hunts yet.</div>`);
-    const summary = [
-      `V9 status: ${model.regime || model.phase}.`,
-      `Public strength ${fmtPct01(model.publicStrength,1)} versus interior ${fmtPct01(model.interiorStrength,1)}.`,
-      `Contradiction load ${fmtPct01(model.contradictionLoad,1)}.`,
-      ...thoughts.slice(0,6),
-      `Next hunts: ${(model.v9Hunts||[]).slice(0,3).join(' | ')}`
-    ].join('\n');
-    const box=document.getElementById('v9ThoughtSummary');
-    if(box) box.value=summary;
-  }
-
-  function v9Snapshot(model){
-    const base = snapshot(model);
-    base.thoughts = model.v9Thoughts || [];
-    base.curiosity = model.v9Curiosity || [];
-    base.corrections = model.v9Corrections || [];
-    base.autonomousHunts = model.v9Hunts || [];
-    base.thoughtSummary = document.getElementById('v9ThoughtSummary')?.value || '';
-    base.regime = model.regime;
-    return base;
-  }
-
-  function v9EnrichHistory(history){
-    return (history||[]).map(h => {
-      if(h.thoughts) return h;
-      const thoughts=[];
-      if(h.slotProbe?.allZero || /null-null/i.test(h.slotProbe?.summary||'')) thoughts.push('Historical slot probe was null-null equality.');
-      if(!h.dnaProbe?.implAddress) thoughts.push('Historical DNA slot was empty.');
-      if(h.nodeBalances?.['5EF7']?.pdai>0) thoughts.push(`Historical 5EF7 carried ${fmtCompact(h.nodeBalances['5EF7'].pdai,3)} pDAI.`);
-      if((h.publicStrength||0) > (h.interiorStrength||0)) thoughts.push('Historical surface strength exceeded interior strength.');
-      return { ...h, thoughts, thoughtSummary: thoughts.join(' ') };
-    });
-  }
-
-  function mergedAllHistoryV9(){
-    const raw = (typeof mergedAllHistory==='function' ? mergedAllHistory() : (typeof mergedHistory==='function' ? mergedHistory() : loadLocalHistory()));
-    return v9EnrichHistory(raw);
-  }
-
-  function v9JournalPush(model){
-    const journal=v9LoadThoughtJournal();
-    journal.push({ts:Date.now(), phase:model.phase, regime:model.regime, thoughts:model.v9Thoughts||[], summary:document.getElementById('v9ThoughtSummary')?.value||''});
-    v9SaveThoughtJournal(journal);
-  }
-
-  function v9HookButtons(){
-    const eh=document.getElementById('exportHistoryBtn');
-    if(eh && !eh.dataset.v9){
-      eh.dataset.v9='1';
-      eh.onclick=()=>download('pdai-v9-history.json', JSON.stringify(mergedAllHistoryV9(), null, 2));
-    }
-    const eb=document.getElementById('exportBundleBtn');
-    if(eb && !eb.dataset.v9){
-      eb.dataset.v9='1';
-      eb.onclick=()=>{
-        const payload={
-          exportedAt:new Date().toISOString(),
-          settings:state.settings,
-          imports:state.imports,
-          localHistory:v9EnrichHistory(loadLocalHistory()),
-          mergedHistory:mergedAllHistoryV9(),
-          thoughtJournal:v9LoadThoughtJournal(),
-          latestModel:latestModelV9
-        };
-        download('pdai-v9-casebundle.json', JSON.stringify(payload, null, 2));
-      };
-    }
-    const et=document.getElementById('exportThoughtHistoryBtn');
-    if(et && !et.dataset.v9){
-      et.dataset.v9='1';
-      et.onclick=()=>download('pdai-v9-thoughts.json', JSON.stringify(v9LoadThoughtJournal(), null, 2));
-    }
-    const copy=document.getElementById('copyThoughtSummaryBtn');
-    if(copy && !copy.dataset.v9){
-      copy.dataset.v9='1';
-      copy.onclick=async()=>{
-        const txt=document.getElementById('v9ThoughtSummary')?.value || '';
-        try{ await navigator.clipboard.writeText(txt); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy thought summary',1200); }
-        catch{ document.getElementById('v9ThoughtSummary')?.select(); }
-      };
-    }
-  }
-
-  addV9Style();
-  addV9Panels();
-
-  const oldBuildModelV9 = buildModel;
-  buildModel = async function(){
-    const model = await oldBuildModelV9();
-    const cur = v9LoadCuriosity();
-    model.v9Thoughts = v9ModelThoughts(model);
-    model.v9Curiosity = v9CuriosityQueue(model);
-    model.v9Corrections = v9Corrections(model);
-    model.v9Hunts = v9AutonomousHunts(model);
-    model.v9Curiosity.forEach(q=>{ cur.hits[q]=(cur.hits[q]||0)+1; });
-    v9SaveCuriosity(cur);
-    latestModelV9 = model;
-    return model;
-  };
-
-  const oldRenderV9 = render;
-  render = function(model){
-    oldRenderV9(model);
-    renderV9Thinking(model);
-    v9HookButtons();
-  };
-
-  sync = async function(){
-    if(state.syncing) return;
-    state.syncing=true;
-    try{
-      const model = await buildModel();
-      render(model);
-      const hist = loadLocalHistory();
-      hist.push(v9Snapshot(model));
-      saveLocalHistory(hist);
-      setText('importInfo',`Imported corpus: ${state.imports.history.length} history, ${state.imports.corpus.length} corpus item(s)`);
-      v9JournalPush(model);
-    } catch(e){
-      $('syncStatus').className='status bad';
-      setText('syncStatus','Sync failed');
-      setText('lastSync',`Last error: ${e.message||String(e)}`);
-    } finally {
-      state.syncing=false;
-    }
-  };
-
-  v9HookButtons();
-})();
-</script>
-
-
-<script>
-(function(){
-  const V10_ACTIONS_KEY='pdai-v10-action-journal';
-  const V10_LEARN_KEY='pdai-v10-learning-memory';
-  let latestModelV10=null;
-  let runningV10Actions=false;
-
-  function v10LoadActions(){ try{return JSON.parse(localStorage.getItem(V10_ACTIONS_KEY)||'[]')}catch{return []} }
-  function v10SaveActions(arr){ localStorage.setItem(V10_ACTIONS_KEY, JSON.stringify((arr||[]).slice(-800))); }
-  function v10LoadMemory(){ try{return JSON.parse(localStorage.getItem(V10_LEARN_KEY)||'{"promoted":{},"contradictions":{},"wins":{},"lastGoal":""}')}catch{return {promoted:{},contradictions:{},wins:{},lastGoal:""}} }
-  function v10SaveMemory(v){ localStorage.setItem(V10_LEARN_KEY, JSON.stringify(v)); }
-  function addrTopic(addr){ return '0x' + '0'.repeat(24) + norm(addr).replace(/^0x/,''); }
-  function uniqBy(arr,keyFn){ const m=new Map(); (arr||[]).forEach(x=>m.set(keyFn(x),x)); return [...m.values()]; }
-  function anyAddrLabel(address){
-    const a = norm(address);
-    const watcher = watchNodes().find(x=>norm(x.address)===a);
-    if(watcher) return watcher.label;
-    const pub = DEFAULTS.PUBLIC_ANCHORS.find(x=>norm(x.address)===a);
-    if(pub) return pub.name;
-    return short(address,10,8);
-  }
-  async function v10GetLogsAdaptive(filter){
-    let from = parseInt(filter.fromBlock,16), to=parseInt(filter.toBlock,16);
-    while(true){
-      try{
-        return await rpc('eth_getLogs',[{...filter,fromBlock:toHex(from),toBlock:toHex(to)}]);
-      }catch(e){
-        const span = to - from;
-        if(span<=25) throw e;
-        from = to - Math.floor(span/2);
-      }
-    }
-  }
-  async function v10AnchorCounterparties(anchor, token, fromBlock, toBlock){
-    const tp = addrTopic(anchor);
-    const out = new Map();
-    const collect = (cp, amt, dir, blk, tx) => {
-      const k = norm(cp);
-      if(!isAddr(k)) return;
-      if(!out.has(k)) out.set(k,{address:k, touches:0, inAmt:0, outAmt:0, lastBlock:0, lastTx:'', token});
-      const x=out.get(k); x.touches++; if(dir==='in') x.inAmt += amt; else x.outAmt += amt; if(blk>=x.lastBlock){x.lastBlock=blk; x.lastTx=tx;}
-    };
-    const [fromLogs,toLogs] = await Promise.all([
-      v10GetLogsAdaptive({address:token, topics:[TRANSFER_TOPIC,tp], fromBlock:toHex(fromBlock), toBlock:toHex(toBlock)}).catch(()=>[]),
-      v10GetLogsAdaptive({address:token, topics:[TRANSFER_TOPIC,null,tp], fromBlock:toHex(fromBlock), toBlock:toHex(toBlock)}).catch(()=>[])
-    ]);
-    const dec = await tokenDecimals(token).catch(()=>18);
-    (fromLogs||[]).forEach(log=>collect(fromTopic(log.topics[2]), units(hexToBigInt(log.data),dec),'out',parseInt(log.blockNumber,16),log.transactionHash));
-    (toLogs||[]).forEach(log=>collect(fromTopic(log.topics[1]), units(hexToBigInt(log.data),dec),'in',parseInt(log.blockNumber,16),log.transactionHash));
-    return [...out.values()].sort((a,b)=>(b.touches + b.inAmt + b.outAmt) - (a.touches + a.inAmt + a.outAmt)).slice(0,12);
-  }
-  async function v10DiscoverAroundAnchor(anchor, model){
-    const latest = model.latest || await blockNumber();
-    const span = Math.max(60, Math.min(240, Number(state.settings.SELECTOR_BLOCKS)||120));
-    const fromBlock = Math.max(0, latest - span);
-    const tokens=[DEFAULTS.TARGET, DEFAULTS.WPLS].concat(isAddr(state.settings.WATCH.ATROPA_TOKEN)?[state.settings.WATCH.ATROPA_TOKEN]:[]);
-    const rows=[];
-    for(const token of tokens){
-      try{ const cps = await v10AnchorCounterparties(anchor, token, fromBlock, latest); cps.forEach(x=>rows.push({...x, sourceAnchor:anchor})); }catch{}
-    }
-    return uniqBy(rows, x=>norm(x.address)+':'+norm(x.token||''));
-  }
-  function v10BuildThoughts(model){
-    const thoughts=[];
-    const hottest=(model.mutationStats?.rows||[]).slice().sort((a,b)=>(b.motion||0)-(a.motion||0))[0];
-    if(hottest && (hottest.motion||0)>0) thoughts.push(`Surface rail ${hottest.name} is moving while interior stays soft; bridge-hunting matters more than poetic certainty.`);
-    if(model.nodeBalances?.['5EF7']?.pdai>0) thoughts.push(`5EF7 is still carrying ${fmtCompact(model.nodeBalances['5EF7'].pdai,3)} pDAI; structural-core status survives every cycle.`);
-    if(model.slotProbe?.allZero) thoughts.push(`Null-null manifold equality is still dead data. V10 must replace symbolic fixation with active address discovery.`);
-    if((model.publicStrength||0)>(model.interiorStrength||0)) thoughts.push(`Public surface is outrunning the interior map. The most valuable action is to identify the hidden counterparties touching live anchors.`);
-    if((model.heatCount||0)===0) thoughts.push(`No heat again. That means the peg story probably will not reveal itself through pending gas alone.`);
-    if((model.contradictionLoad||0)>=0.6) thoughts.push(`Contradiction load is high enough that every dead watcher should be considered replaceable.`);
-    if((model.candidates||[])[0]) thoughts.push(`Top candidate ${short(model.candidates[0].address,10,8)} deserves aggressive selector, payload, and counterparty work.`);
-    if((model.debts||[]).length) thoughts.push(`Evidence debt remains open: ${model.debts[0].task}.`);
-    return thoughts.slice(0,8);
-  }
-  function v10Curiosity(model){
-    const q=[];
-    const movers=(model.mutationStats?.rows||[]).filter(r=>(r.motion||0)>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
-    if(movers[0]) q.push(`Who is touching ${movers[0].name} directly in the last ${Math.max(60, Math.min(240, Number(state.settings.SELECTOR_BLOCKS)||120))} blocks?`);
-    if(model.watchTiers?.['3D07']==='cold') q.push('Which newly discovered address is a better route candidate than 3D07 right now?');
-    if(model.slotProbe?.allZero) q.push('Which non-null storage locations change around active public rails?');
-    if(!model.dnaProbe?.implAddress) q.push('If proxy DNA is empty, which router/caller pattern is actually expressing the machine?');
-    if((model.publicStrength||0)>(model.interiorStrength||0)) q.push('Which address cluster best bridges the surface/interior gap?');
-    return q.slice(0,8);
-  }
-  function v10Plan(model){
-    const goal='Find the strongest active pathway that links live public pDAI rails to a non-decorative interior execution map.';
-    const blockers=[];
-    if(model.slotProbe?.allZero) blockers.push('candidate slots are still null-null');
-    if(!model.dnaProbe?.implAddress) blockers.push('proxy DNA not visible');
-    if((model.heatCount||0)===0) blockers.push('no pending heat');
-    const cold = Object.entries(model.watchTiers||{}).filter(([,v])=>v==='cold').map(([k])=>k);
-    if(cold.length) blockers.push(`cold watchers: ${cold.join(', ')}`);
-    const next=[];
-    next.push('promote counterparties touching live public anchors');
-    next.push('run selector and payload scans on top candidate and 5EF7');
-    next.push('demote watchers that remain dead across multiple cycles');
-    return {goal, blockers, next};
-  }
-  function v10ActionQueue(model){
-    const tasks=[];
-    const seen=new Set();
-    const push=(kind,target,label,why,priority=10,extra={})=>{ const k=kind+'|'+norm(target||'')+'|'+label; if(seen.has(k)) return; seen.add(k); tasks.push({kind,target,label,why,priority,...extra}); };
-    const movers=(model.mutationStats?.rows||[]).filter(r=>(r.motion||0)>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
-    const topCandidate=(model.candidates||[])[0];
-    if(movers[0]) push('anchor-counterparties', movers[0].address, movers[0].name, 'Surface anchor is moving; discover who is touching it.', 1);
-    if(model.nodeBalances?.['5EF7']?.pdai>0) push('selector-scan', DEFAULTS.PUBLIC_ANCHORS[1].address, '5EF7 structural core', 'Check selector clusters around the structural core.', 2);
-    if(topCandidate?.address) push('selector-scan', topCandidate.address, 'Top candidate', 'Top promoted candidate deserves selector clustering.', 3);
-    if(topCandidate?.address) push('payload-sniff', topCandidate.address, 'Top candidate', 'Sniff payload motifs around promoted candidate.', 4);
-    if(model.slotProbe?.allZero) push('non-null-watcher-hunt', DEFAULTS.PUBLIC_ANCHORS[0].address, 'Native optical rail', 'Find non-null counterparties instead of symbolic null slots.', 5);
-    if((model.publicStrength||0)>(model.interiorStrength||0)) push('bridge-gap-hunt', DEFAULTS.PUBLIC_ANCHORS[2].address, 'Bridged surface rail', 'Surface/interior gap is the main mystery.', 6);
-    return tasks.sort((a,b)=>a.priority-b.priority).slice(0,6);
-  }
-  async function v10ExecuteTask(task, model){
-    const base={ts:Date.now(), kind:task.kind, target:task.target, label:task.label, why:task.why, status:'ok', findings:[], promoted:[], meta:{}};
-    try{
-      if(task.kind==='selector-scan'){
-        const rows=await scanSelectors(task.target);
-        base.findings = rows.slice(0,6).map(r=>`${r.selector} • ${r.count} • ${r.direction}`);
-        if(rows[0]?.latest) base.meta.latestTx=rows[0].latest;
-      } else if(task.kind==='payload-sniff'){
-        const rows=await sniffPayloads(task.target);
-        base.findings = rows.slice(0,6).map(r=>`${r.type}: ${String(r.value).slice(0,60)}`);
-      } else if(task.kind==='anchor-counterparties' || task.kind==='bridge-gap-hunt' || task.kind==='non-null-watcher-hunt'){
-        const cps=await v10DiscoverAroundAnchor(task.target, model);
-        base.findings = cps.slice(0,8).map(x=>`${short(x.address,10,8)} • touches ${x.touches} • in ${fmtCompact(x.inAmt,3)} • out ${fmtCompact(x.outAmt,3)}`);
-        base.promoted = cps.slice(0,6).map(x=>x.address);
-        base.meta.counterpartyCount = cps.length;
-      } else {
-        base.status='skipped';
-        base.findings=['No executor for this task yet.'];
-      }
-      if(!base.findings.length) base.findings=['No result.'];
-    }catch(e){
-      base.status='error';
-      base.findings=[e.message||String(e)];
-    }
-    return base;
-  }
-  async function v10RunActions(model){
-    if(runningV10Actions) return {tasks:[], results:[], promoted:[]};
-    runningV10Actions=true;
-    try{
-      const tasks=v10ActionQueue(model);
-      const results=[];
-      const promoted=[];
-      for(const task of tasks.slice(0,3)){
-        const res=await v10ExecuteTask(task, model);
-        results.push(res);
-        (res.promoted||[]).forEach(a=>promoted.push(a));
-      }
-      return {tasks, results, promoted: unique(promoted.map(norm)).filter(isAddr)};
-    } finally { runningV10Actions=false; }
-  }
-  function v10MergePromotions(model, promoted){
-    if(!promoted?.length) return model.candidates||[];
-    const existing = new Map((model.candidates||[]).map(c=>[norm(c.address), {...c}]));
-    promoted.forEach(addr=>{
-      if(!existing.has(norm(addr))) existing.set(norm(addr), {address:norm(addr), score:0, sources:['v10-autonomy'], roles:['candidate'], reason:'promoted by autonomous anchor/counterparty hunt'});
-      const x=existing.get(norm(addr));
-      x.score = (x.score||0) + 5;
-      x.sources = unique([...(x.sources||[]), 'v10-autonomy']);
-      x.roles = unique([...(x.roles||[]), 'bridge-candidate']);
-      x.reason = x.reason || 'promoted by autonomous hunt';
-    });
-    return [...existing.values()].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,40);
-  }
-  function v10UpdateMemory(model){
-    const mem=v10LoadMemory();
-    (model.candidates||[]).slice(0,10).forEach(c=>{ mem.promoted[c.address]=(mem.promoted[c.address]||0)+(c.score||0); });
-    (model.contradictions||[]).forEach(c=>{ mem.contradictions[c.text]=(mem.contradictions[c.text]||0)+1; });
-    if(model.regime) mem.wins[model.regime]=(mem.wins[model.regime]||0)+1;
-    mem.lastGoal = model.v10Plan?.goal || mem.lastGoal;
-    v10SaveMemory(mem);
-    return mem;
-  }
-  function v10AddStyle(){
-    if(document.getElementById('v10Style')) return;
-    const st=document.createElement('style'); st.id='v10Style';
-    st.textContent=`
-      .v10dock{margin-top:14px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}
-      .v10grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
-      .v10bubbleWrap{position:relative;min-height:280px;border-radius:18px;background:radial-gradient(circle at top left, rgba(72,196,255,.12), transparent 25%), radial-gradient(circle at bottom right, rgba(88,255,185,.08), transparent 24%), rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);overflow:hidden;padding:12px}
-      .v10bubbleCloud{position:relative;min-height:250px}
-      .v10bubble{position:absolute;max-width:290px;padding:12px 14px;border-radius:18px 18px 18px 6px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 26px rgba(0,0,0,.18);font-size:.84rem;line-height:1.45;color:var(--text);animation:v10Float 7s ease-in-out infinite}
-      .v10bubble.action{border-color:rgba(72,196,255,.22)} .v10bubble.good{border-color:rgba(88,255,185,.22)} .v10bubble.warn{border-color:rgba(255,204,82,.22)} .v10bubble.bad{border-color:rgba(255,93,115,.22)}
-      .v10bubble:after{content:'';position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.08);border-left:0}
-      .v10subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-      .v10mini{border:1px solid rgba(255,255,255,.05);border-radius:16px;background:rgba(255,255,255,.02);padding:12px}
-      .v10list{display:grid;gap:8px}
-      .v10item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.84rem;line-height:1.45}
-      .v10item.good{border-color:rgba(88,255,185,.18)} .v10item.warn{border-color:rgba(255,204,82,.18)} .v10item.bad{border-color:rgba(255,93,115,.18)} .v10item.info{border-color:rgba(72,196,255,.18)}
-      .v10goal{margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
-      @keyframes v10Float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-      @media (max-width:1400px){.v10grid,.v10subgrid{grid-template-columns:1fr}}
-    `;
-    document.head.appendChild(st);
-  }
-  function v10BubbleRows(thoughts, actions){
-    const out=[];
-    const presets=[
-      {left:'2%',top:'6%'},{left:'34%',top:'4%'},{left:'64%',top:'10%'},
-      {left:'8%',top:'42%'},{left:'40%',top:'46%'},{left:'66%',top:'40%'},
-      {left:'20%',top:'68%'},{left:'56%',top:'70%'}
-    ];
-    thoughts.slice(0,4).forEach((t,i)=>out.push({...presets[i], cls: classifyThought(t), text:t}));
-    actions.slice(0,4).forEach((a,i)=>out.push({...presets[i+4]||presets[presets.length-1], cls: a.status==='error'?'bad':'action', text:`${a.label}: ${a.findings?.[0]||a.status}`}));
-    return out.slice(0,8);
-  }
-  function v10AddPanels(){
-    if(document.getElementById('v10Panel')) return;
-    const app=document.querySelector('.app'); if(!app) return;
-    const sec=document.createElement('div'); sec.id='v10Panel'; sec.className='glass section';
-    sec.innerHTML=`
-      <div class="thinkHead">
-        <div><div class="boxTitle">V10 Autonomous Workhorse</div><div class="small">V10 does not just think — it acts on its top curiosities, journals what it did, and exports the whole reasoning chain.</div></div>
-        <div class="btns">
-          <button id="runV10NowBtn">Run V10 hunts now</button>
-          <button id="exportV10ThoughtsBtn" class="secondary">Export V10 thoughts</button>
-          <button id="copyV10BriefBtn" class="secondary">Copy V10 brief</button>
-        </div>
-      </div>
-      <div class="v10grid">
-        <div class="v10bubbleWrap">
-          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px"><span class="thinkBadge">Autonomous reasoning</span><span class="small" id="v10Stamp">—</span></div>
-          <div id="v10BubbleCloud" class="v10bubbleCloud"></div>
-        </div>
-        <div class="v10subgrid">
-          <div class="v10mini"><div class="boxTitle">Goal</div><div id="v10GoalBox" class="v10goal"></div><div class="v10list" id="v10BlockerList" style="margin-top:10px"></div></div>
-          <div class="v10mini"><div class="boxTitle">Curiosity → action</div><div class="v10list" id="v10CuriosityList"></div></div>
-          <div class="v10mini"><div class="boxTitle">Autonomous action log</div><div class="v10list" id="v10ActionList"></div></div>
-          <div class="v10mini"><div class="boxTitle">Workhorse brief</div><textarea id="v10Brief" style="width:100%;min-height:190px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);"></textarea></div>
-        </div>
-      </div>`;
-    const foot=document.querySelector('.foot'); app.insertBefore(sec, foot || null);
-  }
-  function v10Render(model){
-    const bubbles=v10BubbleRows(model.v10Thoughts||[], model.v10ActionResults||[]).map(b=>`<div class="v10bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('');
-    setHTML('v10BubbleCloud', bubbles || `<div class="v10bubble warn" style="left:8%;top:10%">No autonomous thought-action chain yet.</div>`);
-    setText('v10Stamp', `Cycle • ${new Date().toLocaleTimeString()}`);
-    setHTML('v10GoalBox', `<strong>${esc(model.v10Plan?.goal||'No goal yet.')}</strong>`);
-    setHTML('v10BlockerList', (model.v10Plan?.blockers||[]).map(x=>`<div class="v10item warn">${esc(x)}</div>`).join('') || `<div class="v10item good">No major blockers.</div>`);
-    setHTML('v10CuriosityList', (model.v10Curiosity||[]).map(x=>`<div class="v10item info">${esc(x)}</div>`).join('') || `<div class="v10item warn">No curiosity queue.</div>`);
-    setHTML('v10ActionList', (model.v10ActionResults||[]).map(x=>`<div class="v10item ${x.status==='error'?'bad':'good'}"><strong>${esc(x.label)}</strong><br>${esc(x.findings?.slice(0,2).join(' | ')||x.status)}</div>`).join('') || `<div class="v10item warn">No autonomous actions yet.</div>`);
-    const brief=[
-      `V10 regime: ${model.regime || model.phase}`,
-      `Score: ${fmtFixed(model.score,2)} • public ${fmtPct01(model.publicStrength,1)} • interior ${fmtPct01(model.interiorStrength,1)} • contradiction ${fmtPct01(model.contradictionLoad,1)}`,
-      `Goal: ${model.v10Plan?.goal || '—'}`,
-      `Blockers: ${(model.v10Plan?.blockers||[]).join(' | ') || 'none'}`,
-      `Thoughts: ${(model.v10Thoughts||[]).slice(0,5).join(' | ')}`,
-      `Actions: ${(model.v10ActionResults||[]).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`).join(' | ')}`,
-      `Promoted: ${(model.v10Promoted||[]).map(a=>short(a,10,8)).join(', ') || 'none'}`
-    ].join('\n');
-    const box=document.getElementById('v10Brief'); if(box) box.value=brief;
-  }
-  function v10HookButtons(){
-    const eh=document.getElementById('exportHistoryBtn');
-    if(eh && !eh.dataset.v10){ eh.dataset.v10='1'; eh.onclick=()=>download('pdai-v10-history.json', JSON.stringify(v10MergedHistory(), null, 2)); }
-    const eb=document.getElementById('exportBundleBtn');
-    if(eb && !eb.dataset.v10){ eb.dataset.v10='1'; eb.onclick=()=>download('pdai-v10-casebundle.json', JSON.stringify({exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, localHistory:v10MergedHistory(), thoughtJournal:v9LoadThoughtJournal ? v9LoadThoughtJournal() : [], actionJournal:v10LoadActions(), memory:v10LoadMemory(), latestModel:latestModelV10}, null, 2)); }
-    const et=document.getElementById('exportV10ThoughtsBtn');
-    if(et && !et.dataset.v10){ et.dataset.v10='1'; et.onclick=()=>download('pdai-v10-thought-actions.json', JSON.stringify({thoughtJournal: v9LoadThoughtJournal ? v9LoadThoughtJournal() : [], actionJournal:v10LoadActions(), memory:v10LoadMemory()}, null, 2)); }
-    const copy=document.getElementById('copyV10BriefBtn');
-    if(copy && !copy.dataset.v10){ copy.dataset.v10='1'; copy.onclick=async()=>{ const txt=document.getElementById('v10Brief')?.value || ''; try{ await navigator.clipboard.writeText(txt); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy V10 brief',1200);}catch{ document.getElementById('v10Brief')?.select(); } }; }
-    const run=document.getElementById('runV10NowBtn');
-    if(run && !run.dataset.v10){ run.dataset.v10='1'; run.onclick=()=>sync(); }
-  }
-  function v10Snapshot(model){
-    const base = (typeof v9Snapshot==='function' ? v9Snapshot(model) : snapshot(model));
-    base.regime = model.regime;
-    base.v10Goal = model.v10Plan || null;
-    base.v10Thoughts = model.v10Thoughts || [];
-    base.v10Curiosity = model.v10Curiosity || [];
-    base.v10Actions = model.v10ActionResults || [];
-    base.v10Promoted = model.v10Promoted || [];
-    base.v10Brief = document.getElementById('v10Brief')?.value || '';
-    return base;
-  }
-  function v10MergedHistory(){
-    const raw = (typeof mergedAllHistoryV9==='function' ? mergedAllHistoryV9() : (typeof mergedHistory==='function' ? mergedHistory() : loadLocalHistory()));
-    return (raw||[]).map(h=>({...h, v10Thoughts:h.v10Thoughts||h.thoughts||[], v10Actions:h.v10Actions||[], v10Goal:h.v10Goal||null, v10Brief:h.v10Brief||h.thoughtSummary||''}));
-  }
-
-  v10AddStyle();
-  v10AddPanels();
-
-  const oldBuildModelV10 = buildModel;
-  buildModel = async function(){
-    const model = await oldBuildModelV10();
-    model.v10Thoughts = v10BuildThoughts(model);
-    model.v10Curiosity = v10Curiosity(model);
-    model.v10Plan = v10Plan(model);
-    const actionPack = await v10RunActions(model);
-    model.v10ActionQueue = actionPack.tasks;
-    model.v10ActionResults = actionPack.results;
-    model.v10Promoted = actionPack.promoted;
-    if(actionPack.promoted?.length){
-      model.candidates = v10MergePromotions(model, actionPack.promoted);
-    }
-    model.v10Memory = v10UpdateMemory(model);
-    latestModelV10 = model;
-    const aj = v10LoadActions();
-    actionPack.results.forEach(r=>aj.push(r));
-    v10SaveActions(aj);
-    return model;
-  };
-
-  const oldRenderV10 = render;
-  render = function(model){
-    oldRenderV10(model);
-    v10Render(model);
-    v10HookButtons();
-  };
-
-  const oldSnapshotV10 = snapshot;
-  snapshot = function(model){ return v10Snapshot(model); };
-
-  
-  const V11_JOURNAL_KEY='pdai-v11-journal';
-  const V11_ACTIONS_KEY='pdai-v11-actions';
-  const V11_MEMORY_KEY='pdai-v11-memory';
-
-  function v11LoadJournal(){ try{return JSON.parse(localStorage.getItem(V11_JOURNAL_KEY)||'[]')||[];}catch{return [];} }
-  function v11SaveJournal(x){ localStorage.setItem(V11_JOURNAL_KEY, JSON.stringify((x||[]).slice(-1200))); }
-  function v11LoadActions(){ try{return JSON.parse(localStorage.getItem(V11_ACTIONS_KEY)||'[]')||[];}catch{return [];} }
-  function v11SaveActions(x){ localStorage.setItem(V11_ACTIONS_KEY, JSON.stringify((x||[]).slice(-1200))); }
-  function v11LoadMemory(){ try{return JSON.parse(localStorage.getItem(V11_MEMORY_KEY)||'{"hypotheses":{},"watcherStats":{},"notes":[]}')||{};}catch{return {hypotheses:{},watcherStats:{},notes:[]};} }
-  function v11SaveMemory(x){ localStorage.setItem(V11_MEMORY_KEY, JSON.stringify(x||{})); }
-  function v11History(){ return (typeof v10MergedHistory==='function' ? v10MergedHistory() : (typeof mergedAllHistoryV9==='function' ? mergedAllHistoryV9() : loadLocalHistory())); }
-
-  function v11MineHistory(history){
-    const h=(history||[]).filter(Boolean);
-    const out={count:h.length, phaseCounts:{}, rawPhaseCounts:{}, avgPublic:0, avgInterior:0, avgContradiction:0, nullNullRate:0, dnaEmptyRate:0, hotCounts:{}, persistentHot:null, learned:[], maxScore:0, latestTs:h.length?Math.max(...h.map(x=>x.ts||0)):0};
-    if(!h.length) return out;
-    let p=0,i=0,c=0,nulls=0,dna=0;
-    for(const row of h){
-      const phase=row.stablePhase||row.phase||'unknown';
-      const raw=row.rawPhase||row.phase||'unknown';
-      out.phaseCounts[phase]=(out.phaseCounts[phase]||0)+1;
-      out.rawPhaseCounts[raw]=(out.rawPhaseCounts[raw]||0)+1;
-      p += Number(row.publicStrength||0); i += Number(row.interiorStrength||0); c += Number(row.contradictionLoad||0);
-      if(row.slotProbe?.allZero || /null-null/i.test(row.slotProbe?.summary||'')) nulls += 1;
-      if(!row.dnaProbe?.implAddress) dna += 1;
-      Object.entries(row.watchTiers||{}).forEach(([k,v])=>{ if(v==='hot') out.hotCounts[k]=(out.hotCounts[k]||0)+1; });
-      out.maxScore=Math.max(out.maxScore, Number(row.score||0));
-    }
-    out.avgPublic=p/h.length; out.avgInterior=i/h.length; out.avgContradiction=c/h.length; out.nullNullRate=nulls/h.length; out.dnaEmptyRate=dna/h.length;
-    const hotSorted=Object.entries(out.hotCounts).sort((a,b)=>b[1]-a[1]);
-    out.persistentHot=hotSorted[0]?.[0]||null;
-    if(out.nullNullRate>=0.7) out.learned.push(`Slots are null-null in ${fmtPct01(out.nullNullRate,0)} of history.`);
-    if(out.dnaEmptyRate>=0.7) out.learned.push(`DNA slot is empty in ${fmtPct01(out.dnaEmptyRate,0)} of history.`);
-    if(out.avgPublic>out.avgInterior) out.learned.push(`Public surface dominates interior on average (${fmtPct01(out.avgPublic,0)} vs ${fmtPct01(out.avgInterior,0)}).`);
-    if(out.persistentHot) out.learned.push(`${out.persistentHot} is the most persistent hot watcher.`);
-    if((out.phaseCounts['surface-only']||0) > (out.phaseCounts['audit']||0)) out.learned.push(`Surface-only regime wins more often than audit in history.`);
-    return out;
-  }
-
-  function v11Hypotheses(model, hist){
-    const hs=[];
-    const add=(id,title,score,evidence)=>hs.push({id,title,score:clamp(score,0,1),evidence});
-    add('surface_dominant','Surface pressure is the clearest live expression of the peg story.', 0.4 + 0.35*((model.publicStrength||0)>(model.interiorStrength||0)) + 0.15*(hist.avgPublic>hist.avgInterior) + 0.1*((model.mutationStats?.changedCount||0)>0), [
-      `public ${fmtPct01(model.publicStrength||0,0)} vs interior ${fmtPct01(model.interiorStrength||0,0)}`,
-      `changed public anchors: ${model.mutationStats?.changedCount||0}`
-    ]);
-    add('watcher_map_weak','The current interior watcher map is weak or incomplete.', 0.45 + 0.25*((model.contradictionLoad||0)>=0.6) + 0.15*(hist.nullNullRate>=0.7) + 0.15*((Object.values(model.watchTiers||{}).filter(v=>v==='cold').length)>=4), [
-      `${Object.values(model.watchTiers||{}).filter(v=>v==='cold').length} cold watchers`,
-      `null-null rate ${fmtPct01(hist.nullNullRate||0,0)}`
-    ]);
-    add('fiveef7_core','5EF7 remains a real structural core rather than decorative lore.', 0.5 + 0.2*((model.nodeBalances?.['5EF7']?.pdai||0)>0) + 0.15*((model.watchTiers?.['5EF7'])==='hot') + 0.1*((hist.persistentHot||'')==='5EF7'), [
-      `5EF7 pDAI ${fmtCompact(model.nodeBalances?.['5EF7']?.pdai||0,3)}`,
-      `5EF7 tier ${(model.watchTiers?.['5EF7']||'unknown')}`
-    ]);
-    add('proxy_not_path','Proxy hot-swap is not the active proving path right now.', 0.45 + 0.3*(hist.dnaEmptyRate>=0.7) + 0.2*(!model.dnaProbe?.implAddress), [
-      `dna empty rate ${fmtPct01(hist.dnaEmptyRate||0,0)}`,
-      `current DNA ${model.dnaProbe?.implAddress ? 'present':'empty'}`
-    ]);
-    return hs.sort((a,b)=>b.score-a.score);
-  }
-
-  function v11BuildThoughts(model, hist, hypotheses){
-    const thoughts=[];
-    const hot=Object.entries(model.watchTiers||{}).filter(([,v])=>v==='hot').map(([k])=>k);
-    thoughts.push(hot.length ? `${hot.join(', ')} are the only live watcher lanes right now; the rest of the interior map is mostly inert.` : `No watcher lane is convincingly alive right now.`);
-    if(model.slotProbe?.allZero) thoughts.push(`The slot story is still null-null. V11 should treat that as dead evidence and hunt replacement probes.`);
-    if(!model.dnaProbe?.implAddress) thoughts.push(`The DNA slot is empty again. Proxy-theory cannot carry this cycle.`);
-    if((model.publicStrength||0)>(model.interiorStrength||0)) thoughts.push(`Public anchors are still telling the richer story. The bridge to the interior is the main target.`);
-    if((model.mutationStats?.changedCount||0)>0){
-      const top=(model.mutationStats?.rows||[]).slice().sort((a,b)=>(b.motion||0)-(a.motion||0))[0];
-      if(top) thoughts.push(`${top.name} is the loudest current mover with motion ${fmtFixed(top.motion||0,6)}.`);
-    } else {
-      thoughts.push(`Surface motion is quiet enough that counterparty discovery matters more than raw velocity right now.`);
-    }
-    if((model.nodeBalances?.['5EF7']?.pdai||0)>0) thoughts.push(`5EF7 still carries ${fmtCompact(model.nodeBalances['5EF7'].pdai,3)} pDAI and remains a core lane worth tracing around.`);
-    thoughts.push(...(hist.learned||[]).slice(0,2));
-    const topHyp=hypotheses?.[0];
-    if(topHyp) thoughts.push(`Current best hypothesis: ${topHyp.title} (${fmtPct01(topHyp.score,0)}).`);
-    return uniq(thoughts).slice(0,10);
-  }
-
-  function v11Curiosity(model, hist, hypotheses){
-    const q=[];
-    const movers=(model.mutationStats?.rows||[]).filter(r=>(r.motion||0)>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
-    if(movers[0]) q.push(`Who is touching ${movers[0].name} in the last ${Math.max(60, Math.min(240, Number(state.settings.SELECTOR_BLOCKS)||120))} blocks?`);
-    if((hypotheses||[])[0]?.id==='watcher_map_weak') q.push('Which promoted counterparty should replace the cold watcher set?');
-    if(model.slotProbe?.allZero) q.push('Which non-null storage locations around active rails actually move?');
-    q.push('Which candidate bridges the gap between hot 5EF7 and the live public surface?');
-    if((model.heatCount||0)===0) q.push('What reveals execution sooner than mempool heat on this chain?');
-    return uniq(q).slice(0,8);
-  }
-
-  function v11Plan(model, hist, hypotheses){
-    const top=(hypotheses||[])[0];
-    const blockers=[];
-    if(model.slotProbe?.allZero) blockers.push('null-null storage probes');
-    if(!model.dnaProbe?.implAddress) blockers.push('empty DNA slot');
-    const cold=Object.entries(model.watchTiers||{}).filter(([,v])=>v==='cold').map(([k])=>k);
-    if(cold.length) blockers.push(`cold watchers: ${cold.join(', ')}`);
-    if((model.heatCount||0)===0) blockers.push('no pending heat');
-    return {
-      goal: top?.id==='watcher_map_weak'
-        ? 'Replace the weak interior watcher map by promoting real counterparties from live public anchors and 5EF7 adjacency.'
-        : 'Explain the strongest live public-surface pathway and trace it toward a non-decorative interior execution path.',
-      blockers,
-      next:[
-        'scan live anchor counterparties',
-        'selector-scan the top candidate and 5EF7 neighborhood',
-        'demote dead watchers and promote live bridge candidates',
-        'persist every thought, action, and result into history'
-      ]
-    };
-  }
-
-  function v11ActionQueue(model, hist, hypotheses){
-    const tasks=[]; const seen=new Set();
-    const push=(kind,target,label,why,priority=10,extra={})=>{ const k=kind+'|'+norm(target||'')+'|'+label; if(seen.has(k)) return; seen.add(k); tasks.push({kind,target,label,why,priority,...extra}); };
-    const movers=(model.mutationStats?.rows||[]).filter(r=>(r.motion||0)>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
-    const hot5 = DEFAULTS.PUBLIC_ANCHORS?.[1]?.address;
-    if(movers[0]) push('anchor-counterparties', movers[0].address, movers[0].name, 'Moving anchor deserves counterparty hunt.', 1);
-    if(hot5) push('anchor-counterparties', hot5, '5EF7 structural core', '5EF7 remains the strongest live structural lane.', 2);
-    const topCandidate=(model.candidates||[])[0];
-    if(topCandidate?.address) push('selector-scan', topCandidate.address, 'Top candidate', 'Cluster selectors around best candidate.', 3);
-    if(topCandidate?.address) push('payload-sniff', topCandidate.address, 'Top candidate', 'Sniff payload motifs around best candidate.', 4);
-    if((hypotheses||[])[0]?.id==='watcher_map_weak') push('watcher-rehab', hot5||DEFAULTS.PUBLIC_ANCHORS?.[0]?.address, 'Watcher rehab', 'Replace cold watchers with live bridge candidates.', 5);
-    push('history-mine', '', 'History mine', 'Summarize persistent truths from full history.', 6);
-    return tasks.sort((a,b)=>a.priority-b.priority).slice(0,7);
-  }
-
-  async function v11WatcherRehab(model, anchor){
-    const hist=v11History();
-    const rows=[];
-    if(anchor) {
-      try{
-        const cps=await v10DiscoverAroundAnchor(anchor, model);
-        cps.slice(0,8).forEach(c=>rows.push({address:c.address, touches:c.touches||0, score:(c.touches||0)+(c.inAmt||0>0?1:0)+(c.outAmt||0>0?1:0), why:`counterparty touches ${short(anchor,10,8)}`}));
-      }catch{}
-    }
-    (model.candidates||[]).slice(0,10).forEach(c=>rows.push({address:c.address, touches:0, score:(c.score||0), why:c.reason||'candidate memory'}));
-    const existingHot=Object.entries(model.watchTiers||{}).filter(([,v])=>v==='hot').map(([k])=>k);
-    const banned=new Set(Object.entries(model.watchTiers||{}).filter(([,v])=>v==='cold').map(([k])=>norm(state.settings.WATCH?.[k]||'')));
-    const uniqMap=new Map();
-    rows.forEach(r=>{ const k=norm(r.address); if(!isAddr(k) || banned.has(k)) return; if(!uniqMap.has(k) || (uniqMap.get(k).score||0)<r.score) uniqMap.set(k,r); });
-    return [...uniqMap.values()].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,8);
-  }
-
-  async function v11ExecuteTask(task, model, hist, hypotheses){
-    const out={ts:Date.now(), kind:task.kind, target:task.target, label:task.label, why:task.why, status:'ok', findings:[], promoted:[], meta:{}};
-    try{
-      if(task.kind==='history-mine'){
-        out.findings = (hist.learned||[]).length ? hist.learned.slice(0,5) : ['No strong historical truths yet.'];
-        out.meta.count = hist.count||0;
-      } else if(task.kind==='watcher-rehab'){
-        const rehab=await v11WatcherRehab(model, task.target);
-        out.findings = rehab.slice(0,6).map(r=>`${short(r.address,10,8)} • score ${fmtFixed(r.score||0,2)} • ${r.why}`);
-        out.promoted = rehab.slice(0,5).map(r=>r.address);
-        out.meta.replacementCount = rehab.length;
-      } else if(task.kind==='anchor-counterparties'){
-        const cps=await v10DiscoverAroundAnchor(task.target, model);
-        out.findings = cps.slice(0,8).map(x=>`${short(x.address,10,8)} • touches ${x.touches} • in ${fmtCompact(x.inAmt,3)} • out ${fmtCompact(x.outAmt,3)}`);
-        out.promoted = cps.slice(0,6).map(x=>x.address);
-        out.meta.counterpartyCount = cps.length;
-      } else if(task.kind==='selector-scan'){
-        const rows=await scanSelectors(task.target);
-        out.findings = rows.slice(0,6).map(r=>`${r.selector} • ${r.count} • ${r.direction}`);
-        out.meta.latestTx = rows[0]?.latest || '';
-      } else if(task.kind==='payload-sniff'){
-        const rows=await sniffPayloads(task.target);
-        out.findings = rows.slice(0,6).map(r=>`${r.type}: ${String(r.value).slice(0,80)}`);
-      } else {
-        out.status='skipped'; out.findings=['No executor for this task yet.'];
-      }
-      if(!out.findings.length) out.findings=['No result.'];
-    }catch(e){ out.status='error'; out.findings=[e.message||String(e)]; }
-    return out;
-  }
-
-  let runningV11=false; let latestModelV11=null;
-  async function v11Run(model, hist, hypotheses){
-    if(runningV11) return {queue:[], results:[], promoted:[]};
-    runningV11=true;
-    try{
-      const queue=v11ActionQueue(model, hist, hypotheses);
-      const results=[]; const promoted=[];
-      for(const task of queue.slice(0,4)){
-        const res=await v11ExecuteTask(task, model, hist, hypotheses);
-        results.push(res);
-        (res.promoted||[]).forEach(a=>promoted.push(a));
-      }
-      return {queue, results, promoted: unique(promoted.map(norm)).filter(isAddr)};
-    } finally { runningV11=false; }
-  }
-
-  function v11Promote(model, promoted){
-    const existing=new Map((model.candidates||[]).map(c=>[norm(c.address), {...c}]));
-    (promoted||[]).forEach(addr=>{
-      if(!existing.has(norm(addr))) existing.set(norm(addr), {address:norm(addr), score:0, sources:['v11-agent'], roles:['bridge-candidate'], reason:'promoted by V11 action engine'});
-      const x=existing.get(norm(addr)); x.score=(x.score||0)+8; x.sources=unique([...(x.sources||[]),'v11-agent']); x.roles=unique([...(x.roles||[]),'bridge-candidate']); x.reason='promoted by V11 action engine';
-    });
-    return [...existing.values()].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,50);
-  }
-
-  function v11JournalEntry(model){
-    return {
-      ts: Date.now(),
-      regime: model.regime || model.phase,
-      thoughts: model.v11Thoughts || [],
-      curiosity: model.v11Curiosity || [],
-      actions: model.v11ActionResults || [],
-      goal: model.v11Plan || null,
-      summary: document.getElementById('v10Brief')?.value || ''
-    };
-  }
-
-  function v11RenderIntoV10Panel(model, hist, hypotheses){
-    const thoughtBox=(model.v11Thoughts||[]).slice(0,5).concat((model.v11ActionResults||[]).slice(0,3).map(a=>`${a.label}: ${a.findings?.[0]||a.status}`));
-    const bubbles=v10BubbleRows(thoughtBox, model.v11ActionResults||[]).map(b=>`<div class="v10bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('');
-    setHTML('v10BubbleCloud', bubbles || `<div class="v10bubble warn" style="left:8%;top:10%">No V11 thought-action chain yet.</div>`);
-    setText('v10Stamp', `V11 cycle • ${new Date().toLocaleTimeString()}`);
-    setHTML('v10GoalBox', `<strong>${esc(model.v11Plan?.goal||'No goal yet.')}</strong>`);
-    setHTML('v10BlockerList', (model.v11Plan?.blockers||[]).map(x=>`<div class="v10item warn">${esc(x)}</div>`).join('') || `<div class="v10item good">No major blockers.</div>`);
-    setHTML('v10CuriosityList', (model.v11Curiosity||[]).map(x=>`<div class="v10item info">${esc(x)}</div>`).join('') || `<div class="v10item warn">No curiosity queue.</div>`);
-    setHTML('v10ActionList', (model.v11ActionResults||[]).map(x=>`<div class="v10item ${x.status==='error'?'bad':'good'}"><strong>${esc(x.label)}</strong><br>${esc((x.findings||[]).slice(0,2).join(' | ')||x.status)}</div>`).join('') || `<div class="v10item warn">No autonomous actions yet.</div>`);
-    const brief=[
-      `V11 regime: ${model.regime || model.phase}`,
-      `Score: ${fmtFixed(model.score,2)} • public ${fmtPct01(model.publicStrength,1)} • interior ${fmtPct01(model.interiorStrength,1)} • contradiction ${fmtPct01(model.contradictionLoad,1)}`,
-      `Goal: ${model.v11Plan?.goal || '—'}`,
-      `Blockers: ${(model.v11Plan?.blockers||[]).join(' | ') || 'none'}`,
-      `Learned truths: ${(hist.learned||[]).join(' | ') || 'none'}`,
-      `Top hypotheses: ${(hypotheses||[]).slice(0,3).map(h=>`${h.title} ${fmtPct01(h.score,0)}`).join(' | ')}`,
-      `Thoughts: ${(model.v11Thoughts||[]).slice(0,6).join(' | ')}`,
-      `Actions: ${(model.v11ActionResults||[]).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`).join(' | ')}`,
-      `Promoted: ${(model.v11Promoted||[]).map(a=>short(a,10,8)).join(', ') || 'none'}`
-    ].join('\n');
-    const box=document.getElementById('v10Brief'); if(box) box.value=brief;
-  }
-
-  function v11HookButtons(){
-    const eh=document.getElementById('exportHistoryBtn');
-    if(eh){ eh.onclick=()=>download('pdai-v11-history.json', JSON.stringify(v11MergedHistory(), null, 2)); }
-    const eb=document.getElementById('exportBundleBtn');
-    if(eb){ eb.onclick=()=>download('pdai-v11-casebundle.json', JSON.stringify({exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, localHistory:v11MergedHistory(), v11Journal:v11LoadJournal(), v11Actions:v11LoadActions(), v11Memory:v11LoadMemory(), latestModel:latestModelV11}, null, 2)); }
-    const et=document.getElementById('exportV10ThoughtsBtn');
-    if(et){ et.textContent='Export V11 mind'; et.onclick=()=>download('pdai-v11-mind.json', JSON.stringify({journal:v11LoadJournal(), actions:v11LoadActions(), memory:v11LoadMemory(), latestModel:latestModelV11}, null, 2)); }
-    const copy=document.getElementById('copyV10BriefBtn');
-    if(copy){ copy.textContent='Copy V11 brief'; copy.onclick=async()=>{ const txt=document.getElementById('v10Brief')?.value || ''; try{ await navigator.clipboard.writeText(txt); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy V11 brief',1200);}catch{ document.getElementById('v10Brief')?.select(); } }; }
-    const run=document.getElementById('runV10NowBtn');
-    if(run){ run.textContent='Run V11 hunts now'; run.onclick=()=>sync(); }
-  }
-
-  function v11Snapshot(model){
-    const base=(typeof v10Snapshot==='function' ? v10Snapshot(model) : snapshot(model));
-    base.v11Thoughts=model.v11Thoughts||[];
-    base.v11Curiosity=model.v11Curiosity||[];
-    base.v11Actions=model.v11ActionResults||[];
-    base.v11Promoted=model.v11Promoted||[];
-    base.v11Goal=model.v11Plan||null;
-    base.v11Hypotheses=model.v11Hypotheses||[];
-    base.v11Brief=document.getElementById('v10Brief')?.value || '';
-    return base;
-  }
-  function v11MergedHistory(){
-    return (v11History()||[]).map(h=>{
-      const thoughts=(h.v11Thoughts&&h.v11Thoughts.length?h.v11Thoughts:(h.v10Thoughts&&h.v10Thoughts.length?h.v10Thoughts:(h.thoughts||[])));
-      const actions=(h.v11Actions&&h.v11Actions.length?h.v11Actions:(h.v10Actions&&h.v10Actions.length?h.v10Actions:[]));
-      return {...h, v11Thoughts: thoughts, v11Actions: actions, v11Goal: h.v11Goal||h.v10Goal||null, v11Brief: h.v11Brief||h.v10Brief||h.thoughtSummary||''};
-    });
-  }
-
-  const oldBuildModelV11 = buildModel;
-  buildModel = async function(){
-    const model = await oldBuildModelV11();
-    const hist=v11MineHistory(v11History());
-    const hypotheses=v11Hypotheses(model, hist);
-    model.v11HistorySummary=hist;
-    model.v11Hypotheses=hypotheses;
-    model.v11Thoughts=v11BuildThoughts(model, hist, hypotheses);
-    model.v11Curiosity=v11Curiosity(model, hist, hypotheses);
-    model.v11Plan=v11Plan(model, hist, hypotheses);
-    const pack=await v11Run(model, hist, hypotheses);
-    model.v11ActionQueue=pack.queue;
-    model.v11ActionResults=pack.results;
-    model.v11Promoted=pack.promoted;
-    if(pack.promoted?.length) model.candidates=v11Promote(model, pack.promoted);
-    const mem=v11LoadMemory();
-    mem.lastGoal=model.v11Plan;
-    mem.lastHypotheses=hypotheses.slice(0,5);
-    mem.lastPromoted=model.v11Promoted||[];
-    mem.learned=hist.learned||[];
-    v11SaveMemory(mem);
-    const journal=v11LoadJournal(); journal.push(v11JournalEntry(model)); v11SaveJournal(journal);
-    const acts=v11LoadActions(); (model.v11ActionResults||[]).forEach(a=>acts.push(a)); v11SaveActions(acts);
-    latestModelV11=model;
-    return model;
-  };
-
-  const oldRenderV11=render;
-  render=function(model){
-    oldRenderV11(model);
-    const hist=model.v11HistorySummary||v11MineHistory(v11History());
-    const hyp=model.v11Hypotheses||v11Hypotheses(model,hist);
-    v11RenderIntoV10Panel(model,hist,hyp);
-    v11HookButtons();
-  };
-
-  snapshot=function(model){ return v11Snapshot(model); };
-  document.title='pDAI Peg Prover | v11 Autonomous Cartographer';
-  const titleElV11=document.querySelector('.title'); if(titleElV11) titleElV11.innerHTML='<span class="titleGlow">pDAI Peg Prover</span> • V11 Autonomous Cartographer';
-})();
-</script>
-
-<script>
-(function(){
-  const V12_JOURNAL_KEY='pdai-v12-journal';
-  const V12_ACTIONS_KEY='pdai-v12-actions';
-  const V12_MEMORY_KEY='pdai-v12-memory';
-  let latestModelV12=null;
-
-  function v12Load(key, fallback){ try{ const v=JSON.parse(localStorage.getItem(key)||'null'); return v==null?fallback:v; }catch{return fallback;} }
-  function v12Save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
-  const v12LoadJournal=()=>v12Load(V12_JOURNAL_KEY, []);
-  const v12SaveJournal=(x)=>v12Save(V12_JOURNAL_KEY, x.slice(-500));
-  const v12LoadActions=()=>v12Load(V12_ACTIONS_KEY, []);
-  const v12SaveActions=(x)=>v12Save(V12_ACTIONS_KEY, x.slice(-1000));
-  const v12LoadMemory=()=>v12Load(V12_MEMORY_KEY, {coldCounts:{}, promoted:{}, learned:[], lastGoal:null, lastActions:[], cycle:0});
-  const v12SaveMemory=(x)=>v12Save(V12_MEMORY_KEY, x);
-
-  function v12MergedHistory(){
-    try{ return typeof mergedHistory==='function' ? (mergedHistory()||[]) : (typeof loadLocalHistory==='function' ? loadLocalHistory() : []); }
-    catch{ return []; }
-  }
-
-  function v12MineHistory(hist){
-    const rows=(hist||[]).filter(Boolean);
-    const out={count:rows.length,auditCount:0,surfaceOnlyCount:0,nullNullCount:0,dnaEmptyCount:0,hot5Count:0,learned:[], lastPhases:rows.slice(-12).map(r=>r.stablePhase||r.phase).filter(Boolean)};
-    rows.forEach(r=>{
-      if((r.stablePhase||r.phase)==='audit') out.auditCount++;
-      if((r.stablePhase||r.phase)==='surface-only') out.surfaceOnlyCount++;
-      if(r.slotProbe?.allZero || /null-null/i.test(r.slotProbe?.summary||'')) out.nullNullCount++;
-      if(!r.dnaProbe?.implAddress) out.dnaEmptyCount++;
-      if((r.nodeBalances?.['5EF7']?.pdai||0)>0) out.hot5Count++;
-    });
-    if(out.hot5Count>0) out.learned.push('5EF7 repeatedly persists as the only durable structural watcher.');
-    if(out.nullNullCount>0) out.learned.push('Candidate manifold slots have mostly been null-null, so slot symmetry is not evidentiary yet.');
-    if(out.dnaEmptyCount>0) out.learned.push('The DNA slot has stayed empty across history, weakening proxy-hot-swap explanations.');
-    if(out.surfaceOnlyCount>0) out.learned.push('A surface-only regime has appeared before, meaning public rails can move without interior confirmation.');
-    if(out.auditCount >= Math.max(3, Math.floor(out.count*0.5))) out.learned.push('Audit has dominated the regime history, so the tool must hunt rather than declare.');
-    return out;
-  }
-
-  function v12ColdWatchers(model){
-    return Object.entries(model.watchTiers||{}).filter(([,tier])=>tier==='cold').map(([k])=>k);
-  }
-
-  function v12TopMover(model){
-    return ((model.mutationStats?.rows)||[]).slice().sort((a,b)=>(b.motion||0)-(a.motion||0) || (b.weight||0)-(a.weight||0))[0] || null;
-  }
-
-  function v12ActiveAnchors(model){
-    return ((model.mutationStats?.rows)||[]).filter(r=>((r.motion||0)>0 || (r.weight||0)>0)).sort((a,b)=>(b.motion||0)-(a.motion||0) || (b.weight||0)-(a.weight||0));
-  }
-
-  function v12BuildThoughts(model, hist, mem){
-    const thoughts=[];
-    const hot = Object.entries(model.watchTiers||{}).filter(([,v])=>v==='hot').map(([k])=>k);
-    const cold = v12ColdWatchers(model);
-    thoughts.push(hot.length ? `${hot.join(', ')} remain the only hot watcher lane(s) this cycle.` : 'No watcher lane is convincingly hot this cycle.');
-    if((model.nodeBalances?.['5EF7']?.pdai||0)>0) thoughts.push(`5EF7 still carries ${fmtCompact(model.nodeBalances['5EF7'].pdai,3)} pDAI and remains the strongest structural-core lead.`);
-    if(model.slotProbe?.allZero) thoughts.push('The slot probe is still null-null equality. That is absence, not symmetry proof.');
-    if(!model.dnaProbe?.implAddress) thoughts.push('The DNA slot remains empty, so proxy-mutation still does not explain the current state.');
-    if((model.publicStrength||0) > (model.interiorStrength||0)) thoughts.push('Public surface is still outrunning the interior map. The best use of effort is bridge discovery.');
-    const mover=v12TopMover(model);
-    if(mover && ((mover.motion||0)>0 || (mover.weight||0)>0)) thoughts.push(`${mover.name} is the strongest visible surface rail right now.`);
-    if(cold.length) thoughts.push(`${cold.join(', ')} remain cold and should be demoted or replaced by promoted bridge candidates.`);
-    (hist.learned||[]).slice(0,3).forEach(x=>thoughts.push(`History says: ${x}`));
-    if((model.contradictionLoad||0)>=0.6) thoughts.push('Contradiction load is high enough that dead assumptions must be actively retired.');
-    return [...new Set(thoughts)].slice(0,12);
-  }
-
-  function v12BuildCuriosity(model, hist){
-    const q=[];
-    const mover=v12TopMover(model);
-    if(mover) q.push(`Who are the strongest counterparties around ${mover.name}?`);
-    if((model.nodeBalances?.['5EF7']?.pdai||0)>0) q.push('Which addresses actually bridge the live 5EF7 structural core to the public surface?');
-    if((model.candidates||[])[0]?.address) q.push(`Does the top candidate ${(model.candidates||[])[0].address} show repeat selector or payload behavior?`);
-    if(v12ColdWatchers(model).length) q.push('Which promoted candidates deserve to replace the cold watcher set?');
-    if(model.slotProbe?.allZero) q.push('Which alternative probes are stronger than the current null-null slot read?');
-    return q.slice(0,8);
-  }
-
-  function v12BuildGoal(model, hist){
-    const mover=v12TopMover(model);
-    const target = mover?.address || model.publicAnchors?.[1]?.address || model.publicAnchors?.[0]?.address || DEFAULTS.TARGET;
-    const blockers=[];
-    if(model.slotProbe?.allZero) blockers.push('slot probes still null-null');
-    if(!model.dnaProbe?.implAddress) blockers.push('DNA slot empty');
-    if(v12ColdWatchers(model).length) blockers.push(`${v12ColdWatchers(model).length} cold watcher(s) still loaded`);
-    if((model.heatCount||0)===0) blockers.push('no pending heat');
-    return {
-      goal:`Bridge the live public rails back into the true peg machine by interrogating ${short(target,10,8)} and its counterparties.`,
-      blockers,
-      target
-    };
-  }
-
-  async function v12CounterpartyAction(anchor, model){
-    try{
-      const rows = await v10DiscoverAroundAnchor(anchor, model);
-      const promoted = rows.slice(0,6).map(r=>r.address).filter(isAddr);
-      return {label:`Counterparty hunt ${short(anchor,10,8)}`, status:'ok', findings:rows.slice(0,6).map(r=>`${short(r.address,10,8)} • touches ${r.touches||0} • score ${fmtFixed(r.score||0,2)} • ${r.why||'counterparty'}`), promoted, meta:{count:rows.length}};
-    }catch(e){ return {label:`Counterparty hunt ${short(anchor,10,8)}`, status:'error', findings:[e.message||String(e)], promoted:[], meta:{}}; }
-  }
-
-  async function v12SelectorAction(addr){
-    try{
-      const rows = await scanSelectors(addr);
-      return {label:`Selector scan ${short(addr,10,8)}`, status:'ok', findings:rows.slice(0,8).map(r=>`${r.selector} • ${r.count} • ${r.direction}`), promoted:[], meta:{count:rows.length}};
-    }catch(e){ return {label:`Selector scan ${short(addr,10,8)}`, status:'error', findings:[e.message||String(e)], promoted:[], meta:{}}; }
-  }
-
-  async function v12PayloadAction(addr){
-    try{
-      const rows = await sniffPayloads(addr);
-      return {label:`Payload sniff ${short(addr,10,8)}`, status:'ok', findings:rows.slice(0,8).map(r=>`${r.type}: ${String(r.value).slice(0,90)}`), promoted:[], meta:{count:rows.length}};
-    }catch(e){ return {label:`Payload sniff ${short(addr,10,8)}`, status:'error', findings:[e.message||String(e)], promoted:[], meta:{}}; }
-  }
-
-  function v12RehabAction(model){
-    const rehab=(model.rehab||[]).filter(r=>r.replacement && isAddr(r.replacement.address));
-    const promoted=rehab.slice(0,5).map(r=>r.replacement.address);
-    return {label:'Watcher rehab', status:'ok', findings:rehab.slice(0,6).map(r=>`${r.label} -> ${short(r.replacement.address,10,8)} • ${r.replacement.roles?.[0]||'candidate'} • ${r.problem}`), promoted, meta:{count:rehab.length}};
-  }
-
-  function v12HistoryAction(hist){
-    const findings=(hist.learned||[]).length ? hist.learned.slice(0,6) : ['No strong historical truths yet.'];
-    return {label:'History mine', status:'ok', findings, promoted:[], meta:{count:hist.count||0}};
-  }
-
-  function v12Promote(model, promoted){
-    const existing=new Map((model.candidates||[]).map(c=>[norm(c.address), {...c}]));
-    (promoted||[]).filter(isAddr).forEach((addr,ix)=>{
-      const k=norm(addr); const prev=existing.get(k) || {address:k,score:0,sources:[],roles:['candidate'],reason:'promoted by v12 action loop'};
-      prev.score = Math.max(prev.score||0, 6.5 - ix*0.3);
-      prev.sources = [...new Set([...(prev.sources||[]), 'v12-action'])];
-      prev.reason = prev.reason || 'promoted by v12 action loop';
-      existing.set(k, prev);
-    });
-    model.candidates=[...existing.values()].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,40);
-    return model.candidates;
-  }
-
-  async function v12Run(model, hist, thoughts, curiosity, goal){
-    const actions=[];
-    const anchors=v12ActiveAnchors(model);
-    const mover=anchors[0] || model.publicAnchors?.[1] || model.publicAnchors?.[0] || {address:goal.target};
-    const topCandidate=(model.candidates||[])[0]?.address || mover?.address || goal.target;
-
-    actions.push(v12HistoryAction(hist));
-    if(isAddr(mover?.address)) actions.push(await v12CounterpartyAction(mover.address, model));
-    if(isAddr(topCandidate)) actions.push(await v12SelectorAction(topCandidate));
-    if(isAddr(topCandidate)) actions.push(await v12PayloadAction(topCandidate));
-    actions.push(v12RehabAction(model));
-
-    const cleaned = actions.filter(a=>a && (a.findings||[]).length);
-    const promoted=[...new Set(cleaned.flatMap(a=>a.promoted||[]).filter(isAddr))];
-    return {actions: cleaned.slice(0,5), promoted};
-  }
-
-  function v12Brief(model){
-    const lines=[
-      `Regime: ${model.regime || model.phase}`,
-      `Score: ${fmtFixed(model.score,1)}`,
-      `Public vs interior: ${fmtPct01(model.publicStrength||0,0)} / ${fmtPct01(model.interiorStrength||0,0)}`,
-      `5EF7 pDAI: ${fmtCompact(model.nodeBalances?.['5EF7']?.pdai||0,3)}`,
-      `Thoughts: ${(model.v12Thoughts||[]).slice(0,5).join(' | ') || 'none'}`,
-      `Actions: ${(model.v12Actions||[]).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`).slice(0,5).join(' | ') || 'none'}`,
-      `Goal: ${model.v12Goal?.goal || 'none'}`
-    ];
-    return lines.join('\n');
-  }
-
-  function v12JournalEntry(model){
-    return {ts:Date.now(), phase:model.phase, regime:model.regime, thoughts:model.v12Thoughts||[], curiosity:model.v12Curiosity||[], actions:model.v12Actions||[], goal:model.v12Goal||null, brief:model.v12Brief||''};
-  }
-
-  const oldBuildModelV12 = buildModel;
-  const oldRenderV12 = render;
-  const oldSnapshotV12 = snapshot;
-
-  function v12Snapshot(model){
-    const base=oldSnapshotV12(model);
-    base.v12Thoughts=model.v12Thoughts||[];
-    base.v12Curiosity=model.v12Curiosity||[];
-    base.v12Actions=model.v12Actions||[];
-    base.v12Goal=model.v12Goal||null;
-    base.v12Brief=model.v12Brief||'';
-    base.v12Promoted=model.v12Promoted||[];
-    return base;
-  }
-
-  buildModel = async function(){
-    const model = await oldBuildModelV12();
-    const hist = v12MineHistory(v12MergedHistory());
-    const mem = v12LoadMemory();
-    mem.cycle = (mem.cycle||0) + 1;
-    model.v12HistorySummary = hist;
-    model.v12Thoughts = v12BuildThoughts(model, hist, mem);
-    model.v12Curiosity = v12BuildCuriosity(model, hist);
-    model.v12Goal = v12BuildGoal(model, hist);
-    const pack = await v12Run(model, hist, model.v12Thoughts, model.v12Curiosity, model.v12Goal);
-    model.v12Actions = pack.actions;
-    model.v12Promoted = pack.promoted;
-    if(pack.promoted?.length) v12Promote(model, pack.promoted);
-    model.v12Brief = v12Brief(model);
-    mem.lastGoal = model.v12Goal;
-    mem.lastActions = (model.v12Actions||[]).map(a=>a.label);
-    mem.learned = [...new Set([...(mem.learned||[]), ...(hist.learned||[]), ...(model.v12Thoughts||[]).slice(0,3)])].slice(-30);
-    (pack.promoted||[]).forEach(a=>{ mem.promoted[a] = (mem.promoted[a]||0)+1; });
-    Object.entries(model.watchTiers||{}).forEach(([k,v])=>{ mem.coldCounts[k]=(mem.coldCounts[k]||0)+(v==='cold'?1:0); });
-    v12SaveMemory(mem);
-    const j=v12LoadJournal(); j.push(v12JournalEntry(model)); v12SaveJournal(j);
-    const a=v12LoadActions(); (model.v12Actions||[]).forEach(x=>a.push(x)); v12SaveActions(a);
-    latestModelV12 = model;
-    return model;
-  };
-
-  render = function(model){
-    oldRenderV12(model);
-    const thoughtBox=(model.v12Thoughts||[]).slice(0,5).concat((model.v12Actions||[]).slice(0,3).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`));
-    const bubbleFn = (typeof v10BubbleRows==='function') ? v10BubbleRows : null;
-    const bubbles=bubbleFn ? bubbleFn(thoughtBox, model.v12Actions||[]).map(b=>`<div class="v10bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('') : '';
-    setHTML('v10BubbleCloud', bubbles || `<div class="v10bubble info" style="left:8%;top:10%">V12 is thinking and acting each cycle.</div>`);
-    setHTML('v10GoalBox', `<strong>${esc(model.v12Goal?.goal || 'No goal.')}</strong>`);
-    setHTML('v10BlockerList', (model.v12Goal?.blockers||[]).map(x=>`<div class="v10item warn">${esc(x)}</div>`).join('') || `<div class="v10item good">No blockers.</div>`);
-    setHTML('v10CuriosityList', (model.v12Curiosity||[]).map(x=>`<div class="v10item info">${esc(x)}</div>`).join('') || `<div class="v10item warn">No curiosity queue.</div>`);
-    setHTML('v10ActionList', (model.v12Actions||[]).map(x=>`<div class="v10item ${x.status==='error'?'bad':'good'}"><strong>${esc(x.label)}</strong><br>${esc((x.findings||[]).slice(0,2).join(' | ')||x.status)}</div>`).join('') || `<div class="v10item warn">No actions yet.</div>`);
-    const briefEl=document.getElementById('v10Brief'); if(briefEl) briefEl.value = model.v12Brief || '';
-    const copy=document.getElementById('copyV10BriefBtn');
-    if(copy && !copy.dataset.v12){ copy.dataset.v12='1'; copy.onclick=async()=>{ try{ await navigator.clipboard.writeText(document.getElementById('v10Brief')?.value||''); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy brief',1200);}catch{} }; }
-    const exp=document.getElementById('exportV10ThoughtsBtn');
-    if(exp && !exp.dataset.v12){ exp.dataset.v12='1'; exp.onclick=()=>download('pdai-v12-thought-actions.json', JSON.stringify({journal:v12LoadJournal(), actions:v12LoadActions(), memory:v12LoadMemory(), latestModel:latestModelV12}, null, 2)); }
-    const bundle=document.getElementById('exportBundleBtn');
-    if(bundle && !bundle.dataset.v12){ bundle.dataset.v12='1'; bundle.onclick=()=>download('pdai-v12-casebundle.json', JSON.stringify({exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, localHistory:(typeof loadLocalHistory==='function'?loadLocalHistory():[]), mergedHistory:v12MergedHistory(), v12Journal:v12LoadJournal(), v12Actions:v12LoadActions(), v12Memory:v12LoadMemory(), latestModel:latestModelV12}, null, 2)); }
-  };
-
-  snapshot = v12Snapshot;
-  document.title='pDAI Peg Prover | v12 Autonomous Workhorse';
-  const t=document.querySelector('.title'); if(t) t.innerHTML='<span class="titleGlow">pDAI Peg Prover</span> • V12 Autonomous Workhorse';
-})();
-</script>
-
 </body>
 </html>
