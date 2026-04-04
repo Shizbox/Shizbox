@@ -1068,5 +1068,327 @@ state.settings=loadSettings(); state.imports=loadImports(); applySettingsToUI();
 })();
 </script>
 
+
+<script>
+(function(){
+  const V10_ACTIONS_KEY='pdai-v10-action-journal';
+  const V10_LEARN_KEY='pdai-v10-learning-memory';
+  let latestModelV10=null;
+  let runningV10Actions=false;
+
+  function v10LoadActions(){ try{return JSON.parse(localStorage.getItem(V10_ACTIONS_KEY)||'[]')}catch{return []} }
+  function v10SaveActions(arr){ localStorage.setItem(V10_ACTIONS_KEY, JSON.stringify((arr||[]).slice(-800))); }
+  function v10LoadMemory(){ try{return JSON.parse(localStorage.getItem(V10_LEARN_KEY)||'{"promoted":{},"contradictions":{},"wins":{},"lastGoal":""}')}catch{return {promoted:{},contradictions:{},wins:{},lastGoal:""}} }
+  function v10SaveMemory(v){ localStorage.setItem(V10_LEARN_KEY, JSON.stringify(v)); }
+  function addrTopic(addr){ return '0x' + '0'.repeat(24) + norm(addr).replace(/^0x/,''); }
+  function uniqBy(arr,keyFn){ const m=new Map(); (arr||[]).forEach(x=>m.set(keyFn(x),x)); return [...m.values()]; }
+  function anyAddrLabel(address){
+    const a = norm(address);
+    const watcher = watchNodes().find(x=>norm(x.address)===a);
+    if(watcher) return watcher.label;
+    const pub = DEFAULTS.PUBLIC_ANCHORS.find(x=>norm(x.address)===a);
+    if(pub) return pub.name;
+    return short(address,10,8);
+  }
+  async function v10GetLogsAdaptive(filter){
+    let from = parseInt(filter.fromBlock,16), to=parseInt(filter.toBlock,16);
+    while(true){
+      try{
+        return await rpc('eth_getLogs',[{...filter,fromBlock:toHex(from),toBlock:toHex(to)}]);
+      }catch(e){
+        const span = to - from;
+        if(span<=25) throw e;
+        from = to - Math.floor(span/2);
+      }
+    }
+  }
+  async function v10AnchorCounterparties(anchor, token, fromBlock, toBlock){
+    const tp = addrTopic(anchor);
+    const out = new Map();
+    const collect = (cp, amt, dir, blk, tx) => {
+      const k = norm(cp);
+      if(!isAddr(k)) return;
+      if(!out.has(k)) out.set(k,{address:k, touches:0, inAmt:0, outAmt:0, lastBlock:0, lastTx:'', token});
+      const x=out.get(k); x.touches++; if(dir==='in') x.inAmt += amt; else x.outAmt += amt; if(blk>=x.lastBlock){x.lastBlock=blk; x.lastTx=tx;}
+    };
+    const [fromLogs,toLogs] = await Promise.all([
+      v10GetLogsAdaptive({address:token, topics:[TRANSFER_TOPIC,tp], fromBlock:toHex(fromBlock), toBlock:toHex(toBlock)}).catch(()=>[]),
+      v10GetLogsAdaptive({address:token, topics:[TRANSFER_TOPIC,null,tp], fromBlock:toHex(fromBlock), toBlock:toHex(toBlock)}).catch(()=>[])
+    ]);
+    const dec = await tokenDecimals(token).catch(()=>18);
+    (fromLogs||[]).forEach(log=>collect(fromTopic(log.topics[2]), units(hexToBigInt(log.data),dec),'out',parseInt(log.blockNumber,16),log.transactionHash));
+    (toLogs||[]).forEach(log=>collect(fromTopic(log.topics[1]), units(hexToBigInt(log.data),dec),'in',parseInt(log.blockNumber,16),log.transactionHash));
+    return [...out.values()].sort((a,b)=>(b.touches + b.inAmt + b.outAmt) - (a.touches + a.inAmt + a.outAmt)).slice(0,12);
+  }
+  async function v10DiscoverAroundAnchor(anchor, model){
+    const latest = model.latest || await blockNumber();
+    const span = Math.max(60, Math.min(240, Number(state.settings.SELECTOR_BLOCKS)||120));
+    const fromBlock = Math.max(0, latest - span);
+    const tokens=[DEFAULTS.TARGET, DEFAULTS.WPLS].concat(isAddr(state.settings.WATCH.ATROPA_TOKEN)?[state.settings.WATCH.ATROPA_TOKEN]:[]);
+    const rows=[];
+    for(const token of tokens){
+      try{ const cps = await v10AnchorCounterparties(anchor, token, fromBlock, latest); cps.forEach(x=>rows.push({...x, sourceAnchor:anchor})); }catch{}
+    }
+    return uniqBy(rows, x=>norm(x.address)+':'+norm(x.token||''));
+  }
+  function v10BuildThoughts(model){
+    const thoughts=[];
+    const hottest=(model.mutationStats?.rows||[]).slice().sort((a,b)=>(b.motion||0)-(a.motion||0))[0];
+    if(hottest && (hottest.motion||0)>0) thoughts.push(`Surface rail ${hottest.name} is moving while interior stays soft; bridge-hunting matters more than poetic certainty.`);
+    if(model.nodeBalances?.['5EF7']?.pdai>0) thoughts.push(`5EF7 is still carrying ${fmtCompact(model.nodeBalances['5EF7'].pdai,3)} pDAI; structural-core status survives every cycle.`);
+    if(model.slotProbe?.allZero) thoughts.push(`Null-null manifold equality is still dead data. V10 must replace symbolic fixation with active address discovery.`);
+    if((model.publicStrength||0)>(model.interiorStrength||0)) thoughts.push(`Public surface is outrunning the interior map. The most valuable action is to identify the hidden counterparties touching live anchors.`);
+    if((model.heatCount||0)===0) thoughts.push(`No heat again. That means the peg story probably will not reveal itself through pending gas alone.`);
+    if((model.contradictionLoad||0)>=0.6) thoughts.push(`Contradiction load is high enough that every dead watcher should be considered replaceable.`);
+    if((model.candidates||[])[0]) thoughts.push(`Top candidate ${short(model.candidates[0].address,10,8)} deserves aggressive selector, payload, and counterparty work.`);
+    if((model.debts||[]).length) thoughts.push(`Evidence debt remains open: ${model.debts[0].task}.`);
+    return thoughts.slice(0,8);
+  }
+  function v10Curiosity(model){
+    const q=[];
+    const movers=(model.mutationStats?.rows||[]).filter(r=>(r.motion||0)>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
+    if(movers[0]) q.push(`Who is touching ${movers[0].name} directly in the last ${Math.max(60, Math.min(240, Number(state.settings.SELECTOR_BLOCKS)||120))} blocks?`);
+    if(model.watchTiers?.['3D07']==='cold') q.push('Which newly discovered address is a better route candidate than 3D07 right now?');
+    if(model.slotProbe?.allZero) q.push('Which non-null storage locations change around active public rails?');
+    if(!model.dnaProbe?.implAddress) q.push('If proxy DNA is empty, which router/caller pattern is actually expressing the machine?');
+    if((model.publicStrength||0)>(model.interiorStrength||0)) q.push('Which address cluster best bridges the surface/interior gap?');
+    return q.slice(0,8);
+  }
+  function v10Plan(model){
+    const goal='Find the strongest active pathway that links live public pDAI rails to a non-decorative interior execution map.';
+    const blockers=[];
+    if(model.slotProbe?.allZero) blockers.push('candidate slots are still null-null');
+    if(!model.dnaProbe?.implAddress) blockers.push('proxy DNA not visible');
+    if((model.heatCount||0)===0) blockers.push('no pending heat');
+    const cold = Object.entries(model.watchTiers||{}).filter(([,v])=>v==='cold').map(([k])=>k);
+    if(cold.length) blockers.push(`cold watchers: ${cold.join(', ')}`);
+    const next=[];
+    next.push('promote counterparties touching live public anchors');
+    next.push('run selector and payload scans on top candidate and 5EF7');
+    next.push('demote watchers that remain dead across multiple cycles');
+    return {goal, blockers, next};
+  }
+  function v10ActionQueue(model){
+    const tasks=[];
+    const seen=new Set();
+    const push=(kind,target,label,why,priority=10,extra={})=>{ const k=kind+'|'+norm(target||'')+'|'+label; if(seen.has(k)) return; seen.add(k); tasks.push({kind,target,label,why,priority,...extra}); };
+    const movers=(model.mutationStats?.rows||[]).filter(r=>(r.motion||0)>0).sort((a,b)=>(b.motion||0)-(a.motion||0));
+    const topCandidate=(model.candidates||[])[0];
+    if(movers[0]) push('anchor-counterparties', movers[0].address, movers[0].name, 'Surface anchor is moving; discover who is touching it.', 1);
+    if(model.nodeBalances?.['5EF7']?.pdai>0) push('selector-scan', DEFAULTS.PUBLIC_ANCHORS[1].address, '5EF7 structural core', 'Check selector clusters around the structural core.', 2);
+    if(topCandidate?.address) push('selector-scan', topCandidate.address, 'Top candidate', 'Top promoted candidate deserves selector clustering.', 3);
+    if(topCandidate?.address) push('payload-sniff', topCandidate.address, 'Top candidate', 'Sniff payload motifs around promoted candidate.', 4);
+    if(model.slotProbe?.allZero) push('non-null-watcher-hunt', DEFAULTS.PUBLIC_ANCHORS[0].address, 'Native optical rail', 'Find non-null counterparties instead of symbolic null slots.', 5);
+    if((model.publicStrength||0)>(model.interiorStrength||0)) push('bridge-gap-hunt', DEFAULTS.PUBLIC_ANCHORS[2].address, 'Bridged surface rail', 'Surface/interior gap is the main mystery.', 6);
+    return tasks.sort((a,b)=>a.priority-b.priority).slice(0,6);
+  }
+  async function v10ExecuteTask(task, model){
+    const base={ts:Date.now(), kind:task.kind, target:task.target, label:task.label, why:task.why, status:'ok', findings:[], promoted:[], meta:{}};
+    try{
+      if(task.kind==='selector-scan'){
+        const rows=await scanSelectors(task.target);
+        base.findings = rows.slice(0,6).map(r=>`${r.selector} • ${r.count} • ${r.direction}`);
+        if(rows[0]?.latest) base.meta.latestTx=rows[0].latest;
+      } else if(task.kind==='payload-sniff'){
+        const rows=await sniffPayloads(task.target);
+        base.findings = rows.slice(0,6).map(r=>`${r.type}: ${String(r.value).slice(0,60)}`);
+      } else if(task.kind==='anchor-counterparties' || task.kind==='bridge-gap-hunt' || task.kind==='non-null-watcher-hunt'){
+        const cps=await v10DiscoverAroundAnchor(task.target, model);
+        base.findings = cps.slice(0,8).map(x=>`${short(x.address,10,8)} • touches ${x.touches} • in ${fmtCompact(x.inAmt,3)} • out ${fmtCompact(x.outAmt,3)}`);
+        base.promoted = cps.slice(0,6).map(x=>x.address);
+        base.meta.counterpartyCount = cps.length;
+      } else {
+        base.status='skipped';
+        base.findings=['No executor for this task yet.'];
+      }
+      if(!base.findings.length) base.findings=['No result.'];
+    }catch(e){
+      base.status='error';
+      base.findings=[e.message||String(e)];
+    }
+    return base;
+  }
+  async function v10RunActions(model){
+    if(runningV10Actions) return {tasks:[], results:[], promoted:[]};
+    runningV10Actions=true;
+    try{
+      const tasks=v10ActionQueue(model);
+      const results=[];
+      const promoted=[];
+      for(const task of tasks.slice(0,3)){
+        const res=await v10ExecuteTask(task, model);
+        results.push(res);
+        (res.promoted||[]).forEach(a=>promoted.push(a));
+      }
+      return {tasks, results, promoted: unique(promoted.map(norm)).filter(isAddr)};
+    } finally { runningV10Actions=false; }
+  }
+  function v10MergePromotions(model, promoted){
+    if(!promoted?.length) return model.candidates||[];
+    const existing = new Map((model.candidates||[]).map(c=>[norm(c.address), {...c}]));
+    promoted.forEach(addr=>{
+      if(!existing.has(norm(addr))) existing.set(norm(addr), {address:norm(addr), score:0, sources:['v10-autonomy'], roles:['candidate'], reason:'promoted by autonomous anchor/counterparty hunt'});
+      const x=existing.get(norm(addr));
+      x.score = (x.score||0) + 5;
+      x.sources = unique([...(x.sources||[]), 'v10-autonomy']);
+      x.roles = unique([...(x.roles||[]), 'bridge-candidate']);
+      x.reason = x.reason || 'promoted by autonomous hunt';
+    });
+    return [...existing.values()].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,40);
+  }
+  function v10UpdateMemory(model){
+    const mem=v10LoadMemory();
+    (model.candidates||[]).slice(0,10).forEach(c=>{ mem.promoted[c.address]=(mem.promoted[c.address]||0)+(c.score||0); });
+    (model.contradictions||[]).forEach(c=>{ mem.contradictions[c.text]=(mem.contradictions[c.text]||0)+1; });
+    if(model.regime) mem.wins[model.regime]=(mem.wins[model.regime]||0)+1;
+    mem.lastGoal = model.v10Plan?.goal || mem.lastGoal;
+    v10SaveMemory(mem);
+    return mem;
+  }
+  function v10AddStyle(){
+    if(document.getElementById('v10Style')) return;
+    const st=document.createElement('style'); st.id='v10Style';
+    st.textContent=`
+      .v10dock{margin-top:14px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(10,15,24,.92),rgba(7,11,18,.97))}
+      .v10grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+      .v10bubbleWrap{position:relative;min-height:280px;border-radius:18px;background:radial-gradient(circle at top left, rgba(72,196,255,.12), transparent 25%), radial-gradient(circle at bottom right, rgba(88,255,185,.08), transparent 24%), rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);overflow:hidden;padding:12px}
+      .v10bubbleCloud{position:relative;min-height:250px}
+      .v10bubble{position:absolute;max-width:290px;padding:12px 14px;border-radius:18px 18px 18px 6px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 26px rgba(0,0,0,.18);font-size:.84rem;line-height:1.45;color:var(--text);animation:v10Float 7s ease-in-out infinite}
+      .v10bubble.action{border-color:rgba(72,196,255,.22)} .v10bubble.good{border-color:rgba(88,255,185,.22)} .v10bubble.warn{border-color:rgba(255,204,82,.22)} .v10bubble.bad{border-color:rgba(255,93,115,.22)}
+      .v10bubble:after{content:'';position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:rgba(255,255,255,.08);border-left:0}
+      .v10subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+      .v10mini{border:1px solid rgba(255,255,255,.05);border-radius:16px;background:rgba(255,255,255,.02);padding:12px}
+      .v10list{display:grid;gap:8px}
+      .v10item{padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);font-size:.84rem;line-height:1.45}
+      .v10item.good{border-color:rgba(88,255,185,.18)} .v10item.warn{border-color:rgba(255,204,82,.18)} .v10item.bad{border-color:rgba(255,93,115,.18)} .v10item.info{border-color:rgba(72,196,255,.18)}
+      .v10goal{margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+      @keyframes v10Float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+      @media (max-width:1400px){.v10grid,.v10subgrid{grid-template-columns:1fr}}
+    `;
+    document.head.appendChild(st);
+  }
+  function v10BubbleRows(thoughts, actions){
+    const out=[];
+    const presets=[
+      {left:'2%',top:'6%'},{left:'34%',top:'4%'},{left:'64%',top:'10%'},
+      {left:'8%',top:'42%'},{left:'40%',top:'46%'},{left:'66%',top:'40%'},
+      {left:'20%',top:'68%'},{left:'56%',top:'70%'}
+    ];
+    thoughts.slice(0,4).forEach((t,i)=>out.push({...presets[i], cls: classifyThought(t), text:t}));
+    actions.slice(0,4).forEach((a,i)=>out.push({...presets[i+4]||presets[presets.length-1], cls: a.status==='error'?'bad':'action', text:`${a.label}: ${a.findings?.[0]||a.status}`}));
+    return out.slice(0,8);
+  }
+  function v10AddPanels(){
+    if(document.getElementById('v10Panel')) return;
+    const app=document.querySelector('.app'); if(!app) return;
+    const sec=document.createElement('div'); sec.id='v10Panel'; sec.className='glass section';
+    sec.innerHTML=`
+      <div class="thinkHead">
+        <div><div class="boxTitle">V10 Autonomous Workhorse</div><div class="small">V10 does not just think — it acts on its top curiosities, journals what it did, and exports the whole reasoning chain.</div></div>
+        <div class="btns">
+          <button id="runV10NowBtn">Run V10 hunts now</button>
+          <button id="exportV10ThoughtsBtn" class="secondary">Export V10 thoughts</button>
+          <button id="copyV10BriefBtn" class="secondary">Copy V10 brief</button>
+        </div>
+      </div>
+      <div class="v10grid">
+        <div class="v10bubbleWrap">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px"><span class="thinkBadge">Autonomous reasoning</span><span class="small" id="v10Stamp">—</span></div>
+          <div id="v10BubbleCloud" class="v10bubbleCloud"></div>
+        </div>
+        <div class="v10subgrid">
+          <div class="v10mini"><div class="boxTitle">Goal</div><div id="v10GoalBox" class="v10goal"></div><div class="v10list" id="v10BlockerList" style="margin-top:10px"></div></div>
+          <div class="v10mini"><div class="boxTitle">Curiosity → action</div><div class="v10list" id="v10CuriosityList"></div></div>
+          <div class="v10mini"><div class="boxTitle">Autonomous action log</div><div class="v10list" id="v10ActionList"></div></div>
+          <div class="v10mini"><div class="boxTitle">Workhorse brief</div><textarea id="v10Brief" style="width:100%;min-height:190px;padding:11px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#081019;color:var(--text);"></textarea></div>
+        </div>
+      </div>`;
+    const foot=document.querySelector('.foot'); app.insertBefore(sec, foot || null);
+  }
+  function v10Render(model){
+    const bubbles=v10BubbleRows(model.v10Thoughts||[], model.v10ActionResults||[]).map(b=>`<div class="v10bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('');
+    setHTML('v10BubbleCloud', bubbles || `<div class="v10bubble warn" style="left:8%;top:10%">No autonomous thought-action chain yet.</div>`);
+    setText('v10Stamp', `Cycle • ${new Date().toLocaleTimeString()}`);
+    setHTML('v10GoalBox', `<strong>${esc(model.v10Plan?.goal||'No goal yet.')}</strong>`);
+    setHTML('v10BlockerList', (model.v10Plan?.blockers||[]).map(x=>`<div class="v10item warn">${esc(x)}</div>`).join('') || `<div class="v10item good">No major blockers.</div>`);
+    setHTML('v10CuriosityList', (model.v10Curiosity||[]).map(x=>`<div class="v10item info">${esc(x)}</div>`).join('') || `<div class="v10item warn">No curiosity queue.</div>`);
+    setHTML('v10ActionList', (model.v10ActionResults||[]).map(x=>`<div class="v10item ${x.status==='error'?'bad':'good'}"><strong>${esc(x.label)}</strong><br>${esc(x.findings?.slice(0,2).join(' | ')||x.status)}</div>`).join('') || `<div class="v10item warn">No autonomous actions yet.</div>`);
+    const brief=[
+      `V10 regime: ${model.regime || model.phase}`,
+      `Score: ${fmtFixed(model.score,2)} • public ${fmtPct01(model.publicStrength,1)} • interior ${fmtPct01(model.interiorStrength,1)} • contradiction ${fmtPct01(model.contradictionLoad,1)}`,
+      `Goal: ${model.v10Plan?.goal || '—'}`,
+      `Blockers: ${(model.v10Plan?.blockers||[]).join(' | ') || 'none'}`,
+      `Thoughts: ${(model.v10Thoughts||[]).slice(0,5).join(' | ')}`,
+      `Actions: ${(model.v10ActionResults||[]).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`).join(' | ')}`,
+      `Promoted: ${(model.v10Promoted||[]).map(a=>short(a,10,8)).join(', ') || 'none'}`
+    ].join('\n');
+    const box=document.getElementById('v10Brief'); if(box) box.value=brief;
+  }
+  function v10HookButtons(){
+    const eh=document.getElementById('exportHistoryBtn');
+    if(eh && !eh.dataset.v10){ eh.dataset.v10='1'; eh.onclick=()=>download('pdai-v10-history.json', JSON.stringify(v10MergedHistory(), null, 2)); }
+    const eb=document.getElementById('exportBundleBtn');
+    if(eb && !eb.dataset.v10){ eb.dataset.v10='1'; eb.onclick=()=>download('pdai-v10-casebundle.json', JSON.stringify({exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, localHistory:v10MergedHistory(), thoughtJournal:v9LoadThoughtJournal ? v9LoadThoughtJournal() : [], actionJournal:v10LoadActions(), memory:v10LoadMemory(), latestModel:latestModelV10}, null, 2)); }
+    const et=document.getElementById('exportV10ThoughtsBtn');
+    if(et && !et.dataset.v10){ et.dataset.v10='1'; et.onclick=()=>download('pdai-v10-thought-actions.json', JSON.stringify({thoughtJournal: v9LoadThoughtJournal ? v9LoadThoughtJournal() : [], actionJournal:v10LoadActions(), memory:v10LoadMemory()}, null, 2)); }
+    const copy=document.getElementById('copyV10BriefBtn');
+    if(copy && !copy.dataset.v10){ copy.dataset.v10='1'; copy.onclick=async()=>{ const txt=document.getElementById('v10Brief')?.value || ''; try{ await navigator.clipboard.writeText(txt); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy V10 brief',1200);}catch{ document.getElementById('v10Brief')?.select(); } }; }
+    const run=document.getElementById('runV10NowBtn');
+    if(run && !run.dataset.v10){ run.dataset.v10='1'; run.onclick=()=>sync(); }
+  }
+  function v10Snapshot(model){
+    const base = (typeof v9Snapshot==='function' ? v9Snapshot(model) : snapshot(model));
+    base.regime = model.regime;
+    base.v10Goal = model.v10Plan || null;
+    base.v10Thoughts = model.v10Thoughts || [];
+    base.v10Curiosity = model.v10Curiosity || [];
+    base.v10Actions = model.v10ActionResults || [];
+    base.v10Promoted = model.v10Promoted || [];
+    base.v10Brief = document.getElementById('v10Brief')?.value || '';
+    return base;
+  }
+  function v10MergedHistory(){
+    const raw = (typeof mergedAllHistoryV9==='function' ? mergedAllHistoryV9() : (typeof mergedHistory==='function' ? mergedHistory() : loadLocalHistory()));
+    return (raw||[]).map(h=>({...h, v10Thoughts:h.v10Thoughts||h.thoughts||[], v10Actions:h.v10Actions||[], v10Goal:h.v10Goal||null, v10Brief:h.v10Brief||h.thoughtSummary||''}));
+  }
+
+  v10AddStyle();
+  v10AddPanels();
+
+  const oldBuildModelV10 = buildModel;
+  buildModel = async function(){
+    const model = await oldBuildModelV10();
+    model.v10Thoughts = v10BuildThoughts(model);
+    model.v10Curiosity = v10Curiosity(model);
+    model.v10Plan = v10Plan(model);
+    const actionPack = await v10RunActions(model);
+    model.v10ActionQueue = actionPack.tasks;
+    model.v10ActionResults = actionPack.results;
+    model.v10Promoted = actionPack.promoted;
+    if(actionPack.promoted?.length){
+      model.candidates = v10MergePromotions(model, actionPack.promoted);
+    }
+    model.v10Memory = v10UpdateMemory(model);
+    latestModelV10 = model;
+    const aj = v10LoadActions();
+    actionPack.results.forEach(r=>aj.push(r));
+    v10SaveActions(aj);
+    return model;
+  };
+
+  const oldRenderV10 = render;
+  render = function(model){
+    oldRenderV10(model);
+    v10Render(model);
+    v10HookButtons();
+  };
+
+  const oldSnapshotV10 = snapshot;
+  snapshot = function(model){ return v10Snapshot(model); };
+
+  document.title='pDAI Peg Prover | v10 Autonomous Workhorse';
+  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="titleGlow">pDAI Peg Prover</span> • V10 Autonomous Workhorse';
+})();
+</script>
 </body>
 </html>
