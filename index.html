@@ -1697,5 +1697,246 @@ state.settings=loadSettings(); state.imports=loadImports(); applySettingsToUI();
   const titleElV11=document.querySelector('.title'); if(titleElV11) titleElV11.innerHTML='<span class="titleGlow">pDAI Peg Prover</span> • V11 Autonomous Cartographer';
 })();
 </script>
+
+<script>
+(function(){
+  const V12_JOURNAL_KEY='pdai-v12-journal';
+  const V12_ACTIONS_KEY='pdai-v12-actions';
+  const V12_MEMORY_KEY='pdai-v12-memory';
+  let latestModelV12=null;
+
+  function v12Load(key, fallback){ try{ const v=JSON.parse(localStorage.getItem(key)||'null'); return v==null?fallback:v; }catch{return fallback;} }
+  function v12Save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  const v12LoadJournal=()=>v12Load(V12_JOURNAL_KEY, []);
+  const v12SaveJournal=(x)=>v12Save(V12_JOURNAL_KEY, x.slice(-500));
+  const v12LoadActions=()=>v12Load(V12_ACTIONS_KEY, []);
+  const v12SaveActions=(x)=>v12Save(V12_ACTIONS_KEY, x.slice(-1000));
+  const v12LoadMemory=()=>v12Load(V12_MEMORY_KEY, {coldCounts:{}, promoted:{}, learned:[], lastGoal:null, lastActions:[], cycle:0});
+  const v12SaveMemory=(x)=>v12Save(V12_MEMORY_KEY, x);
+
+  function v12MergedHistory(){
+    try{ return typeof mergedHistory==='function' ? (mergedHistory()||[]) : (typeof loadLocalHistory==='function' ? loadLocalHistory() : []); }
+    catch{ return []; }
+  }
+
+  function v12MineHistory(hist){
+    const rows=(hist||[]).filter(Boolean);
+    const out={count:rows.length,auditCount:0,surfaceOnlyCount:0,nullNullCount:0,dnaEmptyCount:0,hot5Count:0,learned:[], lastPhases:rows.slice(-12).map(r=>r.stablePhase||r.phase).filter(Boolean)};
+    rows.forEach(r=>{
+      if((r.stablePhase||r.phase)==='audit') out.auditCount++;
+      if((r.stablePhase||r.phase)==='surface-only') out.surfaceOnlyCount++;
+      if(r.slotProbe?.allZero || /null-null/i.test(r.slotProbe?.summary||'')) out.nullNullCount++;
+      if(!r.dnaProbe?.implAddress) out.dnaEmptyCount++;
+      if((r.nodeBalances?.['5EF7']?.pdai||0)>0) out.hot5Count++;
+    });
+    if(out.hot5Count>0) out.learned.push('5EF7 repeatedly persists as the only durable structural watcher.');
+    if(out.nullNullCount>0) out.learned.push('Candidate manifold slots have mostly been null-null, so slot symmetry is not evidentiary yet.');
+    if(out.dnaEmptyCount>0) out.learned.push('The DNA slot has stayed empty across history, weakening proxy-hot-swap explanations.');
+    if(out.surfaceOnlyCount>0) out.learned.push('A surface-only regime has appeared before, meaning public rails can move without interior confirmation.');
+    if(out.auditCount >= Math.max(3, Math.floor(out.count*0.5))) out.learned.push('Audit has dominated the regime history, so the tool must hunt rather than declare.');
+    return out;
+  }
+
+  function v12ColdWatchers(model){
+    return Object.entries(model.watchTiers||{}).filter(([,tier])=>tier==='cold').map(([k])=>k);
+  }
+
+  function v12TopMover(model){
+    return ((model.mutationStats?.rows)||[]).slice().sort((a,b)=>(b.motion||0)-(a.motion||0) || (b.weight||0)-(a.weight||0))[0] || null;
+  }
+
+  function v12ActiveAnchors(model){
+    return ((model.mutationStats?.rows)||[]).filter(r=>((r.motion||0)>0 || (r.weight||0)>0)).sort((a,b)=>(b.motion||0)-(a.motion||0) || (b.weight||0)-(a.weight||0));
+  }
+
+  function v12BuildThoughts(model, hist, mem){
+    const thoughts=[];
+    const hot = Object.entries(model.watchTiers||{}).filter(([,v])=>v==='hot').map(([k])=>k);
+    const cold = v12ColdWatchers(model);
+    thoughts.push(hot.length ? `${hot.join(', ')} remain the only hot watcher lane(s) this cycle.` : 'No watcher lane is convincingly hot this cycle.');
+    if((model.nodeBalances?.['5EF7']?.pdai||0)>0) thoughts.push(`5EF7 still carries ${fmtCompact(model.nodeBalances['5EF7'].pdai,3)} pDAI and remains the strongest structural-core lead.`);
+    if(model.slotProbe?.allZero) thoughts.push('The slot probe is still null-null equality. That is absence, not symmetry proof.');
+    if(!model.dnaProbe?.implAddress) thoughts.push('The DNA slot remains empty, so proxy-mutation still does not explain the current state.');
+    if((model.publicStrength||0) > (model.interiorStrength||0)) thoughts.push('Public surface is still outrunning the interior map. The best use of effort is bridge discovery.');
+    const mover=v12TopMover(model);
+    if(mover && ((mover.motion||0)>0 || (mover.weight||0)>0)) thoughts.push(`${mover.name} is the strongest visible surface rail right now.`);
+    if(cold.length) thoughts.push(`${cold.join(', ')} remain cold and should be demoted or replaced by promoted bridge candidates.`);
+    (hist.learned||[]).slice(0,3).forEach(x=>thoughts.push(`History says: ${x}`));
+    if((model.contradictionLoad||0)>=0.6) thoughts.push('Contradiction load is high enough that dead assumptions must be actively retired.');
+    return [...new Set(thoughts)].slice(0,12);
+  }
+
+  function v12BuildCuriosity(model, hist){
+    const q=[];
+    const mover=v12TopMover(model);
+    if(mover) q.push(`Who are the strongest counterparties around ${mover.name}?`);
+    if((model.nodeBalances?.['5EF7']?.pdai||0)>0) q.push('Which addresses actually bridge the live 5EF7 structural core to the public surface?');
+    if((model.candidates||[])[0]?.address) q.push(`Does the top candidate ${(model.candidates||[])[0].address} show repeat selector or payload behavior?`);
+    if(v12ColdWatchers(model).length) q.push('Which promoted candidates deserve to replace the cold watcher set?');
+    if(model.slotProbe?.allZero) q.push('Which alternative probes are stronger than the current null-null slot read?');
+    return q.slice(0,8);
+  }
+
+  function v12BuildGoal(model, hist){
+    const mover=v12TopMover(model);
+    const target = mover?.address || model.publicAnchors?.[1]?.address || model.publicAnchors?.[0]?.address || DEFAULTS.TARGET;
+    const blockers=[];
+    if(model.slotProbe?.allZero) blockers.push('slot probes still null-null');
+    if(!model.dnaProbe?.implAddress) blockers.push('DNA slot empty');
+    if(v12ColdWatchers(model).length) blockers.push(`${v12ColdWatchers(model).length} cold watcher(s) still loaded`);
+    if((model.heatCount||0)===0) blockers.push('no pending heat');
+    return {
+      goal:`Bridge the live public rails back into the true peg machine by interrogating ${short(target,10,8)} and its counterparties.`,
+      blockers,
+      target
+    };
+  }
+
+  async function v12CounterpartyAction(anchor, model){
+    try{
+      const rows = await v10DiscoverAroundAnchor(anchor, model);
+      const promoted = rows.slice(0,6).map(r=>r.address).filter(isAddr);
+      return {label:`Counterparty hunt ${short(anchor,10,8)}`, status:'ok', findings:rows.slice(0,6).map(r=>`${short(r.address,10,8)} • touches ${r.touches||0} • score ${fmtFixed(r.score||0,2)} • ${r.why||'counterparty'}`), promoted, meta:{count:rows.length}};
+    }catch(e){ return {label:`Counterparty hunt ${short(anchor,10,8)}`, status:'error', findings:[e.message||String(e)], promoted:[], meta:{}}; }
+  }
+
+  async function v12SelectorAction(addr){
+    try{
+      const rows = await scanSelectors(addr);
+      return {label:`Selector scan ${short(addr,10,8)}`, status:'ok', findings:rows.slice(0,8).map(r=>`${r.selector} • ${r.count} • ${r.direction}`), promoted:[], meta:{count:rows.length}};
+    }catch(e){ return {label:`Selector scan ${short(addr,10,8)}`, status:'error', findings:[e.message||String(e)], promoted:[], meta:{}}; }
+  }
+
+  async function v12PayloadAction(addr){
+    try{
+      const rows = await sniffPayloads(addr);
+      return {label:`Payload sniff ${short(addr,10,8)}`, status:'ok', findings:rows.slice(0,8).map(r=>`${r.type}: ${String(r.value).slice(0,90)}`), promoted:[], meta:{count:rows.length}};
+    }catch(e){ return {label:`Payload sniff ${short(addr,10,8)}`, status:'error', findings:[e.message||String(e)], promoted:[], meta:{}}; }
+  }
+
+  function v12RehabAction(model){
+    const rehab=(model.rehab||[]).filter(r=>r.replacement && isAddr(r.replacement.address));
+    const promoted=rehab.slice(0,5).map(r=>r.replacement.address);
+    return {label:'Watcher rehab', status:'ok', findings:rehab.slice(0,6).map(r=>`${r.label} -> ${short(r.replacement.address,10,8)} • ${r.replacement.roles?.[0]||'candidate'} • ${r.problem}`), promoted, meta:{count:rehab.length}};
+  }
+
+  function v12HistoryAction(hist){
+    const findings=(hist.learned||[]).length ? hist.learned.slice(0,6) : ['No strong historical truths yet.'];
+    return {label:'History mine', status:'ok', findings, promoted:[], meta:{count:hist.count||0}};
+  }
+
+  function v12Promote(model, promoted){
+    const existing=new Map((model.candidates||[]).map(c=>[norm(c.address), {...c}]));
+    (promoted||[]).filter(isAddr).forEach((addr,ix)=>{
+      const k=norm(addr); const prev=existing.get(k) || {address:k,score:0,sources:[],roles:['candidate'],reason:'promoted by v12 action loop'};
+      prev.score = Math.max(prev.score||0, 6.5 - ix*0.3);
+      prev.sources = [...new Set([...(prev.sources||[]), 'v12-action'])];
+      prev.reason = prev.reason || 'promoted by v12 action loop';
+      existing.set(k, prev);
+    });
+    model.candidates=[...existing.values()].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,40);
+    return model.candidates;
+  }
+
+  async function v12Run(model, hist, thoughts, curiosity, goal){
+    const actions=[];
+    const anchors=v12ActiveAnchors(model);
+    const mover=anchors[0] || model.publicAnchors?.[1] || model.publicAnchors?.[0] || {address:goal.target};
+    const topCandidate=(model.candidates||[])[0]?.address || mover?.address || goal.target;
+
+    actions.push(v12HistoryAction(hist));
+    if(isAddr(mover?.address)) actions.push(await v12CounterpartyAction(mover.address, model));
+    if(isAddr(topCandidate)) actions.push(await v12SelectorAction(topCandidate));
+    if(isAddr(topCandidate)) actions.push(await v12PayloadAction(topCandidate));
+    actions.push(v12RehabAction(model));
+
+    const cleaned = actions.filter(a=>a && (a.findings||[]).length);
+    const promoted=[...new Set(cleaned.flatMap(a=>a.promoted||[]).filter(isAddr))];
+    return {actions: cleaned.slice(0,5), promoted};
+  }
+
+  function v12Brief(model){
+    const lines=[
+      `Regime: ${model.regime || model.phase}`,
+      `Score: ${fmtFixed(model.score,1)}`,
+      `Public vs interior: ${fmtPct01(model.publicStrength||0,0)} / ${fmtPct01(model.interiorStrength||0,0)}`,
+      `5EF7 pDAI: ${fmtCompact(model.nodeBalances?.['5EF7']?.pdai||0,3)}`,
+      `Thoughts: ${(model.v12Thoughts||[]).slice(0,5).join(' | ') || 'none'}`,
+      `Actions: ${(model.v12Actions||[]).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`).slice(0,5).join(' | ') || 'none'}`,
+      `Goal: ${model.v12Goal?.goal || 'none'}`
+    ];
+    return lines.join('\n');
+  }
+
+  function v12JournalEntry(model){
+    return {ts:Date.now(), phase:model.phase, regime:model.regime, thoughts:model.v12Thoughts||[], curiosity:model.v12Curiosity||[], actions:model.v12Actions||[], goal:model.v12Goal||null, brief:model.v12Brief||''};
+  }
+
+  const oldBuildModelV12 = buildModel;
+  const oldRenderV12 = render;
+  const oldSnapshotV12 = snapshot;
+
+  function v12Snapshot(model){
+    const base=oldSnapshotV12(model);
+    base.v12Thoughts=model.v12Thoughts||[];
+    base.v12Curiosity=model.v12Curiosity||[];
+    base.v12Actions=model.v12Actions||[];
+    base.v12Goal=model.v12Goal||null;
+    base.v12Brief=model.v12Brief||'';
+    base.v12Promoted=model.v12Promoted||[];
+    return base;
+  }
+
+  buildModel = async function(){
+    const model = await oldBuildModelV12();
+    const hist = v12MineHistory(v12MergedHistory());
+    const mem = v12LoadMemory();
+    mem.cycle = (mem.cycle||0) + 1;
+    model.v12HistorySummary = hist;
+    model.v12Thoughts = v12BuildThoughts(model, hist, mem);
+    model.v12Curiosity = v12BuildCuriosity(model, hist);
+    model.v12Goal = v12BuildGoal(model, hist);
+    const pack = await v12Run(model, hist, model.v12Thoughts, model.v12Curiosity, model.v12Goal);
+    model.v12Actions = pack.actions;
+    model.v12Promoted = pack.promoted;
+    if(pack.promoted?.length) v12Promote(model, pack.promoted);
+    model.v12Brief = v12Brief(model);
+    mem.lastGoal = model.v12Goal;
+    mem.lastActions = (model.v12Actions||[]).map(a=>a.label);
+    mem.learned = [...new Set([...(mem.learned||[]), ...(hist.learned||[]), ...(model.v12Thoughts||[]).slice(0,3)])].slice(-30);
+    (pack.promoted||[]).forEach(a=>{ mem.promoted[a] = (mem.promoted[a]||0)+1; });
+    Object.entries(model.watchTiers||{}).forEach(([k,v])=>{ mem.coldCounts[k]=(mem.coldCounts[k]||0)+(v==='cold'?1:0); });
+    v12SaveMemory(mem);
+    const j=v12LoadJournal(); j.push(v12JournalEntry(model)); v12SaveJournal(j);
+    const a=v12LoadActions(); (model.v12Actions||[]).forEach(x=>a.push(x)); v12SaveActions(a);
+    latestModelV12 = model;
+    return model;
+  };
+
+  render = function(model){
+    oldRenderV12(model);
+    const thoughtBox=(model.v12Thoughts||[]).slice(0,5).concat((model.v12Actions||[]).slice(0,3).map(a=>`${a.label}: ${(a.findings||[])[0]||a.status}`));
+    const bubbleFn = (typeof v10BubbleRows==='function') ? v10BubbleRows : null;
+    const bubbles=bubbleFn ? bubbleFn(thoughtBox, model.v12Actions||[]).map(b=>`<div class="v10bubble ${b.cls}" style="left:${b.left};top:${b.top}">${esc(b.text)}</div>`).join('') : '';
+    setHTML('v10BubbleCloud', bubbles || `<div class="v10bubble info" style="left:8%;top:10%">V12 is thinking and acting each cycle.</div>`);
+    setHTML('v10GoalBox', `<strong>${esc(model.v12Goal?.goal || 'No goal.')}</strong>`);
+    setHTML('v10BlockerList', (model.v12Goal?.blockers||[]).map(x=>`<div class="v10item warn">${esc(x)}</div>`).join('') || `<div class="v10item good">No blockers.</div>`);
+    setHTML('v10CuriosityList', (model.v12Curiosity||[]).map(x=>`<div class="v10item info">${esc(x)}</div>`).join('') || `<div class="v10item warn">No curiosity queue.</div>`);
+    setHTML('v10ActionList', (model.v12Actions||[]).map(x=>`<div class="v10item ${x.status==='error'?'bad':'good'}"><strong>${esc(x.label)}</strong><br>${esc((x.findings||[]).slice(0,2).join(' | ')||x.status)}</div>`).join('') || `<div class="v10item warn">No actions yet.</div>`);
+    const briefEl=document.getElementById('v10Brief'); if(briefEl) briefEl.value = model.v12Brief || '';
+    const copy=document.getElementById('copyV10BriefBtn');
+    if(copy && !copy.dataset.v12){ copy.dataset.v12='1'; copy.onclick=async()=>{ try{ await navigator.clipboard.writeText(document.getElementById('v10Brief')?.value||''); copy.textContent='Copied'; setTimeout(()=>copy.textContent='Copy brief',1200);}catch{} }; }
+    const exp=document.getElementById('exportV10ThoughtsBtn');
+    if(exp && !exp.dataset.v12){ exp.dataset.v12='1'; exp.onclick=()=>download('pdai-v12-thought-actions.json', JSON.stringify({journal:v12LoadJournal(), actions:v12LoadActions(), memory:v12LoadMemory(), latestModel:latestModelV12}, null, 2)); }
+    const bundle=document.getElementById('exportBundleBtn');
+    if(bundle && !bundle.dataset.v12){ bundle.dataset.v12='1'; bundle.onclick=()=>download('pdai-v12-casebundle.json', JSON.stringify({exportedAt:new Date().toISOString(), settings:state.settings, imports:state.imports, localHistory:(typeof loadLocalHistory==='function'?loadLocalHistory():[]), mergedHistory:v12MergedHistory(), v12Journal:v12LoadJournal(), v12Actions:v12LoadActions(), v12Memory:v12LoadMemory(), latestModel:latestModelV12}, null, 2)); }
+  };
+
+  snapshot = v12Snapshot;
+  document.title='pDAI Peg Prover | v12 Autonomous Workhorse';
+  const t=document.querySelector('.title'); if(t) t.innerHTML='<span class="titleGlow">pDAI Peg Prover</span> • V12 Autonomous Workhorse';
+})();
+</script>
+
 </body>
 </html>
