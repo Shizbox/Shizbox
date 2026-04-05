@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V21 Godmode Correlation Lab</title>
+<title>pDAI Peg Prover • V22 Godmode Deep-Thought Lab</title>
 <style>
   :root{
     --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
@@ -126,8 +126,8 @@
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V21 Godmode Correlation Lab</h1>
-      <div class="sub">V21 goes into Godmode: it treats Maria shorts, videos, streams, X, and your historical corpus as one symbolic layer, then numerically cross-references that layer against PulseChain windows, public anchors, watcher behavior, and historical drift to hunt for peg confirmation and ETA clues.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V22 Godmode Deep-Thought Lab</h1>
+      <div class="sub">V22 goes deeper: it treats Maria videos, shorts, streams, X, and your historical corpus as one symbolic archive, then dissects motifs, numbers, dates, phrases, timelines, and historical resonance to hunt for peg confirmation and ETA scenarios.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
         <div class="chip info">Maria dissection + numeric resonance + history memory</div>
@@ -154,7 +154,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V21 settings</div>
+    <div class="boxTitle">V22 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -169,6 +169,9 @@
       <div class="field"><label>Manual social JSON / lines</label><textarea id="sManualSocial" placeholder='[{"title":"...","publishedAt":"2026-04-01T00:00:00Z","platform":"x"}] or one line per clue'></textarea></div>
       <div class="field"><label>Notes</label><textarea id="sNotes" placeholder="optional notes"></textarea></div>
       <div class="field"><label>Research corpus / transcripts / visual notes</label><textarea id="sResearchCorpus" placeholder="Paste transcript lines, frame notes, numeric ideas, dates, old posts, or JSON to deepen analysis."></textarea></div>
+      <div class="field"><label>Transcript proxy URL</label><input id="sTranscriptProxy" placeholder="optional transcript proxy endpoint" /></div>
+      <div class="field"><label>Godmode speculate level (1-10)</label><input id="sSpeculateLevel" value="8" /></div>
+      <div class="field"><label>Frame notes / visual corpus</label><textarea id="sFrameCorpus" placeholder="Paste visual notes, symbols, frame descriptions, timestamps, or OCR snippets."></textarea></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
@@ -178,7 +181,7 @@
   </div>
 
   <div class="metrics">
-    <div class="card"><div class="label">V21 score</div><div class="value" id="mScore">—</div><div class="hint">Correlation quality</div></div>
+    <div class="card"><div class="label">V22 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
     <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Machine picture</div></div>
     <div class="card"><div class="label">Peg progress</div><div class="value" id="mPeg">—</div><div class="hint">Evidence-weighted, not price-weighted</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
@@ -203,7 +206,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card briefPanel">
-          <div class="label">V21 verdict</div>
+          <div class="label">V22 verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div class="bubbles" id="thoughtBubbles"></div>
@@ -276,14 +279,39 @@
       <div class="tableWrap"><table><thead><tr><th>Watcher</th><th>Tier</th><th>State</th><th>Replacement / promoted</th></tr></thead><tbody id="watchBody"></tbody></table></div>
     </div>
   </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Godmode synthesis</div>
+      <div class="small">Cross-platform memory, transcript-style cues, numbers, and historical drift are fused here into a higher-order synthesis layer.</div>
+      <div id="gmSummary"></div>
+      <div class="brainGrid" style="margin-top:12px">
+        <div class="resCard"><div class="label">Historical memory</div><div id="memoryList"></div></div>
+        <div class="resCard"><div class="label">Transcript / frame cues</div><div id="cueList"></div></div>
+        <div class="resCard"><div class="label">Cross-platform resonance</div><div id="resonanceList"></div></div>
+        <div class="resCard"><div class="label">Theory ledger</div><div id="theoryList"></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Maria video dossiers</div>
+      <div class="small">Each Maria item gets a dossier with phrase overlap, numerical hooks, related X chatter, and historical support.</div>
+      <div id="dossierList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Number / date lattice</div>
+      <div class="small">Recurring durations, ratios, dates, and timing clusters are ranked instead of being hand-waved away.</div>
+      <div id="latticeList"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v21-settings';
-  const HISTORY_KEY='pdai-v21-history';
-  const SOCIAL_CACHE_KEY='pdai-v21-social-cache';
-  const LASTGOOD_KEY='pdai-v21-last-good';
+  const STORAGE_KEY='pdai-v22-settings';
+  const HISTORY_KEY='pdai-v22-history';
+  const SOCIAL_CACHE_KEY='pdai-v22-social-cache';
+  const LASTGOOD_KEY='pdai-v22-last-good';
   const NULL32='0x'+'0'.repeat(64);
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
@@ -393,6 +421,42 @@
     try{ const j=JSON.parse(raw); const arr=Array.isArray(j)?j:[j]; return arr.map(x=>normalizeSocial({id:x.id||('corpus-'+Math.random().toString(36).slice(2)), title:x.title||x.text||'', text:x.text||x.title||'', publishedAt:x.publishedAt||new Date().toISOString(), platform:x.platform||'corpus', kind:x.kind||'note', source:'research-corpus', durationSec:x.durationSec||extractDuration(x.title||x.text||''), phase:x.phase||detectPhase(x.title||x.text||''), code:x.code||extractCode(x.title||x.text||''), author:x.author||''})); }catch{}
     return raw.split(/\n+/).filter(Boolean).map((line,i)=>normalizeSocial({id:'corpus-'+i+'-'+line.slice(0,12), title:line, text:line, platform:'corpus', kind:'note', source:'research-corpus'}));
   }
+  function dedupeSocial(items){ const out=[]; const seen=new Set(); for(const it of items||[]){ const n=normalizeSocial(it); const k=`${n.platform}|${n.id}|${n.link}|${n.title}`; if(seen.has(k)) continue; seen.add(k); out.push(n);} return out.sort((a,b)=>+new Date(b.publishedAt)-+new Date(a.publishedAt)); }
+  function extractHistoricalSocial(history){ const raw=[]; for(const snap of history||[]){ for(const key of ['newSocial','harvestedSocial']) for(const it of (snap[key]||[])) raw.push(it); } return dedupeSocial(raw).slice(0,400); }
+  function wordsSet(s){ return new Set(String(s||'').toLowerCase().match(/[a-z][a-z0-9_-]{2,}/g)||[]); }
+  function overlapScore(a,b){ const sa=wordsSet(a), sb=wordsSet(b); if(!sa.size||!sb.size) return 0; let inter=0; for(const w of sa) if(sb.has(w)) inter++; return inter/Math.max(sa.size,sb.size); }
+  function buildPhraseMap(items){ const counts=new Map(); for(const it of items){ const toks=(String(it.title||'')+' '+String(it.text||'')).toLowerCase().match(/[a-z0-9$#][a-z0-9$#_-]{1,}/g)||[]; for(let i=0;i<toks.length-1;i++){ const bg=toks[i]+' '+toks[i+1]; if(bg.length<5) continue; counts.set(bg,(counts.get(bg)||0)+1);} } return [...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,16).map(([phrase,count])=>({phrase,count})); }
+  function buildNumberLattice(items){
+    const map=new Map();
+    for(const it of items){
+      const txt=`${it.title||''} ${it.text||''}`;
+      const found=[...(txt.match(/\d{1,4}:\d{1,4}/g)||[]), ...(txt.match(/\d{1,4}(?:\.\d+)?/g)||[])];
+      for(const num of found){ const k=String(num); const prev=map.get(k)||{value:k,count:0,contexts:[]}; prev.count++; if(prev.contexts.length<4) prev.contexts.push(it.title||it.text||''); map.set(k,prev);} }
+    return [...map.values()].sort((a,b)=>b.count-a.count).slice(0,20);
+  }
+  function buildTranscriptCues(items){ return dedupeSocial(items).filter(x=>/\d{1,2}:\d{2}|alligator|spider|heat|scribe|manifold|landscape|north hollywood|qwen|spectacle|trilateral|maria/i.test(`${x.title} ${x.text}`)).slice(0,16).map(x=>({title:x.title||x.text, platform:x.platform, code:x.code||'', durationSec:x.durationSec||0, publishedAt:x.publishedAt})); }
+  function buildHistorySignals(history){
+    const rows=(history||[]).slice(-80); if(!rows.length) return {summary:['No historical snapshots loaded.'],avgPublic:0,avgInterior:0,avgSocial:0,trend:'flat'};
+    const avg=(k)=>rows.reduce((a,x)=>a+(Number(x[k])||0),0)/rows.length;
+    const avgPublic=avg('publicStrength'), avgInterior=avg('interiorStrength'), avgSocial=avg('socialDeltaCount');
+    const first=rows[0]?.score||0, last=rows[rows.length-1]?.score||0;
+    const trend=last>first+4?'up':last<first-4?'down':'flat';
+    const repeatedHot=rows.reduce((a,x)=>a+(x.hotWatcher==='5EF7'?1:0),0);
+    const summaries=[`History loaded: ${rows.length} snapshot(s).`,`Average public strength ${pct(avgPublic)} vs interior ${pct(avgInterior)}.`,`Average social delta ${fmt(avgSocial,1)} per snapshot.`,`Hot watcher 5EF7 persisted in ${repeatedHot}/${rows.length} snapshots.`,`Historical score trend is ${trend}.`];
+    return {summary:summaries,avgPublic,avgInterior,avgSocial,trend};
+  }
+  function buildVideoDossiers(items, historySignals, speculateLevel){
+    const corpus=dedupeSocial(items); const yts=corpus.filter(x=>x.platform==='youtube').slice(0,18); const out=[];
+    for(const yt of yts){
+      const related=corpus.filter(o=>o.id!==yt.id && ((Math.abs(+new Date(o.publishedAt)-+new Date(yt.publishedAt)) <= 1000*60*60*24*8) || overlapScore(`${o.title} ${o.text}`, `${yt.title} ${yt.text}`) > 0.16 || (o.code && o.code===yt.code)));
+      const platforms=[...new Set(related.map(x=>x.platform))];
+      const authors=[...new Set(related.map(x=>x.author).filter(Boolean))].slice(0,6);
+      const numbers=extractDateHooks([yt,...related]).flatMap(h=>h.notable||[]).slice(0,8);
+      const resonance=clamp(0.18 + (yt.durationSec?0.1:0) + Math.min(related.length,10)/25 + platforms.length*0.08 + Math.min(numbers.length,6)*0.03 + (speculateLevel/10)*0.08 + (historySignals.avgPublic||0)*0.1,0,0.98);
+      out.push({title:yt.title, publishedAt:yt.publishedAt, durationSec:yt.durationSec||0, code:yt.code||'', platforms, authors, numbers, relatedCount:related.length, resonance, phase:yt.phase||'social'});
+    }
+    return out.sort((a,b)=>b.resonance-a.resonance).slice(0,10);
+  }
   function tokenizeWords(items){
     const stop=new Set(['the','and','for','with','that','this','from','into','your','have','just','will','they','them','about','there','still','only','more','than','when','what','where','which','their','each','across','while','within','being','like','live','soon','gate','roadmap','pulsechain','social','video','short','stream','post']);
     const counts=new Map();
@@ -412,38 +476,69 @@
     }
     return out.slice(0,12);
   }
-  function buildSignalBrain(model, allSocial, research){
-    const corpus=[...allSocial, ...research].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
+  function buildSignalBrain(model, allSocial, research, histSocial, historySignals){
+    const corpus=dedupeSocial([...allSocial, ...research, ...histSocial]).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
     const motifs=tokenizeWords(corpus);
+    const phraseMap=buildPhraseMap(corpus);
+    const lattice=buildNumberLattice(corpus);
     const dateHooks=extractDateHooks(corpus);
+    const transcriptCues=buildTranscriptCues([...research, ...histSocial, ...allSocial]);
     const x9=corpus.filter(x=>/x9oeb|136s/i.test(`${x.title} ${x.text}`));
-    const liberty=corpus.filter(x=>/liberty|gasless|shield|lend|marketplace|stableswap/i.test(`${x.title} ${x.text}`));
-    const ratios=corpus.filter(x=>/156:1|155|31\.62|1000x|1:1|600bn|late april|may/i.test(`${x.title} ${x.text}`));
+    const liberty=corpus.filter(x=>/liberty|gasless|shield|lend|marketplace|stableswap|bridge2pulse|intake/i.test(`${x.title} ${x.text}`));
+    const ratios=corpus.filter(x=>/156:1|155|31\.62|1000x|1:1|600bn|late april|may|april/i.test(`${x.title} ${x.text}`));
+    const maria=corpus.filter(x=>x.platform==='youtube');
     const phaseCounts=corpus.reduce((a,x)=>{ a[x.phase||'social']=(a[x.phase||'social']||0)+1; return a; },{});
     let numericRes=0;
-    numericRes += x9.length ? 0.18 : 0;
-    numericRes += liberty.length ? 0.15 : 0;
+    numericRes += x9.length ? 0.16 : 0;
+    numericRes += liberty.length ? 0.14 : 0;
     numericRes += ratios.length ? 0.14 : 0;
-    numericRes += (dateHooks.filter(d=>d.duration>0).length/10)*0.16;
-    numericRes += (motifs.filter(m=>['libertyswap','gasless','marketplace','stable','heat','alligator','teddy','north','hollywood','qwen','trilateral','peg'].includes(m.word)).length/8)*0.18;
-    numericRes += clamp(model.socialDeltaCount/40,0,1)*0.19;
+    numericRes += (dateHooks.filter(d=>d.duration>0).length/12)*0.14;
+    numericRes += (transcriptCues.length/16)*0.12;
+    numericRes += (phraseMap.filter(p=>/pdai|to \$1|gasless|market maker|stable ?swap|north hollywood|qwen being|landscape teddy bear|trilateral broadcast/i.test(p.phrase)).length/10)*0.12;
+    numericRes += (motifs.filter(m=>['libertyswap','gasless','marketplace','stable','heat','alligator','teddy','north','hollywood','qwen','trilateral','peg','maria','shield'].includes(m.word)).length/10)*0.12;
+    numericRes += clamp(model.socialDeltaCount/50,0,1)*0.10;
     numericRes = clamp(numericRes,0,1);
     const echoes=[];
-    if(x9.length) echoes.push(`x9oeb appears as the strongest explicit window key across loaded material (${x9.length} reference${x9.length>1?'s':''}).`);
-    if(liberty.length) echoes.push(`Liberty / gasless / marketplace language clusters around intake pressure and readiness themes (${liberty.length} hits).`);
-    if(ratios.length) echoes.push(`Numeric-ratio talk (1:1, 155/156, 31.62, 600bn, April/May timing) is recurring enough to treat as an active motif set (${ratios.length} hits).`);
-    if((phaseCounts.intake||0)>0 && (phaseCounts.scribe||0)>0) echoes.push(`Intake and scribe phases are both present, which keeps the 'bridge pressure then execution window' story alive.`);
+    if(x9.length) echoes.push(`x9oeb remains the strongest explicit window key across the loaded archive (${x9.length} reference${x9.length>1?'s':''}).`);
+    if(liberty.length) echoes.push(`Liberty / gasless / marketplace language clusters around intake pressure and readiness (${liberty.length} hits).`);
+    if(ratios.length) echoes.push(`Numeric-ratio talk (1:1, 155/156, 600bn, April/May timing) remains a dense motif set (${ratios.length} hits).`);
+    if((phaseCounts.intake||0)>0 && (phaseCounts.scribe||0)>0) echoes.push(`Intake and scribe phases both appear, preserving the intake-then-execution storyline.`);
+    if(historySignals.avgPublic>historySignals.avgInterior) echoes.push(`Historically, public-surface pressure has stayed ahead of the current interior watcher map.`);
+    const dossiers=buildVideoDossiers(corpus, historySignals, state.settings.speculateLevel||8);
+    const speculateBoost=(state.settings.speculateLevel||8)/10;
     const spec=[];
-    if(x9.length) spec.push({text:'Speculative link: x9oeb behaves like a high-weight synchronization key because it carries explicit timing metadata, a duration, and continued narrative priority in the social layer.', confidence:clamp(0.45+numericRes*0.35,0,0.92)});
-    if(liberty.length) spec.push({text:'Speculative link: LibertySwap / gasless / marketplace chatter may represent the public-facing intake valve for peg pressure rather than the peg mechanic itself.', confidence:clamp(0.38+liberty.length*0.02,0,0.84)});
-    if(ratios.length) spec.push({text:'Speculative numeric link: 155/156 and thin-LP math may be part of the social guidance layer used to point attentive users toward corridor mechanics and timing windows.', confidence:clamp(0.34+ratios.length*0.025,0,0.82)});
-    if(model.interiorStrength < model.publicStrength && model.socialDeltaCount>0) spec.push({text:'Speculative state read: the machine may still be more visible in public-surface pressure + social choreography than in the current interior watcher set.', confidence:clamp(0.55+model.publicStrength*0.2-model.contradictionLoad*0.1,0,0.88)});
+    if(x9.length) spec.push({text:'Speculative link: x9oeb behaves like a primary synchronization key because it carries explicit timing metadata, a duration, and persistent priority in the social archive.', confidence:clamp(0.42+numericRes*0.34+speculateBoost*0.08,0,0.96)});
+    if(liberty.length) spec.push({text:'Speculative link: LibertySwap / gasless / marketplace chatter may describe the intake valve and pressure-build phase rather than the final peg mechanic itself.', confidence:clamp(0.34+liberty.length*0.018+speculateBoost*0.08,0,0.9)});
+    if(ratios.length) spec.push({text:'Speculative numeric link: 155/156 ratios and thin-LP math may be deliberate social breadcrumbs pointing toward corridor repricing and timing windows.', confidence:clamp(0.32+ratios.length*0.02+speculateBoost*0.08,0,0.88)});
+    if(maria.length && transcriptCues.length) spec.push({text:'Speculative archive read: the Maria layer appears structured enough that titles, durations, and repeated phrases should be treated as a designed synchronization system, not random noise.', confidence:clamp(0.45+transcriptCues.length/40+speculateBoost*0.08,0,0.93)});
+    if(model.interiorStrength < model.publicStrength && model.socialDeltaCount>0) spec.push({text:'Speculative state read: the machine may still be more visible in public-surface pressure and social choreography than in the current interior watcher set.', confidence:clamp(0.52+model.publicStrength*0.18-model.contradictionLoad*0.08+speculateBoost*0.04,0,0.9)});
+    const theoryLedger=[
+      {name:'Social choreography is deliberate', score:clamp(0.35+numericRes*0.35+(maria.length/30)*0.15+speculateBoost*0.1-model.contradictionLoad*0.05,0,1), support:`Maria archive ${maria.length} item(s), transcript/frame cues ${transcriptCues.length}, dossiers ${dossiers.length}.`, risk:'Still needs richer frame/audio extraction for direct content proof.'},
+      {name:'Liberty is intake / readiness layer', score:clamp(0.28+(liberty.length/25)*0.3+speculateBoost*0.08+model.publicStrength*0.08,0,1), support:`Liberty-themed hits ${liberty.length}, intake-phase items ${(phaseCounts.intake||0)}.`, risk:'Not the same thing as proving on-chain peg execution.'},
+      {name:'Current interior map is incomplete', score:clamp(0.45+model.publicStrength*0.18-model.interiorStrength*0.05+model.contradictionLoad*0.08,0,1), support:`Public ${pct(model.publicStrength)} vs interior ${pct(model.interiorStrength)} with contradiction load ${pct(model.contradictionLoad)}.`, risk:'New promoted candidates could change this quickly.'},
+      {name:'Near-term readiness window exists', score:clamp(0.2+numericRes*0.22+model.socialDeltaCount/80+Math.max(0,1-model.contradictionLoad)*0.12,0,1), support:`Social delta ${model.socialDeltaCount}, ratio/date hooks ${dateHooks.length}.`, risk:'Needs reserve bursts or stronger interior wake to harden.'}
+    ].sort((a,b)=>b.score-a.score);
+    const base = clamp(0.18 + model.publicStrength*0.22 + numericRes*0.24 + clamp(1-model.contradictionLoad,0,1)*0.12 + model.interiorStrength*0.12 + Math.min(model.socialDeltaCount,50)/50*0.12,0,1);
     const eta=[];
-    const base = clamp(0.2 + model.publicStrength*0.25 + numericRes*0.25 + clamp(1-model.contradictionLoad,0,1)*0.15 + model.interiorStrength*0.15,0,1);
-    eta.push({label:'Near-term readiness window',range:'days to weeks',score:clamp(base,0,1),reason:'Social intensity + public-surface strength are real, but contradictions remain high and interior wake is still incomplete.'});
-    eta.push({label:'Formal peg confirmation window',range:'weeks to months',score:clamp(base-0.18+model.interiorStrength*0.12,0,1),reason:'A true confirmation still wants better interior proof, non-null slot behavior, or stronger route-level evidence.'});
-    eta.push({label:'False-positive risk',range:'always active',score:clamp(model.contradictionLoad*0.9,0,1),reason:'Null-null slots, empty DNA, and cold legacy watchers still create real story debt.'});
-    return {motifs,dateHooks,numericRes,echoes,spec,eta,phaseCounts};
+    eta.push({label:'Socially primed readiness',range:'days to weeks',score:clamp(base+speculateBoost*0.03,0,1),reason:'Social intensity, archive resonance, and public-surface pressure are present, but contradictions remain heavy.'});
+    eta.push({label:'Hard peg confirmation',range:'weeks to months',score:clamp(base-0.16+model.interiorStrength*0.14,0,1),reason:'True confirmation still wants route-level or interior proof beyond social resonance.'});
+    eta.push({label:'Narrative overshoot risk',range:'always active',score:clamp(model.contradictionLoad*0.88,0,1),reason:'Null-null slots, empty DNA, and cold legacy watchers still create real story debt.'});
+    return {motifs,phraseMap,lattice,dateHooks,transcriptCues,numericRes,echoes,spec,eta,phaseCounts,dossiers,historySignals,theoryLedger};
+  }
+
+  async function fetchTranscriptHints(videos){
+    const proxy=(state.settings.transcriptProxy||'').trim(); if(!proxy || !videos.length) return [];
+    const out=[];
+    for(const v of videos.slice(0,6)){
+      const id=(v.link||'').match(/(?:v=|shorts\/)([A-Za-z0-9_-]{6,})/)?.[1]; if(!id) continue;
+      try{
+        const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/youtube/transcript?videoId=${encodeURIComponent(id)}`,{},8000);
+        const arr=Array.isArray(j)?j:(j.items||j.transcript||[]);
+        const text=(arr||[]).map(x=>x.text||x.snippet||'').join(' ').trim();
+        if(text) out.push(normalizeSocial({id:`tx:${id}`,title:`Transcript ${v.title}`,text,platform:'corpus',kind:'transcript',source:'transcript-proxy',publishedAt:v.publishedAt,durationSec:v.durationSec||0,phase:v.phase||detectPhase(text),code:v.code||extractCode(text)}));
+      }catch(e){}
+    }
+    return out;
   }
 
   async function fetchYoutube(channelId, proxy=''){
@@ -585,13 +680,15 @@
 
   function computePegProgress(model){
     const score =
-      (model.publicStrength*0.34)+
-      (model.interiorStrength*0.18)+
-      (Math.min(model.socialDeltaCount,20)/20*0.18)+
-      (Math.min((model.windows||[]).length,12)/12*0.12)+
-      (Math.min((model.v21Promoted||[]).length,5)/5*0.08)+
-      (Math.min((model.counterparties||[]).length,8)/8*0.06)-
-      (model.contradictionLoad*0.18);
+      (model.publicStrength*0.30)+
+      (model.interiorStrength*0.16)+
+      (Math.min(model.socialDeltaCount,24)/24*0.16)+
+      (Math.min((model.windows||[]).length,14)/14*0.10)+
+      (Math.min((model.v22Promoted||[]).length,5)/5*0.08)+
+      (Math.min((model.counterparties||[]).length,8)/8*0.05)+
+      ((model.signalBrain?.numericRes||0)*0.13)+
+      (Math.min((model.signalBrain?.dossiers||[]).length,8)/8*0.08)-
+      (model.contradictionLoad*0.17);
     return clamp(score,0,1);
   }
 
@@ -600,72 +697,88 @@
     const hypotheses=[];
     const contradictions=[];
     const next=[];
-
     observations.push(`${model.socialDeltaCount} new social item(s) this cycle.`);
     observations.push(`${model.hotWatcher} remains the strongest live watcher with ${fmt(model.nodeBalances[model.hotWatcher]?.pdai||0,3)} pDAI.`);
     observations.push(`${model.publicAnchors.length} public anchor rails remain active truth surfaces.`);
+    observations.push(`Historical memory says public ${pct(model.signalBrain.historySignals.avgPublic)} vs interior ${pct(model.signalBrain.historySignals.avgInterior)} on average.`);
     if(model.windows[0]) observations.push(`Latest sync focus: ${model.windows[0].title}`);
-
+    if(model.signalBrain.dossiers[0]) observations.push(`Highest resonance dossier: ${model.signalBrain.dossiers[0].title} (${pct(model.signalBrain.dossiers[0].resonance)}).`);
+    if(model.signalBrain.lattice[0]) observations.push(`Top numeric hook in corpus: ${model.signalBrain.lattice[0].value} (${model.signalBrain.lattice[0].count} hits).`);
     hypotheses.push(model.phase==='surface-leading' ? 'Public-surface mutation is outrunning the current interior watcher map.' : 'Surface/interior balance is changing.');
     if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
     if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
-    if((model.v21Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v21Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
-
+    if(model.signalBrain.transcriptCues.length) hypotheses.push(`Loaded corpus contains ${model.signalBrain.transcriptCues.length} transcript/frame cue(s), which increases structured symbolic signal.`);
+    if((model.v22Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v22Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
+    hypotheses.push(...(model.signalBrain.theoryLedger||[]).slice(0,2).map(t=>`${t.name} (${pct(t.score)})`));
     if(model.slotProbe.allZero && model.slotProbe.equal) contradictions.push('Slot probe is null-null equality; this is absence, not symmetry.');
     if(model.dnaProbe.raw===NULL32) contradictions.push('DNA slot is empty; proxy-swap theory has no lift this cycle.');
     const cold=Object.entries(model.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k);
     if(cold.length) contradictions.push(`Cold watchers still dominate the interior map: ${cold.join(', ')}.`);
     if(!model.payloadHits.length) contradictions.push('No payload motifs surfaced around the hottest anchor window.');
-
+    if(!(model.platformCounts.x||0)) contradictions.push('X coverage is still weak or absent this cycle.');
     next.push('Probe promoted counterparties around 5EF7 and the public anchors.');
     next.push('Turn new YouTube/X posts into block windows and compare against reserve mutation.');
     next.push('Keep degrading empty-slot and empty-DNA theories until non-null state appears.');
-    if(!model.platformCounts.x) next.push('Increase X coverage with bearer token or a working social proxy / mirror.');
-
+    next.push('Feed transcript lines, frame notes, and symbolic observations into the research corpus to deepen Maria dissection.');
+    if(!model.payloadHits.length) next.push('Search for payload/selector motifs around the strongest dossier windows.');
     return {observations,hypotheses,contradictions,next};
   }
-
   async function buildModel(){
+    const hist=loadHistory();
     const chain=await buildChainState();
     let social=[], socialError='';
     const prevCache=loadSocialCache();
     const manual=parseManualSocial(state.settings.manualSocial);
+    const research=[...parseResearchCorpus(state.settings.researchCorpus), ...parseResearchCorpus(state.settings.frameCorpus)];
     try{
       const yt=await fetchYoutube(state.settings.channelId, state.settings.socialProxy).catch(e=>{ socialError+='yt:'+e.message+' '; return []; });
+      const transcriptHints=await fetchTranscriptHints(yt).catch(()=>[]);
       const xRes=await fetchX(state.settings).catch(e=>({items:[], error:e.message}));
       if(xRes.error) socialError += xRes.error + ' ';
-      social=[...yt, ...(xRes.items||[]), ...manual].map(normalizeSocial);
-      const seen=new Set(); social=social.filter(x=>{ const k=`${x.platform}|${x.id}|${x.link}`; if(seen.has(k)) return false; seen.add(k); return true; }).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
-      if(social.length) saveSocialCache(social);
-      else social=prevCache;
-    }catch(e){ socialError += e.message; social=prevCache.concat(parseManualSocial(state.settings.manualSocial), parseResearchCorpus(state.settings.researchCorpus)).slice(0,220); }
-
+      social=dedupeSocial([...yt, ...transcriptHints, ...(xRes.items||[]), ...manual]);
+      if(social.length) saveSocialCache(social); else social=prevCache;
+    }catch(e){ socialError += e.message; social=dedupeSocial(prevCache.concat(manual,research)).slice(0,260); }
     const delta=socialDelta(prevCache,social);
-    const windows=buildWindows(chain,delta.length?delta:social.slice(0,10));
+    const histSocial=extractHistoricalSocial(hist);
+    const windows=buildWindows(chain,delta.length?delta:social.slice(0,14));
     const hotWatcher='5EF7';
     const counterparties=await recentTransferCounterparties(state.settings.watchers[hotWatcher], Math.max(0, chain.latestBlock-state.settings.scanBlocks)).catch(()=>[]);
     const payloadHits=await recentPayloadMotifs(Math.max(0, chain.latestBlock-12)).catch(()=>[]);
     const publicStrength = chain.publicAnchors.length ? 1 : 0;
-    const interiorStrength = clamp((Object.values(chain.watchTiers).filter(v=>v==='hot').length/Object.keys(chain.watchTiers).length)*0.6 + ((chain.nodeBalances['5EF7']?.pdai||0)>0?0.4:0), 0, 1);
-    const contradictionLoad = clamp((chain.slotProbe.allZero?0.35:0)+(chain.dnaProbe.raw===NULL32?0.2:0)+(Object.values(chain.watchTiers).filter(v=>v==='cold').length/10)+(payloadHits.length?0:0.08), 0, 1);
+    const hotCount=Object.values(chain.watchTiers).filter(v=>v==='hot').length;
+    const transcriptBonus=clamp(research.length/30,0,0.2);
+    const interiorStrength = clamp((hotCount/Object.keys(chain.watchTiers).length)*0.55 + ((chain.nodeBalances['5EF7']?.pdai||0)>0?0.35:0) + transcriptBonus, 0, 1);
+    const contradictionLoad = clamp((chain.slotProbe.allZero?0.35:0)+(chain.dnaProbe.raw===NULL32?0.22:0)+(Object.values(chain.watchTiers).filter(v=>v==='cold').length/10)+(payloadHits.length?0:0.08), 0, 1);
     const phase = publicStrength>interiorStrength ? 'surface-leading' : 'balanced';
     const promoted = counterparties[0] ? [counterparties[0].address] : [];
-    const platformCounts = social.reduce((a,x)=>{ a[x.platform]=(a[x.platform]||0)+1; return a; }, {});
-    const signalBrain = buildSignalBrain({publicStrength,interiorStrength,contradictionLoad,socialDeltaCount:delta.length}, social, parseResearchCorpus(state.settings.researchCorpus));
-    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v21Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
+    const platformCounts = dedupeSocial([...social,...research,...histSocial]).reduce((a,x)=>{ a[x.platform]=(a[x.platform]||0)+1; return a; }, {});
+    const historySignals = buildHistorySignals(hist);
+    const signalBrain = buildSignalBrain({publicStrength,interiorStrength,contradictionLoad,socialDeltaCount:delta.length}, social, research, histSocial, historySignals);
+    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v22Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
     const thinking = buildThinking(baseModel);
-    const v21Actions=[
+    const v22Actions=[
       {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
-      ...(windows[0]?[{kind:'sync-window',status:'ok',findings:[`${windows[0].phase} window ${fmt(windows[0].blocks,1)} blocks from ${windows[0].title.match(/\b\d+s\b/i)?.[0]||'timing'}`, windows[0].code?`code ${windows[0].code}`:'no code']}]:[]),
+      ...(windows[0]?[{kind:'sync-window',status:'ok',findings:[`${windows[0].phase} window ${fmt(windows[0].blocks,1)} blocks from ${windows[0].title.match(/\d+s/i)?.[0]||'timing'}`, windows[0].code?`code ${windows[0].code}`:'no code']}]:[]),
       {kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new counterparties']},
       {kind:'watcher-rehab',status:'ok',findings:[`cold watchers: ${Object.entries(chain.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')}`, promoted[0]?`promote ${short(promoted[0],10,8)}`:'no promotion']},
-      {kind:'payload-sniff',status:'ok',findings:payloadHits.length?payloadHits.map(x=>`${x.text} @ ${short(x.hash,10,8)}`):['no recent payload motifs around hottest anchor']}
+      {kind:'payload-sniff',status:'ok',findings:payloadHits.length?payloadHits.map(x=>`${x.text} @ ${short(x.hash,10,8)}`):['no recent payload motifs around hottest anchor']},
+      {kind:'godmode-dissection',status:'ok',findings:[`${signalBrain.dossiers.length} Maria dossier(s)`, `${signalBrain.transcriptCues.length} cue(s)`, `${signalBrain.lattice.length} numeric hook(s)`]}
     ];
-    const allThoughts=[...thinking.observations.slice(0,2), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,2)];
-    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v21Thoughts:allThoughts, v21Actions, v21Goal:'Dissect Maria and all historical pDAI clues, numerically cross-reference them against chain windows, and keep tightening peg confirmation + ETA scenarios.', v21Thinking:thinking, v21Speculation:baseModel.signalBrain.spec, v21Eta:baseModel.signalBrain.eta};
-    model.pegProgress = computePegProgress(model);
-    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) - contradictionLoad*20, 0, 100);
-    model.v21Brief = `V21 regime: ${model.phase}\nScore: ${fmt(model.score,1)}\nPeg progress: ${pct(model.pegProgress)}\nPublic vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}\nHot watcher: ${hotWatcher}\nSocial delta: ${delta.length}\nThoughts: ${model.v21Thoughts.join(' | ')}\nActions: ${v21Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}\nPromoted: ${promoted.join(', ')||'—'}`;
+    const allThoughts=[...thinking.observations.slice(0,3), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,3)];
+    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v22Thoughts:allThoughts, v22Actions, v22Goal:'Dissect every Maria clue, historical pDAI post, number, date, and phrase into a unified correlation engine that sharpens peg confirmation and ETA scenarios.', v22Thinking:thinking, v22Speculation:baseModel.signalBrain.spec, v22Eta:baseModel.signalBrain.eta, v22Godmode:baseModel.signalBrain};
+    model.pegProgress = computePegProgress({...model, v22Promoted: promoted});
+    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*10 - contradictionLoad*18, 0, 100);
+    model.v22Brief = `V22 regime: ${model.phase}
+Score: ${fmt(model.score,1)}
+Peg progress: ${pct(model.pegProgress)}
+Public vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}
+Hot watcher: ${hotWatcher}
+Social delta: ${delta.length}
+Top dossier: ${model.signalBrain.dossiers[0]?.title||'—'}
+Top theory: ${model.signalBrain.theoryLedger[0]?.name||'—'}
+Thoughts: ${model.v22Thoughts.join(' | ')}
+Actions: ${v22Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
+Promoted: ${promoted.join(', ')||'—'}`;
     return model;
   }
 
@@ -674,7 +787,7 @@
       {k:'Social capture', on:model.socialDeltaCount>0 || model.harvestedSocial.length>0, v:model.socialDeltaCount?`${model.socialDeltaCount} new`:`${model.harvestedSocial.length} seen`},
       {k:'Windowing', on:(model.windows||[]).length>0, v:`${(model.windows||[]).length} windows`},
       {k:'Surface resonance', on:model.publicStrength>.7, v:pct(model.publicStrength)},
-      {k:'Candidate promotion', on:(model.v21Promoted||[]).length>0, v:(model.v21Promoted||[]).length?short(model.v21Promoted[0],8,6):'—'},
+      {k:'Candidate promotion', on:(model.v22Promoted||[]).length>0, v:(model.v22Promoted||[]).length?short(model.v22Promoted[0],8,6):'—'},
       {k:'Interior wake', on:model.interiorStrength>.35, v:pct(model.interiorStrength)},
       {k:'Contradiction control', on:model.contradictionLoad<.45, v:pct(1-model.contradictionLoad)}
     ];
@@ -685,36 +798,43 @@
     $('syncStatus').textContent=model.socialError?'degraded':'synced'; $('syncStatus').className='status '+(model.socialError?'warn':'ok');
     $('lastSync').textContent='Last sync: '+new Date().toLocaleString();
     $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length} • YT ${model.platformCounts.youtube||0} • X ${model.platformCounts.x||0} • Corpus ${model.platformCounts.corpus||0}${model.socialError?` • ${model.socialError}`:''}`;
-    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v21Promoted||[]).length);
+    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v22Promoted||[]).length);
     $('pegReactor').style.setProperty('--peg', (model.pegProgress*100).toFixed(1)); $('heroPeg').textContent=(model.pegProgress*100).toFixed(1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
-    $('verdict').textContent=model.phase; $('brief').textContent=model.v21Brief.split('\n').slice(0,4).join(' • ');
-    $('thoughtBubbles').innerHTML=model.v21Thoughts.slice(0,3).map(t=>`<div class="bubble">${t}</div>`).join('');
-    $('obsList').innerHTML=model.v21Thinking.observations.map(t=>uiItem(t,'info')).join('');
-    $('hypList').innerHTML=model.v21Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
-    $('conList').innerHTML=model.v21Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
-    $('nextList').innerHTML=model.v21Thinking.next.map(t=>uiItem(t,'good')).join('');
-    $('actionList').innerHTML=model.v21Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
-    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Top promoted candidate: ${(model.v21Promoted||[])[0]?short(model.v21Promoted[0],10,8):'—'}.`];
+    $('verdict').textContent=model.phase; $('brief').textContent=model.v22Brief.split('\n').slice(0,5).join(' • ');
+    $('thoughtBubbles').innerHTML=model.v22Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
+    $('obsList').innerHTML=model.v22Thinking.observations.map(t=>uiItem(t,'info')).join('');
+    $('hypList').innerHTML=model.v22Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
+    $('conList').innerHTML=model.v22Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
+    $('nextList').innerHTML=model.v22Thinking.next.map(t=>uiItem(t,'good')).join('');
+    $('actionList').innerHTML=model.v22Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
+    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Top promoted candidate: ${(model.v22Promoted||[])[0]?short(model.v22Promoted[0],10,8):'—'}.`];
     $('truthList').innerHTML=truths.map(t=>uiItem(t,'info')).join('');
-    $('briefList').innerHTML=uiItem(model.v21Brief.replace(/\n/g,'<br>'),'good');
+    $('briefList').innerHTML=uiItem(model.v22Brief.replace(/\n/g,'<br>'),'good');
     $('progressBoard').innerHTML=progressMilestones(model).map(m=>`<div class="milestone ${m.on?'active':''}"><div class="mileK">${m.k}</div><div class="mileV">${m.v}</div></div>`).join('');
     $('motifPills').innerHTML=(model.signalBrain.motifs||[]).slice(0,12).map(m=>`<span class="pill">${m.word} • ${m.count}</span>`).join('') || '<span class="small">No motifs yet.</span>';
     $('numScore').textContent=pct(model.signalBrain.numericRes); $('numHint').textContent=`Hooks: ${(model.signalBrain.dateHooks||[]).length} • phases ${Object.keys(model.signalBrain.phaseCounts||{}).length}`;
     $('echoList').innerHTML=(model.signalBrain.echoes||[]).slice(0,5).map(t=>uiItem(t,'info')).join('') || uiItem('No strong echoes yet.','warn');
     $('dateHooks').innerHTML=(model.signalBrain.dateHooks||[]).slice(0,6).map(h=>uiItem(`${h.title} • ${h.duration||0}s • ${h.notable&&h.notable.length?h.notable.join(', '):'no notable numbers'}`, 'warn')).join('') || uiItem('No date/duration hooks yet.','warn');
-    $('specList').innerHTML=(model.v21Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
-    $('etaList').innerHTML=(model.v21Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
+    $('specList').innerHTML=(model.v22Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
+    $('etaList').innerHTML=(model.v22Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
+    $('gmSummary').innerHTML=[uiItem(`Godmode numeric resonance: ${pct(model.signalBrain.numericRes)}.`,'good'), ...model.signalBrain.historySignals.summary.slice(0,3).map(x=>uiItem(x,'info'))].join('');
+    $('memoryList').innerHTML=model.signalBrain.historySignals.summary.map(x=>uiItem(x,'info')).join('');
+    $('cueList').innerHTML=(model.signalBrain.transcriptCues||[]).slice(0,8).map(c=>uiItem(`${c.platform}: ${c.title} ${c.durationSec?`• ${c.durationSec}s`:''}`,'warn')).join('') || uiItem('No transcript/frame cues loaded yet.','warn');
+    $('resonanceList').innerHTML=(model.signalBrain.echoes||[]).slice(0,6).map(x=>uiItem(x,'good')).join('') || uiItem('No strong resonance lines yet.','warn');
+    $('theoryList').innerHTML=(model.signalBrain.theoryLedger||[]).slice(0,5).map(t=>uiItem(`<strong>${t.name}</strong> • ${pct(t.score)}<br>${t.support}<br><span class="small">${t.risk}</span>`, t.score>.6?'good':'warn')).join('');
+    $('dossierList').innerHTML=(model.signalBrain.dossiers||[]).slice(0,8).map(d=>uiItem(`<strong>${d.title}</strong><br>${d.durationSec||0}s • ${d.phase}${d.code?` • ${d.code}`:''}<br>Resonance ${pct(d.resonance)} • related ${d.relatedCount} • platforms ${d.platforms.join(', ')||'—'}${d.authors.length?`<br><span class="small">Authors: ${d.authors.join(', ')}</span>`:''}${d.numbers.length?`<br><span class="small">Numbers: ${d.numbers.join(', ')}</span>`:''}`, d.resonance>.6?'good':'info')).join('') || uiItem('No dossiers yet.','warn');
+    $('latticeList').innerHTML=(model.signalBrain.lattice||[]).slice(0,10).map(n=>uiItem(`<strong>${n.value}</strong> • ${n.count} hit(s)<br><span class="small">${(n.contexts||[]).slice(0,2).join(' | ')}</span>`, 'warn')).join('') || uiItem('No numeric/date lattice yet.','warn');
 
     $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,30):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
     $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${fmt(w.blocks,1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
     $('anchorBody').innerHTML=(model.publicAnchors||[]).map(a=>`<tr><td>${a.name}</td><td class="mono">${short(a.address,10,8)}</td><td>${fmt(a.reserve0,3)}</td><td>${fmt(a.reserve1,3)}</td></tr>`).join('');
-    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v21Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v21Promoted[0],10,8):'—'}</td></tr>`).join('');
+    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v22Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v22Promoted[0],10,8):'—'}</td></tr>`).join('');
   }
 
   function renderFallback(err){
     const last=loadLastGood();
     if(last){
-      last.v21Thoughts=(last.v21Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
+      last.v22Thoughts=(last.v22Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
       render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot';
     } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); }
   }
@@ -722,10 +842,10 @@
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
   async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); const model=await buildModel(); render(model); saveLastGood(snapshot(model)); state.history=loadHistory(); state.history.push(snapshot(model)); saveHistory(state.history); } catch(err){ console.error(err); renderFallback(err); } finally{ state.syncing=false; } }
 
-  function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; $('sResearchCorpus').value=state.settings.researchCorpus||''; }
-  function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; state.settings.researchCorpus=$('sResearchCorpus').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v21-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v21-bundle.json'; a.click(); }
+  function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; $('sResearchCorpus').value=state.settings.researchCorpus||''; $('sTranscriptProxy').value=state.settings.transcriptProxy||''; $('sSpeculateLevel').value=state.settings.speculateLevel||8; $('sFrameCorpus').value=state.settings.frameCorpus||''; }
+  function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; state.settings.researchCorpus=$('sResearchCorpus').value; state.settings.transcriptProxy=$('sTranscriptProxy').value.trim(); state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8; state.settings.frameCorpus=$('sFrameCorpus').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v22-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v22-bundle.json'; a.click(); }
   function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)) saveHistory(j); else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
