@@ -127,10 +127,10 @@
   <div class="panel top">
     <div>
       <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V23.1 Godmode Deep-Thought Lab</h1>
-      <div class="sub">V23 turns the tool into a transcript-first correlation engine: it parses Maria video blocks, phrases, repeated structures, numbers, dates, X posts, and historical archives into a claim ledger, resonance grid, and ETA scenarios for peg confirmation.</div>
+      <div class="sub">V24 turns the tool into a claim-pressure proof engine: it decomposes Maria transcripts, dates, and numbers, cross-examines X and historical echoes, and grades each peg claim by support, observed effect, unresolved contradictions, and ETA pressure.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
-        <div class="chip info">Transcript parser + claim ledger + historical echoes</div>
+        <div class="chip info">Claim-pressure board + transcript decomposition + historical echoes</div>
         <div class="chip warn">Speculation is allowed but clearly labeled</div>
       </div>
     </div>
@@ -154,7 +154,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V23 settings</div>
+    <div class="boxTitle">V24 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -206,7 +206,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card briefPanel">
-          <div class="label">V23 verdict</div>
+          <div class="label">V24 verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div class="bubbles" id="thoughtBubbles"></div>
@@ -214,6 +214,10 @@
         <div class="card">
           <div class="boxTitle">Milestone board</div>
           <div class="progressBoard" id="progressBoard"></div>
+        </div>
+        <div class="card">
+          <div class="boxTitle">Proof pressure board</div>
+          <div class="progressBoard" id="proofBoard"></div>
         </div>
       </div>
       <div class="card">
@@ -308,14 +312,32 @@
     </div>
   </div>
 
+  <div class="twocol">
+    <div class="panel">
+      <div class="boxTitle">Transcript decomposition</div>
+      <div class="small">Maria and historical corpora are broken into actors, actions, mirrored transcript blocks, and ratio/date motifs so the tool can reason claim-by-claim instead of vibe-by-vibe.</div>
+      <div class="brainGrid" style="margin-top:12px">
+        <div class="resCard"><div class="label">Actors / nouns</div><div id="actorList"></div></div>
+        <div class="resCard"><div class="label">Actions / verbs</div><div id="actionWordList"></div></div>
+        <div class="resCard"><div class="label">Mirrored structures</div><div id="mirrorList"></div></div>
+        <div class="resCard"><div class="label">Ratios / timing motifs</div><div id="ratioList"></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Claim-pressure ledger</div>
+      <div class="small">Every major peg claim gets explicit support, observed effect, unresolved contradictions, and proof pressure instead of one blended vibe score.</div>
+      <div id="claimPressureList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v23-settings';
-  const HISTORY_KEY='pdai-v23-history';
-  const SOCIAL_CACHE_KEY='pdai-v23-social-cache';
-  const LASTGOOD_KEY='pdai-v23-last-good';
+  const STORAGE_KEY='pdai-v24-settings';
+  const HISTORY_KEY='pdai-v24-history';
+  const SOCIAL_CACHE_KEY='pdai-v24-social-cache';
+  const LASTGOOD_KEY='pdai-v24-last-good';
   const NULL32='0x'+'0'.repeat(64);
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
@@ -508,6 +530,66 @@
     push('156:1 / thin-LP repricing motif','x','Numeric breadcrumbs may point to corridor repricing logic rather than a literal price path.','156:1 / 1:1 / 600bn','Expect repeated ratio language to align with thin liquidity arguments and oracle/liquidation stories.', (nine?0.42:0)+(dcent?0.34:0), 0.21);
     push('Interior watcher map still incomplete','chain','Public surface continues to outrun the current machine watcher set.','public > interior','Expect promoted counterparties to outperform legacy cold watchers.', clamp(0.5 + model.publicStrength*0.2 - model.interiorStrength*0.1 + historySignals.avgPublic*0.1,0,1), 0.08);
     return claims.sort((a,b)=>(b.support-b.contradiction)-(a.support-a.contradiction)).slice(0,12);
+  }
+
+
+  function buildTranscriptDecomposition(items){
+    const corpus=dedupeSocial(items);
+    const combined=corpus.map(x=>`${x.title||''} ${x.text||''}`).join(' \n ').toLowerCase();
+    const actorTerms=['alligator','scribe','spider','machine','manifold','token','wavelet','fracture','directive','void','liberty','marketplace','stableswap','oracle','liquidations','collateral','heat'];
+    const actionTerms=['guiding','observe','verifies','constructs','handwrites','identifies','pulls','snapping','consume','zeroing','manifested','terminated','boost','sponsored','reprice','lock','fire','redeem','pulse'];
+    const countTerm=(txt,term)=>txt.split(term.toLowerCase()).length-1;
+    const actorList=actorTerms.map(term=>({term,count:countTerm(combined,term)})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count).slice(0,10);
+    const actionList=actionTerms.map(term=>({term,count:countTerm(combined,term)})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count).slice(0,10);
+    const mirrors=[]; const seen={};
+    for(const it of corpus){
+      const txt=((it.text||it.title||'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim());
+      if(txt.length<80) continue;
+      const key=txt.slice(0,180);
+      seen[key]=seen[key]||{count:0,sample:(it.title||it.text||'').slice(0,180)};
+      seen[key].count++;
+    }
+    for(const v of Object.values(seen)) if(v.count>1) mirrors.push({sample:v.sample,count:v.count});
+    mirrors.sort((a,b)=>b.count-a.count);
+    const ratios=[];
+    const ratioTerms=['1:1','155','156','115','121','136','71','42','32','600bn','april','may'];
+    for(const rt of ratioTerms){
+      const c=countTerm(combined,rt);
+      if(c) ratios.push({term:rt,count:c});
+    }
+    ratios.sort((a,b)=>b.count-a.count);
+    return {actorList,actionList,mirrors:mirrors.slice(0,8),ratios:ratios.slice(0,12)};
+  }
+  function buildProofPressure(model, signalBrain){
+    const narrative=clamp(signalBrain.numericRes*0.35 + Math.min(model.socialDeltaCount,60)/60*0.25 + Math.min((signalBrain.transcriptStructures||[]).length,6)/6*0.18 + Math.min((signalBrain.cueClusters||[]).length,10)/10*0.12 + Math.min((signalBrain.dossiers||[]).length,8)/8*0.10,0,1);
+    const surface=clamp(model.publicStrength*0.48 + Math.min((model.counterparties||[]).length,6)/6*0.18 + ((model.hotWatcher==='5EF7'&& (model.nodeBalances['5EF7']?.pdai||0)>0)?0.16:0) + Math.min((model.windows||[]).length,10)/10*0.10 + Math.min((model.platformCounts?.x||0),20)/20*0.08,0,1);
+    const interior=clamp(model.interiorStrength*0.55 + (Object.values(model.watchTiers||{}).filter(v=>v==='hot').length>1?0.18:0) + (model.v24Promoted?.length?0.12:0) - (model.slotProbe?.allZero?0.12:0) - (model.dnaProbe?.raw===NULL32?0.1:0),0,1);
+    const eta=clamp(narrative*0.35 + surface*0.30 + interior*0.20 + Math.max(0,1-model.contradictionLoad)*0.15,0,1);
+    return [
+      {name:'Narrative coherence', score:narrative, hint:`${model.socialDeltaCount} social deltas • ${(signalBrain.transcriptStructures||[]).length} structures`},
+      {name:'Surface execution', score:surface, hint:`${model.hotWatcher} hot • ${(model.counterparties||[]).length} counterparties`},
+      {name:'Interior execution', score:interior, hint:`${pct(model.interiorStrength)} interior • ${Object.values(model.watchTiers||{}).filter(v=>v==='hot').length} hot watchers`},
+      {name:'ETA confidence', score:eta, hint:`contradiction ${pct(1-model.contradictionLoad)}`}
+    ];
+  }
+  function buildClaimPressureLedger(claims, model){
+    const out=[];
+    for(const c of claims||[]){
+      let observed='No direct chain effect isolated yet.';
+      if(/x9oeb/i.test(c.clue) && (model.windows||[]).some(w=>/x9oeb/i.test(`${w.code||''} ${w.title||''}`))){ const w=(model.windows||[]).find(w=>/x9oeb/i.test(`${w.code||''} ${w.title||''}`)); observed=`Observed social timing window at approx block ${w.approxBlock.toLocaleString()} spanning ${fmt(w.blocks,1)} block(s).`; }
+      else if(/sfvcy|heat/i.test(c.clue) && (model.windows||[]).some(w=>/sfvcy/i.test(`${w.code||''} ${w.title||''}`))){ const w=(model.windows||[]).find(w=>/sfvcy/i.test(`${w.code||''} ${w.title||''}`)); observed=`Observed heat window at approx block ${w.approxBlock.toLocaleString()}.`; }
+      else if(/Liberty/i.test(c.clue)){ observed=`Observed LibertySwapFi / DcentraliseMe intake and readiness posts in current corpus.`; }
+      else if(/156:1|thin-LP/i.test(c.clue)){ observed=`Observed NineIronCapital and DcentraliseMe ratio/liquidity motifs in active social archive.`; }
+      else if(/Interior watcher map/i.test(c.clue)){ observed=`Observed 5EF7 hot while ${Object.entries(model.watchTiers||{}).filter(([k,v])=>v==='cold').map(([k])=>k).join(', ')} remain cold.`; }
+      let unresolved=[];
+      if(model.slotProbe?.allZero) unresolved.push('null-null slot symmetry persists');
+      if(model.dnaProbe?.raw===NULL32) unresolved.push('DNA slot still empty');
+      if(!model.payloadHits?.length) unresolved.push('no payload motifs around hottest anchor');
+      if(/interior/i.test(c.clue) && Object.values(model.watchTiers||{}).filter(v=>v==='hot').length<=1) unresolved.push('legacy watcher map still mostly cold');
+      const pressure=clamp((c.support-c.contradiction)+(/No direct chain/.test(observed)?0:0.12)-unresolved.length*0.03,0,1);
+      out.push({...c, observed, unresolved: unresolved.join('; ') || 'none', pressure});
+    }
+    return out.sort((a,b)=>b.pressure-a.pressure).slice(0,12);
   }
 
   function buildHistorySignals(history){
@@ -761,7 +843,7 @@
       (model.interiorStrength*0.16)+
       (Math.min(model.socialDeltaCount,24)/24*0.16)+
       (Math.min((model.windows||[]).length,14)/14*0.10)+
-      (Math.min((model.v23Promoted||[]).length,5)/5*0.08)+
+      (Math.min((model.v24Promoted||[]).length,5)/5*0.08)+
       (Math.min((model.counterparties||[]).length,8)/8*0.05)+
       ((model.signalBrain?.numericRes||0)*0.13)+
       (Math.min((model.signalBrain?.dossiers||[]).length,8)/8*0.08)-
@@ -786,7 +868,7 @@
     if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
     if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
     if(model.signalBrain.transcriptCues.length) hypotheses.push(`Loaded corpus contains ${model.signalBrain.transcriptCues.length} transcript/frame cue(s), which increases structured symbolic signal.`);
-    if((model.v23Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v23Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
+    if((model.v24Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v24Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
     hypotheses.push(...(model.signalBrain.theoryLedger||[]).slice(0,2).map(t=>`${t.name} (${pct(t.score)})`));
     hypotheses.push(...(model.signalBrain.claimLedger||[]).slice(0,2).map(t=>`${t.clue} (${pct(clamp(t.support-t.contradiction,0,1))})`));
     if(model.slotProbe.allZero && model.slotProbe.equal) contradictions.push('Slot probe is null-null equality; this is absence, not symmetry.');
@@ -835,32 +917,37 @@
     const platformCounts = dedupeSocial([...social,...research,...histSocial]).reduce((a,x)=>{ a[x.platform]=(a[x.platform]||0)+1; return a; }, {});
     const historySignals = buildHistorySignals(hist);
     const signalBrain = buildSignalBrain({publicStrength,interiorStrength,contradictionLoad,socialDeltaCount:delta.length,slotProbe:chain.slotProbe,payloadHits}, social, research, histSocial, historySignals);
-    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v23Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
+    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v24Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
     baseModel.signalBrain.claimLedger = buildClaimLedger(baseModel, [...social,...research,...histSocial], historySignals, signalBrain);
+    baseModel.signalBrain.transcriptDecomp = buildTranscriptDecomposition([...social,...research,...histSocial]);
+    baseModel.signalBrain.proofPressure = buildProofPressure(baseModel, baseModel.signalBrain);
+    baseModel.signalBrain.claimPressureLedger = buildClaimPressureLedger(baseModel.signalBrain.claimLedger, baseModel);
     const thinking = buildThinking(baseModel);
-    const v23Actions=[
+    const v24Actions=[
       {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
       ...(windows[0]?[{kind:'sync-window',status:'ok',findings:[`${windows[0].phase} window ${fmt(windows[0].blocks,1)} blocks from ${windows[0].title.match(/\d+s/i)?.[0]||'timing'}`, windows[0].code?`code ${windows[0].code}`:'no code']}]:[]),
       {kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new counterparties']},
       {kind:'watcher-rehab',status:'ok',findings:[`cold watchers: ${Object.entries(chain.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')}`, promoted[0]?`promote ${short(promoted[0],10,8)}`:'no promotion']},
       {kind:'payload-sniff',status:'ok',findings:payloadHits.length?payloadHits.map(x=>`${x.text} @ ${short(x.hash,10,8)}`):['no recent payload motifs around hottest anchor']},
       {kind:'godmode-dissection',status:'ok',findings:[`${signalBrain.dossiers.length} Maria dossier(s)`, `${signalBrain.transcriptCues.length} cue(s)`, `${signalBrain.lattice.length} numeric hook(s)`]},
-      {kind:'transcript-parser',status:'ok',findings:[`${signalBrain.transcriptStructures.length} structures`, `${signalBrain.cueClusters.length} cue clusters`, `${signalBrain.claimLedger.length} claims`]}
+      {kind:'transcript-parser',status:'ok',findings:[`${signalBrain.transcriptStructures.length} structures`, `${signalBrain.cueClusters.length} cue clusters`, `${signalBrain.claimLedger.length} claims`]},
+      {kind:'proof-pressure',status:'ok',findings:(baseModel.signalBrain.proofPressure||[]).map(s=>`${s.name} ${pct(s.score)}`)}
     ];
     const allThoughts=[...thinking.observations.slice(0,3), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,3)];
-    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v23Thoughts:allThoughts, v23Actions, v23Goal:'Parse every Maria clue, transcript, number, date, and cross-platform echo into a structured claim ledger that sharpens peg confirmation and ETA scenarios.', v23Thinking:thinking, v23Speculation:baseModel.signalBrain.spec, v23Eta:baseModel.signalBrain.eta, v23Godmode:baseModel.signalBrain};
-    model.pegProgress = computePegProgress({...model, v23Promoted: promoted});
+    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v24Thoughts:allThoughts, v24Actions, v24Goal:'Turn every major peg clue into a proof-pressure claim with explicit support, observed effects, unresolved contradictions, and ETA weight.', v24Thinking:thinking, v24Speculation:baseModel.signalBrain.spec, v24Eta:baseModel.signalBrain.eta, v24Godmode:baseModel.signalBrain};
+    model.pegProgress = computePegProgress({...model, v24Promoted: promoted});
     model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*10 - contradictionLoad*18, 0, 100);
-    model.v23Brief = `V23 regime: ${model.phase}
+    model.v23Brief = `V24 regime: ${model.phase}
 Score: ${fmt(model.score,1)}
 Peg progress: ${pct(model.pegProgress)}
 Public vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}
+Narrative / surface / interior / ETA: ${(model.signalBrain.proofPressure||[]).map(s=>`${s.name.split(' ')[0]} ${pct(s.score)}`).join(' • ')}
 Hot watcher: ${hotWatcher}
 Social delta: ${delta.length}
 Top dossier: ${model.signalBrain.dossiers[0]?.title||'—'}
 Top claim: ${model.signalBrain.claimLedger[0]?.clue||model.signalBrain.theoryLedger[0]?.name||'—'}
-Thoughts: ${model.v23Thoughts.join(' | ')}
-Actions: ${v23Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
+Thoughts: ${model.v24Thoughts.join(' | ')}
+Actions: ${v24Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
 Promoted: ${promoted.join(', ')||'—'}`;
     return model;
   }
@@ -870,7 +957,7 @@ Promoted: ${promoted.join(', ')||'—'}`;
       {k:'Social capture', on:model.socialDeltaCount>0 || model.harvestedSocial.length>0, v:model.socialDeltaCount?`${model.socialDeltaCount} new`:`${model.harvestedSocial.length} seen`},
       {k:'Windowing', on:(model.windows||[]).length>0, v:`${(model.windows||[]).length} windows`},
       {k:'Surface resonance', on:model.publicStrength>.7, v:pct(model.publicStrength)},
-      {k:'Candidate promotion', on:(model.v23Promoted||[]).length>0, v:(model.v23Promoted||[]).length?short(model.v23Promoted[0],8,6):'—'},
+      {k:'Candidate promotion', on:(model.v24Promoted||[]).length>0, v:(model.v24Promoted||[]).length?short(model.v24Promoted[0],8,6):'—'},
       {k:'Interior wake', on:model.interiorStrength>.35, v:pct(model.interiorStrength)},
       {k:'Contradiction control', on:model.contradictionLoad<.45, v:pct(1-model.contradictionLoad)}
     ];
@@ -881,30 +968,36 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('syncStatus').textContent=model.socialError?'degraded':'synced'; $('syncStatus').className='status '+(model.socialError?'warn':'ok');
     $('lastSync').textContent='Last sync: '+new Date().toLocaleString();
     $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length} • YT ${model.platformCounts.youtube||0} • X ${model.platformCounts.x||0} • Corpus ${model.platformCounts.corpus||0}${model.socialError?` • ${model.socialError}`:''}`;
-    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v23Promoted||[]).length);
+    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v24Promoted||[]).length);
     $('pegReactor').style.setProperty('--peg', (model.pegProgress*100).toFixed(1)); $('heroPeg').textContent=(model.pegProgress*100).toFixed(1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
     $('verdict').textContent=model.phase; $('brief').textContent=model.v23Brief.split('\n').slice(0,5).join(' • ');
-    $('thoughtBubbles').innerHTML=model.v23Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
-    $('obsList').innerHTML=model.v23Thinking.observations.map(t=>uiItem(t,'info')).join('');
-    $('hypList').innerHTML=model.v23Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
-    $('conList').innerHTML=model.v23Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
-    $('nextList').innerHTML=model.v23Thinking.next.map(t=>uiItem(t,'good')).join('');
-    $('actionList').innerHTML=model.v23Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
-    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Top promoted candidate: ${(model.v23Promoted||[])[0]?short(model.v23Promoted[0],10,8):'—'}.`];
+    $('thoughtBubbles').innerHTML=model.v24Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
+    $('obsList').innerHTML=model.v24Thinking.observations.map(t=>uiItem(t,'info')).join('');
+    $('hypList').innerHTML=model.v24Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
+    $('conList').innerHTML=model.v24Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
+    $('nextList').innerHTML=model.v24Thinking.next.map(t=>uiItem(t,'good')).join('');
+    $('actionList').innerHTML=model.v24Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
+    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Narrative vs surface vs interior vs ETA: ${(model.signalBrain.proofPressure||[]).map(p=>`${p.name.split(' ')[0]} ${pct(p.score)}`).join(' • ')}.`,`Top promoted candidate: ${(model.v24Promoted||[])[0]?short(model.v24Promoted[0],10,8):'—'}.`];
     $('truthList').innerHTML=truths.map(t=>uiItem(t,'info')).join('');
     $('briefList').innerHTML=uiItem(model.v23Brief.replace(/\n/g,'<br>'),'good');
     $('progressBoard').innerHTML=progressMilestones(model).map(m=>`<div class="milestone ${m.on?'active':''}"><div class="mileK">${m.k}</div><div class="mileV">${m.v}</div></div>`).join('');
+    $('proofBoard').innerHTML=(model.signalBrain.proofPressure||[]).map(p=>`<div class="milestone ${p.score>.55?'active':''}"><div class="mileK">${p.name}</div><div class="mileV">${pct(p.score)}<br><span class="small">${p.hint}</span></div></div>`).join('');
     $('motifPills').innerHTML=(model.signalBrain.motifs||[]).slice(0,12).map(m=>`<span class="pill">${m.word} • ${m.count}</span>`).join('') || '<span class="small">No motifs yet.</span>';
     $('numScore').textContent=pct(model.signalBrain.numericRes); $('numHint').textContent=`Hooks: ${(model.signalBrain.dateHooks||[]).length} • phases ${Object.keys(model.signalBrain.phaseCounts||{}).length}`;
     $('echoList').innerHTML=(model.signalBrain.echoes||[]).slice(0,5).map(t=>uiItem(t,'info')).join('') || uiItem('No strong echoes yet.','warn');
     $('dateHooks').innerHTML=(model.signalBrain.dateHooks||[]).slice(0,6).map(h=>uiItem(`${h.title} • ${h.duration||0}s • ${h.notable&&h.notable.length?h.notable.join(', '):'no notable numbers'}`, 'warn')).join('') || uiItem('No date/duration hooks yet.','warn');
-    $('specList').innerHTML=(model.v23Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
-    $('etaList').innerHTML=(model.v23Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
+    $('specList').innerHTML=(model.v24Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
+    $('etaList').innerHTML=(model.v24Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
     $('gmSummary').innerHTML=[uiItem(`Godmode numeric resonance: ${pct(model.signalBrain.numericRes)}.`,'good'), ...model.signalBrain.historySignals.summary.slice(0,3).map(x=>uiItem(x,'info'))].join('');
     $('memoryList').innerHTML=model.signalBrain.historySignals.summary.map(x=>uiItem(x,'info')).join('');
     $('cueList').innerHTML=(model.signalBrain.transcriptCues||[]).slice(0,8).map(c=>uiItem(`${c.platform}: ${c.title} ${c.durationSec?`• ${c.durationSec}s`:''}`,'warn')).join('') || uiItem('No transcript/frame cues loaded yet.','warn');
     $('resonanceList').innerHTML=(model.signalBrain.echoes||[]).slice(0,6).map(x=>uiItem(x,'good')).join('') || uiItem('No strong resonance lines yet.','warn');
     $('theoryList').innerHTML=(model.signalBrain.claimLedger||[]).slice(0,6).map(t=>uiItem(`<strong>${t.clue}</strong> • ${pct(clamp(t.support-t.contradiction,0,1))}<br>${t.meaning}<br><span class="small">Hook: ${t.hook} • Expectation: ${t.expectation}</span>`, (t.support-t.contradiction)>.35?'good':'warn')).join('');
+    $('actorList').innerHTML=(model.signalBrain.transcriptDecomp?.actorList||[]).map(x=>uiItem(`${x.term} • ${x.count}`,'good')).join('') || uiItem('No actor decomposition yet.','warn');
+    $('actionWordList').innerHTML=(model.signalBrain.transcriptDecomp?.actionList||[]).map(x=>uiItem(`${x.term} • ${x.count}`,'info')).join('') || uiItem('No action decomposition yet.','warn');
+    $('mirrorList').innerHTML=(model.signalBrain.transcriptDecomp?.mirrors||[]).map(x=>uiItem(`${x.count} mirrored block(s)<br><span class="small">${x.sample}</span>`,'warn')).join('') || uiItem('No mirrored transcript blocks yet.','warn');
+    $('ratioList').innerHTML=(model.signalBrain.transcriptDecomp?.ratios||[]).map(x=>uiItem(`${x.term} • ${x.count}`,'warn')).join('') || uiItem('No ratio timing motifs yet.','warn');
+    $('claimPressureList').innerHTML=(model.signalBrain.claimPressureLedger||[]).map(c=>uiItem(`<strong>${c.clue}</strong> • ${pct(c.pressure)}<br>${c.meaning}<br><span class="small">Observed: ${c.observed}</span><br><span class="small">Unresolved: ${c.unresolved}</span>`, c.pressure>.55?'good':'warn')).join('') || uiItem('No claim-pressure entries yet.','warn');
     $('dossierList').innerHTML=(model.signalBrain.dossiers||[]).slice(0,8).map(d=>uiItem(`<strong>${d.title}</strong><br>${d.durationSec||0}s • ${d.phase}${d.code?` • ${d.code}`:''}<br>Resonance ${pct(d.resonance)} • related ${d.relatedCount} • platforms ${d.platforms.join(', ')||'—'}${d.authors.length?`<br><span class="small">Authors: ${d.authors.join(', ')}</span>`:''}${d.numbers.length?`<br><span class="small">Numbers: ${d.numbers.join(', ')}</span>`:''}`, d.resonance>.6?'good':'info')).join('') || uiItem('No dossiers yet.','warn');
     $('latticeList').innerHTML=(model.signalBrain.lattice||[]).slice(0,10).map(n=>uiItem(`<strong>${n.value}</strong> • ${n.count} hit(s)<br><span class="small">${(n.contexts||[]).slice(0,2).join(' | ')}</span>`, 'warn')).join('') || uiItem('No numeric/date lattice yet.','warn');
     $('structureList').innerHTML=(model.signalBrain.transcriptStructures||[]).slice(0,8).map(s=>uiItem(`<strong>${s.name}</strong> • ${s.count} hit(s)<br><span class="small">${s.sample}</span>`, 'good')).join('') || uiItem('No transcript structures yet.','warn');
@@ -915,13 +1008,13 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,30):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
     $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${fmt(w.blocks,1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
     $('anchorBody').innerHTML=(model.publicAnchors||[]).map(a=>`<tr><td>${a.name}</td><td class="mono">${short(a.address,10,8)}</td><td>${fmt(a.reserve0,3)}</td><td>${fmt(a.reserve1,3)}</td></tr>`).join('');
-    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v23Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v23Promoted[0],10,8):'—'}</td></tr>`).join('');
+    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v24Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v24Promoted[0],10,8):'—'}</td></tr>`).join('');
   }
 
   function renderFallback(err){
     const last=loadLastGood();
     if(last){
-      last.v23Thoughts=(last.v23Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
+      last.v24Thoughts=(last.v24Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
       render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot';
     } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); }
   }
@@ -931,8 +1024,8 @@ Promoted: ${promoted.join(', ')||'—'}`;
 
   function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; $('sResearchCorpus').value=state.settings.researchCorpus||''; $('sTranscriptProxy').value=state.settings.transcriptProxy||''; $('sSpeculateLevel').value=state.settings.speculateLevel||8; $('sFrameCorpus').value=state.settings.frameCorpus||''; }
   function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; state.settings.researchCorpus=$('sResearchCorpus').value; state.settings.transcriptProxy=$('sTranscriptProxy').value.trim(); state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8; state.settings.frameCorpus=$('sFrameCorpus').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v23-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v23-bundle.json'; a.click(); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v24-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v24-bundle.json'; a.click(); }
   function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)) saveHistory(j); else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
