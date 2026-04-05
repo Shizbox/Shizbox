@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V25 Above-God-Tier Claim Courtroom</title>
+<title>pDAI Peg Prover • V26 Above-God-Tier Peg Cartographer</title>
 <style>
   :root{
     --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
@@ -126,11 +126,11 @@
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V25 Above-God-Tier Claim Courtroom</h1>
-      <div class="sub">V25 turns the tool into an above-god-tier peg courtroom: it weighs transcript structure, numeric/date resonance, cross-platform witness testimony, surface execution, interior execution, and ETA scenarios side-by-side so every major peg claim is forced to stand trial.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V26 Above-God-Tier Peg Cartographer</h1>
+      <div class="sub">V26 does all of it: claim courtroom, transcript dissection, window forensics, intake-pressure analysis, shadow machine mapping, null-awakening alerts, thin-LP attrition tracking, and scenario ETA logic so the peg thesis is tested from every angle at once.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
-        <div class="chip info">Claim courtroom + witness convergence + scenario tree</div>
+        <div class="chip info">Courtroom + intake pressure + shadow map + window forensics</div>
         <div class="chip warn">Speculation is allowed but clearly labeled</div>
       </div>
     </div>
@@ -154,7 +154,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V25 settings</div>
+    <div class="boxTitle">V26 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -181,7 +181,7 @@
   </div>
 
   <div class="metrics">
-    <div class="card"><div class="label">V25 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
+    <div class="card"><div class="label">V26 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
     <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Machine picture</div></div>
     <div class="card"><div class="label">Peg progress</div><div class="value" id="mPeg">—</div><div class="hint">Evidence-weighted, not price-weighted</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
@@ -206,7 +206,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card briefPanel">
-          <div class="label">V25 verdict</div>
+          <div class="label">V26 verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div class="bubbles" id="thoughtBubbles"></div>
@@ -333,6 +333,33 @@
 
   <div class="tri">
     <div class="panel">
+      <div class="boxTitle">Intake pressure monitor</div>
+      <div class="small">Tracks Liberty / gasless / stablecoin readiness language, bridged stable surface weight, and macro intake pressure as a structural prerequisite rather than a clock.</div>
+      <div id="intakeList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Shadow machine map</div>
+      <div class="small">Legacy watchers stay visible, but recurring promoted counterparties and seeded new-plumbing addresses are now ranked as a competing interior map.</div>
+      <div id="shadowMapList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Null awakening + thin-LP attrition</div>
+      <div class="small">Watches for the first non-zero slot state and measures whether the native optical rail is getting thin enough for violent repricing.</div>
+      <div class="brainGrid" style="margin-top:12px">
+        <div class="resCard"><div class="label">Slot awakening</div><div id="slotWakeList"></div></div>
+        <div class="resCard"><div class="label">Thin-LP attrition</div><div id="thinLPList"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <div class="boxTitle">Window forensics</div>
+    <div class="small">Every social window is ranked by timing weight, phase, expected chain effect, and cross-platform witness overlap so the tool knows which windows deserve the most proof pressure.</div>
+    <div id="windowForensicsList" style="margin-top:12px"></div>
+  </div>
+
+  <div class="tri">
+    <div class="panel">
       <div class="boxTitle">Claim courtroom</div>
       <div class="small">Every major peg claim is judged in public: witness count, source diversity, symbolic support, observed chain effect, unresolved debt, and final verdict.</div>
       <div id="courtroomList" style="margin-top:12px"></div>
@@ -344,7 +371,7 @@
     </div>
     <div class="panel">
       <div class="boxTitle">Scenario tree</div>
-      <div class="small">Instead of one blended ETA, V25 branches the case into readiness, surface-led repricing, interior wake-up, and confirmation debt scenarios.</div>
+      <div class="small">Instead of one blended ETA, V26 branches the case into readiness, surface-led repricing, interior wake-up, and confirmation debt scenarios.</div>
       <div id="scenarioTree" style="margin-top:12px"></div>
     </div>
   </div>
@@ -353,10 +380,10 @@
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v25-settings';
-  const HISTORY_KEY='pdai-v25-history';
-  const SOCIAL_CACHE_KEY='pdai-v25-social-cache';
-  const LASTGOOD_KEY='pdai-v25-last-good';
+  const STORAGE_KEY='pdai-v26-settings';
+  const HISTORY_KEY='pdai-v26-history';
+  const SOCIAL_CACHE_KEY='pdai-v26-social-cache';
+  const LASTGOOD_KEY='pdai-v26-last-good';
   const NULL32='0x'+'0'.repeat(64);
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
@@ -582,7 +609,7 @@
   function buildProofPressure(model, signalBrain){
     const narrative=clamp(signalBrain.numericRes*0.35 + Math.min(model.socialDeltaCount,60)/60*0.25 + Math.min((signalBrain.transcriptStructures||[]).length,6)/6*0.18 + Math.min((signalBrain.cueClusters||[]).length,10)/10*0.12 + Math.min((signalBrain.dossiers||[]).length,8)/8*0.10,0,1);
     const surface=clamp(model.publicStrength*0.48 + Math.min((model.counterparties||[]).length,6)/6*0.18 + ((model.hotWatcher==='5EF7'&& (model.nodeBalances['5EF7']?.pdai||0)>0)?0.16:0) + Math.min((model.windows||[]).length,10)/10*0.10 + Math.min((model.platformCounts?.x||0),20)/20*0.08,0,1);
-    const interior=clamp(model.interiorStrength*0.55 + (Object.values(model.watchTiers||{}).filter(v=>v==='hot').length>1?0.18:0) + (model.v25Promoted?.length?0.12:0) - (model.slotProbe?.allZero?0.12:0) - (model.dnaProbe?.raw===NULL32?0.1:0),0,1);
+    const interior=clamp(model.interiorStrength*0.55 + (Object.values(model.watchTiers||{}).filter(v=>v==='hot').length>1?0.18:0) + (model.v26Promoted?.length?0.12:0) - (model.slotProbe?.allZero?0.12:0) - (model.dnaProbe?.raw===NULL32?0.1:0),0,1);
     const eta=clamp(narrative*0.35 + surface*0.30 + interior*0.20 + Math.max(0,1-model.contradictionLoad)*0.15,0,1);
     return [
       {name:'Narrative coherence', score:narrative, hint:`${model.socialDeltaCount} social deltas • ${(signalBrain.transcriptStructures||[]).length} structures`},
@@ -661,6 +688,94 @@
     ].sort((a,b)=>b.score-a.score);
   }
 
+  function buildIntakePressure(model, items, historySignals){
+    const corpus=dedupeSocial(items);
+    const stableRe=/\b(dai|usdc|usdt|stablecoin|gasless|shield|liquidity|capital|bridge|routing|marketplace|stableswap|1:1|quotes?|sponsored|fees?)\b/i;
+    const intakeRe=/liberty|gasless|shield|bridge2pulse|marketplace|stableswap|liquidity|capital flowing|sponsored gas|working|almost there|few more hours/i;
+    const recent=corpus.filter(x=>{ const t=+new Date(x.publishedAt||0); return Number.isFinite(t) && (Date.now()-t) <= 1000*60*60*24*10; });
+    const stableHits=recent.filter(x=>stableRe.test(`${x.title||''} ${x.text||''}`));
+    const intakeHits=recent.filter(x=>intakeRe.test(`${x.title||''} ${x.text||''}`));
+    const byAuthor={};
+    for(const x of intakeHits){ const a=x.author||x.platform||'unknown'; byAuthor[a]=(byAuthor[a]||0)+1; }
+    const bridged=model.publicAnchors.find(a=>/bridged dai/i.test(a.name||''));
+    const native=model.publicAnchors.find(a=>/native pdai/i.test(a.name||''));
+    const core=model.nodeBalances['5EF7']?.pdai||0;
+    const bridgedReserve=bridged?.reserve0||0;
+    const nativeReserve=native?.reserve0||0;
+    const coreToNative=nativeReserve?core/nativeReserve:0;
+    const score=clamp(Math.min(stableHits.length,16)/16*0.28 + Math.min(intakeHits.length,16)/16*0.28 + (bridgedReserve>1e10?0.16:0) + Math.min(coreToNative/250,1)*0.12 + Math.min((historySignals.avgSocial||0)/30,1)*0.08 + (Object.keys(byAuthor).length>=2?0.08:0),0,1);
+    const reasons=[
+      `${stableHits.length} recent stable/intake clue(s) across social inputs.`,
+      bridged?`Bridged DAI/WPLS rail shows ${fmt(bridgedReserve,3)} reserve on the public surface.`:'Bridged surface rail unavailable.',
+      native?`5EF7 / native optical rail ratio is ${fmt(coreToNative,2)}x.`:'Native rail unavailable.',
+      'Direct Liberty routing-contract balances remain unresolved until explicit contract addresses are mapped.'
+    ];
+    const authors=Object.entries(byAuthor).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([author,count])=>({author,count}));
+    return {score,reasons,authors,stableCount:stableHits.length,intakeCount:intakeHits.length,bridgedReserve,coreToNative};
+  }
+
+  function buildShadowMachineMap(model, counterparties, promoted, historySignals){
+    const seed='0x5f4bc6714ad363751ac0f4375618346fa4a15d08';
+    const rows=[];
+    const add=(address,label,count,why,extra=0)=>{ if(!isAddr(address)) return; rows.push({address,label,count:count||0,why,score:clamp((Math.min(count||0,5)/5)*0.42 + (promoted.includes(address)?0.22:0) + (address.toLowerCase()===seed?0.24:0) + extra + Math.min((historySignals.avgPublic||0),1)*0.08,0,1)}); };
+    add(seed,'seeded probe',3,'User-prioritized new-plumbing candidate.',0.12);
+    for(const c of counterparties||[]) add(c.address, promoted.includes(c.address)?'promoted counterparty':'counterparty', c.count, 'Observed near the strongest live watcher or anchor flow.');
+    const dedup={};
+    for(const r of rows){ const k=r.address.toLowerCase(); if(!dedup[k] || r.score>dedup[k].score) dedup[k]=r; }
+    return Object.values(dedup).sort((a,b)=>b.score-a.score).slice(0,8);
+  }
+
+  function buildNullAwakening(model, history){
+    const rows=(history||[]).slice(-80);
+    const everNonZero=rows.some(r=>r.slotProbe && !r.slotProbe.allZero);
+    const changed=rows.some((r,i)=>i>0 && JSON.stringify(r.slotProbe?.values||{})!==JSON.stringify(rows[i-1].slotProbe?.values||{}));
+    const status=model.slotProbe.allZero?'dormant':'awake';
+    const score=model.slotProbe.allZero?0:1;
+    const reasons=[
+      model.slotProbe.allZero?'Slots are still null-null; awakening has not started.':'Slots are non-zero; awakening detected.',
+      everNonZero?'Historical snapshots already saw non-zero slot state.':'History has not yet seen non-zero slot state.',
+      changed?'Historical slot values have changed at least once.':'Historical slot values have stayed static so far.'
+    ];
+    return {status,score,reasons,everNonZero,changed};
+  }
+
+  function buildThinLP(model, history){
+    const rows=(history||[]).filter(r=>Array.isArray(r.publicAnchors));
+    const getNative=(r)=>r.publicAnchors.find(a=>/native pdai/i.test(a.name||''))?.reserve0||0;
+    const getBridged=(r)=>r.publicAnchors.find(a=>/bridged dai/i.test(a.name||''))?.reserve0||0;
+    const nativeNow=getNative(model);
+    const firstNative=rows.length?getNative(rows[0]):nativeNow;
+    const bridgedNow=getBridged(model);
+    const coreNow=model.nodeBalances['5EF7']?.pdai||0;
+    const attrition=firstNative?((firstNative-nativeNow)/firstNative):0;
+    const coreRatio=nativeNow?coreNow/nativeNow:0;
+    const snapScore=clamp(Math.min(coreRatio/250,1)*0.5 + Math.max(attrition,0)*0.25 + (bridgedNow>1e10?0.1:0) + model.publicStrength*0.08,0,1);
+    const reasons=[
+      `Native optical rail now holds ${fmt(nativeNow,3)} pDAI reserve.`,
+      `5EF7 / native rail ratio is ${fmt(coreRatio,2)}x.`,
+      `Attrition from loaded history start is ${pct(Math.max(attrition,0))}.`,
+      'A higher core/native ratio plus positive attrition increases violent repricing potential.'
+    ];
+    return {nativeNow,firstNative,attrition,coreRatio,snapScore,reasons,bridgedNow};
+  }
+
+  function buildWindowForensics(model, claimPressureLedger, witnessBoard){
+    const witnessAvg=(witnessBoard||[]).reduce((a,x)=>a+x.resonance,0)/Math.max(1,(witnessBoard||[]).length);
+    const phaseWeight={scribe:0.92,heat:0.76,lock:0.66,init:0.58,intake:0.54,social:0.36};
+    return (model.windows||[]).map(w=>{
+      const codeNeedle=(w.code||'').toLowerCase();
+      const claimHit=codeNeedle && (claimPressureLedger||[]).some(c=>String(c.clue||'').toLowerCase().includes(codeNeedle))?0.12:0;
+      const timing=Math.min(w.blocks||1,14)/14;
+      const score=clamp((phaseWeight[w.phase]||0.35)*0.52 + timing*0.18 + claimHit + witnessAvg*0.12 + ((w.code&&['x9oeb','sfvcy','7pr6k','xutw9'].includes(w.code))?0.08:0),0,1);
+      let expectation='Watch for reserve mutation and counterparty emergence.';
+      if(w.phase==='scribe') expectation='Highest expectation for coordination or staged execution pressure.';
+      else if(w.phase==='heat') expectation='Watch for priming, chatter spikes, or faster reserve motion.';
+      else if(w.phase==='lock') expectation='Watch for setup / alignment before stronger windows.';
+      else if(w.phase==='init') expectation='Watch for initial state or routing preparation.';
+      return {...w,score,expectation};
+    }).sort((a,b)=>b.score-a.score).slice(0,10);
+  }
+
   function buildOmegaSummary(model, witnessBoard, courtroom){
     const topWitness=witnessBoard?.[0];
     const topClaim=courtroom?.[0];
@@ -668,6 +783,7 @@
       `Top witness: ${topWitness?`${topWitness.name} (${pct(topWitness.resonance)})`:'—'}.`,
       `Top courtroom claim: ${topClaim?`${topClaim.clue} → ${topClaim.verdict}`:'—'}.`,
       `Current machine picture remains ${model.phase}, with ${model.hotWatcher} as the dominant live watcher and contradiction load at ${pct(model.contradictionLoad)}.`,
+      `Intake pressure currently reads ${pct(model.signalBrain.intakePressure?.score||0)} and the top shadow-machine candidate is ${(model.signalBrain.shadowMachineMap||[])[0]?short(model.signalBrain.shadowMachineMap[0].address,10,8):'—'}.`,
     ];
   }
 
@@ -922,7 +1038,7 @@
       (model.interiorStrength*0.16)+
       (Math.min(model.socialDeltaCount,24)/24*0.16)+
       (Math.min((model.windows||[]).length,14)/14*0.10)+
-      (Math.min((model.v25Promoted||[]).length,5)/5*0.08)+
+      (Math.min((model.v26Promoted||[]).length,5)/5*0.08)+
       (Math.min((model.counterparties||[]).length,8)/8*0.05)+
       ((model.signalBrain?.numericRes||0)*0.13)+
       (Math.min((model.signalBrain?.dossiers||[]).length,8)/8*0.08)-
@@ -943,11 +1059,15 @@
     if(model.signalBrain.dossiers[0]) observations.push(`Highest resonance dossier: ${model.signalBrain.dossiers[0].title} (${pct(model.signalBrain.dossiers[0].resonance)}).`);
     if(model.signalBrain.transcriptStructures?.[0]) observations.push(`Top transcript structure: ${model.signalBrain.transcriptStructures[0].name} (${model.signalBrain.transcriptStructures[0].count} hits).`);
     if(model.signalBrain.lattice[0]) observations.push(`Top numeric hook in corpus: ${model.signalBrain.lattice[0].value} (${model.signalBrain.lattice[0].count} hits).`);
+    if(model.signalBrain.intakePressure) observations.push(`Intake pressure reads ${pct(model.signalBrain.intakePressure.score)} with ${model.signalBrain.intakePressure.intakeCount} intake cue(s).`);
+    if(model.signalBrain.thinLP) observations.push(`Thin-LP snap score reads ${pct(model.signalBrain.thinLP.snapScore)} with 5EF7/native ratio ${fmt(model.signalBrain.thinLP.coreRatio,2)}x.`);
     hypotheses.push(model.phase==='surface-leading' ? 'Public-surface mutation is outrunning the current interior watcher map.' : 'Surface/interior balance is changing.');
     if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
     if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
     if(model.signalBrain.transcriptCues.length) hypotheses.push(`Loaded corpus contains ${model.signalBrain.transcriptCues.length} transcript/frame cue(s), which increases structured symbolic signal.`);
-    if((model.v25Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v25Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
+    if((model.v26Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v26Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
+    if((model.signalBrain.shadowMachineMap||[])[0]) hypotheses.push(`Shadow machine map currently favors ${short(model.signalBrain.shadowMachineMap[0].address,10,8)} over at least part of the legacy watcher set.`);
+    if((model.signalBrain.intakePressure?.score||0)>.55) hypotheses.push('Macro intake pressure may now be a structural prerequisite signal rather than just narrative noise.');
     hypotheses.push(...(model.signalBrain.theoryLedger||[]).slice(0,2).map(t=>`${t.name} (${pct(t.score)})`));
     hypotheses.push(...(model.signalBrain.claimLedger||[]).slice(0,2).map(t=>`${t.clue} (${pct(clamp(t.support-t.contradiction,0,1))})`));
     if(model.slotProbe.allZero && model.slotProbe.equal) contradictions.push('Slot probe is null-null equality; this is absence, not symmetry.');
@@ -957,12 +1077,16 @@
     if(!model.payloadHits.length) contradictions.push('No payload motifs surfaced around the hottest anchor window.');
     if(!(model.platformCounts.x||0)) contradictions.push('X coverage is still weak or absent this cycle.');
     if((model.signalBrain.transcriptStructures||[]).length===0) contradictions.push('Transcript structure map is thin; Maria parsing needs more transcript/frame material.');
+    if(model.signalBrain.nullAwakening?.status==='dormant') contradictions.push('Null-null equality has not ended; slot awakening is still missing.');
     next.push('Probe promoted counterparties around 5EF7 and the public anchors.');
     next.push('Turn new YouTube/X posts into block windows and compare against reserve mutation.');
     next.push('Keep degrading empty-slot and empty-DNA theories until non-null state appears.');
     next.push('Feed transcript lines, frame notes, and symbolic observations into the research corpus to deepen Maria dissection.');
     next.push('Compare top claim-ledger items against actual window mutations instead of leaving them symbolic.');
     if(!model.payloadHits.length) next.push('Search for payload/selector motifs around the strongest dossier windows.');
+    next.push('Monitor the shadow machine map and seed address 0x5f4bc6714ad363751ac0f4375618346fa4a15d08 for recurrence and flow.');
+    next.push('Track the first non-zero slot state as a structural awakening alarm.');
+    next.push('Keep measuring native optical-rail attrition to estimate violent repricing potential.');
     return {observations,hypotheses,contradictions,next};
   }
   async function buildModel(){
@@ -996,13 +1120,18 @@
     const platformCounts = dedupeSocial([...social,...research,...histSocial]).reduce((a,x)=>{ a[x.platform]=(a[x.platform]||0)+1; return a; }, {});
     const historySignals = buildHistorySignals(hist);
     const signalBrain = buildSignalBrain({publicStrength,interiorStrength,contradictionLoad,socialDeltaCount:delta.length,slotProbe:chain.slotProbe,payloadHits}, social, research, histSocial, historySignals);
-    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v25Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
+    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v26Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
     baseModel.signalBrain.claimLedger = buildClaimLedger(baseModel, [...social,...research,...histSocial], historySignals, signalBrain);
     baseModel.signalBrain.transcriptDecomp = buildTranscriptDecomposition([...social,...research,...histSocial]);
     baseModel.signalBrain.proofPressure = buildProofPressure(baseModel, baseModel.signalBrain);
     baseModel.signalBrain.claimPressureLedger = buildClaimPressureLedger(baseModel.signalBrain.claimLedger, baseModel);
+    baseModel.signalBrain.intakePressure = buildIntakePressure(baseModel, [...social,...research,...histSocial], historySignals);
+    baseModel.signalBrain.shadowMachineMap = buildShadowMachineMap(baseModel, counterparties, promoted, historySignals);
+    baseModel.signalBrain.nullAwakening = buildNullAwakening(baseModel, hist);
+    baseModel.signalBrain.thinLP = buildThinLP(baseModel, hist);
+    baseModel.signalBrain.windowForensics = buildWindowForensics(baseModel, baseModel.signalBrain.claimPressureLedger, baseModel.signalBrain.witnessBoard);
     const thinking = buildThinking(baseModel);
-    const v25Actions=[
+    const v26Actions=[
       {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
       ...(windows[0]?[{kind:'sync-window',status:'ok',findings:[`${windows[0].phase} window ${fmt(windows[0].blocks,1)} blocks from ${windows[0].title.match(/\d+s/i)?.[0]||'timing'}`, windows[0].code?`code ${windows[0].code}`:'no code']}]:[]),
       {kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new counterparties']},
@@ -1013,10 +1142,10 @@
       {kind:'proof-pressure',status:'ok',findings:(baseModel.signalBrain.proofPressure||[]).map(s=>`${s.name} ${pct(s.score)}`)}
     ];
     const allThoughts=[...thinking.observations.slice(0,3), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,3)];
-    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v25Thoughts:allThoughts, v25Actions, v25Goal:'Force every major peg clue into a courtroom verdict, weigh witness convergence, and separate narrative, surface, interior, and ETA pressure.', v25Thinking:thinking, v25Speculation:baseModel.signalBrain.spec, v25Eta:baseModel.signalBrain.eta, v25Godmode:baseModel.signalBrain};
-    model.pegProgress = computePegProgress({...model, v25Promoted: promoted});
+    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v26Thoughts:allThoughts, v26Actions, v26Goal:'Do all of it: courtroom verdicts, intake pressure, shadow machine mapping, null awakening, thin-LP attrition, and window forensics at once.', v26Thinking:thinking, v26Speculation:baseModel.signalBrain.spec, v26Eta:baseModel.signalBrain.eta, v26Godmode:baseModel.signalBrain};
+    model.pegProgress = computePegProgress({...model, v26Promoted: promoted});
     model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*10 - contradictionLoad*18, 0, 100);
-    model.v25Brief = `V25 regime: ${model.phase}
+    model.v26Brief = `V26 regime: ${model.phase}
 Score: ${fmt(model.score,1)}
 Peg progress: ${pct(model.pegProgress)}
 Public vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}
@@ -1025,8 +1154,8 @@ Hot watcher: ${hotWatcher}
 Social delta: ${delta.length}
 Top dossier: ${model.signalBrain.dossiers[0]?.title||'—'}
 Top claim: ${model.signalBrain.claimLedger[0]?.clue||model.signalBrain.theoryLedger[0]?.name||'—'}
-Thoughts: ${model.v25Thoughts.join(' | ')}
-Actions: ${v25Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
+Thoughts: ${model.v26Thoughts.join(' | ')}
+Actions: ${v26Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
 Promoted: ${promoted.join(', ')||'—'}`;
     return model;
   }
@@ -1036,7 +1165,7 @@ Promoted: ${promoted.join(', ')||'—'}`;
       {k:'Social capture', on:model.socialDeltaCount>0 || model.harvestedSocial.length>0, v:model.socialDeltaCount?`${model.socialDeltaCount} new`:`${model.harvestedSocial.length} seen`},
       {k:'Windowing', on:(model.windows||[]).length>0, v:`${(model.windows||[]).length} windows`},
       {k:'Surface resonance', on:model.publicStrength>.7, v:pct(model.publicStrength)},
-      {k:'Candidate promotion', on:(model.v25Promoted||[]).length>0, v:(model.v25Promoted||[]).length?short(model.v25Promoted[0],8,6):'—'},
+      {k:'Candidate promotion', on:(model.v26Promoted||[]).length>0, v:(model.v26Promoted||[]).length?short(model.v26Promoted[0],8,6):'—'},
       {k:'Interior wake', on:model.interiorStrength>.35, v:pct(model.interiorStrength)},
       {k:'Contradiction control', on:model.contradictionLoad<.45, v:pct(1-model.contradictionLoad)}
     ];
@@ -1047,26 +1176,26 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('syncStatus').textContent=model.socialError?'degraded':'synced'; $('syncStatus').className='status '+(model.socialError?'warn':'ok');
     $('lastSync').textContent='Last sync: '+new Date().toLocaleString();
     $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length} • YT ${model.platformCounts.youtube||0} • X ${model.platformCounts.x||0} • Corpus ${model.platformCounts.corpus||0}${model.socialError?` • ${model.socialError}`:''}`;
-    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v25Promoted||[]).length);
+    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v26Promoted||[]).length);
     $('pegReactor').style.setProperty('--peg', (model.pegProgress*100).toFixed(1)); $('heroPeg').textContent=(model.pegProgress*100).toFixed(1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
-    $('verdict').textContent=model.phase; $('brief').textContent=model.v25Brief.split('\n').slice(0,5).join(' • ');
-    $('thoughtBubbles').innerHTML=model.v25Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
-    $('obsList').innerHTML=model.v25Thinking.observations.map(t=>uiItem(t,'info')).join('');
-    $('hypList').innerHTML=model.v25Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
-    $('conList').innerHTML=model.v25Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
-    $('nextList').innerHTML=model.v25Thinking.next.map(t=>uiItem(t,'good')).join('');
-    $('actionList').innerHTML=model.v25Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
-    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Narrative vs surface vs interior vs ETA: ${(model.signalBrain.proofPressure||[]).map(p=>`${p.name.split(' ')[0]} ${pct(p.score)}`).join(' • ')}.`,`Top promoted candidate: ${(model.v25Promoted||[])[0]?short(model.v25Promoted[0],10,8):'—'}.`];
+    $('verdict').textContent=model.phase; $('brief').textContent=model.v26Brief.split('\n').slice(0,5).join(' • ');
+    $('thoughtBubbles').innerHTML=model.v26Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
+    $('obsList').innerHTML=model.v26Thinking.observations.map(t=>uiItem(t,'info')).join('');
+    $('hypList').innerHTML=model.v26Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
+    $('conList').innerHTML=model.v26Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
+    $('nextList').innerHTML=model.v26Thinking.next.map(t=>uiItem(t,'good')).join('');
+    $('actionList').innerHTML=model.v26Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
+    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Narrative vs surface vs interior vs ETA: ${(model.signalBrain.proofPressure||[]).map(p=>`${p.name.split(' ')[0]} ${pct(p.score)}`).join(' • ')}.`,`Top promoted candidate: ${(model.v26Promoted||[])[0]?short(model.v26Promoted[0],10,8):'—'}.`,`Intake pressure: ${pct(model.signalBrain.intakePressure?.score||0)}.`,`Thin-LP snap score: ${pct(model.signalBrain.thinLP?.snapScore||0)}.`,`Top shadow candidate: ${(model.signalBrain.shadowMachineMap||[])[0]?short(model.signalBrain.shadowMachineMap[0].address,10,8):'—'}.`];
     $('truthList').innerHTML=truths.map(t=>uiItem(t,'info')).join('');
-    $('briefList').innerHTML=uiItem(model.v25Brief.replace(/\n/g,'<br>'),'good');
+    $('briefList').innerHTML=uiItem(model.v26Brief.replace(/\n/g,'<br>'),'good');
     $('progressBoard').innerHTML=progressMilestones(model).map(m=>`<div class="milestone ${m.on?'active':''}"><div class="mileK">${m.k}</div><div class="mileV">${m.v}</div></div>`).join('');
     $('proofBoard').innerHTML=(model.signalBrain.proofPressure||[]).map(p=>`<div class="milestone ${p.score>.55?'active':''}"><div class="mileK">${p.name}</div><div class="mileV">${pct(p.score)}<br><span class="small">${p.hint}</span></div></div>`).join('');
     $('motifPills').innerHTML=(model.signalBrain.motifs||[]).slice(0,12).map(m=>`<span class="pill">${m.word} • ${m.count}</span>`).join('') || '<span class="small">No motifs yet.</span>';
     $('numScore').textContent=pct(model.signalBrain.numericRes); $('numHint').textContent=`Hooks: ${(model.signalBrain.dateHooks||[]).length} • phases ${Object.keys(model.signalBrain.phaseCounts||{}).length}`;
     $('echoList').innerHTML=(model.signalBrain.echoes||[]).slice(0,5).map(t=>uiItem(t,'info')).join('') || uiItem('No strong echoes yet.','warn');
     $('dateHooks').innerHTML=(model.signalBrain.dateHooks||[]).slice(0,6).map(h=>uiItem(`${h.title} • ${h.duration||0}s • ${h.notable&&h.notable.length?h.notable.join(', '):'no notable numbers'}`, 'warn')).join('') || uiItem('No date/duration hooks yet.','warn');
-    $('specList').innerHTML=(model.v25Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
-    $('etaList').innerHTML=(model.v25Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
+    $('specList').innerHTML=(model.v26Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
+    $('etaList').innerHTML=(model.v26Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
     $('gmSummary').innerHTML=[uiItem(`Godmode numeric resonance: ${pct(model.signalBrain.numericRes)}.`,'good'), ...model.signalBrain.historySignals.summary.slice(0,3).map(x=>uiItem(x,'info'))].join('');
     $('memoryList').innerHTML=model.signalBrain.historySignals.summary.map(x=>uiItem(x,'info')).join('');
     $('cueList').innerHTML=(model.signalBrain.transcriptCues||[]).slice(0,8).map(c=>uiItem(`${c.platform}: ${c.title} ${c.durationSec?`• ${c.durationSec}s`:''}`,'warn')).join('') || uiItem('No transcript/frame cues loaded yet.','warn');
@@ -1077,6 +1206,11 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('mirrorList').innerHTML=(model.signalBrain.transcriptDecomp?.mirrors||[]).map(x=>uiItem(`${x.count} mirrored block(s)<br><span class="small">${x.sample}</span>`,'warn')).join('') || uiItem('No mirrored transcript blocks yet.','warn');
     $('ratioList').innerHTML=(model.signalBrain.transcriptDecomp?.ratios||[]).map(x=>uiItem(`${x.term} • ${x.count}`,'warn')).join('') || uiItem('No ratio timing motifs yet.','warn');
     $('claimPressureList').innerHTML=(model.signalBrain.claimPressureLedger||[]).map(c=>uiItem(`<strong>${c.clue}</strong> • ${pct(c.pressure)}<br>${c.meaning}<br><span class="small">Observed: ${c.observed}</span><br><span class="small">Unresolved: ${c.unresolved}</span>`, c.pressure>.55?'good':'warn')).join('') || uiItem('No claim-pressure entries yet.','warn');
+    $('intakeList').innerHTML=(model.signalBrain.intakePressure?.reasons||[]).map((r,i)=>uiItem(i===0?`<strong>${pct(model.signalBrain.intakePressure.score)}</strong> • ${r}`:r, i===0 && (model.signalBrain.intakePressure.score||0)>.55?'good':'info')).join('') || uiItem('No intake-pressure view yet.','warn');
+    $('shadowMapList').innerHTML=(model.signalBrain.shadowMachineMap||[]).map(s=>uiItem(`<strong>${short(s.address,10,8)}</strong> • ${s.label} • ${pct(s.score)}<br><span class="small">Count ${s.count} • ${s.why}</span>`, s.score>.55?'good':'info')).join('') || uiItem('No shadow-machine candidates yet.','warn');
+    $('slotWakeList').innerHTML=(model.signalBrain.nullAwakening?.reasons||[]).map((r,i)=>uiItem(i===0?`<strong>${(model.signalBrain.nullAwakening?.status||'—').toUpperCase()}</strong> • ${r}`:r, (model.signalBrain.nullAwakening?.status||'')==='awake'?'good':'warn')).join('') || uiItem('No slot-awakening view yet.','warn');
+    $('thinLPList').innerHTML=(model.signalBrain.thinLP?.reasons||[]).map((r,i)=>uiItem(i===0?`<strong>${pct(model.signalBrain.thinLP.snapScore||0)}</strong> • ${r}`:r, (model.signalBrain.thinLP?.snapScore||0)>.55?'good':'info')).join('') || uiItem('No thin-LP view yet.','warn');
+    $('windowForensicsList').innerHTML=(model.signalBrain.windowForensics||[]).map(w=>uiItem(`<strong>${w.title}</strong> • ${pct(w.score)}<br><span class="small">${w.phase}${w.code?` / ${w.code}`:''} • ${fmt(w.blocks,1)} blocks • approx ${w.approxBlock.toLocaleString()}</span><br><span class="small">${w.expectation}</span>`, w.score>.65?'good':'info')).join('') || uiItem('No window forensics yet.','warn');
     $('dossierList').innerHTML=(model.signalBrain.dossiers||[]).slice(0,8).map(d=>uiItem(`<strong>${d.title}</strong><br>${d.durationSec||0}s • ${d.phase}${d.code?` • ${d.code}`:''}<br>Resonance ${pct(d.resonance)} • related ${d.relatedCount} • platforms ${d.platforms.join(', ')||'—'}${d.authors.length?`<br><span class="small">Authors: ${d.authors.join(', ')}</span>`:''}${d.numbers.length?`<br><span class="small">Numbers: ${d.numbers.join(', ')}</span>`:''}`, d.resonance>.6?'good':'info')).join('') || uiItem('No dossiers yet.','warn');
     $('latticeList').innerHTML=(model.signalBrain.lattice||[]).slice(0,10).map(n=>uiItem(`<strong>${n.value}</strong> • ${n.count} hit(s)<br><span class="small">${(n.contexts||[]).slice(0,2).join(' | ')}</span>`, 'warn')).join('') || uiItem('No numeric/date lattice yet.','warn');
     $('structureList').innerHTML=(model.signalBrain.transcriptStructures||[]).slice(0,8).map(s=>uiItem(`<strong>${s.name}</strong> • ${s.count} hit(s)<br><span class="small">${s.sample}</span>`, 'good')).join('') || uiItem('No transcript structures yet.','warn');
@@ -1091,13 +1225,13 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,30):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
     $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${fmt(w.blocks,1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
     $('anchorBody').innerHTML=(model.publicAnchors||[]).map(a=>`<tr><td>${a.name}</td><td class="mono">${short(a.address,10,8)}</td><td>${fmt(a.reserve0,3)}</td><td>${fmt(a.reserve1,3)}</td></tr>`).join('');
-    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v25Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v25Promoted[0],10,8):'—'}</td></tr>`).join('');
+    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v26Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v26Promoted[0],10,8):'—'}</td></tr>`).join('');
   }
 
   function renderFallback(err){
     const last=loadLastGood();
     if(last){
-      last.v25Thoughts=(last.v25Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
+      last.v26Thoughts=(last.v26Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
       render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot';
     } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); }
   }
@@ -1107,8 +1241,8 @@ Promoted: ${promoted.join(', ')||'—'}`;
 
   function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; $('sResearchCorpus').value=state.settings.researchCorpus||''; $('sTranscriptProxy').value=state.settings.transcriptProxy||''; $('sSpeculateLevel').value=state.settings.speculateLevel||8; $('sFrameCorpus').value=state.settings.frameCorpus||''; }
   function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; state.settings.researchCorpus=$('sResearchCorpus').value; state.settings.transcriptProxy=$('sTranscriptProxy').value.trim(); state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8; state.settings.frameCorpus=$('sFrameCorpus').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v25-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v25-bundle.json'; a.click(); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v26-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v26-bundle.json'; a.click(); }
   function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)) saveHistory(j); else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
