@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V18 Social Correlator</title>
+<title>pDAI Peg Prover • V19 Social + X Correlator</title>
 <style>
   :root{
     --bg:#071018; --panel:#0e1722; --panel2:#0b1320; --line:#23384b; --text:#e9f4ff; --muted:#8ea6b9;
@@ -66,11 +66,11 @@
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V18 Social Correlator</h1>
-      <div class="sub">V18 treats YouTube + X + manual memory as the social sync layer, PulseChain as the execution layer, and correlates both every cycle. It is resilient by default: social failure degrades instead of killing chain sync.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V19 Social + X Correlator</h1>
+      <div class="sub">V19 treats YouTube + X profiles + X search + manual memory as the social sync layer, PulseChain as the execution layer, and correlates both every cycle. It degrades gracefully when one social path fails instead of killing chain sync.</div>
       <div class="chips">
         <div class="chip good">5EF7 stays priority structural core</div>
-        <div class="chip info">Maria + X are first-class inputs</div>
+        <div class="chip info">Maria + X profiles are first-class inputs</div>
         <div class="chip warn">null-null slots are contradiction, not proof</div>
       </div>
     </div>
@@ -94,7 +94,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V18 settings</div>
+    <div class="boxTitle">V19 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -104,7 +104,9 @@
       <div class="field"><label>Social proxy URL</label><input id="sSocialProxy" placeholder="optional proxy endpoint" /></div>
       <div class="field"><label>X bearer token</label><input id="sXBearer" placeholder="optional X bearer (browser use may fail)" /></div>
       <div class="field"><label>X recent-search query</label><input id="sXQuery" value='(pDAI OR "$pDAI" OR pdai OR "$pdai") -is:retweet' /></div>
-      <div class="field"><label>Tracked X accounts</label><input id="sXAccounts" value="NineIronCapital,DcentraliseMe" /></div>
+      <div class="field"><label>Tracked X accounts</label><input id="sXAccounts" value="LibertySwapFi,NineIronCapital,DcentraliseMe,RichardHeartWin,TheGreekGod11,files_dirty" /></div>
+      <div class="field"><label>X proxy / Nitter base URLs</label><textarea id="sXMirrors" placeholder="https://nitter.net
+https://xcancel.com"></textarea></div>
       <div class="field"><label>Manual social JSON / lines</label><textarea id="sManualSocial" placeholder='[{"title":"...","publishedAt":"2026-04-01T00:00:00Z","platform":"x"}] or one line per clue'></textarea></div>
       <div class="field"><label>Notes</label><textarea id="sNotes" placeholder="optional notes"></textarea></div>
     </div>
@@ -116,7 +118,7 @@
   </div>
 
   <div class="grid4">
-    <div class="card"><div class="label">V18 score</div><div class="value" id="mScore">—</div><div class="hint">Correlation quality</div></div>
+    <div class="card"><div class="label">V19 score</div><div class="value" id="mScore">—</div><div class="hint">Correlation quality</div></div>
     <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Current machine picture</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
     <div class="card"><div class="label">Hot watcher</div><div class="value" id="mHot">—</div><div class="hint">Strongest live node</div></div>
@@ -133,7 +135,7 @@
     </div>
     <div>
       <div class="card">
-        <div class="label">V18 verdict</div>
+        <div class="label">V19 verdict</div>
         <div class="value" id="verdict">—</div>
         <div class="hint" id="brief">—</div>
         <div class="parts" style="margin-top:12px">
@@ -185,15 +187,15 @@
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v18-settings';
-  const HISTORY_KEY='pdai-v18-history';
-  const SOCIAL_CACHE_KEY='pdai-v18-social-cache';
-  const LASTGOOD_KEY='pdai-v18-last-good';
+  const STORAGE_KEY='pdai-v19-settings';
+  const HISTORY_KEY='pdai-v19-history';
+  const SOCIAL_CACHE_KEY='pdai-v19-social-cache';
+  const LASTGOOD_KEY='pdai-v19-last-good';
   const NULL32='0x'+'0'.repeat(64);
   const TRANSFER_TOPIC='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
-    socialProxy:'', xBearer:'', xQuery:'(pDAI OR "$pDAI" OR pdai OR "$pdai") -is:retweet', xAccounts:'NineIronCapital,DcentraliseMe', manualSocial:'', notes:'',
+    socialProxy:'', xBearer:'', xQuery:'(pDAI OR \"$pDAI\" OR pdai OR \"$pdai\" OR LibertySwap OR #pDAI) -is:retweet', xAccounts:'LibertySwapFi,NineIronCapital,DcentraliseMe,RichardHeartWin,TheGreekGod11,files_dirty', xMirrors:'https://nitter.net\nhttps://xcancel.com', manualSocial:'', notes:'',
     target:'0x6B175474E89094C44Da98b954EedeAC495271d0F',
     wpls:'0xA1077a294dde1b09bb078844df40758A5d0F9A27',
     dead:'0x000000000000000000000000000000000000dEaD',
@@ -305,19 +307,74 @@
     }
     throw new Error(results.map(x=>x.error||'failed').join(' | ')||'youtube fetch failed');
   }
+  function parseAccountList(txt){ return String(txt||'').split(/[\n, ]+/).map(x=>x.trim().replace(/^@/,'')).filter(Boolean); }
+  async function fetchText(url, ms=12000){
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
+    try{ const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error(`HTTP ${r.status}`); return await r.text(); } finally{ clearTimeout(t); }
+  }
+  async function fetchXRssViaMirror(base, user){
+    const rssUrl=`${base.replace(/\/$/,'')}/${encodeURIComponent(user)}/rss`;
+    const tries=[
+      `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`
+    ];
+    for(const url of tries){
+      try{
+        if(url.includes('rss2json')){
+          const j=await fetchJSON(url,{},10000);
+          const items=(j.items||[]).map(x=>normalizeSocial({id:`xrss:${user}:${x.guid||x.link}`,title:x.title||x.description||'',text:x.description||x.title||'',link:x.link||'',publishedAt:x.pubDate,platform:'x',kind:'post',source:'x-rss',author:user}));
+          if(items.length) return items;
+        } else {
+          const xml=await fetchText(url,10000);
+          const doc=new DOMParser().parseFromString(xml,'application/xml');
+          const items=[...doc.querySelectorAll('item')].map((e,i)=>normalizeSocial({id:`xrss:${user}:${e.querySelector('guid')?.textContent||e.querySelector('link')?.textContent||i}`,title:e.querySelector('title')?.textContent||'',text:e.querySelector('description')?.textContent||e.querySelector('title')?.textContent||'',link:e.querySelector('link')?.textContent||'',publishedAt:e.querySelector('pubDate')?.textContent,platform:'x',kind:'post',source:'x-rss-xml',author:user}));
+          if(items.length) return items;
+        }
+      }catch(e){}
+    }
+    return [];
+  }
   async function fetchX(settings){
-    const out=[];
-    const proxy=(settings.socialProxy||'').trim();
-    const q=encodeURIComponent(settings.xQuery||DEFAULTS.xQuery);
+    const out=[]; const proxy=(settings.socialProxy||'').trim(); const q=encodeURIComponent(settings.xQuery||DEFAULTS.xQuery); const users=parseAccountList(settings.xAccounts);
+    const mirrors=parseAccountList(String(settings.xMirrors||'').replace(/https?:\/\//g,m=>m)).map(x=>x.startsWith('http')?x:`https://${x}`);
+    let errors=[];
     if(proxy){
-      try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/recent?query=${q}&max_results=25`,{},10000); const arr=(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id,title:x.text||x.title,text:x.text,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy',author:x.author_id||x.author||''})); if(arr.length) return arr; }catch{}
+      try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/recent?query=${q}&max_results=25`,{},10000); const arr=(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id||x.url,title:x.text||x.title,text:x.text||x.title,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy',author:x.author_id||x.author||x.username||''})); out.push(...arr); }catch(e){ errors.push('proxy-recent:'+e.message); }
+      if(users.length){
+        try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/users?users=${encodeURIComponent(users.join(','))}&max_results=15`,{},10000); const arr=(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id||x.url||`${x.author||x.username}:${x.created_at}`,title:x.text||x.title,text:x.text||x.title,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy-users',author:x.author||x.username||x.author_id||''})); out.push(...arr); }catch(e){ errors.push('proxy-users:'+e.message); }
+      }
     }
     if((settings.xBearer||'').trim()){
-      const url=`https://api.x.com/2/tweets/search/recent?query=${q}&max_results=25&tweet.fields=created_at,author_id,text`;
-      const j=await fetchJSON(url,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
-      return (j.data||[]).map(x=>normalizeSocial({id:x.id,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-recent',author:x.author_id}));
+      try{
+        const recent=await fetchJSON(`https://api.x.com/2/tweets/search/recent?query=${q}&max_results=25&tweet.fields=created_at,author_id,text`,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
+        out.push(...(recent.data||[]).map(x=>normalizeSocial({id:`x:${x.id}`,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-recent',author:x.author_id})));
+      }catch(e){ errors.push('x-recent:'+e.message); }
+      if(users.length){
+        try{
+          const u=await fetchJSON(`https://api.x.com/2/users/by?usernames=${encodeURIComponent(users.join(','))}&user.fields=username,name`,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
+          const map=(u.data||[]);
+          for(const row of map){
+            try{
+              const t=await fetchJSON(`https://api.x.com/2/users/${row.id}/tweets?max_results=10&tweet.fields=created_at,text`,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
+              out.push(...(t.data||[]).map(x=>normalizeSocial({id:`xtl:${row.username}:${x.id}`,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-user',author:row.username,link:`https://x.com/${row.username}/status/${x.id}`})));
+            }catch(e){ errors.push(`x-user:${row.username}:`+e.message); }
+          }
+        }catch(e){ errors.push('x-users-lookup:'+e.message); }
+      }
     }
-    return out;
+    if(!out.length && mirrors.length && users.length){
+      for(const user of users){
+        for(const base of mirrors){
+          const arr=await fetchXRssViaMirror(base,user);
+          if(arr.length){ out.push(...arr); break; }
+        }
+      }
+    }
+    const dedup=new Map();
+    for(const item of out){ if(!item || !item.id) continue; dedup.set(String(item.id), item); }
+    const arr=[...dedup.values()].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
+    if(!arr.length && errors.length) throw new Error(errors.join(' | '));
+    return arr;
   }
 
   function diffSocial(cache, items){
@@ -388,9 +445,14 @@
     thoughts.push(chain.dnaProbe.raw===NULL32?'DNA slot is empty again; proxy-swap theory cannot carry this cycle.':'DNA slot non-empty this cycle.');
     thoughts.push(`${hotWatcher} still carries ${fmt(chain.nodeBalances[hotWatcher]?.pdai/1e9,3)}B pDAI and remains the strongest live watcher.`);
     thoughts.push(`Public anchors are still the richer truth layer than the current interior map.`);
+    const xItems=delta.harvested.filter(x=>x.platform==='x');
+    const libertyHits=delta.harvested.filter(x=>/libertyswap|libertylend|stableswap|market maker marketplace/i.test((x.title||'')+' '+(x.text||'')) || /LibertySwapFi|DcentraliseMe/i.test(x.author||''));
+    if(xItems.length) thoughts.push(`X layer is live with ${xItems.length} harvested item(s).`);
+    if(libertyHits.length) thoughts.push(`LibertySwap/intake-valve language is present in the social layer.`);
     if(delta.newSocial[0]) thoughts.push(`Latest social focus: ${delta.newSocial[0].title}`);
     const actions=[];
-    actions.push({kind:'social-delta',status:socialError?'degraded':'ok',findings:[delta.newSocial.length?`${delta.newSocial.length} new social item(s)`:(socialError?`social fetch failed, using cache (${socialError.trim()})`:'no new social items this cycle')]});
+    actions.push({kind:'social-delta',status:socialError?'degraded':'ok',findings:[delta.newSocial.length?`${delta.newSocial.length} new social item(s)`:(socialError?`social fetch failed, using cache (${socialError.trim()})`:'no new social items this cycle')], platformCounts:{youtube:delta.harvested.filter(x=>x.platform==='youtube').length, x:delta.harvested.filter(x=>x.platform==='x').length, manual:delta.harvested.filter(x=>x.platform==='manual').length}});
+    actions.push({kind:'x-profile-harvest',status:xItems.length?'ok':'warn',findings:[xItems.length?`${xItems.length} X item(s) harvested`:'no X items harvested', libertyHits.length?`${libertyHits.length} LibertySwap/intake-valve social hit(s)`:'no LibertySwap social hits']});
     if(delta.newSocial[0]&&delta.newSocial[0].durationSec) actions.push({kind:'sync-window',status:'ok',findings:[`scribe window ${(delta.newSocial[0].durationSec/state.settings.blockSec).toFixed(1)} blocks from ${delta.newSocial[0].durationSec}s`, delta.newSocial[0].code?`code ${delta.newSocial[0].code}`:'']});
     actions.push({kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new candidate counterparties']});
     actions.push({kind:'watcher-rehab',status:'ok',findings:[`cold watchers: ${Object.entries(chain.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')}`, promoted[0]?`promote ${short(promoted[0],10,8)}`:'no promotion']});
@@ -406,17 +468,17 @@
     $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length}${model.socialError?` • ${model.socialError}`:''}`;
     $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher;
     $('heroScore').textContent=fmt(model.score,1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
-    $('verdict').textContent=model.phase; $('brief').textContent=model.v18Brief;
-    $('pPublic').textContent=pct(model.publicStrength); $('pInterior').textContent=pct(model.interiorStrength); $('pContradiction').textContent=pct(model.contradictionLoad); $('pNewSocial').textContent=String(model.socialDeltaCount); $('pWindows').textContent=String(model.windows.length); $('pPromoted').textContent=model.v18Promoted.length?short(model.v18Promoted[0],8,6):'—';
-    $('thoughtBubbles').innerHTML=(model.v18Thoughts||[]).slice(0,3).map(t=>`<div class="bubble">${t}</div>`).join('');
-    $('thoughtList').innerHTML=(model.v18Thoughts||[]).map(t=>uiItem(t,/No new social|empty|null-null/.test(t)?'warn':'good')).join('');
-    $('actionList').innerHTML=(model.v18Actions||[]).map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
+    $('verdict').textContent=model.phase; $('brief').textContent=model.v19Brief;
+    $('pPublic').textContent=pct(model.publicStrength); $('pInterior').textContent=pct(model.interiorStrength); $('pContradiction').textContent=pct(model.contradictionLoad); $('pNewSocial').textContent=String(model.socialDeltaCount); $('pWindows').textContent=String(model.windows.length); $('pPromoted').textContent=(model.v19Promoted||[]).length?short(model.v19Promoted[0],8,6):'—';
+    $('thoughtBubbles').innerHTML=(model.v19Thoughts||model.v18Thoughts||[]).slice(0,3).map(t=>`<div class="bubble">${t}</div>`).join('');
+    $('thoughtList').innerHTML=(model.v19Thoughts||model.v18Thoughts||[]).map(t=>uiItem(t,/No new social|empty|null-null/.test(t)?'warn':'good')).join('');
+    $('actionList').innerHTML=(model.v19Actions||model.v18Actions||[]).map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
     const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`];
     $('truthList').innerHTML=truths.map(t=>uiItem(t,'info')).join('');
     $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,25):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
     $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${w.blocks.toFixed(1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
     $('anchorBody').innerHTML=(model.publicAnchors||[]).map(a=>`<tr><td>${a.name}</td><td class="mono">${short(a.address,10,8)}</td><td>${fmt(a.reserve0,3)}</td><td>${fmt(a.reserve1,3)}</td></tr>`).join('');
-    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${model.v18Promoted[0]&&model.watchTiers[k]==='cold'?short(model.v18Promoted[0],10,8):'—'}</td></tr>`).join('');
+    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v19Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v19Promoted[0],10,8):'—'}</td></tr>`).join('');
   }
   function renderFallback(err){
     const last=loadLastGood(); if(last){ last.v18Thoughts=(last.v18Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]); render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot'; }
@@ -424,10 +486,10 @@
   }
 
   async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); const model=await buildModel(); render(model); saveLastGood(snapshot(model)); state.history=loadHistory(); state.history.push(snapshot(model)); saveHistory(state.history); } catch(err){ console.error(err); renderFallback(err); } finally{ state.syncing=false; } }
-  function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; }
-  function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v18-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v18-bundle.json'; a.click(); }
+  function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; }
+  function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v19-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v19-bundle.json'; a.click(); }
   function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)){ saveHistory(j); } else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
