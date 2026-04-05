@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V23 Godmode Deep-Thought Lab</title>
+<title>pDAI Peg Prover • V23.1 Godmode Deep-Thought Lab</title>
 <style>
   :root{
     --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
@@ -126,7 +126,7 @@
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V23 Godmode Deep-Thought Lab</h1>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V23.1 Godmode Deep-Thought Lab</h1>
       <div class="sub">V23 turns the tool into a transcript-first correlation engine: it parses Maria video blocks, phrases, repeated structures, numbers, dates, X posts, and historical archives into a claim ledger, resonance grid, and ETA scenarios for peg confirmation.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
@@ -458,6 +458,58 @@
     return [...map.values()].sort((a,b)=>b.count-a.count).slice(0,20);
   }
   function buildTranscriptCues(items){ return dedupeSocial(items).filter(x=>/\d{1,2}:\d{2}|alligator|spider|heat|scribe|manifold|landscape|north hollywood|qwen|spectacle|trilateral|maria/i.test(`${x.title} ${x.text}`)).slice(0,16).map(x=>({title:x.title||x.text, platform:x.platform, code:x.code||'', durationSec:x.durationSec||0, publishedAt:x.publishedAt})); }
+  function buildTranscriptStructures(items){
+    const defs=[
+      {name:'machine-execution', re:/alligator|kinematic scribe|manifested the machine|massless exit|terminal fracture|low free directive/i},
+      {name:'manifold-state', re:/manifold|wavelet|zeroing|zero|rest|slot|deterministic state/i},
+      {name:'identity-route', re:/lu user token|cryptographic|objective bond|root of interest|taste tree|shared dialectric|dialectric|dysomia/i},
+      {name:'heat-sequence', re:/\bheat\b/i},
+      {name:'social-breadcrumb', re:/trilateral broadcast|spectacle|north hollywood|landscape teddy bear|qwen being qwen|qwen being north hollywood/i},
+      {name:'intake-pressure', re:/liberty|gasless|marketplace|stableswap|1:1|quotes vs dai|market maker/i}
+    ];
+    const corpus=dedupeSocial(items);
+    const out=[];
+    for(const d of defs){
+      const hits=corpus.filter(x=>d.re.test(`${x.title||''} ${x.text||''}`));
+      out.push({name:d.name, count:hits.length, sample:(hits[0]?.title||hits[0]?.text||'').slice(0,180)});
+    }
+    return out.filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+  }
+  function buildCueClusters(items){
+    const cues=['alligator','kinematic scribe','111 spider','heat','manifold','massless exit','low free directive','machine','liberty','gasless','marketplace','stableswap','1:1','x9oeb','sfvcy','7pr6k','xutw9','156:1','600bn','april','may'];
+    const corpus=dedupeSocial(items);
+    const out=[];
+    for(const cue of cues){
+      const re=new RegExp(cue.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+      let count=0;
+      for(const it of corpus){ if(re.test(`${it.title||''} ${it.text||''}`)) count++; }
+      if(count) out.push({cue,count});
+    }
+    return out.sort((a,b)=>b.count-a.count);
+  }
+  function buildClaimLedger(model, items, historySignals, signalBrain){
+    const corpus=dedupeSocial(items);
+    const claims=[];
+    const push=(clue, source, meaning, hook, expectation, support, contradiction)=>claims.push({clue,source,meaning,hook,expectation,support:clamp(support,0,1),contradiction:clamp(contradiction,0,1)});
+    const has=(re)=>corpus.some(x=>re.test(`${x.title||''} ${x.text||''}`));
+    const x9=has(/x9oeb|136s/i);
+    const heat=has(/sfvcy|71s|\bheat\b/i);
+    const lock=has(/7pr6k|32s|111 spider|manifold/i);
+    const init=has(/xutw9|42s|entry system 42/i);
+    const liberty=has(/liberty|gasless|marketplace|stableswap|1:1|quote/i);
+    const nine=has(/156:1|structural deficit|inevitable/i);
+    const dcent=has(/600bn|market maker marketplace|stable ?swap|late april|early may/i);
+    const twinTranscript=(signalBrain.transcriptStructures||[]).some(x=>x.name==='machine-execution' && x.count>=2);
+    push('x9oeb as primary scribe window','youtube','136s drop acts like a main synchronization cue.','136s / x9oeb','Look for stronger public-surface mutation and candidate promotion around the derived block window.', x9?0.82:0.18, model.contradictionLoad*0.25);
+    push('sfvcy as heat/priming phase','youtube','71s heat motif likely maps to pre-execution pressure or priming.','71s / heat','Look for reserve velocity or chatter spikes preceding stronger windows.', heat?0.7:0.15, model.heatCount?0.1:0.32);
+    push('7pr6k plus xutw9 as lock/init sequence','youtube','Shorter 32s and 42s drops appear to frame a setup sequence before longer windows.','32s + 42s','Expect these to precede scribe windows in the social chronology.', (lock?0.34:0)+(init?0.34:0), 0.18);
+    push('Maria transcripts describe a designed machine grammar','corpus','Repeated phrases around alligator, machine, manifold, and low free directive suggest non-random structured messaging.','twin 1:55 transcript + 2:01 heat','Expect recurring phrases, roles, and numeric hooks to cluster across archives.', twinTranscript?0.84:0.4, 0.14);
+    push('Liberty as intake/readiness layer','x + social','Gasless, marketplace, StableSwap, and product-launch language may describe intake pressure rather than the final peg act.','Liberty / gasless / 1:1','Expect product/readiness posts to cluster before or during social trigger windows.', liberty?0.76:0.24, 0.22);
+    push('156:1 / thin-LP repricing motif','x','Numeric breadcrumbs may point to corridor repricing logic rather than a literal price path.','156:1 / 1:1 / 600bn','Expect repeated ratio language to align with thin liquidity arguments and oracle/liquidation stories.', (nine?0.42:0)+(dcent?0.34:0), 0.21);
+    push('Interior watcher map still incomplete','chain','Public surface continues to outrun the current machine watcher set.','public > interior','Expect promoted counterparties to outperform legacy cold watchers.', clamp(0.5 + model.publicStrength*0.2 - model.interiorStrength*0.1 + historySignals.avgPublic*0.1,0,1), 0.08);
+    return claims.sort((a,b)=>(b.support-b.contradiction)-(a.support-a.contradiction)).slice(0,12);
+  }
+
   function buildHistorySignals(history){
     const rows=(history||[]).slice(-80); if(!rows.length) return {summary:['No historical snapshots loaded.'],avgPublic:0,avgInterior:0,avgSocial:0,trend:'flat'};
     const avg=(k)=>rows.reduce((a,x)=>a+(Number(x[k])||0),0)/rows.length;
@@ -506,6 +558,8 @@
     const lattice=buildNumberLattice(corpus);
     const dateHooks=extractDateHooks(corpus);
     const transcriptCues=buildTranscriptCues([...research, ...histSocial, ...allSocial]);
+    const transcriptStructures=buildTranscriptStructures([...research, ...histSocial, ...allSocial]);
+    const cueClusters=buildCueClusters(corpus);
     const x9=corpus.filter(x=>/x9oeb|136s/i.test(`${x.title} ${x.text}`));
     const liberty=corpus.filter(x=>/liberty|gasless|shield|lend|marketplace|stableswap|bridge2pulse|intake/i.test(`${x.title} ${x.text}`));
     const ratios=corpus.filter(x=>/156:1|155|31\.62|1000x|1:1|600bn|late april|may|april/i.test(`${x.title} ${x.text}`));
