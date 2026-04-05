@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V16 Resilient Social-Correlation Engine</title>
+<title>pDAI Peg Prover • V17 Multi-Platform Correlation Engine</title>
 <style>
 :root{--bg:#070b12;--panel:#0f1724;--panel2:#121d2b;--line:#22364f;--text:#eef7ff;--muted:#93a6b8;--cyan:#55c7ff;--green:#66ffb3;--amber:#ffcf66;--red:#ff7373;--violet:#b696ff;--pink:#ff7bd7;--radius:18px;--shadow:0 10px 30px rgba(0,0,0,.28)}
 *{box-sizing:border-box} html,body{margin:0;padding:0;background:radial-gradient(circle at top,#0f1b2c 0%,var(--bg) 44%,#05070c 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -38,7 +38,7 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
 <div class="app">
   <div class="panel top">
     <div>
-      <h1 class="title"><span>pDAI Peg Prover</span> • V16 Resilient Social-Correlation Engine</h1>
+      <h1 class="title"><span>pDAI Peg Prover</span> • V17 Multi-Platform Correlation Engine</h1>
       <div class="sub">V15 treats the Maria channel as a primary synchronization layer. Every cycle it harvests channel activity, derives duration → block windows, fires chain probes, records thoughts and actions, and exports an auditable trail. No legacy wrappers, no stale version drift.</div>
       <div class="row" style="margin-top:12px">
         <span class="pill good">Social clues = first-class input</span>
@@ -65,7 +65,7 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
   </div>
 
   <div id="settingsBox" class="panel section settings">
-    <div class="label">V15 settings</div>
+    <div class="label">V17 settings</div>
     <div class="grid4">
       <div class="field"><label class="small">Private RPC</label><input id="sPrivateRpc" placeholder="https://..." /></div>
       <div class="field"><label class="small">Auto refresh ms</label><input id="sAutoRefresh" placeholder="45000" /></div>
@@ -75,6 +75,9 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
       <div class="field"><label class="small">Videos URL</label><input id="sVideosUrl" /></div>
       <div class="field"><label class="small">Streams URL</label><input id="sStreamsUrl" /></div>
       <div class="field"><label class="small">Shorts URL</label><input id="sShortsUrl" /></div>
+      <div class="field"><label class="small">X bearer token</label><input id="sXBearer" placeholder="Bearer token for official X API" /></div>
+      <div class="field"><label class="small">X recent-search query</label><input id="sXQuery" placeholder='(pDAI OR "$pDAI") -is:retweet' /></div>
+      <div class="field"><label class="small">X accounts to watch</label><input id="sXAccounts" placeholder="NineIronCapital,handle2" /></div>
     </div>
     <div class="grid2" style="margin-top:10px">
       <div class="field"><label class="small">Manual social memory (one per line: ISO_DATETIME | title | url)</label><textarea id="sManualSocial"></textarea></div>
@@ -89,7 +92,7 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
 
   <div class="panel section">
     <div class="grid6">
-      <div class="card"><div class="label">V16 score</div><div id="mScore" class="value">—</div><div class="hint">weighted by surface truth, interior truth, social sync, and contradictions</div></div>
+      <div class="card"><div class="label">V17 score</div><div id="mScore" class="value">—</div><div class="hint">weighted by surface truth, interior truth, social sync, and contradictions</div></div>
       <div class="card"><div class="label">Regime</div><div id="mRegime" class="value">—</div><div class="hint">current best description</div></div>
       <div class="card"><div class="label">5EF7 pDAI</div><div id="m5ef7" class="value">—</div><div class="hint">structural core watcher</div></div>
       <div class="card"><div class="label">Social delta</div><div id="mSocialDelta" class="value">—</div><div class="hint">new channel/manual items this cycle</div></div>
@@ -147,10 +150,10 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
 </div>
 <script>
 (() => {
-  const VERSION = 'V16';
-  const STORAGE_KEY = 'pdai-peg-prover-v16-settings';
-  const HISTORY_KEY = 'pdai-peg-prover-v16-history';
-  const CORPUS_KEY = 'pdai-peg-prover-v16-corpus';
+  const VERSION = 'V17';
+  const STORAGE_KEY = 'pdai-peg-prover-v17-settings';
+  const HISTORY_KEY = 'pdai-peg-prover-v17-history';
+  const CORPUS_KEY = 'pdai-peg-prover-v17-corpus';
   const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
   const EIP1967_SLOT = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
   const NULL32 = '0x' + '0'.repeat(64);
@@ -161,6 +164,7 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
     videosUrl:'https://www.youtube.com/@%E9%9D%88%E8%84%85%E7%94%A8/videos',
     streamsUrl:'https://www.youtube.com/@%E9%9D%88%E8%84%85%E7%94%A8/streams',
     shortsUrl:'https://www.youtube.com/@%E9%9D%88%E8%84%85%E7%94%A8/shorts',
+    xBearer:'', xQuery:'(pDAI OR "$pDAI" OR "pDAI" OR pdai OR "$pdai") -is:retweet', xAccounts:'NineIronCapital', xMaxResults:25,
     manualSocial:'', notes:'',
     rpcs:['https://pulsechain-rpc.publicnode.com','https://rpc.pulsechain.com','https://rpc.pulsechainrpc.com','https://pulsechain.rpc.thirdweb.com','https://rpc-pulsechain.g4mm4.io'],
     token:'0x6B175474E89094C44Da98b954EedeAC495271d0F',
@@ -197,11 +201,11 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
   function loadJSON(key, fallback){ try{ const x = JSON.parse(localStorage.getItem(key)||'null'); return x ?? fallback; } catch { return fallback; } }
   function saveJSON(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
   function loadSettings(){
-    const legacy = Object.assign({}, loadJSON('pdai-peg-prover-v15-settings', {}), loadJSON(STORAGE_KEY, {}));
+    const legacy = Object.assign({}, loadJSON('pdai-peg-prover-v15-settings', {}), loadJSON('pdai-peg-prover-v16-settings', {}), loadJSON(STORAGE_KEY, {}));
     return Object.assign({}, DEFAULTS, legacy);
   }
   function saveSettings(){ saveJSON(STORAGE_KEY, state.settings); }
-  function loadHistory(){ const v16 = loadJSON(HISTORY_KEY, []); const v15 = loadJSON('pdai-peg-prover-v15-history', []); return [...(Array.isArray(v15)?v15:[]), ...(Array.isArray(v16)?v16:[])].slice(-250); }
+  function loadHistory(){ const v17 = loadJSON(HISTORY_KEY, []); const v16 = loadJSON('pdai-peg-prover-v16-history', []); const v15 = loadJSON('pdai-peg-prover-v15-history', []); return [...(Array.isArray(v15)?v15:[]), ...(Array.isArray(v16)?v16:[]), ...(Array.isArray(v17)?v17:[])].slice(-300); }
   function saveHistory(hist){ saveJSON(HISTORY_KEY, hist.slice(-250)); }
   function loadLastGood(){ return loadJSON(CORPUS_KEY+'-lastgood', null); }
   function saveLastGood(x){ saveJSON(CORPUS_KEY+'-lastgood', x); }
@@ -232,23 +236,48 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
   function extractCode(title){ const m=String(title||'').match(/\b([a-z0-9]{5})\b/i); return m ? m[1].toLowerCase() : ''; }
   async function fetchTextWithFallbacks(urls){ let lastErr; for(const u of urls){ try{ const res=await fetchWithTimeout(u, {}, 10000); if(!res.ok) throw new Error('HTTP '+res.status); return await res.text(); } catch(err){ lastErr=err; } } throw lastErr || new Error('fetch failed'); }
   async function harvestSocial(){
-    const out=[]; const feed = 'https://www.youtube.com/feeds/videos.xml?channel_id='+encodeURIComponent(state.settings.channelId);
+    const out=[]; const errors=[];
+    const feed = 'https://www.youtube.com/feeds/videos.xml?channel_id='+encodeURIComponent(state.settings.channelId);
     const urls = [feed, 'https://api.allorigins.win/raw?url='+encodeURIComponent(feed), 'https://r.jina.ai/http://www.youtube.com/feeds/videos.xml?channel_id='+encodeURIComponent(state.settings.channelId)];
-    let harvestError='';
     try{
       const xml = await fetchTextWithFallbacks(urls);
       const doc = new DOMParser().parseFromString(xml, 'text/xml');
       const entries=[...doc.querySelectorAll('entry')];
-      for(const e of entries){ const id=e.querySelector('videoId')?.textContent?.trim() || e.querySelector('id')?.textContent?.trim() || ''; const title=e.querySelector('title')?.textContent?.trim() || ''; const link=e.querySelector('link')?.getAttribute('href') || (id ? 'https://www.youtube.com/watch?v='+id : ''); const publishedAt=e.querySelector('published')?.textContent?.trim() || e.querySelector('updated')?.textContent?.trim() || ''; out.push({ id, title, link, publishedAt, kind: link.includes('/shorts/') ? 'short' : 'video', source:'yt-feed', durationSec:parseDurationSec(title), phase:phaseGuess(title), code:extractCode(title) }); }
-    } catch(err){ harvestError=err.message||String(err); }
-    const manual = parseManualSocial(state.settings.manualSocial).map(x=>({ ...x, durationSec:parseDurationSec(x.title), phase:phaseGuess(x.title), code:extractCode(x.title) }));
+      for(const e of entries){ const id=e.querySelector('videoId')?.textContent?.trim() || e.querySelector('id')?.textContent?.trim() || ''; const title=e.querySelector('title')?.textContent?.trim() || ''; const link=e.querySelector('link')?.getAttribute('href') || (id ? 'https://www.youtube.com/watch?v='+id : ''); const publishedAt=e.querySelector('published')?.textContent?.trim() || e.querySelector('updated')?.textContent?.trim() || ''; out.push({ id, title, text:title, link, publishedAt, kind: link.includes('/shorts/') ? 'short' : 'video', platform:'youtube', source:'yt-feed', durationSec:parseDurationSec(title), phase:phaseGuess(title), code:extractCode(title) }); }
+    } catch(err){ errors.push('youtube: '+(err.message||String(err))); }
+
+    const manual = parseManualSocial(state.settings.manualSocial).map(x=>({ ...x, text:x.title, platform:'manual', source:'manual', durationSec:parseDurationSec(x.title), phase:phaseGuess(x.title), code:extractCode(x.title) }));
+
+    const xBearer = (state.settings.xBearer||'').trim();
+    if(xBearer){
+      const baseQueries = [];
+      if((state.settings.xQuery||'').trim()) baseQueries.push((state.settings.xQuery||'').trim());
+      const handles = (state.settings.xAccounts||'').split(',').map(s=>s.trim().replace(/^@/,'')).filter(Boolean);
+      for(const h of handles){ baseQueries.push(`from:${h} (pDAI OR "$pDAI" OR pdai OR "$pdai") -is:retweet`); }
+      const uniqQ=[...new Set(baseQueries)];
+      for(const q of uniqQ.slice(0,6)){
+        try{
+          const url = 'https://api.x.com/2/tweets/search/recent?max_results='+encodeURIComponent(String(state.settings.xMaxResults||25))+'&tweet.fields=created_at,text,author_id,public_metrics&expansions=author_id&user.fields=username,name&query='+encodeURIComponent(q);
+          const json = await fetchJSON(url,{headers:{'Authorization':'Bearer '+xBearer,'accept':'application/json'}},10000);
+          const users = new Map((json.includes?.users||[]).map(u=>[u.id,u]));
+          for(const t of (json.data||[])){
+            const u = users.get(t.author_id)||{};
+            const cleanText=(t.text||'').replace(/\s+/g,' ').trim();
+            out.push({ id:t.id, title:cleanText.slice(0,180), text:cleanText, link:'https://x.com/i/web/status/'+t.id, publishedAt:t.created_at||'', kind:'x-post', platform:'x', source:'x-api', author:u.username?('@'+u.username):'', durationSec:parseDurationSec(cleanText), phase:phaseGuess(cleanText), code:extractCode(cleanText), query:q, metrics:t.public_metrics||{} });
+          }
+        } catch(err){ errors.push('x: '+(err.message||String(err))); }
+      }
+    } else {
+      errors.push('x: no bearer token');
+    }
+
     let merged=[...out,...manual].filter(x=>x.title || x.link);
     const cached = loadJSON(CORPUS_KEY+'-social-cache', []);
     if(!merged.length && Array.isArray(cached) && cached.length) merged = cached;
     const uniq=new Map(); for(const item of merged){ uniq.set(item.id || item.link || item.title, item); }
     const finalItems=[...uniq.values()].sort((a,b)=>(new Date(b.publishedAt||0)-new Date(a.publishedAt||0)));
-    if(finalItems.length) saveJSON(CORPUS_KEY+'-social-cache', finalItems.slice(0,100));
-    return { items: finalItems, error: harvestError };
+    if(finalItems.length) saveJSON(CORPUS_KEY+'-social-cache', finalItems.slice(0,250));
+    return { items: finalItems, error: errors.filter(Boolean).join(' • ') };
   }
   function deriveWindow(item){ const duration = item.durationSec || 0; const blocks = duration ? duration / Math.max(1, Number(state.settings.blockSec)||10) : 0; return { durationSec:duration, blockWindow:blocks ? Math.round(blocks*10)/10 : 0 } }
   function socialDelta(items, priorIds){ const ids = new Set(priorIds||[]); return items.filter(x => x.id && !ids.has(x.id)); }
@@ -277,7 +306,7 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
     arr.push({kind:'payload-sniff',status:'ok',findings:model.payloadHits.length ? model.payloadHits.map(p=>`${p.note} @ block ${p.block}`) : ['no recent payload motifs around hottest anchor']});
     return arr;
   }
-  function buildBrief(model){ return `${VERSION} regime: ${model.regime}\nScore: ${model.score.toFixed(1)}\nPublic vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}\nHot watcher: ${model.hotWatcher || 'none'}\nSocial delta: ${model.newSocial.length}\nThoughts: ${model.v15Thoughts.join(' | ')}\nActions: ${model.v15Actions.map(a=>a.kind+': '+a.findings.join(' ; ')).join(' | ')}\nPromoted: ${model.promoted.length ? model.promoted.join(', ') : 'none'}`; }
+  function buildBrief(model){ return `${VERSION} regime: ${model.regime}\nScore: ${model.score.toFixed(1)}\nPublic vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}\nHot watcher: ${model.hotWatcher || 'none'}\nSocial delta: ${model.newSocial.length} (X ${model.platformCounts.x||0} / YT ${model.platformCounts.youtube||0})\nThoughts: ${model.v17Thoughts.join(' | ')}\nActions: ${model.v17Actions.map(a=>a.kind+': '+a.findings.join(' ; ')).join(' | ')}\nPromoted: ${model.promoted.length ? model.promoted.join(', ') : 'none'}`; }
   async function buildModel(){
     const latestBlock=await blockNumber();
     const primary = await Promise.allSettled([
@@ -292,6 +321,7 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
     const dnaRaw = primary[5].status==='fulfilled' ? primary[5].value : NULL32;
     const socialRes = primary[6].status==='fulfilled' ? primary[6].value : {items: loadJSON(CORPUS_KEY+'-social-cache', []), error: primary[6].reason?.message || 'social unavailable'};
     const socialItems = socialRes.items || [];
+    const platformCounts = socialItems.reduce((a,x)=>{ const k=x.platform||'other'; a[k]=(a[k]||0)+1; return a; }, {});
     const seen=loadSeenSocialIds();
     const newSocial=socialDelta(socialItems, seen);
     saveSeenSocialIds(socialItems.map(x=>x.id).filter(Boolean));
@@ -313,22 +343,22 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
     const regime = publicStrength>interiorStrength+0.15 ? 'surface-leading' : interiorStrength>publicStrength ? 'interior-awakening' : 'mixed';
     const latestSocial = (newSocial[0] || socialItems[0] || null);
     const model={ latestBlock, total:units(totalRaw,tokenDec), burned:units(burnRaw,tokenDec), heatCount:0, publicStrength, interiorStrength, contradictionLoad, anchors, nodeBalances, slotProbe, dnaProbe, socialItems, newSocial, latestSocial, counterparties, coldWatchers, promoted, payloadHits, hotWatcher, regime, socialError:socialRes.error||'', stale:false };
-    model.v15Goal = latestSocial ? `Correlate ${latestSocial.code || latestSocial.phase || 'new channel drop'} to chain activity and either promote a live candidate or falsify the window.` : 'Keep channel as primary sync layer and bridge the live public surface to a better interior watcher map.';
-    model.v15Thoughts = buildThoughts(model);
-    model.v15Actions = buildActions(model);
+    model.v17Goal = latestSocial ? `Correlate ${latestSocial.code || latestSocial.phase || 'new channel drop'} to chain activity and either promote a live candidate or falsify the window.` : 'Keep channel as primary sync layer and bridge the live public surface to a better interior watcher map.';
+    model.v17Thoughts = buildThoughts(model);
+    model.v17Actions = buildActions(model);
     model.score = clamp(100*(0.38*publicStrength + 0.24*interiorStrength + 0.18*(newSocial.length?1:0.25) + 0.08*(promoted.length?1:0) + 0.12*(1-contradictionLoad)),0,100);
-    model.v15Brief = buildBrief(model);
+    model.v17Brief = buildBrief(model);
     return model;
   }
   function renderList(id, rows, cls){ if(!rows.length){ $(id).innerHTML='<div class="small">none</div>'; return; } $(id).innerHTML=rows.map(r=>`<div class="bubble ${cls}">${r}</div>`).join(''); }
-  function render(model){ $('syncStatus').textContent = model.newSocial.length ? 'social delta' : 'synced'; $('syncStatus').className='status '+(model.newSocial.length?'good':'info'); $('lastSync').textContent='Last sync: '+new Date().toLocaleString(); $('historyInfo').textContent='History: '+state.history.length+' local'; $('socialInfo').textContent=`Social: ${model.socialItems.length} harvested / ${model.newSocial.length} new${model.socialError?` • degraded`:''}${model.stale?` • stale`:''}`;
+  function render(model){ $('syncStatus').textContent = model.newSocial.length ? 'social delta' : 'synced'; $('syncStatus').className='status '+(model.newSocial.length?'good':'info'); $('lastSync').textContent='Last sync: '+new Date().toLocaleString(); $('historyInfo').textContent='History: '+state.history.length+' local'; $('socialInfo').textContent=`Social: ${model.socialItems.length} harvested / ${model.newSocial.length} new / ${model.platformCounts.x||0} X / ${model.platformCounts.youtube||0} YT${model.socialError?` • degraded`:''}${model.stale?` • stale`:''}`;
     $('mScore').textContent=model.score.toFixed(1); $('mRegime').textContent=model.regime; $('m5ef7').textContent=compact(model.nodeBalances['5EF7']?.pdai||0,3); $('mSocialDelta').textContent=String(model.newSocial.length); $('mLayers').textContent=`${pct(model.publicStrength)} / ${pct(model.interiorStrength)}`; $('mContradiction').textContent=pct(model.contradictionLoad);
-    const bubbles=[]; model.v15Thoughts.forEach(x=>bubbles.push(`<div class="bubble thought">💭 ${esc(x)}</div>`)); model.v15Actions.forEach(a=>bubbles.push(`<div class="bubble action">⚙️ <strong>${esc(a.kind)}</strong>: ${esc(a.findings.join(' | '))}</div>`)); if(model.latestSocial) bubbles.unshift(`<div class="bubble social">📡 Latest channel sync: ${esc(model.latestSocial.title)}</div>`); $('thoughtBubbles').innerHTML=bubbles.join('');
-    $('goalText').textContent=model.v15Goal; $('briefText').textContent=model.v15Brief; $('kvHot').textContent=model.hotWatcher||'—'; $('kvSocial').textContent=model.latestSocial ? short(model.latestSocial.title,26,0) : 'none'; $('kvBlocks').textContent=model.latestSocial ? deriveWindow(model.latestSocial).blockWindow.toString() : '—'; $('kvPromoted').textContent=model.promoted.length?String(model.promoted.length):'0';
-    renderList('actionList', model.v15Actions.map(a=>`<strong>${a.kind}</strong><br>${a.findings.join('<br>')}`), 'action');
+    const bubbles=[]; model.v17Thoughts.forEach(x=>bubbles.push(`<div class="bubble thought">💭 ${esc(x)}</div>`)); model.v17Actions.forEach(a=>bubbles.push(`<div class="bubble action">⚙️ <strong>${esc(a.kind)}</strong>: ${esc(a.findings.join(' | '))}</div>`)); if(model.latestSocial) bubbles.unshift(`<div class="bubble social">📡 Latest channel sync: ${esc(model.latestSocial.title)}</div>`); $('thoughtBubbles').innerHTML=bubbles.join('');
+    $('goalText').textContent=model.v17Goal; $('briefText').textContent=model.v17Brief; $('kvHot').textContent=model.hotWatcher||'—'; $('kvSocial').textContent=model.latestSocial ? short(model.latestSocial.title,26,0) : 'none'; $('kvBlocks').textContent=model.latestSocial ? deriveWindow(model.latestSocial).blockWindow.toString() : '—'; $('kvPromoted').textContent=model.promoted.length?String(model.promoted.length):'0';
+    renderList('actionList', model.v17Actions.map(a=>`<strong>${a.kind}</strong><br>${a.findings.join('<br>')}`), 'action');
     renderList('promotedList', model.promoted.length ? model.promoted.map(a=>`${short(a,12,8)}`) : ['none'], 'result');
     const contradictions=[]; if(model.slotProbe.allZero&&model.slotProbe.equal) contradictions.push('Candidate slots are equal only because both are zero.'); if(!model.dnaProbe.implAddress) contradictions.push('DNA slot is empty / zero.'); if(model.coldWatchers.length) contradictions.push('Cold watcher set: '+model.coldWatchers.join(', ')); renderList('contradictionList', contradictions, 'result');
-    $('socialBody').innerHTML = model.socialItems.length ? model.socialItems.slice(0,12).map(item=>{ const w=deriveWindow(item); const isNew=model.newSocial.some(n=>n.id===item.id); return `<tr><td>${item.publishedAt?esc(new Date(item.publishedAt).toLocaleString()):'—'}</td><td>${esc(item.kind||'video')}</td><td>${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">${esc(item.title)}</a>`:esc(item.title)}</td><td>${item.durationSec||'—'}s</td><td>${esc(item.phase||'observe')}</td><td>${w.blockWindow?esc(String(w.blockWindow))+' blk':''}</td><td>${isNew?'<span class="tag good">new</span>':'<span class="tag">seen</span>'}</td></tr>`; }).join('') : '<tr><td colspan="7" class="small">No social items yet.</td></tr>';
+    $('socialBody').innerHTML = model.socialItems.length ? model.socialItems.slice(0,12).map(item=>{ const w=deriveWindow(item); const isNew=model.newSocial.some(n=>n.id===item.id); return `<tr><td>${item.publishedAt?esc(new Date(item.publishedAt).toLocaleString()):'—'}</td><td>${esc(item.platform||item.kind||'social')}</td><td>${item.link?`<a href="${esc(item.link)}" target="_blank" rel="noopener">${esc(item.title)}</a>`:esc(item.title)}${item.author?`<div class="small">${esc(item.author)}</div>`:''}</td><td>${item.durationSec||'—'}s</td><td>${esc(item.phase||'observe')}</td><td>${w.blockWindow?esc(String(w.blockWindow))+' blk':''}</td><td>${isNew?'<span class="tag good">new</span>':'<span class="tag">seen</span>'}</td></tr>`; }).join('') : '<tr><td colspan="7" class="small">No social items yet.</td></tr>';
     $('anchorsBody').innerHTML = model.anchors.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.role)}</td><td>${a.reserve0!=null?compact(a.reserve0,3):'—'}</td><td>${a.reserve1!=null?compact(a.reserve1,3):'—'}</td><td>${a.error?'<span class="tag bad">error</span>':'<span class="tag">quiet</span>'}</td><td>${a.error?esc(a.error):'live'}</td></tr>`).join('');
     $('watchersBody').innerHTML = state.settings.watchers.map(w=>{ const b=model.nodeBalances[w.label]||{}; const hot=(b.pdai||0)>0 || (b.nonce||0)>0; return `<tr><td>${esc(w.label)}</td><td>${hot?'<span class="tag good">hot</span>':'<span class="tag">cold</span>'}</td><td>${compact(b.pdai||0,3)}</td><td>${b.nonce||0}</td><td>${hot?'active':'idle'}</td></tr>`; }).join('');
     const truths=[
@@ -339,12 +369,12 @@ button{border:none;border-radius:12px;padding:10px 13px;font:inherit;font-weight
       {claim:'Public anchors are measurable',status:model.anchors.length?'verified':'missing',result:model.anchors.map(a=>a.name).join(' | ')}
     ]; $('truthBody').innerHTML = truths.map(t=>`<tr><td>${esc(t.claim)}</td><td><span class="tag ${t.status==='verified'?'good':t.status==='contradiction'?'bad':''}">${esc(t.status)}</span></td><td>${esc(t.result)}</td></tr>`).join('');
   }
-  function snapshot(model){ return { ts:Date.now(), score:model.score, phase:model.regime, rawPhase:model.regime, stablePhase:model.regime, total:model.total, burned:model.burned, heatCount:model.heatCount, publicStrength:model.publicStrength, interiorStrength:model.interiorStrength, contradictionLoad:model.contradictionLoad, slotProbe:model.slotProbe, dnaProbe:model.dnaProbe, watchTiers:Object.fromEntries(state.settings.watchers.map(w=>[w.label, ((model.nodeBalances[w.label]?.pdai||0)>0||(model.nodeBalances[w.label]?.nonce||0)>0)?'hot':'cold'])), publicAnchors:model.anchors, nodeBalances:model.nodeBalances, v15Thoughts:model.v15Thoughts, v15Actions:model.v15Actions, v15Goal:model.v15Goal, v15Brief:model.v15Brief, v15Promoted:model.promoted, socialDeltaCount:model.newSocial.length, newSocial:model.newSocial, harvestedSocial:model.socialItems.slice(0,40) }; }
-  async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); const model=await buildModel(); render(model); state.history=loadHistory(); state.history.push(snapshot(model)); saveHistory(state.history); saveLastGood(snapshot(model)); } catch(err){ const fallback=loadLastGood(); if(fallback){ $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot'; try{ render({ ...fallback, stale:true, anchors:fallback.publicAnchors||[], socialItems:fallback.harvestedSocial||[], newSocial:[], latestSocial:(fallback.harvestedSocial||[])[0]||null, counterparties:[], coldWatchers:Object.entries(fallback.watchTiers||{}).filter(([k,v])=>v==='cold').map(([k])=>k), promoted:fallback.v15Promoted||[], payloadHits:[], hotWatcher:Object.entries(fallback.watchTiers||{}).find(([k,v])=>v==='hot')?.[0]||'5EF7', regime:fallback.phase||'degraded', v15Thoughts:(fallback.v15Thoughts||[]).concat(['Rendered last good snapshot because live sync failed.']), v15Actions:(fallback.v15Actions||[]), socialError:err.message||String(err), total:fallback.total||0, burned:fallback.burned||0, publicStrength:fallback.publicStrength||0, interiorStrength:fallback.interiorStrength||0, contradictionLoad:fallback.contradictionLoad||0, slotProbe:fallback.slotProbe||{values:{},allZero:true,equal:true,summary:'unknown'}, dnaProbe:fallback.dnaProbe||{raw:NULL32,implAddress:''}, nodeBalances:fallback.nodeBalances||{} }); }catch{} } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); } } finally{ state.syncing=false; } }
-  function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sVideosUrl').value=state.settings.videosUrl; $('sStreamsUrl').value=state.settings.streamsUrl; $('sShortsUrl').value=state.settings.shortsUrl; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; }
-  function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||45000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.videosUrl=$('sVideosUrl').value.trim(); state.settings.streamsUrl=$('sStreamsUrl').value.trim(); state.settings.shortsUrl=$('sShortsUrl').value.trim(); state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v15-history.json'; a.click(); URL.revokeObjectURL(a.href); }
-  function exportBundle(){ const bundle={version:VERSION, settings:loadSettings(), history:loadHistory(), corpus:loadJSON(CORPUS_KEY,{})}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v15-bundle.json'; a.click(); URL.revokeObjectURL(a.href); }
+  function snapshot(model){ return { ts:Date.now(), score:model.score, phase:model.regime, rawPhase:model.regime, stablePhase:model.regime, total:model.total, burned:model.burned, heatCount:model.heatCount, publicStrength:model.publicStrength, interiorStrength:model.interiorStrength, contradictionLoad:model.contradictionLoad, slotProbe:model.slotProbe, dnaProbe:model.dnaProbe, watchTiers:Object.fromEntries(state.settings.watchers.map(w=>[w.label, ((model.nodeBalances[w.label]?.pdai||0)>0||(model.nodeBalances[w.label]?.nonce||0)>0)?'hot':'cold'])), publicAnchors:model.anchors, nodeBalances:model.nodeBalances, v17Thoughts:model.v17Thoughts, v17Actions:model.v17Actions, v17Goal:model.v17Goal, v17Brief:model.v17Brief, v17Promoted:model.promoted, socialDeltaCount:model.newSocial.length, newSocial:model.newSocial, harvestedSocial:model.socialItems.slice(0,40) }; }
+  async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); const model=await buildModel(); render(model); state.history=loadHistory(); state.history.push(snapshot(model)); saveHistory(state.history); saveLastGood(snapshot(model)); } catch(err){ const fallback=loadLastGood(); if(fallback){ $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot'; try{ render({ ...fallback, stale:true, anchors:fallback.publicAnchors||[], socialItems:fallback.harvestedSocial||[], newSocial:[], latestSocial:(fallback.harvestedSocial||[])[0]||null, counterparties:[], coldWatchers:Object.entries(fallback.watchTiers||{}).filter(([k,v])=>v==='cold').map(([k])=>k), promoted:fallback.v17Promoted||[], payloadHits:[], hotWatcher:Object.entries(fallback.watchTiers||{}).find(([k,v])=>v==='hot')?.[0]||'5EF7', regime:fallback.phase||'degraded', v17Thoughts:(fallback.v17Thoughts||[]).concat(['Rendered last good snapshot because live sync failed.']), v17Actions:(fallback.v17Actions||[]), socialError:err.message||String(err), total:fallback.total||0, burned:fallback.burned||0, publicStrength:fallback.publicStrength||0, interiorStrength:fallback.interiorStrength||0, contradictionLoad:fallback.contradictionLoad||0, slotProbe:fallback.slotProbe||{values:{},allZero:true,equal:true,summary:'unknown'}, dnaProbe:fallback.dnaProbe||{raw:NULL32,implAddress:''}, nodeBalances:fallback.nodeBalances||{} }); }catch{} } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); } } finally{ state.syncing=false; } }
+  function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sVideosUrl').value=state.settings.videosUrl; $('sStreamsUrl').value=state.settings.streamsUrl; $('sShortsUrl').value=state.settings.shortsUrl; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; }
+  function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||45000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.videosUrl=$('sVideosUrl').value.trim(); state.settings.streamsUrl=$('sStreamsUrl').value.trim(); state.settings.shortsUrl=$('sShortsUrl').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim(); state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync, Math.max(15000,state.settings.autoRefresh)); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v17-history.json'; a.click(); URL.revokeObjectURL(a.href); }
+  function exportBundle(){ const bundle={version:VERSION, settings:loadSettings(), history:loadHistory(), corpus:loadJSON(CORPUS_KEY,{})}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v17-bundle.json'; a.click(); URL.revokeObjectURL(a.href); }
   function importHistoryFile(file){ const fr=new FileReader(); fr.onload=()=>{ try{ const data=JSON.parse(fr.result); const hist=Array.isArray(data)?data:(Array.isArray(data.history)?data.history:[]); const merged=[...loadHistory(), ...hist].sort((a,b)=>(a.ts||0)-(b.ts||0)); saveHistory(merged); state.history=merged; $('historyInfo').textContent='History: '+merged.length+' local'; } catch(err){ alert('Import failed: '+err.message); } }; fr.readAsText(file); }
   $('refreshBtn').onclick=sync; $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open'); $('saveSettingsBtn').onclick=()=>{ pullSettings(); sync(); }; $('resetSettingsBtn').onclick=()=>{ state.settings=JSON.parse(JSON.stringify(DEFAULTS)); saveSettings(); pushSettings(); sync(); }; $('clearHistoryBtn').onclick=()=>{ saveHistory([]); state.history=[]; $('historyInfo').textContent='History: 0 local'; }; $('exportHistoryBtn').onclick=exportHistory; $('exportBundleBtn').onclick=exportBundle; $('importHistoryBtn').onclick=()=>$('historyFile').click(); $('historyFile').onchange=(e)=>{ const f=e.target.files?.[0]; if(f) importHistoryFile(f); e.target.value=''; }; $('copyBriefBtn').onclick=()=>navigator.clipboard.writeText($('briefText').textContent||'');
   state.settings=loadSettings(); pushSettings(); state.history=loadHistory(); $('historyInfo').textContent='History: '+state.history.length+' local'; state.timer=setInterval(sync, Math.max(15000,state.settings.autoRefresh)); sync();
