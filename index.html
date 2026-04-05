@@ -3,75 +3,125 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V19 Social + X Correlator</title>
+<title>pDAI Peg Prover • V20 Peg Reactor</title>
 <style>
   :root{
-    --bg:#071018; --panel:#0e1722; --panel2:#0b1320; --line:#23384b; --text:#e9f4ff; --muted:#8ea6b9;
-    --green:#58ffb9; --cyan:#48c4ff; --amber:#ffcc52; --red:#ff6478; --purple:#b888ff;
+    --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
+    --text:#edf7ff; --muted:#93a8bb; --green:#58ffb9; --cyan:#48c4ff; --amber:#ffcb60; --red:#ff687d; --violet:#bf8bff;
+    --shadow:0 18px 60px rgba(0,0,0,.35), 0 0 60px rgba(72,196,255,.08);
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:radial-gradient(circle at top,#102236 0,#071018 55%,#04080e 100%);color:var(--text)}
-  .wrap{max-width:1600px;margin:0 auto;padding:16px}
-  .panel{background:linear-gradient(180deg,rgba(14,23,34,.96),rgba(8,14,22,.98));border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 14px 40px rgba(0,0,0,.25)}
-  .top{display:grid;grid-template-columns:1.4fr .9fr;gap:14px}
-  .title{font-size:1.7rem;font-weight:900;letter-spacing:.03em;margin:0}
+  body{margin:0;color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;background:radial-gradient(circle at top,var(--bg2) 0,var(--bg) 52%,#02050a 100%);overflow-x:hidden}
+  body:before,body:after{content:"";position:fixed;inset:-20%;pointer-events:none;z-index:-2}
+  body:before{background:
+      radial-gradient(circle at 20% 20%, rgba(72,196,255,.18), transparent 16%),
+      radial-gradient(circle at 80% 12%, rgba(88,255,185,.12), transparent 18%),
+      radial-gradient(circle at 50% 78%, rgba(191,139,255,.10), transparent 20%);
+    filter:blur(22px)}
+  body:after{background-image:
+      radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,.35), transparent),
+      radial-gradient(1px 1px at 120px 80px, rgba(255,255,255,.22), transparent),
+      radial-gradient(2px 2px at 240px 160px, rgba(255,255,255,.22), transparent),
+      radial-gradient(1px 1px at 300px 40px, rgba(255,255,255,.18), transparent);
+    background-size:360px 240px; opacity:.35; animation:drift 40s linear infinite}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-180px)}}
+  @keyframes pulseGlow{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+  @keyframes rotate{to{transform:rotate(360deg)}}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes shimmer{to{background-position:200% 0}}
+
+  .wrap{max-width:1680px;margin:0 auto;padding:18px}
+  .panel{background:linear-gradient(180deg,rgba(13,20,32,.94),rgba(7,12,20,.98));border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+  .top{display:grid;grid-template-columns:1.25fr .95fr;gap:14px}
+  .title{font-size:1.9rem;font-weight:950;letter-spacing:.02em;margin:0}
   .glow{background:linear-gradient(90deg,var(--green),var(--cyan),#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .sub{color:var(--muted);line-height:1.5;margin-top:8px}
+  .sub{color:var(--muted);line-height:1.55;margin-top:10px;max-width:980px}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-  .chip{border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:.78rem;color:var(--muted)}
+  .chip{padding:7px 11px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.03);font-size:.78rem;color:var(--muted)}
   .chip.good{color:var(--green)} .chip.info{color:var(--cyan)} .chip.warn{color:var(--amber)}
-  .status{padding:10px 14px;border-radius:999px;font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;display:inline-block;border:1px solid var(--line)}
+  .status{padding:10px 14px;border-radius:999px;border:1px solid var(--line2);display:inline-block;font-size:.8rem;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
   .ok{color:var(--green)} .warn{color:var(--amber)} .bad{color:var(--red)} .info{color:var(--cyan)}
-  .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-  button{appearance:none;border:1px solid #31516b;background:linear-gradient(180deg,#15314a,#112233);color:var(--text);padding:10px 13px;border-radius:12px;font:inherit;font-weight:750;cursor:pointer}
+  .meta{font-size:.8rem;color:var(--muted);line-height:1.55;text-align:right;margin-top:10px}
+  .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+  button{appearance:none;border:1px solid #31516b;background:linear-gradient(180deg,#173550,#102031);color:var(--text);padding:10px 13px;border-radius:13px;font:inherit;font-weight:750;cursor:pointer}
   button.secondary{background:linear-gradient(180deg,#151d28,#101722);border-color:#273545}
-  .meta{color:var(--muted);font-size:.8rem;line-height:1.5;text-align:right;margin-top:10px}
-  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:14px}
-  .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
-  .value{font-size:1.45rem;font-weight:900;margin-top:8px}
-  .hint{margin-top:8px;color:var(--muted);font-size:.8rem}
-  .hero{display:grid;grid-template-columns:360px 1fr;gap:14px;margin-top:14px}
-  .orb{display:flex;align-items:center;justify-content:center;min-height:360px;position:relative}
-  .ring{width:280px;height:280px;border-radius:50%;background:conic-gradient(from -90deg,var(--green),var(--cyan),var(--purple),var(--green));padding:10px;box-shadow:0 0 35px rgba(72,196,255,.15)}
-  .inner{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 50% 35%,rgba(88,255,185,.12),transparent 18%),#0a1320;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:18px}
-  .score{font-size:3rem;font-weight:1000;line-height:1}
-  .scoreSub{font-size:.95rem;font-weight:800;margin-top:8px}
-  .scoreHint{font-size:.82rem;color:var(--muted);margin-top:8px}
-  .parts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-  .part{border:1px solid var(--line);border-radius:14px;padding:10px;background:rgba(255,255,255,.02)}
-  .part .k{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}.part .v{margin-top:6px;font-weight:800}
-  .lists{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
-  .boxTitle{font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
-  .item{padding:10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);font-size:.85rem;line-height:1.45;margin-bottom:8px}
-  .item.good{border-color:rgba(88,255,185,.3)} .item.warn{border-color:rgba(255,204,82,.3)} .item.bad{border-color:rgba(255,100,120,.3)}
-  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+
   .settings{display:none;margin-top:14px}.settings.open{display:block}
   .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
   .field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
   input,textarea,select{width:100%;padding:10px 12px;border-radius:12px;background:#08111a;color:var(--text);border:1px solid var(--line);font:inherit}
   textarea{min-height:84px;resize:vertical}
+
+  .metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:14px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:20px;padding:14px}
+  .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+  .value{font-size:1.55rem;font-weight:950;margin-top:9px;line-height:1.1}
+  .hint{margin-top:8px;color:var(--muted);font-size:.82rem;line-height:1.45}
+
+  .hero{display:grid;grid-template-columns:420px 1fr;gap:14px;margin-top:14px}
+  .reactor{min-height:470px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .reactor:before,.reactor:after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+  .reactor:before{width:460px;height:460px;background:radial-gradient(circle, rgba(72,196,255,.09), transparent 58%);filter:blur(10px);animation:pulseGlow 6s ease-in-out infinite}
+  .reactor:after{width:580px;height:580px;border:1px dashed rgba(72,196,255,.15);animation:rotate 24s linear infinite}
+  .pegReactor{position:relative;width:320px;height:320px;border-radius:50%;padding:14px;background:conic-gradient(from -90deg,var(--green),var(--cyan),var(--violet),var(--green));box-shadow:0 0 50px rgba(72,196,255,.18);animation:rotate 18s linear infinite reverse}
+  .pegReactor:before{content:"";position:absolute;inset:14px;border-radius:50%;background:conic-gradient(from -90deg,
+      rgba(88,255,185,.24) 0 calc(var(--peg)*1%),
+      rgba(255,255,255,.04) calc(var(--peg)*1%) 100%);
+      mask:radial-gradient(circle at center, transparent 57%, #000 58%);
+      -webkit-mask:radial-gradient(circle at center, transparent 57%, #000 58%)}
+  .pegCore{position:absolute;inset:48px;border-radius:50%;border:1px solid var(--line2);background:radial-gradient(circle at 50% 35%, rgba(88,255,185,.15), transparent 16%), radial-gradient(circle at center, #0e1724 0, #08111a 70%);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:18px;box-shadow:inset 0 0 35px rgba(255,255,255,.03)}
+  .score{font-size:3.2rem;font-weight:1000;line-height:1}
+  .scoreSub{font-size:1rem;font-weight:850;margin-top:8px;text-transform:uppercase;letter-spacing:.08em}
+  .scoreHint{font-size:.84rem;color:var(--muted);margin-top:8px}
+  .orbit{position:absolute;inset:0;animation:rotate 14s linear infinite}
+  .nodeDot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 16px currentColor}
+  .nodeDot.a{top:18px;left:50%;transform:translateX(-50%);color:var(--green)}
+  .nodeDot.b{right:36px;top:95px;color:var(--cyan)}
+  .nodeDot.c{right:60px;bottom:72px;color:var(--amber)}
+  .nodeDot.d{left:42px;bottom:90px;color:var(--violet)}
+  .nodeDot.e{left:28px;top:110px;color:var(--red)}
+
+  .heroRight{display:grid;grid-template-rows:auto auto auto;gap:12px}
+  .summary{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}
+  .briefPanel{position:relative;overflow:hidden}
+  .briefPanel:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);background-size:200% 100%;animation:shimmer 8s linear infinite;pointer-events:none}
+  .thinkingLane{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+  .thoughtCol{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.02)}
+  .thoughtCol h4{margin:0 0 10px;font-size:.8rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+  .item{padding:10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);font-size:.85rem;line-height:1.45;margin-bottom:8px}
+  .item.good{border-color:rgba(88,255,185,.28)} .item.warn{border-color:rgba(255,203,96,.28)} .item.bad{border-color:rgba(255,104,125,.28)} .item.info{border-color:rgba(72,196,255,.28)}
+  .bubbles{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .bubble{max-width:360px;padding:11px 13px;border-radius:18px;background:linear-gradient(180deg,#142233,#0e1722);border:1px solid #38516a;font-size:.84rem;line-height:1.4;position:relative;animation:floaty 4s ease-in-out infinite}
+  .bubble:after{content:"";position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:#203247}
+  .bubble:nth-child(2){animation-delay:.4s}.bubble:nth-child(3){animation-delay:.8s}
+
+  .progressBoard{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+  .milestone{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.02);position:relative;overflow:hidden}
+  .milestone.active{border-color:rgba(88,255,185,.35);box-shadow:0 0 18px rgba(88,255,185,.08) inset}
+  .milestone.active:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(88,255,185,.08),transparent);background-size:200% 100%;animation:shimmer 3s linear infinite}
+  .mileK{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
+  .mileV{margin-top:7px;font-weight:850}
+
+  .lists{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+  .boxTitle{font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
   .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:10px}
   table{width:100%;border-collapse:collapse;min-width:980px} th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;font-size:.82rem;vertical-align:top} th{position:sticky;top:0;background:#0d1621;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:.68rem}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  .tag{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);font-size:.72rem}
-  .thinking{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .bubble{max-width:420px;padding:10px 12px;border-radius:16px;background:linear-gradient(180deg,#142233,#0e1722);border:1px solid #38516a;font-size:.84rem;line-height:1.4;position:relative}
-  .bubble:after{content:"";position:absolute;left:18px;bottom:-8px;border:8px solid transparent;border-top-color:#203247}
-  .small{font-size:.8rem;color:var(--muted)}
-  @media (max-width:1200px){.top,.hero,.lists,.twocol,.form,.grid4,.parts{grid-template-columns:1fr}} 
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.small{font-size:.8rem;color:var(--muted)} .tag{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);font-size:.72rem}
+
+  @media (max-width:1300px){.top,.hero,.summary,.lists,.twocol,.form,.metrics,.thinkingLane,.progressBoard{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V19 Social + X Correlator</h1>
-      <div class="sub">V19 treats YouTube + X profiles + X search + manual memory as the social sync layer, PulseChain as the execution layer, and correlates both every cycle. It degrades gracefully when one social path fails instead of killing chain sync.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V20 Peg Reactor</h1>
+      <div class="sub">V20 turns the current tool into a visual peg reactor. It treats Maria + X + manual social memory as a primary synchronization layer, PulseChain as the execution layer, and organizes its mind into observations, hypotheses, contradictions, and next probes every cycle.</div>
       <div class="chips">
-        <div class="chip good">5EF7 stays priority structural core</div>
-        <div class="chip info">Maria + X profiles are first-class inputs</div>
-        <div class="chip warn">null-null slots are contradiction, not proof</div>
+        <div class="chip good">Peg progress is evidence-weighted</div>
+        <div class="chip info">YouTube + X + manual memory merged</div>
+        <div class="chip warn">Null-null slots never count as proof</div>
       </div>
     </div>
     <div>
@@ -82,7 +132,7 @@
         <div id="socialMeta">Social: —</div>
         <div id="historyMeta">History: —</div>
       </div>
-      <div class="btns" style="margin-top:12px">
+      <div class="btns">
         <button id="refreshBtn">Refresh now</button>
         <button id="settingsBtn" class="secondary">Settings</button>
         <button id="importBtn" class="secondary">Import history</button>
@@ -94,7 +144,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V19 settings</div>
+    <div class="boxTitle">V20 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -102,11 +152,10 @@
       <div class="field"><label>Seconds per block</label><input id="sBlockSec" value="10.2" /></div>
       <div class="field"><label>YouTube channel ID</label><input id="sChannelId" value="UC0ADdeCTOW9Qlai7G3kLLFg" /></div>
       <div class="field"><label>Social proxy URL</label><input id="sSocialProxy" placeholder="optional proxy endpoint" /></div>
-      <div class="field"><label>X bearer token</label><input id="sXBearer" placeholder="optional X bearer (browser use may fail)" /></div>
-      <div class="field"><label>X recent-search query</label><input id="sXQuery" value='(pDAI OR "$pDAI" OR pdai OR "$pdai") -is:retweet' /></div>
+      <div class="field"><label>X bearer token</label><input id="sXBearer" placeholder="optional X bearer" /></div>
+      <div class="field"><label>X recent-search query</label><input id="sXQuery" value='(pDAI OR "$pDAI" OR pdai OR "$pdai" OR LibertySwap OR #pDAI OR #PulseChain) -is:retweet' /></div>
       <div class="field"><label>Tracked X accounts</label><input id="sXAccounts" value="LibertySwapFi,NineIronCapital,DcentraliseMe,RichardHeartWin,TheGreekGod11,files_dirty" /></div>
-      <div class="field"><label>X proxy / Nitter base URLs</label><textarea id="sXMirrors" placeholder="https://nitter.net
-https://xcancel.com"></textarea></div>
+      <div class="field"><label>X mirror / Nitter base URLs</label><textarea id="sXMirrors" placeholder="https://nitter.net&#10;https://xcancel.com"></textarea></div>
       <div class="field"><label>Manual social JSON / lines</label><textarea id="sManualSocial" placeholder='[{"title":"...","publishedAt":"2026-04-01T00:00:00Z","platform":"x"}] or one line per clue'></textarea></div>
       <div class="field"><label>Notes</label><textarea id="sNotes" placeholder="optional notes"></textarea></div>
     </div>
@@ -117,58 +166,68 @@ https://xcancel.com"></textarea></div>
     </div>
   </div>
 
-  <div class="grid4">
-    <div class="card"><div class="label">V19 score</div><div class="value" id="mScore">—</div><div class="hint">Correlation quality</div></div>
-    <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Current machine picture</div></div>
+  <div class="metrics">
+    <div class="card"><div class="label">V20 score</div><div class="value" id="mScore">—</div><div class="hint">Correlation quality</div></div>
+    <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Machine picture</div></div>
+    <div class="card"><div class="label">Peg progress</div><div class="value" id="mPeg">—</div><div class="hint">Evidence-weighted, not price-weighted</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
     <div class="card"><div class="label">Hot watcher</div><div class="value" id="mHot">—</div><div class="hint">Strongest live node</div></div>
+    <div class="card"><div class="label">Promoted</div><div class="value" id="mPromoted">—</div><div class="hint">Candidate discovery count</div></div>
   </div>
 
   <div class="panel hero">
-    <div class="orb">
-      <div class="ring"><div class="inner">
-        <div class="label">Correlation score</div>
-        <div class="score" id="heroScore">0.0</div>
-        <div class="scoreSub" id="heroPhase">—</div>
-        <div class="scoreHint" id="heroHint">—</div>
-      </div></div>
-    </div>
-    <div>
-      <div class="card">
-        <div class="label">V19 verdict</div>
-        <div class="value" id="verdict">—</div>
-        <div class="hint" id="brief">—</div>
-        <div class="parts" style="margin-top:12px">
-          <div class="part"><div class="k">Public</div><div class="v" id="pPublic">—</div></div>
-          <div class="part"><div class="k">Interior</div><div class="v" id="pInterior">—</div></div>
-          <div class="part"><div class="k">Contradiction</div><div class="v" id="pContradiction">—</div></div>
-          <div class="part"><div class="k">New social</div><div class="v" id="pNewSocial">—</div></div>
-          <div class="part"><div class="k">Windows</div><div class="v" id="pWindows">—</div></div>
-          <div class="part"><div class="k">Promoted</div><div class="v" id="pPromoted">—</div></div>
+    <div class="reactor">
+      <div class="pegReactor" id="pegReactor" style="--peg:0">
+        <div class="orbit">
+          <div class="nodeDot a"></div><div class="nodeDot b"></div><div class="nodeDot c"></div><div class="nodeDot d"></div><div class="nodeDot e"></div>
+        </div>
+        <div class="pegCore">
+          <div class="label">Peg progress</div>
+          <div class="score" id="heroPeg">0.0</div>
+          <div class="scoreSub" id="heroPhase">—</div>
+          <div class="scoreHint" id="heroHint">—</div>
         </div>
       </div>
-      <div class="card" style="margin-top:12px">
-        <div class="boxTitle">Thinking now</div>
-        <div id="thoughtBubbles" class="thinking"></div>
+    </div>
+    <div class="heroRight">
+      <div class="summary">
+        <div class="card briefPanel">
+          <div class="label">V20 verdict</div>
+          <div class="value" id="verdict">—</div>
+          <div class="hint" id="brief">—</div>
+          <div class="bubbles" id="thoughtBubbles"></div>
+        </div>
+        <div class="card">
+          <div class="boxTitle">Milestone board</div>
+          <div class="progressBoard" id="progressBoard"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="boxTitle">Thinking stack</div>
+        <div class="thinkingLane">
+          <div class="thoughtCol"><h4>Observations</h4><div id="obsList"></div></div>
+          <div class="thoughtCol"><h4>Hypotheses</h4><div id="hypList"></div></div>
+          <div class="thoughtCol"><h4>Contradictions</h4><div id="conList"></div></div>
+          <div class="thoughtCol"><h4>Next probes</h4><div id="nextList"></div></div>
+        </div>
+      </div>
+      <div class="lists">
+        <div class="panel"><div class="boxTitle">Actions</div><div id="actionList"></div></div>
+        <div class="panel"><div class="boxTitle">Key truths</div><div id="truthList"></div></div>
+        <div class="panel"><div class="boxTitle">Operator brief</div><div id="briefList"></div></div>
       </div>
     </div>
-  </div>
-
-  <div class="lists">
-    <div class="panel"><div class="boxTitle">Thoughts</div><div id="thoughtList"></div></div>
-    <div class="panel"><div class="boxTitle">Actions</div><div id="actionList"></div></div>
-    <div class="panel"><div class="boxTitle">Important truths</div><div id="truthList"></div></div>
   </div>
 
   <div class="twocol">
     <div class="panel">
-      <div class="boxTitle">Social stream</div>
-      <div class="small">YouTube + X + manual memory. New items generate timing windows and chain tests.</div>
+      <div class="boxTitle">Unified social stream</div>
+      <div class="small">YouTube + X + manual memory. New items become timing windows and evidence tasks.</div>
       <div class="tableWrap"><table><thead><tr><th>Platform</th><th>When</th><th>Title / text</th><th>Duration</th><th>Phase</th><th>Code</th></tr></thead><tbody id="socialBody"></tbody></table></div>
     </div>
     <div class="panel">
       <div class="boxTitle">Sync windows</div>
-      <div class="small">Duration ÷ block seconds gives a scan window. Latest social items become active probes.</div>
+      <div class="small">Duration ÷ block seconds gives a scan window. Social items become actionable windows.</div>
       <div class="tableWrap"><table><thead><tr><th>Item</th><th>Upload</th><th>Blocks</th><th>Approx block</th><th>Window</th><th>Status</th></tr></thead><tbody id="windowBody"></tbody></table></div>
     </div>
   </div>
@@ -179,7 +238,7 @@ https://xcancel.com"></textarea></div>
       <div class="tableWrap"><table><thead><tr><th>Name</th><th>Address</th><th>Reserve A</th><th>Reserve B</th></tr></thead><tbody id="anchorBody"></tbody></table></div>
     </div>
     <div class="panel">
-      <div class="boxTitle">Watcher rehab</div>
+      <div class="boxTitle">Watcher rehab + promoted candidates</div>
       <div class="tableWrap"><table><thead><tr><th>Watcher</th><th>Tier</th><th>State</th><th>Replacement / promoted</th></tr></thead><tbody id="watchBody"></tbody></table></div>
     </div>
   </div>
@@ -187,18 +246,18 @@ https://xcancel.com"></textarea></div>
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v19-settings';
-  const HISTORY_KEY='pdai-v19-history';
-  const SOCIAL_CACHE_KEY='pdai-v19-social-cache';
-  const LASTGOOD_KEY='pdai-v19-last-good';
+  const STORAGE_KEY='pdai-v20-settings';
+  const HISTORY_KEY='pdai-v20-history';
+  const SOCIAL_CACHE_KEY='pdai-v20-social-cache';
+  const LASTGOOD_KEY='pdai-v20-last-good';
   const NULL32='0x'+'0'.repeat(64);
-  const TRANSFER_TOPIC='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
-    socialProxy:'', xBearer:'', xQuery:'(pDAI OR \"$pDAI\" OR pdai OR \"$pdai\" OR LibertySwap OR #pDAI) -is:retweet', xAccounts:'LibertySwapFi,NineIronCapital,DcentraliseMe,RichardHeartWin,TheGreekGod11,files_dirty', xMirrors:'https://nitter.net\nhttps://xcancel.com', manualSocial:'', notes:'',
+    socialProxy:'', xBearer:'', xQuery:'(pDAI OR "$pDAI" OR pdai OR "$pdai" OR LibertySwap OR #pDAI OR #PulseChain) -is:retweet',
+    xAccounts:'LibertySwapFi,NineIronCapital,DcentraliseMe,RichardHeartWin,TheGreekGod11,files_dirty',
+    xMirrors:'https://nitter.net\nhttps://xcancel.com', manualSocial:'', notes:'',
     target:'0x6B175474E89094C44Da98b954EedeAC495271d0F',
-    wpls:'0xA1077a294dde1b09bb078844df40758A5d0F9A27',
-    dead:'0x000000000000000000000000000000000000dEaD',
+    wpls:'0xA1077a294dde1b09bb078844df40758A5d0F9A27', dead:'0x000000000000000000000000000000000000dEaD',
     anchors:[
       {address:'0x947b4633e32e0c7f2c76753b43f008480715416d', name:'Native pDAI/WPLS', role:'optical rail', type:'public-native'},
       {address:'0x5ef7aac0de4f2012cb36730da140025b113fada4', name:'ATROPA/DAI core', role:'structural core', type:'core'},
@@ -208,13 +267,14 @@ https://xcancel.com"></textarea></div>
     slots:['0x7b12','0x0968'],
     rpcs:['https://pulsechain-rpc.publicnode.com','https://rpc.pulsechain.com','https://rpc-pulsechain.g4mm4.io']
   };
-  const state={settings:null, syncing:false, timer:null, history:[], rpcIdx:0};
+  const state={settings:null, history:[], syncing:false, rpcIdx:0, timer:null};
   const $=id=>document.getElementById(id);
   const norm=x=>String(x||'').trim().toLowerCase();
   const isAddr=x=>/^0x[a-fA-F0-9]{40}$/.test(String(x||'').trim());
-  const short=(s,a=8,b=6)=>!s?'—':(s.length>a+b+3?s.slice(0,a)+'…'+s.slice(-b):s);
+  const short=(s,a=8,b=6)=>!s?'—':(s.length>a+b+1?s.slice(0,a)+'…'+s.slice(-b):s);
   const fmt=(n,d=2)=>Number.isFinite(n)?Number(n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';
   const pct=(n,d=1)=>Number.isFinite(n)?(n*100).toFixed(d)+'%':'—';
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const hexToBig=h=>{try{return BigInt(h||'0x0')}catch{return 0n}};
   const units=(big,dec=18)=>{ const neg=big<0n; const v=neg?-big:big; let s=v.toString(); if(dec===0) return Number((neg?'-':'')+s); if(s.length<=dec) s='0'.repeat(dec-s.length+1)+s; const int=s.slice(0,-dec)||'0'; const frac=s.slice(-dec).replace(/0+$/,'').slice(0,10); return parseFloat((neg?'-':'')+int+(frac?'.'+frac:'')); };
   const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
@@ -222,17 +282,23 @@ https://xcancel.com"></textarea></div>
   const merge=(a,b)=>Object.assign({},a,b||{});
   const uiItem=(t,cls='warn')=>`<div class="item ${cls}">${t}</div>`;
   function loadSettings(){ return merge(DEFAULTS, load(STORAGE_KEY, {})); }
-  function saveSettings(){ save(STORAGE_KEY, state.settings); }
+  function saveSettings(){ save(STORAGE_KEY,state.settings); }
   function loadHistory(){ return load(HISTORY_KEY, []); }
   function saveHistory(h){ save(HISTORY_KEY,h.slice(-500)); $('historyMeta').textContent=`History: ${h.length} snapshots`; }
   function loadSocialCache(){ return load(SOCIAL_CACHE_KEY, []); }
-  function saveSocialCache(v){ save(SOCIAL_CACHE_KEY,v.slice(0,200)); }
+  function saveSocialCache(v){ save(SOCIAL_CACHE_KEY,v.slice(0,300)); }
   function loadLastGood(){ return load(LASTGOOD_KEY, null); }
   function saveLastGood(v){ save(LASTGOOD_KEY,v); }
+  function parseAccountList(txt){ return String(txt||'').split(/[\n, ]+/).map(x=>x.trim().replace(/^@/,'')).filter(Boolean); }
 
   async function fetchJSON(url, opts={}, ms=12000){
-    const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
     try{ const r=await fetch(url,{...opts,signal:ctl.signal}); if(!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json(); }
+    finally{ clearTimeout(t); }
+  }
+  async function fetchText(url, ms=12000){
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
+    try{ const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error(`HTTP ${r.status}`); return await r.text(); }
     finally{ clearTimeout(t); }
   }
   async function rpc(method, params){
@@ -243,18 +309,19 @@ https://xcancel.com"></textarea></div>
       try{
         const json=await fetchJSON(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+i,method,params})},12000);
         if(json.error) throw new Error(json.error.message||'rpc error');
-        state.rpcIdx=idx; $('rpcMeta').textContent='RPC: '+url.replace(/^https?:\/\//,''); return json.result;
+        state.rpcIdx=idx; $('rpcMeta').textContent='RPC: '+url.replace(/^https?:\/\//,'');
+        return json.result;
       }catch(err){ lastErr=err; }
     }
-    throw lastErr||new Error('All RPCs failed');
+    throw lastErr || new Error('All RPCs failed');
   }
   async function ercBalanceOf(token, holder){ const data='0x70a08231'+norm(holder).replace(/^0x/,'').padStart(64,'0'); return hexToBig(await rpc('eth_call',[{to:token,data},'latest'])); }
   async function ercTotalSupply(token){ return hexToBig(await rpc('eth_call',[{to:token,data:'0x18160ddd'},'latest'])); }
   async function ercDecimals(token){ return parseInt(await rpc('eth_call',[{to:token,data:'0x313ce567'},'latest']),16)||18; }
   async function txCount(addr){ return parseInt(await rpc('eth_getTransactionCount',[addr,'latest']),16)||0; }
   async function getStorageAt(addr,slot){ return await rpc('eth_getStorageAt',[addr,slot,'latest']); }
-  async function blockByNumber(b){ return await rpc('eth_getBlockByNumber',[typeof b==='number'?'0x'+b.toString(16):b,false]); }
   async function blockNumber(){ return parseInt(await rpc('eth_blockNumber',[]),16); }
+  async function blockByNumber(b){ return await rpc('eth_getBlockByNumber',[typeof b==='number'?'0x'+b.toString(16):b,false]); }
   async function getLogs(filter){ return await rpc('eth_getLogs',[filter]); }
   async function pairMeta(pair){
     const [t0,t1,resv]=await Promise.all([
@@ -262,57 +329,54 @@ https://xcancel.com"></textarea></div>
       rpc('eth_call',[{to:pair,data:'0xd21220a7'},'latest']),
       rpc('eth_call',[{to:pair,data:'0x0902f1ac'},'latest'])
     ]);
-    const token0='0x'+String(t0).slice(-40); const token1='0x'+String(t1).slice(-40);
-    const hex=String(resv||'0x').replace(/^0x/,'');
-    const w=(i)=>'0x'+hex.slice(i*64,(i+1)*64);
+    const token0='0x'+String(t0).slice(-40), token1='0x'+String(t1).slice(-40);
+    const hex=String(resv||'0x').replace(/^0x/,''); const w=i=>'0x'+hex.slice(i*64,(i+1)*64);
     return {token0,token1,reserve0:hexToBig(w(0)),reserve1:hexToBig(w(1))};
   }
 
-  function detectPhase(text){ const s=String(text||'').toLowerCase(); if(/x9oeb|scribe|136s/.test(s)) return 'scribe'; if(/sfvcy|heat|71s/.test(s)) return 'heat'; if(/7pr6k|32s|lock/.test(s)) return 'lock'; if(/xutw9|42s|init/.test(s)) return 'init'; return 'social'; }
+  function detectPhase(text){ const s=String(text||'').toLowerCase(); if(/x9oeb|scribe|136s/.test(s)) return 'scribe'; if(/sfvcy|heat|71s/.test(s)) return 'heat'; if(/7pr6k|32s|lock/.test(s)) return 'lock'; if(/xutw9|42s|init/.test(s)) return 'init'; if(/liberty|swap|lend|marketplace|stable/.test(s)) return 'intake'; return 'social'; }
   function extractDuration(text){ const s=String(text||''); let m=s.match(/\b(\d{1,3})s\b/i); if(m) return Number(m[1]); m=s.match(/\b(\d{1,2}):(\d{2})\b/); if(m) return Number(m[1])*60+Number(m[2]); return 0; }
   function extractCode(text){ const m=String(text||'').match(/\b([a-z0-9]{5})\b/i); return m?m[1].toLowerCase():''; }
   function normalizeSocial(item){
     const title=item.title||item.text||item.full_text||'';
     return {
       id:item.id||item.guid||item.link||('manual-'+Math.random().toString(36).slice(2)),
-      title, text:item.text||title, link:item.link||item.url||'', publishedAt:item.publishedAt||item.pubDate||item.created_at||new Date().toISOString(),
+      title, text:item.text||title, link:item.link||item.url||'',
+      publishedAt:item.publishedAt||item.pubDate||item.created_at||new Date().toISOString(),
       platform:item.platform||item.source||item.kind||'social', kind:item.kind||item.platform||'post', source:item.source||'manual',
       durationSec:item.durationSec||extractDuration(title), phase:item.phase||detectPhase(title), code:item.code||extractCode(title), author:item.author||item.username||''
     };
   }
   function parseManualSocial(txt){
-    const out=[]; const raw=String(txt||'').trim(); if(!raw) return out;
+    const raw=String(txt||'').trim(); if(!raw) return [];
     try{ const j=JSON.parse(raw); if(Array.isArray(j)) return j.map(normalizeSocial); if(j&&typeof j==='object') return [normalizeSocial(j)]; }catch{}
     return raw.split(/\n+/).map((line,i)=>normalizeSocial({id:'manual-'+i+'-'+line.slice(0,12),title:line,platform:'manual',source:'manual'}));
   }
+
   async function fetchYoutube(channelId, proxy=''){
-    const results=[]; const feedUrl=`https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`;
+    const feedUrl=`https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`;
     const tries=[];
-    if(proxy) tries.push(`${proxy.replace(/\/$/,'')}/youtube?channelId=${encodeURIComponent(channelId)}`);
-    tries.push(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`);
-    tries.push(`https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`);
-    for(const url of tries){
+    if(proxy) tries.push({type:'proxy', url:`${proxy.replace(/\/$/,'')}/youtube?channelId=${encodeURIComponent(channelId)}`});
+    tries.push({type:'rss2json', url:`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`});
+    tries.push({type:'allorigins', url:`https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`});
+    let errs=[];
+    for(const t of tries){
       try{
-        if(url.includes('rss2json')){
-          const j=await fetchJSON(url,{},10000); const items=(j.items||[]).map(x=>normalizeSocial({id:x.guid||x.link,title:x.title,link:x.link,publishedAt:x.pubDate,platform:'youtube',kind:x.link?.includes('/shorts/')?'short':'video',source:'yt-feed'}));
-          if(items.length) return items;
-        } else if(url.includes('/youtube?')){
-          const j=await fetchJSON(url,{},10000); const arr=(j.items||j.data||[]).map(x=>normalizeSocial({...x,platform:'youtube',source:'proxy'})); if(arr.length) return arr;
-        } else {
-          const xml=await fetch(url).then(r=>r.text());
-          const doc=new DOMParser().parseFromString(xml,'application/xml'); const entries=[...doc.querySelectorAll('entry')].map(e=>normalizeSocial({id:e.querySelector('videoId')?.textContent||e.querySelector('id')?.textContent,title:e.querySelector('title')?.textContent,link:e.querySelector('link')?.getAttribute('href'),publishedAt:e.querySelector('published')?.textContent,platform:'youtube',kind:(e.querySelector('link')?.getAttribute('href')||'').includes('/shorts/')?'short':'video',source:'yt-feed-xml'}));
+        if(t.type==='proxy'){
+          const j=await fetchJSON(t.url,{},10000); const arr=(j.items||j.data||[]).map(x=>normalizeSocial({...x,platform:'youtube',source:'proxy'})); if(arr.length) return arr;
+        }else if(t.type==='rss2json'){
+          const j=await fetchJSON(t.url,{},10000); const items=(j.items||[]).map(x=>normalizeSocial({id:'yt:'+ (x.guid||x.link), title:x.title, text:x.title, link:x.link, publishedAt:x.pubDate, platform:'youtube', kind:x.link?.includes('/shorts/')?'short':'video', source:'yt-feed'})); if(items.length) return items;
+        }else{
+          const xml=await fetchText(t.url,10000); const doc=new DOMParser().parseFromString(xml,'application/xml');
+          const entries=[...doc.querySelectorAll('entry')].map(e=>normalizeSocial({id:'yt:'+(e.querySelector('videoId')?.textContent||e.querySelector('id')?.textContent), title:e.querySelector('title')?.textContent, text:e.querySelector('title')?.textContent, link:e.querySelector('link')?.getAttribute('href'), publishedAt:e.querySelector('published')?.textContent, platform:'youtube', kind:(e.querySelector('link')?.getAttribute('href')||'').includes('/shorts/')?'short':'video', source:'yt-feed-xml'}));
           if(entries.length) return entries;
         }
-      }catch(e){ results.push({error:e.message,url}); }
+      }catch(e){ errs.push(e.message); }
     }
-    throw new Error(results.map(x=>x.error||'failed').join(' | ')||'youtube fetch failed');
+    throw new Error(errs.join(' | ') || 'youtube fetch failed');
   }
-  function parseAccountList(txt){ return String(txt||'').split(/[\n, ]+/).map(x=>x.trim().replace(/^@/,'')).filter(Boolean); }
-  async function fetchText(url, ms=12000){
-    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
-    try{ const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error(`HTTP ${r.status}`); return await r.text(); } finally{ clearTimeout(t); }
-  }
-  async function fetchXRssViaMirror(base, user){
+
+  async function fetchXRssViaMirror(base,user){
     const rssUrl=`${base.replace(/\/$/,'')}/${encodeURIComponent(user)}/rss`;
     const tries=[
       `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`,
@@ -321,190 +385,255 @@ https://xcancel.com"></textarea></div>
     for(const url of tries){
       try{
         if(url.includes('rss2json')){
-          const j=await fetchJSON(url,{},10000);
-          const items=(j.items||[]).map(x=>normalizeSocial({id:`xrss:${user}:${x.guid||x.link}`,title:x.title||x.description||'',text:x.description||x.title||'',link:x.link||'',publishedAt:x.pubDate,platform:'x',kind:'post',source:'x-rss',author:user}));
-          if(items.length) return items;
-        } else {
-          const xml=await fetchText(url,10000);
-          const doc=new DOMParser().parseFromString(xml,'application/xml');
-          const items=[...doc.querySelectorAll('item')].map((e,i)=>normalizeSocial({id:`xrss:${user}:${e.querySelector('guid')?.textContent||e.querySelector('link')?.textContent||i}`,title:e.querySelector('title')?.textContent||'',text:e.querySelector('description')?.textContent||e.querySelector('title')?.textContent||'',link:e.querySelector('link')?.textContent||'',publishedAt:e.querySelector('pubDate')?.textContent,platform:'x',kind:'post',source:'x-rss-xml',author:user}));
-          if(items.length) return items;
+          const j=await fetchJSON(url,{},10000); const items=(j.items||[]).map(x=>normalizeSocial({id:`xrss:${user}:${x.guid||x.link}`, title:x.title||x.description||'', text:x.description||x.title||'', link:x.link||'', publishedAt:x.pubDate, platform:'x', kind:'post', source:'x-rss', author:user})); if(items.length) return items;
+        }else{
+          const xml=await fetchText(url,10000); const doc=new DOMParser().parseFromString(xml,'application/xml');
+          const items=[...doc.querySelectorAll('item')].map((e,i)=>normalizeSocial({id:`xrss:${user}:${e.querySelector('guid')?.textContent||e.querySelector('link')?.textContent||i}`, title:e.querySelector('title')?.textContent||'', text:e.querySelector('description')?.textContent||e.querySelector('title')?.textContent||'', link:e.querySelector('link')?.textContent||'', publishedAt:e.querySelector('pubDate')?.textContent, platform:'x', kind:'post', source:'x-rss-xml', author:user})); if(items.length) return items;
         }
       }catch(e){}
     }
     return [];
   }
+
   async function fetchX(settings){
-    const out=[]; const proxy=(settings.socialProxy||'').trim(); const q=encodeURIComponent(settings.xQuery||DEFAULTS.xQuery); const users=parseAccountList(settings.xAccounts);
-    const mirrors=parseAccountList(String(settings.xMirrors||'').replace(/https?:\/\//g,m=>m)).map(x=>x.startsWith('http')?x:`https://${x}`);
-    let errors=[];
+    const out=[]; const proxy=(settings.socialProxy||'').trim(); const q=encodeURIComponent(settings.xQuery||DEFAULTS.xQuery); const users=parseAccountList(settings.xAccounts); const errs=[];
+    const mirrors=parseAccountList(String(settings.xMirrors||'')).map(x=>x.startsWith('http')?x:`https://${x}`);
+
     if(proxy){
-      try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/recent?query=${q}&max_results=25`,{},10000); const arr=(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id||x.url,title:x.text||x.title,text:x.text||x.title,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy',author:x.author_id||x.author||x.username||''})); out.push(...arr); }catch(e){ errors.push('proxy-recent:'+e.message); }
+      try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/recent?query=${q}&max_results=25`,{},10000); out.push(...(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id||x.url,title:x.text||x.title,text:x.text||x.title,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy',author:x.author_id||x.author||x.username||''}))); }catch(e){ errs.push('proxy-recent:'+e.message); }
       if(users.length){
-        try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/users?users=${encodeURIComponent(users.join(','))}&max_results=15`,{},10000); const arr=(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id||x.url||`${x.author||x.username}:${x.created_at}`,title:x.text||x.title,text:x.text||x.title,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy-users',author:x.author||x.username||x.author_id||''})); out.push(...arr); }catch(e){ errors.push('proxy-users:'+e.message); }
+        try{ const j=await fetchJSON(`${proxy.replace(/\/$/,'')}/x/users?users=${encodeURIComponent(users.join(','))}&max_results=15`,{},10000); out.push(...(j.data||j.items||[]).map(x=>normalizeSocial({id:x.id||x.url||`${x.author||x.username}:${x.created_at}`,title:x.text||x.title,text:x.text||x.title,link:x.url||'',publishedAt:x.created_at||x.publishedAt,platform:'x',kind:'post',source:'x-proxy-user',author:x.author||x.username||''}))); }catch(e){ errs.push('proxy-user:'+e.message); }
       }
     }
-    if((settings.xBearer||'').trim()){
+
+    if(settings.xBearer){
+      const headers={Authorization:`Bearer ${settings.xBearer}`};
       try{
-        const recent=await fetchJSON(`https://api.x.com/2/tweets/search/recent?query=${q}&max_results=25&tweet.fields=created_at,author_id,text`,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
-        out.push(...(recent.data||[]).map(x=>normalizeSocial({id:`x:${x.id}`,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-recent',author:x.author_id})));
-      }catch(e){ errors.push('x-recent:'+e.message); }
-      if(users.length){
+        const j=await fetchJSON(`https://api.x.com/2/tweets/search/recent?query=${q}&max_results=25&tweet.fields=created_at,author_id,text`,{headers},10000);
+        out.push(...(j.data||[]).map(x=>normalizeSocial({id:'x:'+x.id,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-api-search',author:x.author_id||''})));
+      }catch(e){ errs.push('x-search:'+e.message); }
+      for(const user of users.slice(0,4)){
         try{
-          const u=await fetchJSON(`https://api.x.com/2/users/by?usernames=${encodeURIComponent(users.join(','))}&user.fields=username,name`,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
-          const map=(u.data||[]);
-          for(const row of map){
-            try{
-              const t=await fetchJSON(`https://api.x.com/2/users/${row.id}/tweets?max_results=10&tweet.fields=created_at,text`,{headers:{'Authorization':'Bearer '+settings.xBearer,'accept':'application/json'}},10000);
-              out.push(...(t.data||[]).map(x=>normalizeSocial({id:`xtl:${row.username}:${x.id}`,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-user',author:row.username,link:`https://x.com/${row.username}/status/${x.id}`})));
-            }catch(e){ errors.push(`x-user:${row.username}:`+e.message); }
-          }
-        }catch(e){ errors.push('x-users-lookup:'+e.message); }
+          const userData=await fetchJSON(`https://api.x.com/2/users/by/username/${encodeURIComponent(user)}`,{headers},10000);
+          const uid=userData?.data?.id; if(!uid) continue;
+          const posts=await fetchJSON(`https://api.x.com/2/users/${uid}/tweets?max_results=10&tweet.fields=created_at,text`,{headers},10000);
+          out.push(...(posts.data||[]).map(x=>normalizeSocial({id:'xuser:'+x.id,title:x.text,text:x.text,publishedAt:x.created_at,platform:'x',kind:'post',source:'x-api-user',author:user})));
+        }catch(e){ errs.push('x-user:'+user+':'+e.message); }
       }
     }
-    if(!out.length && mirrors.length && users.length){
-      for(const user of users){
-        for(const base of mirrors){
-          const arr=await fetchXRssViaMirror(base,user);
-          if(arr.length){ out.push(...arr); break; }
-        }
+
+    for(const m of mirrors.slice(0,3)){
+      for(const user of users.slice(0,4)){
+        const items=await fetchXRssViaMirror(m,user); if(items.length) out.push(...items);
       }
     }
-    const dedup=new Map();
-    for(const item of out){ if(!item || !item.id) continue; dedup.set(String(item.id), item); }
-    const arr=[...dedup.values()].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
-    if(!arr.length && errors.length) throw new Error(errors.join(' | '));
-    return arr;
+
+    const dedup=[]; const seen=new Set();
+    for(const it of out){ const k=(it.platform||'')+'|'+(it.id||it.link||it.title); if(seen.has(k)) continue; seen.add(k); dedup.push(it); }
+    dedup.sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
+    return {items:dedup.slice(0,120), error:errs.join(' | ')};
   }
 
-  function diffSocial(cache, items){
-    const seen=new Set((cache||[]).map(x=>String(x.id)));
-    const fresh=items.filter(x=>!seen.has(String(x.id)));
-    return {newSocial:fresh, harvested:[...items].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt))};
+  function socialDelta(prev,current){
+    const prevSet=new Set((prev||[]).map(x=>`${x.platform}|${x.id}|${x.link}`));
+    return current.filter(x=>!prevSet.has(`${x.platform}|${x.id}|${x.link}`));
   }
-  function approximateBlockWindow(item, latestBlock, latestTsMs, blockSec){
-    const t=new Date(item.publishedAt).getTime(); if(!Number.isFinite(t)) return null;
-    const deltaSec=Math.max(0,(latestTsMs-t)/1000); const around=latestBlock-Math.round(deltaSec/blockSec); const span=Math.max(1, Math.ceil((item.durationSec||0)/blockSec));
-    return {id:item.id,title:item.title,publishedAt:item.publishedAt,approxBlock:around,blocks:span,fromBlock:Math.max(0,around),toBlock:Math.max(0,around+span),code:item.code||'',phase:item.phase||'social'};
-  }
+  function inferApproxBlockFromTime(latestBlock, latestTsMs, itemTsMs, blockSec){ const delta=Math.round((latestTsMs-itemTsMs)/(blockSec*1000)); return Math.max(0, latestBlock-delta); }
 
-  async function buildChain(){
-    const [latestBlock, targetDec, latestBlockObj] = await Promise.all([blockNumber(), ercDecimals(state.settings.target), blockByNumber('latest')]);
-    const latestTsMs=parseInt(latestBlockObj.timestamp,16)*1000;
-    const [totalRaw,burnedRaw,slotA,slotB,dnaRaw] = await Promise.all([
-      ercTotalSupply(state.settings.target), ercBalanceOf(state.settings.target,state.settings.dead),
-      getStorageAt(state.settings.target,state.settings.slots[0]), getStorageAt(state.settings.target,state.settings.slots[1]), getStorageAt(state.settings.target,'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc')
-    ]);
-    const anchors=await Promise.all(state.settings.anchors.map(async a=>{ const m=await pairMeta(a.address); const d0=await ercDecimals(m.token0); const d1=await ercDecimals(m.token1); return {...a,token0:m.token0,token1:m.token1,reserve0:units(m.reserve0,d0),reserve1:units(m.reserve1,d1)}; }));
-    const nodeEntries=Object.entries(state.settings.watchers||{});
+  async function buildChainState(){
+    const latestBlock=await blockNumber(); const latestBlk=await blockByNumber(latestBlock); const latestTsMs=parseInt(latestBlk.timestamp,16)*1000;
+    const pdDec=await ercDecimals(state.settings.target);
+    const [totalRaw,burnedRaw]=await Promise.all([ercTotalSupply(state.settings.target), ercBalanceOf(state.settings.target,state.settings.dead)]);
+    const total=units(totalRaw,pdDec), burned=units(burnedRaw,pdDec);
+    const publicAnchors=[];
+    for(const a of state.settings.anchors){
+      const meta=await pairMeta(a.address);
+      const [d0,d1]=await Promise.all([ercDecimals(meta.token0), ercDecimals(meta.token1)]);
+      publicAnchors.push({...a, token0:meta.token0, token1:meta.token1, reserve0:units(meta.reserve0,d0), reserve1:units(meta.reserve1,d1)});
+    }
     const nodeBalances={};
-    await Promise.all(nodeEntries.map(async ([k,v])=>{ try{ const [pdai,atropa,nonce]=await Promise.all([ercBalanceOf(state.settings.target,v), k==='5EF7'?ercBalanceOf('0xcc78a0acdf847a2c1714d2a925bb4477df5d48a6',v):Promise.resolve(0n), txCount(v)]); nodeBalances[k]={pdai:units(pdai,targetDec),wpls:0,atropa:units(atropa,18),nonce}; }catch{ nodeBalances[k]={pdai:0,wpls:0,atropa:0,nonce:0}; } }));
-    const watchTiers={}; Object.entries(nodeBalances).forEach(([k,v])=>watchTiers[k]=(v.pdai>0||v.atropa>0||v.nonce>0)?'hot':'cold');
-    return {latestBlock,latestTsMs,total:units(totalRaw,targetDec),burned:units(burnedRaw,targetDec),publicAnchors:anchors,nodeBalances,watchTiers,slotProbe:{values:{[state.settings.slots[0]]:slotA,[state.settings.slots[1]]:slotB},allZero:slotA===NULL32&&slotB===NULL32,equal:slotA===slotB,changed:false,summary:(slotA===NULL32&&slotB===NULL32)?'null-null equality':(slotA===slotB?'equal':'divergent')},dnaProbe:{raw:dnaRaw,implAddress:dnaRaw===NULL32?'':'0x'+dnaRaw.slice(-40),changed:false}};
+    for(const [label,addr] of Object.entries(state.settings.watchers)){
+      nodeBalances[label]={ pdai:units(await ercBalanceOf(state.settings.target,addr),pdDec), wpls:units(await ercBalanceOf(state.settings.wpls,addr),18), atropa: label==='5EF7' ? publicAnchors[1]?.reserve1||0 : 0, nonce:await txCount(addr) };
+    }
+    const slotVals={}; for(const s of state.settings.slots) slotVals[s]=await getStorageAt(state.settings.target,s);
+    const dnaRaw=await getStorageAt(state.settings.target,'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc');
+    const watchTiers={}; for(const [k,v] of Object.entries(nodeBalances)) watchTiers[k]=(v.pdai>0||v.nonce>0)?'hot':'cold';
+    return {latestBlock,latestTsMs,total,burned,publicAnchors,nodeBalances,watchTiers,slotProbe:{values:slotVals,allZero:Object.values(slotVals).every(v=>norm(v)===norm(NULL32)),equal:new Set(Object.values(slotVals).map(norm)).size===1,changed:false,summary:Object.values(slotVals).every(v=>norm(v)===norm(NULL32))?'null-null equality':'live slot divergence'},dnaProbe:{raw:dnaRaw,implAddress:norm(dnaRaw)===norm(NULL32)?'':'0x'+dnaRaw.slice(-40),changed:false}};
   }
 
-  async function counterpartyHunt(chain){
-    const fromBlock=Math.max(0,chain.latestBlock-state.settings.scanBlocks); const addrSet=new Set([state.settings.watchers['5EF7'], ...state.settings.anchors.map(x=>x.address)].map(norm));
-    const logs=await getLogs({address:state.settings.target,fromBlock:'0x'+fromBlock.toString(16),toBlock:'latest',topics:[TRANSFER_TOPIC]});
-    const counts=new Map();
-    for(const l of logs){ const from='0x'+l.topics[1].slice(-40), to='0x'+l.topics[2].slice(-40); const nf=norm(from), nt=norm(to); if(addrSet.has(nf)&&!addrSet.has(nt)) counts.set(nt,(counts.get(nt)||0)+1); if(addrSet.has(nt)&&!addrSet.has(nf)) counts.set(nf,(counts.get(nf)||0)+1); }
-    return [...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(([a,c])=>({address:a,count:c}));
-  }
-  async function sniffPayloads(chain, hotWatcher){
-    const b=Math.max(0,chain.latestBlock-40); const addrs=[state.settings.watchers[hotWatcher], ...state.settings.anchors.map(x=>x.address)].filter(Boolean);
-    const hits=[];
-    for(let n=b;n<=chain.latestBlock;n++){
-      try{ const block=await blockByNumber(n); const txs=block.transactions||[]; for(const txh of txs.slice(0,20)){ const tx=await rpc('eth_getTransactionByHash',[txh]); if(tx?.to && addrs.map(norm).includes(norm(tx.to)) && tx.input && tx.input!=='0x'){ const hex=tx.input.replace(/^0x/,''); let ascii=''; for(let i=0;i<Math.min(hex.length,160);i+=2){ const ch=parseInt(hex.slice(i,i+2),16); if(ch>=32&&ch<=126) ascii+=String.fromCharCode(ch); }
-            if(/bell|proxy|heat|qwen|pdai/i.test(ascii)) hits.push({hash:tx.hash,to:tx.to,text:ascii.slice(0,40)}); }
-        }
-      }catch{}
+  async function recentTransferCounterparties(hotAddr, fromBlock){
+    const holder='0x'+norm(hotAddr).replace(/^0x/,'').padStart(64,'0');
+    const logs=(await getLogs({address:state.settings.target, fromBlock:'0x'+fromBlock.toString(16), toBlock:'latest', topics:['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', [holder,null],[holder,null]]}).catch(()=>[])) || [];
+    const counts={};
+    for(const log of logs){
+      const from='0x'+String(log.topics?.[1]||'').slice(-40), to='0x'+String(log.topics?.[2]||'').slice(-40);
+      const cp=norm(from)===norm(hotAddr)?to:from; if(!isAddr(cp) || norm(cp)===norm(hotAddr)) continue; counts[cp]=(counts[cp]||0)+1;
     }
-    return hits.slice(0,8);
+    return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([address,count])=>({address,count}));
+  }
+
+  async function recentPayloadMotifs(fromBlock){
+    const hits=[]; const end=await blockNumber(); const start=Math.max(fromBlock,end-30);
+    for(let b=start;b<=end;b++){
+      const blk=await blockByNumber(b); const txs=blk.transactions||[];
+      for(const tx of txs.slice(0,8)){
+        const data=(tx.input||''); if(!data || data==='0x') continue;
+        const raw=data.replace(/^0x/,''); let txt='';
+        for(let i=0;i<raw.length && i<160;i+=2){ const ch=parseInt(raw.slice(i,i+2),16); if(ch>=32&&ch<=126) txt+=String.fromCharCode(ch); }
+        if(/bell|proxy|heat|qwen|liberty|pdai/i.test(txt)) hits.push({hash:tx.hash,text:txt.slice(0,42),block:b});
+      }
+    }
+    return hits.slice(0,6);
+  }
+
+  function buildWindows(chain,social){
+    return social.slice(0,20).map(item=>{ const t=+new Date(item.publishedAt); const approxBlock=inferApproxBlockFromTime(chain.latestBlock,chain.latestTsMs,t,state.settings.blockSec); const blocks=Math.max(1,(item.durationSec||0)/state.settings.blockSec); return {id:item.id,title:item.title,publishedAt:item.publishedAt,approxBlock,blocks,fromBlock:approxBlock,toBlock:approxBlock+Math.ceil(blocks),code:item.code,phase:item.phase}; });
+  }
+
+  function computePegProgress(model){
+    const score =
+      (model.publicStrength*0.34)+
+      (model.interiorStrength*0.18)+
+      (Math.min(model.socialDeltaCount,20)/20*0.18)+
+      (Math.min((model.windows||[]).length,12)/12*0.12)+
+      (Math.min((model.v20Promoted||[]).length,5)/5*0.08)+
+      (Math.min((model.counterparties||[]).length,8)/8*0.06)-
+      (model.contradictionLoad*0.18);
+    return clamp(score,0,1);
+  }
+
+  function buildThinking(model){
+    const observations=[];
+    const hypotheses=[];
+    const contradictions=[];
+    const next=[];
+
+    observations.push(`${model.socialDeltaCount} new social item(s) this cycle.`);
+    observations.push(`${model.hotWatcher} remains the strongest live watcher with ${fmt(model.nodeBalances[model.hotWatcher]?.pdai||0,3)} pDAI.`);
+    observations.push(`${model.publicAnchors.length} public anchor rails remain active truth surfaces.`);
+    if(model.windows[0]) observations.push(`Latest sync focus: ${model.windows[0].title}`);
+
+    hypotheses.push(model.phase==='surface-leading' ? 'Public-surface mutation is outrunning the current interior watcher map.' : 'Surface/interior balance is changing.');
+    if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
+    if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
+    if((model.v20Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v20Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
+
+    if(model.slotProbe.allZero && model.slotProbe.equal) contradictions.push('Slot probe is null-null equality; this is absence, not symmetry.');
+    if(model.dnaProbe.raw===NULL32) contradictions.push('DNA slot is empty; proxy-swap theory has no lift this cycle.');
+    const cold=Object.entries(model.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k);
+    if(cold.length) contradictions.push(`Cold watchers still dominate the interior map: ${cold.join(', ')}.`);
+    if(!model.payloadHits.length) contradictions.push('No payload motifs surfaced around the hottest anchor window.');
+
+    next.push('Probe promoted counterparties around 5EF7 and the public anchors.');
+    next.push('Turn new YouTube/X posts into block windows and compare against reserve mutation.');
+    next.push('Keep degrading empty-slot and empty-DNA theories until non-null state appears.');
+    if(!model.platformCounts.x) next.push('Increase X coverage with bearer token or a working social proxy / mirror.');
+
+    return {observations,hypotheses,contradictions,next};
   }
 
   async function buildModel(){
-    const chain = await buildChain();
-    let socialItems=[], socialError='';
+    const chain=await buildChainState();
+    let social=[], socialError='';
+    const prevCache=loadSocialCache();
     const manual=parseManualSocial(state.settings.manualSocial);
-    try{ const yt=await fetchYoutube(state.settings.channelId, state.settings.socialProxy); socialItems.push(...yt); }catch(e){ socialError+='yt:'+e.message+' '; }
-    try{ const xs=await fetchX(state.settings); socialItems.push(...xs); }catch(e){ socialError+='x:'+e.message+' '; }
-    socialItems.push(...manual);
-    socialItems = socialItems.map(normalizeSocial).filter(x=>x.id&&x.title).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
-    const cache=loadSocialCache(); const delta=diffSocial(cache,socialItems); if(delta.harvested.length) saveSocialCache(delta.harvested);
-    const windows=delta.harvested.slice(0,12).map(it=>approximateBlockWindow(it,chain.latestBlock,chain.latestTsMs,state.settings.blockSec)).filter(Boolean);
-    const hotWatcher = Object.entries(chain.watchTiers).find(([k,v])=>v==='hot')?.[0] || '5EF7';
-    let counterparties=[]; try{ counterparties=await counterpartyHunt(chain); }catch{}
-    let payloadHits=[]; try{ payloadHits=await sniffPayloads(chain, hotWatcher); }catch{}
-    const promoted=counterparties.length?[counterparties[0].address]:[];
-    const publicStrength=1; const interiorStrength=(Object.values(chain.watchTiers).filter(v=>v==='hot').length)/(Object.keys(chain.watchTiers).length||1)+0.1;
-    const contradictionLoad=(chain.slotProbe.allZero?0.35:0)+(chain.dnaProbe.raw===NULL32?0.25:0)+(Object.values(chain.watchTiers).filter(v=>v==='cold').length/(Object.keys(chain.watchTiers).length||1))*0.25;
-    const phase=publicStrength>interiorStrength?'surface-leading':'correlated';
-    const thoughts=[];
-    thoughts.push(delta.newSocial.length?`Detected ${delta.newSocial.length} new social item(s) this cycle.`:'No new social delta was detected this cycle.');
-    thoughts.push(`Slot probe remains ${chain.slotProbe.summary}; treat as contradiction, not symmetry.`);
-    thoughts.push(chain.dnaProbe.raw===NULL32?'DNA slot is empty again; proxy-swap theory cannot carry this cycle.':'DNA slot non-empty this cycle.');
-    thoughts.push(`${hotWatcher} still carries ${fmt(chain.nodeBalances[hotWatcher]?.pdai/1e9,3)}B pDAI and remains the strongest live watcher.`);
-    thoughts.push(`Public anchors are still the richer truth layer than the current interior map.`);
-    const xItems=delta.harvested.filter(x=>x.platform==='x');
-    const libertyHits=delta.harvested.filter(x=>/libertyswap|libertylend|stableswap|market maker marketplace/i.test((x.title||'')+' '+(x.text||'')) || /LibertySwapFi|DcentraliseMe/i.test(x.author||''));
-    if(xItems.length) thoughts.push(`X layer is live with ${xItems.length} harvested item(s).`);
-    if(libertyHits.length) thoughts.push(`LibertySwap/intake-valve language is present in the social layer.`);
-    if(delta.newSocial[0]) thoughts.push(`Latest social focus: ${delta.newSocial[0].title}`);
-    const actions=[];
-    actions.push({kind:'social-delta',status:socialError?'degraded':'ok',findings:[delta.newSocial.length?`${delta.newSocial.length} new social item(s)`:(socialError?`social fetch failed, using cache (${socialError.trim()})`:'no new social items this cycle')], platformCounts:{youtube:delta.harvested.filter(x=>x.platform==='youtube').length, x:delta.harvested.filter(x=>x.platform==='x').length, manual:delta.harvested.filter(x=>x.platform==='manual').length}});
-    actions.push({kind:'x-profile-harvest',status:xItems.length?'ok':'warn',findings:[xItems.length?`${xItems.length} X item(s) harvested`:'no X items harvested', libertyHits.length?`${libertyHits.length} LibertySwap/intake-valve social hit(s)`:'no LibertySwap social hits']});
-    if(delta.newSocial[0]&&delta.newSocial[0].durationSec) actions.push({kind:'sync-window',status:'ok',findings:[`scribe window ${(delta.newSocial[0].durationSec/state.settings.blockSec).toFixed(1)} blocks from ${delta.newSocial[0].durationSec}s`, delta.newSocial[0].code?`code ${delta.newSocial[0].code}`:'']});
-    actions.push({kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new candidate counterparties']});
-    actions.push({kind:'watcher-rehab',status:'ok',findings:[`cold watchers: ${Object.entries(chain.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')}`, promoted[0]?`promote ${short(promoted[0],10,8)}`:'no promotion']});
-    actions.push({kind:'payload-sniff',status:'ok',findings:payloadHits.length?payloadHits.map(x=>`motif ${x.text} @ ${short(x.hash,10,8)}`):['no recent payload motifs around hottest anchor']});
-    const brief=`V18 regime: ${phase}\nScore: ${fmt((publicStrength*45+interiorStrength*20+(delta.newSocial.length?10:0)+(promoted.length?5:0)+(payloadHits.length?10:0)+(delta.newSocial.length&&windows.length?5:0)-(contradictionLoad*20)),1)}\nPublic vs interior: ${pct(publicStrength)} / ${pct(interiorStrength)}\nHot watcher: ${hotWatcher}\nSocial delta: ${delta.newSocial.length}\nThoughts: ${thoughts.join(' | ')}\nActions: ${actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}\nPromoted: ${promoted.join(', ')||'—'}`;
-    return {...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, score:(publicStrength*45+interiorStrength*20+(delta.newSocial.length?10:0)+(promoted.length?5:0)+(payloadHits.length?10:0)+(delta.newSocial.length&&windows.length?5:0)-(contradictionLoad*20)), thoughts, thoughtSummary:thoughts.join(' '), v18Thoughts:thoughts, v18Actions:actions, v18Goal:'Use all social clues to generate chain windows and promote live candidates.', v18Brief:brief, v18Promoted:promoted, socialDeltaCount:delta.newSocial.length, newSocial:delta.newSocial, harvestedSocial:delta.harvested, socialError:socialError.trim(), windows, counterparties, payloadHits, hotWatcher};
+    try{
+      const yt=await fetchYoutube(state.settings.channelId, state.settings.socialProxy).catch(e=>{ socialError+='yt:'+e.message+' '; return []; });
+      const xRes=await fetchX(state.settings).catch(e=>({items:[], error:e.message}));
+      if(xRes.error) socialError += xRes.error + ' ';
+      social=[...yt, ...(xRes.items||[]), ...manual].map(normalizeSocial);
+      const seen=new Set(); social=social.filter(x=>{ const k=`${x.platform}|${x.id}|${x.link}`; if(seen.has(k)) return false; seen.add(k); return true; }).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
+      if(social.length) saveSocialCache(social);
+      else social=prevCache;
+    }catch(e){ socialError += e.message; social=prevCache.concat(manual).slice(0,120); }
+
+    const delta=socialDelta(prevCache,social);
+    const windows=buildWindows(chain,delta.length?delta:social.slice(0,10));
+    const hotWatcher='5EF7';
+    const counterparties=await recentTransferCounterparties(state.settings.watchers[hotWatcher], Math.max(0, chain.latestBlock-state.settings.scanBlocks)).catch(()=>[]);
+    const payloadHits=await recentPayloadMotifs(Math.max(0, chain.latestBlock-12)).catch(()=>[]);
+    const publicStrength = chain.publicAnchors.length ? 1 : 0;
+    const interiorStrength = clamp((Object.values(chain.watchTiers).filter(v=>v==='hot').length/Object.keys(chain.watchTiers).length)*0.6 + ((chain.nodeBalances['5EF7']?.pdai||0)>0?0.4:0), 0, 1);
+    const contradictionLoad = clamp((chain.slotProbe.allZero?0.35:0)+(chain.dnaProbe.raw===NULL32?0.2:0)+(Object.values(chain.watchTiers).filter(v=>v==='cold').length/10)+(payloadHits.length?0:0.08), 0, 1);
+    const phase = publicStrength>interiorStrength ? 'surface-leading' : 'balanced';
+    const promoted = counterparties[0] ? [counterparties[0].address] : [];
+    const platformCounts = social.reduce((a,x)=>{ a[x.platform]=(a[x.platform]||0)+1; return a; }, {});
+    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v20Promoted:promoted, platformCounts, socialError:socialError.trim()};
+    const thinking = buildThinking(baseModel);
+    const v20Actions=[
+      {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
+      ...(windows[0]?[{kind:'sync-window',status:'ok',findings:[`${windows[0].phase} window ${fmt(windows[0].blocks,1)} blocks from ${windows[0].title.match(/\b\d+s\b/i)?.[0]||'timing'}`, windows[0].code?`code ${windows[0].code}`:'no code']}]:[]),
+      {kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new counterparties']},
+      {kind:'watcher-rehab',status:'ok',findings:[`cold watchers: ${Object.entries(chain.watchTiers).filter(([,v])=>v==='cold').map(([k])=>k).join(', ')}`, promoted[0]?`promote ${short(promoted[0],10,8)}`:'no promotion']},
+      {kind:'payload-sniff',status:'ok',findings:payloadHits.length?payloadHits.map(x=>`${x.text} @ ${short(x.hash,10,8)}`):['no recent payload motifs around hottest anchor']}
+    ];
+    const allThoughts=[...thinking.observations.slice(0,2), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,2)];
+    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v20Thoughts:allThoughts, v20Actions, v20Goal:'Use social clues to generate chain windows, prove or falsify them, and replace weak interior watchers with live candidates.', v20Thinking:thinking};
+    model.pegProgress = computePegProgress(model);
+    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) - contradictionLoad*20, 0, 100);
+    model.v20Brief = `V20 regime: ${model.phase}\nScore: ${fmt(model.score,1)}\nPeg progress: ${pct(model.pegProgress)}\nPublic vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}\nHot watcher: ${hotWatcher}\nSocial delta: ${delta.length}\nThoughts: ${model.v20Thoughts.join(' | ')}\nActions: ${v20Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}\nPromoted: ${promoted.join(', ')||'—'}`;
+    return model;
   }
-  function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
+
+  function progressMilestones(model){
+    const checks=[
+      {k:'Social capture', on:model.socialDeltaCount>0 || model.harvestedSocial.length>0, v:model.socialDeltaCount?`${model.socialDeltaCount} new`:`${model.harvestedSocial.length} seen`},
+      {k:'Windowing', on:(model.windows||[]).length>0, v:`${(model.windows||[]).length} windows`},
+      {k:'Surface resonance', on:model.publicStrength>.7, v:pct(model.publicStrength)},
+      {k:'Candidate promotion', on:(model.v20Promoted||[]).length>0, v:(model.v20Promoted||[]).length?short(model.v20Promoted[0],8,6):'—'},
+      {k:'Interior wake', on:model.interiorStrength>.35, v:pct(model.interiorStrength)},
+      {k:'Contradiction control', on:model.contradictionLoad<.45, v:pct(1-model.contradictionLoad)}
+    ];
+    return checks;
+  }
 
   function render(model){
     $('syncStatus').textContent=model.socialError?'degraded':'synced'; $('syncStatus').className='status '+(model.socialError?'warn':'ok');
     $('lastSync').textContent='Last sync: '+new Date().toLocaleString();
-    $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length}${model.socialError?` • ${model.socialError}`:''}`;
-    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher;
-    $('heroScore').textContent=fmt(model.score,1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
-    $('verdict').textContent=model.phase; $('brief').textContent=model.v19Brief;
-    $('pPublic').textContent=pct(model.publicStrength); $('pInterior').textContent=pct(model.interiorStrength); $('pContradiction').textContent=pct(model.contradictionLoad); $('pNewSocial').textContent=String(model.socialDeltaCount); $('pWindows').textContent=String(model.windows.length); $('pPromoted').textContent=(model.v19Promoted||[]).length?short(model.v19Promoted[0],8,6):'—';
-    $('thoughtBubbles').innerHTML=(model.v19Thoughts||model.v18Thoughts||[]).slice(0,3).map(t=>`<div class="bubble">${t}</div>`).join('');
-    $('thoughtList').innerHTML=(model.v19Thoughts||model.v18Thoughts||[]).map(t=>uiItem(t,/No new social|empty|null-null/.test(t)?'warn':'good')).join('');
-    $('actionList').innerHTML=(model.v19Actions||model.v18Actions||[]).map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
-    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`];
+    $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length} • YT ${model.platformCounts.youtube||0} • X ${model.platformCounts.x||0}${model.socialError?` • ${model.socialError}`:''}`;
+    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v20Promoted||[]).length);
+    $('pegReactor').style.setProperty('--peg', (model.pegProgress*100).toFixed(1)); $('heroPeg').textContent=(model.pegProgress*100).toFixed(1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
+    $('verdict').textContent=model.phase; $('brief').textContent=model.v20Brief.split('\n').slice(0,4).join(' • ');
+    $('thoughtBubbles').innerHTML=model.v20Thoughts.slice(0,3).map(t=>`<div class="bubble">${t}</div>`).join('');
+    $('obsList').innerHTML=model.v20Thinking.observations.map(t=>uiItem(t,'info')).join('');
+    $('hypList').innerHTML=model.v20Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
+    $('conList').innerHTML=model.v20Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
+    $('nextList').innerHTML=model.v20Thinking.next.map(t=>uiItem(t,'good')).join('');
+    $('actionList').innerHTML=model.v20Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
+    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Top promoted candidate: ${(model.v20Promoted||[])[0]?short(model.v20Promoted[0],10,8):'—'}.`];
     $('truthList').innerHTML=truths.map(t=>uiItem(t,'info')).join('');
-    $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,25):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
-    $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${w.blocks.toFixed(1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
+    $('briefList').innerHTML=uiItem(model.v20Brief.replace(/\n/g,'<br>'),'good');
+    $('progressBoard').innerHTML=progressMilestones(model).map(m=>`<div class="milestone ${m.on?'active':''}"><div class="mileK">${m.k}</div><div class="mileV">${m.v}</div></div>`).join('');
+    $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,30):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
+    $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${fmt(w.blocks,1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
     $('anchorBody').innerHTML=(model.publicAnchors||[]).map(a=>`<tr><td>${a.name}</td><td class="mono">${short(a.address,10,8)}</td><td>${fmt(a.reserve0,3)}</td><td>${fmt(a.reserve1,3)}</td></tr>`).join('');
-    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v19Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v19Promoted[0],10,8):'—'}</td></tr>`).join('');
-  }
-  function renderFallback(err){
-    const last=loadLastGood(); if(last){ last.v18Thoughts=(last.v18Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]); render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot'; }
-    else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); }
+    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v20Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v20Promoted[0],10,8):'—'}</td></tr>`).join('');
   }
 
+  function renderFallback(err){
+    const last=loadLastGood();
+    if(last){
+      last.v20Thoughts=(last.v20Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
+      render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot';
+    } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); }
+  }
+
+  function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
   async function sync(){ if(state.syncing) return; state.syncing=true; try{ state.settings=loadSettings(); const model=await buildModel(); render(model); saveLastGood(snapshot(model)); state.history=loadHistory(); state.history.push(snapshot(model)); saveHistory(state.history); } catch(err){ console.error(err); renderFallback(err); } finally{ state.syncing=false; } }
+
   function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; }
   function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v19-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v19-bundle.json'; a.click(); }
-  function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)){ saveHistory(j); } else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v20-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v20-bundle.json'; a.click(); }
+  function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)) saveHistory(j); else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
   $('saveSettingsBtn').onclick=()=>{ pullSettings(); sync(); };
   $('clearSettingsBtn').onclick=()=>{ localStorage.removeItem(STORAGE_KEY); state.settings=loadSettings(); pushSettings(); sync(); };
   $('clearHistoryBtn').onclick=()=>{ localStorage.removeItem(HISTORY_KEY); state.history=[]; $('historyMeta').textContent='History: 0 snapshots'; };
-  $('refreshBtn').onclick=sync;
-  $('exportBtn').onclick=exportHistory;
-  $('bundleBtn').onclick=exportBundle;
-  $('importBtn').onclick=()=>$('importFile').click();
-  $('importFile').onchange=(e)=>{ const f=e.target.files?.[0]; if(f) importHistoryFile(f); e.target.value=''; };
+  $('refreshBtn').onclick=sync; $('exportBtn').onclick=exportHistory; $('bundleBtn').onclick=exportBundle; $('importBtn').onclick=()=>$('importFile').click(); $('importFile').onchange=(e)=>{ const f=e.target.files?.[0]; if(f) importHistoryFile(f); e.target.value=''; };
 
-  state.settings=loadSettings(); pushSettings(); state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`;
-  state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh));
-  sync();
+  state.settings=loadSettings(); pushSettings(); state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); sync();
 })();
 </script>
 </body>
