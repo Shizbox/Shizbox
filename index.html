@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V30 Ultra-Godmode Contract Cartographer</title>
+<title>pDAI Peg Prover • V31 Ultra-Godmode Move Composer</title>
 <style>
   :root{
     --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
@@ -126,8 +126,8 @@
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V30 Ultra-Godmode Contract Cartographer</h1>
-      <div class="sub">V30 adds ultra-godmode contract intelligence: it does all of V29 plus direct pDAI contract anomaly hunting, log pulse analysis, mint/burn/approval monitoring, window-local contract standouts, and self-proof verdicts focused on what the token contract itself is doing.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V31 Ultra-Godmode Move Composer</h1>
+      <div class="sub">V31 adds ultra-godmode move composition: it keeps the contract cartography, but also builds the likely behind-the-scenes peg choreography from route opening, warehousing, supply-control doctrine, shadow plumbing, token-shell behavior, and missing execution proofs.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
         <div class="chip info">Courtroom + intake pressure + shadow map + window forensics</div>
@@ -154,7 +154,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V30 settings</div>
+    <div class="boxTitle">V31 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -181,7 +181,7 @@
   </div>
 
   <div class="metrics">
-    <div class="card"><div class="label">V30 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
+    <div class="card"><div class="label">V31 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
     <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Machine picture</div></div>
     <div class="card"><div class="label">Peg progress</div><div class="value" id="mPeg">—</div><div class="hint">Evidence-weighted, not price-weighted</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
@@ -206,7 +206,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card briefPanel">
-          <div class="label">V30 verdict</div>
+          <div class="label">V31 verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div class="bubbles" id="thoughtBubbles"></div>
@@ -238,6 +238,24 @@
         <div class="panel"><div class="boxTitle">Actions</div><div id="actionList"></div></div>
         <div class="panel"><div class="boxTitle">Key truths</div><div id="truthList"></div></div>
         <div class="panel"><div class="boxTitle">Operator brief</div><div id="briefList"></div></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Move builder</div>
+      <div class="small">This lane tries to connect the dots into the likely behind-the-scenes move sequence instead of only scoring isolated clues.</div>
+      <div class="brainGrid">
+        <div class="resCard"><div class="label">Current move state</div><div id="moveStateList"></div></div>
+        <div class="resCard"><div class="label">Behind-the-scenes recipe</div><div id="moveRecipeList"></div></div>
+        <div class="resCard"><div class="label">Missing links</div><div id="missingLinksList"></div></div>
+      </div>
+      <div class="brainGrid" style="margin-top:12px">
+        <div class="resCard"><div class="label">Move stages</div><div id="moveStageList"></div></div>
+        <div class="resCard"><div class="label">pDAI contract inner eye</div><div id="contractInnerEyeList"></div></div>
+        <div class="resCard"><div class="label">Move verdicts</div><div id="moveVerdictList"></div></div>
       </div>
     </div>
   </div>
@@ -411,10 +429,10 @@
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v30-settings';
-  const HISTORY_KEY='pdai-v30-history';
-  const SOCIAL_CACHE_KEY='pdai-v30-social-cache';
-  const LASTGOOD_KEY='pdai-v30-last-good';
+  const STORAGE_KEY='pdai-v31-settings';
+  const HISTORY_KEY='pdai-v31-history';
+  const SOCIAL_CACHE_KEY='pdai-v31-social-cache';
+  const LASTGOOD_KEY='pdai-v31-last-good';
   const NULL32='0x'+'0'.repeat(64);
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
@@ -1392,6 +1410,92 @@ async function reserveEvidenceForWindows(chain, windows){
     ];
     return {candidateDig, anchorEvidence, selfProof, nativeAttrition, slotAwake, transferGraph, slotWindowEvidence, reserveWindowEvidence, proofChallenges};
   }
+
+  function buildContractInnerEye(model, hist){
+    const ci=model.signalBrain?.contractIntel||{};
+    const topToucher=ci.topTouchers?.[0];
+    const topSpender=ci.topSpenders?.[0];
+    const windowActive=(ci.windowPulse||[]).some(w=>(w.score||0)>0);
+    const exotic=(ci.otherTopicCount||0)>0;
+    const mintCount=ci.mints?.count||0;
+    const burnCount=ci.burns?.count||0;
+    let stance='quiet-shell / active-perimeter';
+    if(mintCount || burnCount) stance='active-supply-shell';
+    else if(windowActive) stance='window-reactive-shell';
+    else if((ci.approvalCount||0)>0) stance='spender-prep / perimeter-active';
+    const reserve0 = asNum(model.publicAnchors?.find(x=>norm(x.address)===norm('0x947b4633e32e0c7f2c76753b43f008480715416d'))?.reserve0||0);
+    const corePdai = asNum(model.nodeBalances?.['5EF7']?.pdai||0);
+    const sequestration = reserve0>0 ? clamp(corePdai/(reserve0*350),0,1) : 0;
+    const windowBest=(ci.windowPulse||[])[0];
+    const score = clamp((ci.standoutScore||0)*0.45 + (sequestration*0.25) + ((topToucher&&topToucher.count>100)?0.15:0) + ((topSpender&&topSpender.count>1)?0.08:0) + (exotic?0.07:0),0,1);
+    const flags=[];
+    flags.push(`Stance: ${stance}.`);
+    flags.push(`Top toucher ${topToucher?short(topToucher.address,10,8):'—'} with ${(topToucher&&topToucher.count)||0} pDAI log edge(s).`);
+    flags.push(`Approvals ${ci.approvalCount||0} • top spender ${topSpender?short(topSpender.address,10,8):'—'}.`);
+    flags.push(`Mint ${mintCount} • burn ${burnCount} • other topics ${ci.otherTopicCount||0}.`);
+    flags.push(`5EF7/core sequestration versus native rail reads ${pct(sequestration)}.`);
+    if(windowBest) flags.push(`Strongest contract-local window is ${windowBest.code} at ${pct(windowBest.score)}.`);
+    const verdicts=[
+      {kind:'contract-stance', verdict:stance, text:`The pDAI token shell currently looks like ${stance}.`},
+      {kind:'sequestration', verdict:sequestration>.55?'strong':'moderate', text:`5EF7 versus native optical rail suggests ${pct(sequestration)} float sequestration pressure.`},
+      {kind:'spender-shape', verdict:(ci.approvalCount||0)>0?'observed':'quiet', text:`Approval surface is ${(ci.approvalCount||0)>0?'present':'quiet'} with ${(ci.approvalCount||0)} approval log(s).`},
+      {kind:'token-window-reactivity', verdict:windowActive?'observed':'quiet', text:windowActive?`${(ci.windowPulse||[]).filter(w=>w.score>0).length} social windows touched the token contract.`:'Token contract is quiet inside the strongest social windows.'}
+    ];
+    return {stance, score, flags, verdicts, sequestration};
+  }
+
+  function buildMoveBuilder(model, items, hist){
+    const socialItems = dedupeSocial(items||[]);
+    const allText = socialItems.map(x=>`${x.title||''} ${x.text||''}`.toLowerCase());
+    const countHits = (terms)=> allText.reduce((a,t)=> a + (terms.some(term=>t.includes(term)) ? 1 : 0), 0);
+    const routeHits = countHits(['sdk','api','bridge','cross-chain','route','wallet service providers','usdc','major wallet','privacy routes']);
+    const intakeHits = countHits(['liberty','gasless','marketplace','stableswap','1:1','liquidity','route', 'stablecoin']);
+    const supplyHits = countHits(['supply control','buyback','burn','burns','unpredictable','protocol fee']);
+    const warehousingRatio = (()=>{ const core=asNum(model.nodeBalances?.['5EF7']?.pdai||0); const native=asNum(model.publicAnchors?.find(x=>norm(x.address)===norm('0x947b4633e32e0c7f2c76753b43f008480715416d'))?.reserve0||0); return native>0?core/native:0; })();
+    const candidate = model.signalBrain?.chainDig?.candidateDig?.[0];
+    const shadow = model.signalBrain?.shadowMachineMap?.[0];
+    const proofPasses = (model.signalBrain?.chainDig?.proofChallenges||[]).filter(x=>x.pass).length;
+    const contractPulse = model.signalBrain?.contractIntel?.standoutScore||0;
+    const contractQuietWindows = !((model.signalBrain?.contractIntel?.windowPulse||[]).some(w=>(w.score||0)>0));
+    const slotAwake = !(model.slotProbe?.allZero && model.slotProbe?.equal);
+    const thinLP = model.signalBrain?.thinLP?.snapScore||0;
+    const stages = [
+      {name:'External intake routes opening', score:clamp(routeHits/8*0.65 + intakeHits/18*0.35,0,1), why:`Route/API/bridge cues ${routeHits} • intake cues ${intakeHits}`},
+      {name:'Core liquidity warehousing', score:clamp((warehousingRatio/320)*0.72 + ((asNum(model.nodeBalances?.['5EF7']?.pdai||0)>1e9)?0.28:0),0,1), why:`5EF7/native ratio ${fmt(warehousingRatio,2)}x`},
+      {name:'Supply-control doctrine', score:clamp(supplyHits/6*0.75 + ((model.signalBrain?.contractIntel?.approvalCount||0)>0?0.15:0) + ((model.signalBrain?.contractIntel?.topSpenders||[]).length?0.10:0),0,1), why:`Supply/burn cues ${supplyHits} • approvals ${(model.signalBrain?.contractIntel?.approvalCount||0)}`},
+      {name:'Shadow plumbing active', score:clamp((candidate?.score||0)*0.5 + (shadow?.score||0)*0.2 + (((model.signalBrain?.chainDig?.transferGraph?.topEdges||[]).length?0.15:0)) + (((model.signalBrain?.chainDig?.selfProof||[]).some(x=>x.kind==='transfer-graph'&&x.verdict==='observed'))?0.15:0),0,1), why:`Top candidate ${candidate?pct(candidate.score):'—'} • shadow ${shadow?pct(shadow.score):'—'}`},
+      {name:'Token shell activation', score:clamp(contractPulse*0.55 + ((contractQuietWindows?0:0.15)) + (slotAwake?0.20:0) + (((model.signalBrain?.contractIntel?.mints?.count||0)+(model.signalBrain?.contractIntel?.burns?.count||0)>0)?0.10:0),0,1), why:`Contract pulse ${pct(contractPulse)} • slot awake ${slotAwake?'yes':'no'}`},
+      {name:'Formal peg execution', score:clamp((proofPasses/5)*0.35 + (slotAwake?0.25:0) + (((model.signalBrain?.contractIntel?.mints?.count||0)+(model.signalBrain?.contractIntel?.burns?.count||0)>0)?0.20:0) + (((model.signalBrain?.chainDig?.selfProof||[]).some(x=>x.kind==='window-sync'&&x.verdict==='observed'))?0.20:0),0,1), why:`Proof passes ${proofPasses}/5`},
+    ];
+    const dominant = stages.reduce((a,b)=> b.score>a.score?b:a, stages[0]);
+    let stateText='behind-the-scenes plumbing / reserve choreography';
+    if(stages[0].score>.55 && stages[1].score>.65 && stages[3].score>.55 && stages[4].score<.45) stateText='intake + warehousing + shadow routing are active, but the token shell is still quiet';
+    if(stages[4].score>.55 && stages[5].score<.55) stateText='the token shell is beginning to matter, but formal execution proof is still missing';
+    if(stages[5].score>.65) stateText='formal peg execution signals are starting to outweigh narrative scaffolding';
+    const recipe = [
+      `Open intake routes and public API/SDK rails (${pct(stages[0].score)}).`,
+      `Warehouse native pDAI inside the 5EF7 structural core (${pct(stages[1].score)}).`,
+      `Condition the market around supply-control / buyback / burn doctrine (${pct(stages[2].score)}).`,
+      `Let shadow candidates absorb and route ordinary ERC20 flow while legacy watchers stay cold (${pct(stages[3].score)}).`,
+      `Wait for the token shell itself to stop being quiet (${pct(stages[4].score)}).`,
+      `Only then does literal peg execution stop being mostly narrative (${pct(stages[5].score)}).`,
+    ];
+    const missing = [];
+    if(!slotAwake) missing.push('Watched storage slots are still null-null; the token shell has not visibly awakened.');
+    if(contractQuietWindows) missing.push('Top social windows still are not lighting up the token contract itself.');
+    if((model.signalBrain?.chainDig?.proofChallenges||[]).find(x=>x.claim.includes('anchor motion') && !x.pass)) missing.push('The strongest Maria windows are still not causing decisive anchor motion.');
+    if((model.signalBrain?.chainDig?.proofChallenges||[]).find(x=>x.claim.includes('legacy watcher') && !x.pass)) missing.push('The old machine map is still mostly dead, so shadow plumbing must keep carrying the case.');
+    if(((model.signalBrain?.contractIntel?.mints?.count||0)+((model.signalBrain?.contractIntel?.burns?.count||0)))===0) missing.push('There is still no mint/burn shell evidence inside the pDAI contract.');
+    const verdicts=[
+      {kind:'dominant-move', verdict:'observed', text:`Current best-fit move state: ${stateText}.`},
+      {kind:'execution-gap', verdict:stages[5].score>.6?'narrowing':'wide', text:`Formal peg execution stage reads ${pct(stages[5].score)}.`},
+      {kind:'routing-vs-token', verdict:(stages[0].score>.55 && stages[4].score<.45)?'routing-dominant':'mixed', text:`Routing/intake ${pct(stages[0].score)} versus token-shell activation ${pct(stages[4].score)}.`},
+      {kind:'move-confidence', verdict:dominant.score>.65?'strong':'moderate', text:`Move-composer confidence ${pct(clamp((stages[0].score+stages[1].score+stages[3].score)/3,0,1))}.`}
+    ];
+    return {stages, dominant, stateText, recipe, missing, verdicts, confidence:clamp((stages[0].score+stages[1].score+stages[2].score+stages[3].score)/4,0,1)};
+  }
+
+
   function buildThinking(model){
     const observations=[];
     const hypotheses=[];
@@ -1410,6 +1514,8 @@ async function reserveEvidenceForWindows(chain, windows){
     if(model.signalBrain.chainDig?.candidateDig?.[0]) observations.push(`Top chain-dig candidate is ${short(model.signalBrain.chainDig.candidateDig[0].address,10,8)} at ${pct(model.signalBrain.chainDig.candidateDig[0].score)}.`);
     if(model.signalBrain.chainDig?.reserveWindowEvidence?.[0]) observations.push(`Top reserve-window move: ${model.signalBrain.chainDig.reserveWindowEvidence[0].anchor} ${model.signalBrain.chainDig.reserveWindowEvidence[0].code} ${fmt(model.signalBrain.chainDig.reserveWindowEvidence[0].pct0,2)}% / ${fmt(model.signalBrain.chainDig.reserveWindowEvidence[0].pct1,2)}%.`);
     if(model.signalBrain.contractIntel) observations.push(`pDAI contract standout score reads ${pct(model.signalBrain.contractIntel.standoutScore)} with ${model.signalBrain.contractIntel.transferCount} transfer logs and ${model.signalBrain.contractIntel.approvalCount} approval logs.`);
+    if(model.signalBrain.moveBuilder) observations.push(`Move builder says: ${model.signalBrain.moveBuilder.stateText}.`);
+    if(model.signalBrain.contractInnerEye) observations.push(`pDAI inner eye stance: ${model.signalBrain.contractInnerEye.stance}.`);
     hypotheses.push(model.phase==='surface-leading' ? 'Public-surface mutation is outrunning the current interior watcher map.' : 'Surface/interior balance is changing.');
     if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
     if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
@@ -1418,6 +1524,7 @@ async function reserveEvidenceForWindows(chain, windows){
     if((model.signalBrain.shadowMachineMap||[])[0]) hypotheses.push(`Shadow machine map currently favors ${short(model.signalBrain.shadowMachineMap[0].address,10,8)} over at least part of the legacy watcher set.`);
     if(model.signalBrain.chainDig?.proofChallenges?.filter(x=>x.pass).length) hypotheses.push(`${model.signalBrain.chainDig.proofChallenges.filter(x=>x.pass).length} blockchain proof challenge(s) currently pass.`);
     if((model.signalBrain.contractIntel?.standoutScore||0)>.55) hypotheses.push('The pDAI contract itself is now standing out enough that direct token-contract evidence deserves more weight in the peg case.');
+    if((model.signalBrain.moveBuilder?.dominant?.score||0)>.55) hypotheses.push(`Move builder favors ${model.signalBrain.moveBuilder.dominant.name.toLowerCase()} (${pct(model.signalBrain.moveBuilder.dominant.score)}).`);
     if((model.signalBrain.intakePressure?.score||0)>.55) hypotheses.push('Macro intake pressure may now be a structural prerequisite signal rather than just narrative noise.');
     hypotheses.push(...(model.signalBrain.theoryLedger||[]).slice(0,2).map(t=>`${t.name} (${pct(t.score)})`));
     hypotheses.push(...(model.signalBrain.claimLedger||[]).slice(0,2).map(t=>`${t.clue} (${pct(clamp(t.support-t.contradiction,0,1))})`));
@@ -1432,6 +1539,7 @@ async function reserveEvidenceForWindows(chain, windows){
     if(model.signalBrain.chainDig?.proofChallenges?.find(x=>x.claim.includes('anchor motion') && !x.pass)) contradictions.push('Top Maria windows are still not producing decisive anchor-motion proof.');
     if(model.signalBrain.chainDig?.proofChallenges?.find(x=>x.claim.includes('shadow candidate') && !x.pass)) contradictions.push('Promoted/shadow candidates are not yet proving enough on-chain activity to replace the old map.');
     if((model.signalBrain.contractIntel?.transferCount||0)===0) contradictions.push('The pDAI contract itself is not emitting transfer evidence inside the scanned range.');
+    if((model.signalBrain.contractInnerEye?.stance||'').includes('quiet-shell')) contradictions.push('The token shell itself is still quieter than the surrounding routing/perimeter graph.');
     next.push('Scan reserve windows around the strongest social windows and compare before/after reserves directly.');
     next.push('Promote candidates that win both transfer-graph and tx-activity checks.');
     next.push('Keep checking watched slots for the first non-zero awakening.');
@@ -1484,6 +1592,8 @@ async function reserveEvidenceForWindows(chain, windows){
     baseModel.signalBrain.windowForensics = buildWindowForensics(baseModel, baseModel.signalBrain.claimPressureLedger, baseModel.signalBrain.witnessBoard);
     baseModel.signalBrain.chainDig = await buildChainDig(chain, windows, counterparties, promoted, hist);
     baseModel.signalBrain.contractIntel = await buildPdaiContractIntel(chain, windows, promoted, hist);
+    baseModel.signalBrain.contractInnerEye = buildContractInnerEye(baseModel, hist);
+    baseModel.signalBrain.moveBuilder = buildMoveBuilder(baseModel, [...social,...research,...histSocial], hist);
     const thinking = buildThinking(baseModel);
     const v30Actions=[
       {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
@@ -1497,12 +1607,13 @@ async function reserveEvidenceForWindows(chain, windows){
       {kind:'chain-dig',status:'ok',findings:(baseModel.signalBrain.chainDig?.selfProof||[]).map(s=>`${s.kind}: ${s.verdict}`)},
       {kind:'chain-proof-challenges',status:'ok',findings:(baseModel.signalBrain.chainDig?.proofChallenges||[]).map(s=>`${s.pass?'PASS':'FAIL'} ${s.claim}`)},
       {kind:'chain-graph',status:'ok',findings:(baseModel.signalBrain.chainDig?.transferGraph?.topEdges||[]).slice(0,3).map(e=>`${short(e.from,8,6)}→${short(e.to,8,6)} (${e.count})`)},
-      {kind:'pdai-contract-intel',status:'ok',findings:(baseModel.signalBrain.contractIntel?.verdicts||[]).map(v=>`${v.kind}: ${v.verdict}`)}
+      {kind:'pdai-contract-intel',status:'ok',findings:(baseModel.signalBrain.contractIntel?.verdicts||[]).map(v=>`${v.kind}: ${v.verdict}`)},
+      {kind:'move-builder',status:'ok',findings:[baseModel.signalBrain.moveBuilder?.stateText||'no move state', ...((baseModel.signalBrain.moveBuilder?.verdicts||[]).map(v=>`${v.kind}: ${v.verdict}`)).slice(0,3)]}
     ];
     const allThoughts=[...thinking.observations.slice(0,3), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,3)];
     const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v30Thoughts:allThoughts, v30Actions, v30Goal:'Let the tool prove or falsify its own theories by digging the chain directly: windows, reserves, candidates, graphs, slots, and LP attrition.', v30Thinking:thinking, v30Speculation:baseModel.signalBrain.spec, v30Eta:baseModel.signalBrain.eta, v30Godmode:baseModel.signalBrain};
     model.pegProgress = computePegProgress({...model, v30Promoted: promoted});
-    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*10 + (model.signalBrain.contractIntel?.standoutScore||0)*8 - contradictionLoad*18, 0, 100);
+    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*8 + (model.signalBrain.contractIntel?.standoutScore||0)*8 + (model.signalBrain.moveBuilder?.confidence||0)*10 + (model.signalBrain.contractInnerEye?.score||0)*6 - contradictionLoad*16, 0, 100);
     model.v30Brief = `V29 regime: ${model.phase}
 Score: ${fmt(model.score,1)}
 Peg progress: ${pct(model.pegProgress)}
@@ -1513,6 +1624,8 @@ Social delta: ${delta.length}
 Top dossier: ${model.signalBrain.dossiers[0]?.title||'—'}
 Top claim: ${model.signalBrain.claimLedger[0]?.clue||model.signalBrain.theoryLedger[0]?.name||'—'}
 pDAI contract pulse: ${pct(model.signalBrain.contractIntel?.standoutScore||0)}
+Move state: ${model.signalBrain.moveBuilder?.stateText||'—'}
+pDAI inner eye: ${model.signalBrain.contractInnerEye?.stance||'—'}
 Thoughts: ${model.v30Thoughts.join(' | ')}
 Actions: ${v30Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
 Promoted: ${promoted.join(', ')||'—'}`;
@@ -1618,8 +1731,8 @@ Promoted: ${promoted.join(', ')||'—'}`;
 
   function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; $('sResearchCorpus').value=state.settings.researchCorpus||''; $('sTranscriptProxy').value=state.settings.transcriptProxy||''; $('sSpeculateLevel').value=state.settings.speculateLevel||8; $('sFrameCorpus').value=state.settings.frameCorpus||''; }
   function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; state.settings.researchCorpus=$('sResearchCorpus').value; state.settings.transcriptProxy=$('sTranscriptProxy').value.trim(); state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8; state.settings.frameCorpus=$('sFrameCorpus').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v30-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v30-bundle.json'; a.click(); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v31-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v31-bundle.json'; a.click(); }
   function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)) saveHistory(j); else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
