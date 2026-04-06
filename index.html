@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V28 Above-God-Tier Peg Cartographer</title>
+<title>pDAI Peg Prover • V29 Above-God-Tier Peg Cartographer</title>
 <style>
   :root{
     --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
@@ -126,8 +126,8 @@
 <div class="wrap">
   <div class="panel top">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V28 Above-God-Tier Peg Cartographer</h1>
-      <div class="sub">V28 does all of it: claim courtroom, transcript dissection, window forensics, intake-pressure analysis, shadow machine mapping, null-awakening alerts, thin-LP attrition tracking, and scenario ETA logic so the peg thesis is tested from every angle at once.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V29 Above-God-Tier Peg Cartographer</h1>
+      <div class="sub">V29 does all of it: claim courtroom, transcript dissection, window forensics, intake-pressure analysis, shadow machine mapping, null-awakening alerts, thin-LP attrition tracking, and scenario ETA logic so the peg thesis is tested from every angle at once.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
         <div class="chip info">Courtroom + intake pressure + shadow map + window forensics</div>
@@ -154,7 +154,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V28 settings</div>
+    <div class="boxTitle">V29 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Auto refresh ms</label><input id="sAutoRefresh" value="30000" /></div>
@@ -181,7 +181,7 @@
   </div>
 
   <div class="metrics">
-    <div class="card"><div class="label">V28 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
+    <div class="card"><div class="label">V29 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
     <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Machine picture</div></div>
     <div class="card"><div class="label">Peg progress</div><div class="value" id="mPeg">—</div><div class="hint">Evidence-weighted, not price-weighted</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
@@ -206,7 +206,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card briefPanel">
-          <div class="label">V28 verdict</div>
+          <div class="label">V29 verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div class="bubbles" id="thoughtBubbles"></div>
@@ -389,7 +389,7 @@
     </div>
     <div class="panel">
       <div class="boxTitle">Scenario tree</div>
-      <div class="small">Instead of one blended ETA, V28 branches the case into readiness, surface-led repricing, interior wake-up, and confirmation debt scenarios.</div>
+      <div class="small">Instead of one blended ETA, V29 branches the case into readiness, surface-led repricing, interior wake-up, and confirmation debt scenarios.</div>
       <div id="scenarioTree" style="margin-top:12px"></div>
     </div>
   </div>
@@ -398,10 +398,10 @@
 
 <script>
 (() => {
-  const STORAGE_KEY='pdai-v28-settings';
-  const HISTORY_KEY='pdai-v28-history';
-  const SOCIAL_CACHE_KEY='pdai-v28-social-cache';
-  const LASTGOOD_KEY='pdai-v28-last-good';
+  const STORAGE_KEY='pdai-v29-settings';
+  const HISTORY_KEY='pdai-v29-history';
+  const SOCIAL_CACHE_KEY='pdai-v29-social-cache';
+  const LASTGOOD_KEY='pdai-v29-last-good';
   const NULL32='0x'+'0'.repeat(64);
   const DEFAULTS={
     privateRpc:'', autoRefresh:30000, scanBlocks:300, blockSec:10.2, channelId:'UC0ADdeCTOW9Qlai7G3kLLFg',
@@ -645,7 +645,7 @@
     const narrative=clamp(signalBrain.numericRes*0.35 + Math.min(model.socialDeltaCount,60)/60*0.25 + Math.min((signalBrain.transcriptStructures||[]).length,6)/6*0.18 + Math.min((signalBrain.cueClusters||[]).length,10)/10*0.12 + Math.min((signalBrain.dossiers||[]).length,8)/8*0.10,0,1);
     const surface=clamp(model.publicStrength*0.48 + Math.min((model.counterparties||[]).length,6)/6*0.18 + ((model.hotWatcher==='5EF7'&& (model.nodeBalances['5EF7']?.pdai||0)>0)?0.16:0) + Math.min((model.windows||[]).length,10)/10*0.10 + Math.min((model.platformCounts?.x||0),20)/20*0.08,0,1);
     const chainDigBoost=((signalBrain.chainDig?.candidateDig?.[0]?.score||0)*0.12)+((signalBrain.chainDig?.selfProof?.some(x=>x.kind==='window-sync'&&x.verdict==='observed'))?0.10:0);
-    const interior=clamp(model.interiorStrength*0.55 + (Object.values(model.watchTiers||{}).filter(v=>v==='hot').length>1?0.18:0) + (model.v28Promoted?.length?0.12:0) + chainDigBoost - (model.slotProbe?.allZero?0.12:0) - (model.dnaProbe?.raw===NULL32?0.1:0),0,1);
+    const interior=clamp(model.interiorStrength*0.55 + (Object.values(model.watchTiers||{}).filter(v=>v==='hot').length>1?0.18:0) + (model.v29Promoted?.length?0.12:0) + chainDigBoost - (model.slotProbe?.allZero?0.12:0) - (model.dnaProbe?.raw===NULL32?0.1:0),0,1);
     const eta=clamp(narrative*0.35 + surface*0.30 + interior*0.20 + Math.max(0,1-model.contradictionLoad)*0.15,0,1);
     return [
       {name:'Narrative coherence', score:narrative, hint:`${model.socialDeltaCount} social deltas • ${(signalBrain.transcriptStructures||[]).length} structures`},
@@ -1074,7 +1074,7 @@
       (model.interiorStrength*0.16)+
       (Math.min(model.socialDeltaCount,24)/24*0.16)+
       (Math.min((model.windows||[]).length,14)/14*0.10)+
-      (Math.min((model.v28Promoted||[]).length,5)/5*0.08)+
+      (Math.min((model.v29Promoted||[]).length,5)/5*0.08)+
       (Math.min((model.counterparties||[]).length,8)/8*0.05)+
       ((model.signalBrain?.numericRes||0)*0.13)+
       (Math.min((model.signalBrain?.dossiers||[]).length,8)/8*0.08)-
@@ -1146,7 +1146,50 @@
     }
     return out;
   }
-  async function reserveEvidenceForWindows(chain, windows){
+  
+  async function selectorProfileForAddress(addr, fromBlock, depth=24){
+    const end=await blockNumber(); const start=Math.max(fromBlock,end-depth);
+    const counts={}; const samples=[];
+    for(let b=start; b<=end; b++){
+      const blk=await blockByNumberFull(b).catch(()=>null);
+      const txs=blk?.transactions||[];
+      for(const tx of txs){
+        const from=norm(tx.from||''); const to=norm(tx.to||'');
+        if(from!==norm(addr) && to!==norm(addr)) continue;
+        const input=String(tx.input||'0x');
+        const selector=input.length>=10?input.slice(0,10):'0x';
+        counts[selector]=(counts[selector]||0)+1;
+        if(samples.length<4) samples.push(`${b}:${selector}`);
+      }
+    }
+    const topSelectors=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([selector,count])=>({selector,count}));
+    return {topSelectors, samples, unique:Object.keys(counts).length};
+  }
+  async function netFlowForAddress(addr, fromBlock, toBlock='latest'){
+    const holder=topicAddr(addr);
+    const [outLogs,inLogs]=await Promise.all([
+      getLogs({address:state.settings.target,fromBlock:typeof fromBlock==='number'?'0x'+fromBlock.toString(16):fromBlock,toBlock:typeof toBlock==='number'?'0x'+toBlock.toString(16):toBlock,topics:[TRANSFER_TOPIC,holder]}).catch(()=>[]),
+      getLogs({address:state.settings.target,fromBlock:typeof fromBlock==='number'?'0x'+fromBlock.toString(16):fromBlock,toBlock:typeof toBlock==='number'?'0x'+toBlock.toString(16):toBlock,topics:[TRANSFER_TOPIC,null,holder]}).catch(()=>[])
+    ]);
+    const sum=(logs)=> (logs||[]).reduce((a,log)=>{ try{ return a + Number(BigInt(log.data||'0x0'))/1e18; }catch(e){ return a; } },0);
+    const outAmt=sum(outLogs), inAmt=sum(inLogs);
+    return {inAmt,outAmt,net:inAmt-outAmt};
+  }
+  async function adjacencyForAddress(addr, fromBlock, depth=24){
+    const end=await blockNumber(); const start=Math.max(fromBlock,end-depth);
+    const counts={};
+    for(let b=start; b<=end; b++){
+      const blk=await blockByNumberFull(b).catch(()=>null);
+      const txs=blk?.transactions||[];
+      for(const tx of txs){
+        const from=norm(tx.from||''); const to=norm(tx.to||'');
+        if(from===norm(addr) && to && to!==norm(addr)) counts[to]=(counts[to]||0)+1;
+        else if(to===norm(addr) && from && from!==norm(addr)) counts[from]=(counts[from]||0)+1;
+      }
+    }
+    return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([address,count])=>({address,count}));
+  }
+async function reserveEvidenceForWindows(chain, windows){
     const decCache={};
     async function dec(token){ if(decCache[token]==null) decCache[token]=await ercDecimals(token).catch(()=>18); return decCache[token]; }
     const out=[];
@@ -1185,12 +1228,16 @@
     const graphCounts=transferGraph.nodeCounts||{};
     const candidateSubjects=[...new Set([...(promoted||[]), seed, ...counterparties.slice(0,5).map(x=>x.address), state.settings.watchers['5EF7']].map(norm))].slice(0,7);
     const candidateDig=[];
-    for(const addr of candidateSubjects){
-      const [code, nonce, hitsRecent, txActivity] = await Promise.all([
+    for(const [i,addr] of candidateSubjects.entries()){
+      const wantDeep=i<5;
+      const [code, nonce, hitsRecent, txActivity, flow, selectors, adjacency] = await Promise.all([
         getCode(addr).catch(()=>'0x'),
         txCount(addr).catch(()=>0),
         transferHitsFor(addr, fromBlock).catch(()=>({inCount:0,outCount:0,total:0})),
-        txActivityForAddress(addr, Math.max(fromBlock, latest-28), 28).catch(()=>({total:0,fromHits:0,toHits:0,samples:[]}))
+        txActivityForAddress(addr, Math.max(fromBlock, latest-28), 28).catch(()=>({total:0,fromHits:0,toHits:0,samples:[]})),
+        wantDeep?netFlowForAddress(addr, fromBlock).catch(()=>({inAmt:0,outAmt:0,net:0})):Promise.resolve({inAmt:0,outAmt:0,net:0}),
+        wantDeep?selectorProfileForAddress(addr, Math.max(fromBlock, latest-28), 28).catch(()=>({topSelectors:[],samples:[],unique:0})):Promise.resolve({topSelectors:[],samples:[],unique:0}),
+        wantDeep?adjacencyForAddress(addr, Math.max(fromBlock, latest-28), 28).catch(()=>[]):Promise.resolve([])
       ]);
       let windowHits=0; const touched=[];
       for(const w of (windows||[]).slice(0,5)){
@@ -1199,8 +1246,8 @@
       }
       const codeBytes=Math.max(0,(String(code).replace(/^0x/,'').length/2)|0);
       const graphTouches=graphCounts[norm(addr)]||0;
-      const score=clamp((counterparties.find(x=>norm(x.address)===norm(addr))?.count||0)/5 + (nonce>0?0.16:0) + (hitsRecent.total>0?0.18:0) + (windowHits>0?0.24:0) + (codeBytes>2?0.12:0) + (txActivity.total>0?0.14:0) + Math.min(graphTouches,6)/30,0,1);
-      candidateDig.push({address:addr, codeType:codeBytes>2?'contract':'EOA', codeBytes, nonce, recentTransfers:hitsRecent.total, windowHits, touched, txActivity, graphTouches, score});
+      const score=clamp((counterparties.find(x=>norm(x.address)===norm(addr))?.count||0)/5 + (nonce>0?0.16:0) + (hitsRecent.total>0?0.18:0) + (windowHits>0?0.24:0) + (codeBytes>2?0.12:0) + (txActivity.total>0?0.14:0) + Math.min(graphTouches,6)/30 + (Math.abs(flow.net)>0?0.08:0) + (selectors.unique>0?0.06:0),0,1);
+      candidateDig.push({address:addr, codeType:codeBytes>2?'contract':'EOA', codeBytes, nonce, recentTransfers:hitsRecent.total, windowHits, touched, txActivity, graphTouches, flow, selectors, adjacency, score});
     }
     candidateDig.sort((a,b)=>b.score-a.score);
 
@@ -1225,6 +1272,8 @@
 
     const selfProof=[];
     if(candidateDig[0]) selfProof.push({kind:'candidate-best', verdict:candidateDig[0].score>0.55?'active':'weak', text:`Top candidate ${short(candidateDig[0].address,10,8)} scores ${pct(candidateDig[0].score)} with ${candidateDig[0].recentTransfers} transfer hit(s), ${candidateDig[0].windowHits} window hit(s), ${candidateDig[0].txActivity.total} tx touch(es), and ${candidateDig[0].graphTouches} graph touch(es).`});
+    if(candidateDig[0]) selfProof.push({kind:'selector-fingerprint', verdict:(candidateDig[0].selectors?.unique||0)>0?'observed':'quiet', text:(candidateDig[0].selectors?.topSelectors?.length)?`Top selectors on ${short(candidateDig[0].address,10,8)}: ${candidateDig[0].selectors.topSelectors.slice(0,3).map(s=>`${s.selector}×${s.count}`).join(' ; ')}.`:'No selector fingerprint yet on the top candidate.'});
+    if(candidateDig[0]) selfProof.push({kind:'net-flow', verdict:Math.abs(candidateDig[0].flow?.net||0)>0?'observed':'flat', text:`Top candidate net pDAI flow is ${fmt(candidateDig[0].flow?.net||0,3)} (in ${fmt(candidateDig[0].flow?.inAmt||0,3)} / out ${fmt(candidateDig[0].flow?.outAmt||0,3)}).`});
     selfProof.push({kind:'slot-awakening', verdict:slotAwake?'primed':'dormant', text:slotAwake?'At least one watched storage slot becomes non-null inside a scanned window or live state.':'Watched storage slots are still null-null equality.'});
     const syncHeavy=anchorEvidence.filter(a=>a.windowSyncs>0).sort((a,b)=>b.windowSyncs-a.windowSyncs)[0];
     const reserveHeavy=reserveWindowEvidence[0];
@@ -1264,7 +1313,7 @@
     if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
     if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
     if(model.signalBrain.transcriptCues.length) hypotheses.push(`Loaded corpus contains ${model.signalBrain.transcriptCues.length} transcript/frame cue(s), which increases structured symbolic signal.`);
-    if((model.v28Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v28Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
+    if((model.v29Promoted||[]).length) hypotheses.push(`Promoted candidate ${short(model.v29Promoted[0],10,8)} may be a better interior probe than current cold watchers.`);
     if((model.signalBrain.shadowMachineMap||[])[0]) hypotheses.push(`Shadow machine map currently favors ${short(model.signalBrain.shadowMachineMap[0].address,10,8)} over at least part of the legacy watcher set.`);
     if(model.signalBrain.chainDig?.proofChallenges?.filter(x=>x.pass).length) hypotheses.push(`${model.signalBrain.chainDig.proofChallenges.filter(x=>x.pass).length} blockchain proof challenge(s) currently pass.`);
     if((model.signalBrain.intakePressure?.score||0)>.55) hypotheses.push('Macro intake pressure may now be a structural prerequisite signal rather than just narrative noise.');
@@ -1320,7 +1369,7 @@
     const platformCounts = dedupeSocial([...social,...research,...histSocial]).reduce((a,x)=>{ a[x.platform]=(a[x.platform]||0)+1; return a; }, {});
     const historySignals = buildHistorySignals(hist);
     const signalBrain = buildSignalBrain({publicStrength,interiorStrength,contradictionLoad,socialDeltaCount:delta.length,slotProbe:chain.slotProbe,payloadHits}, social, research, histSocial, historySignals);
-    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v28Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
+    const baseModel={...chain, phase, rawPhase:phase, stablePhase:phase, publicStrength, interiorStrength, contradictionLoad, socialDeltaCount:delta.length, newSocial:delta, harvestedSocial:social, windows, counterparties, payloadHits, hotWatcher, v29Promoted:promoted, platformCounts, socialError:socialError.trim(), signalBrain};
     baseModel.signalBrain.claimLedger = buildClaimLedger(baseModel, [...social,...research,...histSocial], historySignals, signalBrain);
     baseModel.signalBrain.transcriptDecomp = buildTranscriptDecomposition([...social,...research,...histSocial]);
     baseModel.signalBrain.proofPressure = buildProofPressure(baseModel, baseModel.signalBrain);
@@ -1332,7 +1381,7 @@
     baseModel.signalBrain.windowForensics = buildWindowForensics(baseModel, baseModel.signalBrain.claimPressureLedger, baseModel.signalBrain.witnessBoard);
     baseModel.signalBrain.chainDig = await buildChainDig(chain, windows, counterparties, promoted, hist);
     const thinking = buildThinking(baseModel);
-    const v28Actions=[
+    const v29Actions=[
       {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
       ...(windows[0]?[{kind:'sync-window',status:'ok',findings:[`${windows[0].phase} window ${fmt(windows[0].blocks,1)} blocks from ${windows[0].title.match(/\d+s/i)?.[0]||'timing'}`, windows[0].code?`code ${windows[0].code}`:'no code']}]:[]),
       {kind:'counterparty-hunt',status:'ok',findings:counterparties.length?counterparties.map(x=>`candidate ${short(x.address,10,8)} (${x.count})`):['no new counterparties']},
@@ -1346,10 +1395,10 @@
       {kind:'chain-graph',status:'ok',findings:(baseModel.signalBrain.chainDig?.transferGraph?.topEdges||[]).slice(0,3).map(e=>`${short(e.from,8,6)}→${short(e.to,8,6)} (${e.count})`)}
     ];
     const allThoughts=[...thinking.observations.slice(0,3), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,3)];
-    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v28Thoughts:allThoughts, v28Actions, v28Goal:'Let the tool prove or falsify its own theories by digging the chain directly: windows, reserves, candidates, graphs, slots, and LP attrition.', v28Thinking:thinking, v28Speculation:baseModel.signalBrain.spec, v28Eta:baseModel.signalBrain.eta, v28Godmode:baseModel.signalBrain};
-    model.pegProgress = computePegProgress({...model, v28Promoted: promoted});
+    const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v29Thoughts:allThoughts, v29Actions, v29Goal:'Let the tool prove or falsify its own theories by digging the chain directly: windows, reserves, candidates, graphs, slots, and LP attrition.', v29Thinking:thinking, v29Speculation:baseModel.signalBrain.spec, v29Eta:baseModel.signalBrain.eta, v29Godmode:baseModel.signalBrain};
+    model.pegProgress = computePegProgress({...model, v29Promoted: promoted});
     model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*10 - contradictionLoad*18, 0, 100);
-    model.v28Brief = `V28 regime: ${model.phase}
+    model.v29Brief = `V29 regime: ${model.phase}
 Score: ${fmt(model.score,1)}
 Peg progress: ${pct(model.pegProgress)}
 Public vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}
@@ -1358,8 +1407,8 @@ Hot watcher: ${hotWatcher}
 Social delta: ${delta.length}
 Top dossier: ${model.signalBrain.dossiers[0]?.title||'—'}
 Top claim: ${model.signalBrain.claimLedger[0]?.clue||model.signalBrain.theoryLedger[0]?.name||'—'}
-Thoughts: ${model.v28Thoughts.join(' | ')}
-Actions: ${v28Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
+Thoughts: ${model.v29Thoughts.join(' | ')}
+Actions: ${v29Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
 Promoted: ${promoted.join(', ')||'—'}`;
     return model;
   }
@@ -1369,7 +1418,7 @@ Promoted: ${promoted.join(', ')||'—'}`;
       {k:'Social capture', on:model.socialDeltaCount>0 || model.harvestedSocial.length>0, v:model.socialDeltaCount?`${model.socialDeltaCount} new`:`${model.harvestedSocial.length} seen`},
       {k:'Windowing', on:(model.windows||[]).length>0, v:`${(model.windows||[]).length} windows`},
       {k:'Surface resonance', on:model.publicStrength>.7, v:pct(model.publicStrength)},
-      {k:'Candidate promotion', on:(model.v28Promoted||[]).length>0, v:(model.v28Promoted||[]).length?short(model.v28Promoted[0],8,6):'—'},
+      {k:'Candidate promotion', on:(model.v29Promoted||[]).length>0, v:(model.v29Promoted||[]).length?short(model.v29Promoted[0],8,6):'—'},
       {k:'Interior wake', on:model.interiorStrength>.35, v:pct(model.interiorStrength)},
       {k:'Contradiction control', on:model.contradictionLoad<.45, v:pct(1-model.contradictionLoad)}
     ];
@@ -1380,26 +1429,26 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('syncStatus').textContent=model.socialError?'degraded':'synced'; $('syncStatus').className='status '+(model.socialError?'warn':'ok');
     $('lastSync').textContent='Last sync: '+new Date().toLocaleString();
     $('socialMeta').textContent=`Social: ${model.socialDeltaCount} new • harvested ${model.harvestedSocial.length} • YT ${model.platformCounts.youtube||0} • X ${model.platformCounts.x||0} • Corpus ${model.platformCounts.corpus||0}${model.socialError?` • ${model.socialError}`:''}`;
-    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v28Promoted||[]).length);
+    $('mScore').textContent=fmt(model.score,1); $('mRegime').textContent=model.phase; $('mPeg').textContent=pct(model.pegProgress); $('mSocial').textContent=String(model.socialDeltaCount); $('mHot').textContent=model.hotWatcher; $('mPromoted').textContent=String((model.v29Promoted||[]).length);
     $('pegReactor').style.setProperty('--peg', (model.pegProgress*100).toFixed(1)); $('heroPeg').textContent=(model.pegProgress*100).toFixed(1); $('heroPhase').textContent=model.stablePhase; $('heroHint').textContent=model.slotProbe.summary;
-    $('verdict').textContent=model.phase; $('brief').textContent=model.v28Brief.split('\n').slice(0,5).join(' • ');
-    $('thoughtBubbles').innerHTML=model.v28Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
-    $('obsList').innerHTML=model.v28Thinking.observations.map(t=>uiItem(t,'info')).join('');
-    $('hypList').innerHTML=model.v28Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
-    $('conList').innerHTML=model.v28Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
-    $('nextList').innerHTML=model.v28Thinking.next.map(t=>uiItem(t,'good')).join('');
-    $('actionList').innerHTML=model.v28Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
-    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Narrative vs surface vs interior vs ETA: ${(model.signalBrain.proofPressure||[]).map(p=>`${p.name.split(' ')[0]} ${pct(p.score)}`).join(' • ')}.`,`Top promoted candidate: ${(model.v28Promoted||[])[0]?short(model.v28Promoted[0],10,8):'—'}.`,`Intake pressure: ${pct(model.signalBrain.intakePressure?.score||0)}.`,`Thin-LP snap score: ${pct(model.signalBrain.thinLP?.snapScore||0)}.`,`Top shadow candidate: ${(model.signalBrain.shadowMachineMap||[])[0]?short(model.signalBrain.shadowMachineMap[0].address,10,8):'—'}.`,`Top chain-dig candidate: ${(model.signalBrain.chainDig?.candidateDig||[])[0]?short(model.signalBrain.chainDig.candidateDig[0].address,10,8):'—'}.`,`Slot awakening: ${model.signalBrain.chainDig?.slotAwake?'non-null':'still dormant'}.`,`Proof challenges passed: ${(model.signalBrain.chainDig?.proofChallenges||[]).filter(x=>x.pass).length}/${(model.signalBrain.chainDig?.proofChallenges||[]).length||0}.`];
+    $('verdict').textContent=model.phase; $('brief').textContent=model.v29Brief.split('\n').slice(0,5).join(' • ');
+    $('thoughtBubbles').innerHTML=model.v29Thoughts.slice(0,5).map(t=>`<div class="bubble">${t}</div>`).join('');
+    $('obsList').innerHTML=model.v29Thinking.observations.map(t=>uiItem(t,'info')).join('');
+    $('hypList').innerHTML=model.v29Thinking.hypotheses.map(t=>uiItem(t,'good')).join('');
+    $('conList').innerHTML=model.v29Thinking.contradictions.map(t=>uiItem(t,'warn')).join('');
+    $('nextList').innerHTML=model.v29Thinking.next.map(t=>uiItem(t,'good')).join('');
+    $('actionList').innerHTML=model.v29Actions.map(a=>uiItem(`<strong>${a.kind}</strong>: ${a.findings.join(' ; ')}`, a.status==='ok'?'good':'warn')).join('');
+    const truths=[`${model.hotWatcher} remains the strongest live watcher.`,`Public anchors remain the richest truth layer.`,`Null-null slots are contradiction, not proof.`,`DNA slot is ${model.dnaProbe.raw===NULL32?'empty':'non-empty'}.`,`Numeric resonance currently reads ${pct(model.signalBrain.numericRes)}.`,`Narrative vs surface vs interior vs ETA: ${(model.signalBrain.proofPressure||[]).map(p=>`${p.name.split(' ')[0]} ${pct(p.score)}`).join(' • ')}.`,`Top promoted candidate: ${(model.v29Promoted||[])[0]?short(model.v29Promoted[0],10,8):'—'}.`,`Intake pressure: ${pct(model.signalBrain.intakePressure?.score||0)}.`,`Thin-LP snap score: ${pct(model.signalBrain.thinLP?.snapScore||0)}.`,`Top shadow candidate: ${(model.signalBrain.shadowMachineMap||[])[0]?short(model.signalBrain.shadowMachineMap[0].address,10,8):'—'}.`,`Top chain-dig candidate: ${(model.signalBrain.chainDig?.candidateDig||[])[0]?short(model.signalBrain.chainDig.candidateDig[0].address,10,8):'—'}.`,`Slot awakening: ${model.signalBrain.chainDig?.slotAwake?'non-null':'still dormant'}.`,`Proof challenges passed: ${(model.signalBrain.chainDig?.proofChallenges||[]).filter(x=>x.pass).length}/${(model.signalBrain.chainDig?.proofChallenges||[]).length||0}.`, `Top selector fingerprint: ${(model.signalBrain.chainDig?.candidateDig?.[0]?.selectors?.topSelectors||[]).slice(0,2).map(s=>`${s.selector}×${s.count}`).join(' ; ')||'none'}.`, `Top candidate net flow: ${fmt(model.signalBrain.chainDig?.candidateDig?.[0]?.flow?.net||0,3)} pDAI.`];
     $('truthList').innerHTML=truths.map(t=>uiItem(t,'info')).join('');
-    $('briefList').innerHTML=uiItem(model.v28Brief.replace(/\n/g,'<br>'),'good');
+    $('briefList').innerHTML=uiItem(model.v29Brief.replace(/\n/g,'<br>'),'good');
     $('progressBoard').innerHTML=progressMilestones(model).map(m=>`<div class="milestone ${m.on?'active':''}"><div class="mileK">${m.k}</div><div class="mileV">${m.v}</div></div>`).join('');
     $('proofBoard').innerHTML=(model.signalBrain.proofPressure||[]).map(p=>`<div class="milestone ${p.score>.55?'active':''}"><div class="mileK">${p.name}</div><div class="mileV">${pct(p.score)}<br><span class="small">${p.hint}</span></div></div>`).join('');
     $('motifPills').innerHTML=(model.signalBrain.motifs||[]).slice(0,12).map(m=>`<span class="pill">${m.word} • ${m.count}</span>`).join('') || '<span class="small">No motifs yet.</span>';
     $('numScore').textContent=pct(model.signalBrain.numericRes); $('numHint').textContent=`Hooks: ${(model.signalBrain.dateHooks||[]).length} • phases ${Object.keys(model.signalBrain.phaseCounts||{}).length}`;
     $('echoList').innerHTML=(model.signalBrain.echoes||[]).slice(0,5).map(t=>uiItem(t,'info')).join('') || uiItem('No strong echoes yet.','warn');
     $('dateHooks').innerHTML=(model.signalBrain.dateHooks||[]).slice(0,6).map(h=>uiItem(`${h.title} • ${h.duration||0}s • ${h.notable&&h.notable.length?h.notable.join(', '):'no notable numbers'}`, 'warn')).join('') || uiItem('No date/duration hooks yet.','warn');
-    $('specList').innerHTML=(model.v28Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
-    $('etaList').innerHTML=(model.v28Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
+    $('specList').innerHTML=(model.v29Speculation||[]).map(s=>uiItem(`${s.text}<br><span class="small">Confidence ${pct(s.confidence)}</span>`, s.confidence>.6?'good':'warn')).join('') || uiItem('No speculative links generated yet.','warn');
+    $('etaList').innerHTML=(model.v29Eta||[]).map(e=>`<div class="eta"><div><strong>${e.label}</strong><div class="small">${e.reason}</div></div><div><div class="ribbon">${e.range}</div><div class="small" style="margin-top:6px;text-align:right">${pct(e.score)}</div></div></div>`).join('') || uiItem('No ETA scenarios yet.','warn');
     $('gmSummary').innerHTML=[uiItem(`Godmode numeric resonance: ${pct(model.signalBrain.numericRes)}.`,'good'), ...model.signalBrain.historySignals.summary.slice(0,3).map(x=>uiItem(x,'info'))].join('');
     $('memoryList').innerHTML=model.signalBrain.historySignals.summary.map(x=>uiItem(x,'info')).join('');
     $('cueList').innerHTML=(model.signalBrain.transcriptCues||[]).slice(0,8).map(c=>uiItem(`${c.platform}: ${c.title} ${c.durationSec?`• ${c.durationSec}s`:''}`,'warn')).join('') || uiItem('No transcript/frame cues loaded yet.','warn');
@@ -1437,13 +1486,13 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('socialBody').innerHTML=(model.harvestedSocial.length?model.harvestedSocial.slice(0,30):[]).map(s=>`<tr><td>${s.platform}</td><td>${new Date(s.publishedAt).toLocaleString()}</td><td>${s.link?`<a href="${s.link}" target="_blank" style="color:var(--cyan)">${s.title||s.text}</a>`:(s.title||s.text)}</td><td>${s.durationSec||'—'}</td><td>${s.phase||'—'}</td><td>${s.code||'—'}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No social items loaded.</td></tr>`;
     $('windowBody').innerHTML=(model.windows||[]).map(w=>`<tr><td>${w.title}</td><td>${new Date(w.publishedAt).toLocaleString()}</td><td>${fmt(w.blocks,1)}</td><td>${w.approxBlock.toLocaleString()}</td><td>${w.fromBlock.toLocaleString()}–${w.toBlock.toLocaleString()}</td><td>${w.phase}${w.code?` / ${w.code}`:''}</td></tr>`).join('') || `<tr><td colspan="6" class="small">No active windows.</td></tr>`;
     $('anchorBody').innerHTML=(model.publicAnchors||[]).map(a=>`<tr><td>${a.name}</td><td class="mono">${short(a.address,10,8)}</td><td>${fmt(a.reserve0,3)}</td><td>${fmt(a.reserve1,3)}</td></tr>`).join('');
-    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v28Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v28Promoted[0],10,8):'—'}</td></tr>`).join('');
+    $('watchBody').innerHTML=Object.entries(state.settings.watchers).map(([k,v])=>`<tr><td>${k}</td><td><span class="tag">${model.watchTiers[k]||'cold'}</span></td><td>pDAI ${fmt(model.nodeBalances[k]?.pdai||0,3)} • nonce ${model.nodeBalances[k]?.nonce||0}</td><td>${(model.v29Promoted||[])[0]&&model.watchTiers[k]==='cold'?short(model.v29Promoted[0],10,8):'—'}</td></tr>`).join('');
   }
 
   function renderFallback(err){
     const last=loadLastGood();
     if(last){
-      last.v28Thoughts=(last.v28Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
+      last.v29Thoughts=(last.v29Thoughts||[]).concat([`Rendered last good snapshot because live sync failed: ${err.message||String(err)}`]);
       render(last); $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn'; $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing last good snapshot';
     } else { $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad'; $('lastSync').textContent='Last error: '+(err.message||String(err)); }
   }
@@ -1453,8 +1502,8 @@ Promoted: ${promoted.join(', ')||'—'}`;
 
   function pushSettings(){ $('sPrivateRpc').value=state.settings.privateRpc||''; $('sAutoRefresh').value=state.settings.autoRefresh; $('sScanBlocks').value=state.settings.scanBlocks; $('sBlockSec').value=state.settings.blockSec; $('sChannelId').value=state.settings.channelId; $('sSocialProxy').value=state.settings.socialProxy||''; $('sXBearer').value=state.settings.xBearer||''; $('sXQuery').value=state.settings.xQuery||''; $('sXAccounts').value=state.settings.xAccounts||''; $('sXMirrors').value=state.settings.xMirrors||''; $('sManualSocial').value=state.settings.manualSocial||''; $('sNotes').value=state.settings.notes||''; $('sResearchCorpus').value=state.settings.researchCorpus||''; $('sTranscriptProxy').value=state.settings.transcriptProxy||''; $('sSpeculateLevel').value=state.settings.speculateLevel||8; $('sFrameCorpus').value=state.settings.frameCorpus||''; }
   function pullSettings(){ state.settings.privateRpc=$('sPrivateRpc').value.trim(); state.settings.autoRefresh=Number($('sAutoRefresh').value)||30000; state.settings.scanBlocks=Number($('sScanBlocks').value)||300; state.settings.blockSec=Number($('sBlockSec').value)||10.2; state.settings.channelId=$('sChannelId').value.trim()||DEFAULTS.channelId; state.settings.socialProxy=$('sSocialProxy').value.trim(); state.settings.xBearer=$('sXBearer').value.trim(); state.settings.xQuery=$('sXQuery').value.trim()||DEFAULTS.xQuery; state.settings.xAccounts=$('sXAccounts').value.trim(); state.settings.xMirrors=$('sXMirrors').value; state.settings.manualSocial=$('sManualSocial').value; state.settings.notes=$('sNotes').value; state.settings.researchCorpus=$('sResearchCorpus').value; state.settings.transcriptProxy=$('sTranscriptProxy').value.trim(); state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8; state.settings.frameCorpus=$('sFrameCorpus').value; saveSettings(); if(state.timer) clearInterval(state.timer); state.timer=setInterval(sync,Math.max(12000,state.settings.autoRefresh)); }
-  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v28-history.json'; a.click(); }
-  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v28-bundle.json'; a.click(); }
+  function exportHistory(){ const blob=new Blob([JSON.stringify(loadHistory(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v29-history.json'; a.click(); }
+  function exportBundle(){ const bundle={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood()}; const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v29-bundle.json'; a.click(); }
   function importHistoryFile(file){ const reader=new FileReader(); reader.onload=()=>{ try{ const j=JSON.parse(reader.result); if(Array.isArray(j)) saveHistory(j); else if(j && Array.isArray(j.history)){ saveHistory(j.history); if(j.settings){ localStorage.setItem(STORAGE_KEY, JSON.stringify({...loadSettings(), ...j.settings})); } if(j.socialCache) saveSocialCache(j.socialCache); if(j.lastGood) saveLastGood(j.lastGood); } state.history=loadHistory(); $('historyMeta').textContent=`History: ${state.history.length} snapshots`; sync(); } catch(e){ alert('Import failed: '+e.message); } }; reader.readAsText(file); }
 
   $('settingsBtn').onclick=()=>$('settingsBox').classList.toggle('open');
