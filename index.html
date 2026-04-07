@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V31 Ultra-Godmode Move Composer</title>
+<title>pDAI Peg Prover • V32 Ultra-Godmode Move Composer</title>
 <style>
   :root{
     --bg:#040812; --bg2:#09172a; --panel:#0c1421; --panel2:#0a111c; --line:#22344b; --line2:#2f4f72;
@@ -127,7 +127,7 @@
   <div class="panel top">
     <div>
       <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V31 Ultra-Godmode Move Composer</h1>
-      <div class="sub">V31 adds ultra-godmode move composition: it keeps the contract cartography, but also builds the likely behind-the-scenes peg choreography from route opening, warehousing, supply-control doctrine, shadow plumbing, token-shell behavior, and missing execution proofs.</div>
+      <div class="sub">V32 adds ultra-godmode move composition: it keeps the contract cartography, but also builds the likely behind-the-scenes peg choreography from route opening, warehousing, supply-control doctrine, shadow plumbing, token-shell behavior, and missing execution proofs.</div>
       <div class="chips">
         <div class="chip good">Peg progress is evidence + correlation weighted</div>
         <div class="chip info">Courtroom + intake pressure + shadow map + window forensics</div>
@@ -181,7 +181,7 @@
   </div>
 
   <div class="metrics">
-    <div class="card"><div class="label">V31 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
+    <div class="card"><div class="label">V32 score</div><div class="value" id="mScore">—</div><div class="hint">Godmode correlation quality</div></div>
     <div class="card"><div class="label">Regime</div><div class="value" id="mRegime">—</div><div class="hint">Machine picture</div></div>
     <div class="card"><div class="label">Peg progress</div><div class="value" id="mPeg">—</div><div class="hint">Evidence-weighted, not price-weighted</div></div>
     <div class="card"><div class="label">Social delta</div><div class="value" id="mSocial">—</div><div class="hint">New YouTube/X/manual items</div></div>
@@ -206,7 +206,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card briefPanel">
-          <div class="label">V31 verdict</div>
+          <div class="label">V32 verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div class="bubbles" id="thoughtBubbles"></div>
@@ -256,6 +256,21 @@
         <div class="resCard"><div class="label">Move stages</div><div id="moveStageList"></div></div>
         <div class="resCard"><div class="label">pDAI contract inner eye</div><div id="contractInnerEyeList"></div></div>
         <div class="resCard"><div class="label">Move verdicts</div><div id="moveVerdictList"></div></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Omega intelligence layer</div>
+      <div class="small">Five new intelligence lanes: causal graphing, rival-model elimination, contract baselining, entity convergence, and adaptive proof planning.</div>
+      <div class="brainGrid">
+        <div class="resCard"><div class="label">Causal graph</div><div id="causalGraphList"></div></div>
+        <div class="resCard"><div class="label">Rival models</div><div id="rivalModelsList"></div></div>
+        <div class="resCard"><div class="label">Contract baseline anomalies</div><div id="contractBaselineList"></div></div>
+        <div class="resCard"><div class="label">Entity convergence</div><div id="entityConvergenceList"></div></div>
+        <div class="resCard"><div class="label">Adaptive proof planner</div><div id="probePlannerList"></div></div>
       </div>
     </div>
   </div>
@@ -1496,6 +1511,93 @@ async function reserveEvidenceForWindows(chain, windows){
   }
 
 
+  function buildCausalGraph(model, items){
+    const texts=(items||[]).map(x=>`${x.title||''} ${x.text||''}`.toLowerCase());
+    const hit=(terms)=>texts.reduce((a,t)=>a+(terms.some(term=>t.includes(term))?1:0),0);
+    const intake=hit(['liberty','sdk','api','bridge','usdc','eusdt','edai','marketplace','stableswap','route']);
+    const warehousing=asNum(model.nodeBalances?.['5EF7']?.pdai||0)>1e9?1:0;
+    const supply=hit(['supply control','buyback','burn','burns','unpredictable','1:1','156:1','31.62']);
+    const shadow=(model.signalBrain?.chainDig?.candidateDig||[])[0];
+    const contractPulse=model.signalBrain?.contractIntel?.standoutScore||0;
+    const slotAwake=!(model.slotProbe?.allZero && model.slotProbe?.equal);
+    const edges=[];
+    const push=(from,to,score,reason)=>edges.push({from,to,score:clamp(score,0,1),reason});
+    push('Liberty / intake chatter','External stablecoin routing', 0.25 + Math.min(intake,18)/18*0.55, `${intake} intake/routing hits in social + corpus lanes.`);
+    push('External stablecoin routing','5EF7 warehousing', 0.25 + warehousing*0.45 + Math.min((model.signalBrain?.intakePressure?.score||0),1)*0.2, `5EF7 remains hot with ${fmt(model.nodeBalances?.['5EF7']?.pdai||0,3)} pDAI.`);
+    push('5EF7 warehousing','Shadow plumbing', 0.2 + ((shadow?.score||0)*0.55) + (((model.signalBrain?.chainDig?.transferGraph?.topEdges||[]).length>0)?0.15:0), shadow?`Top candidate ${short(shadow.address,10,8)} scores ${pct(shadow.score)}.`:'Shadow candidate not yet strong.');
+    push('Shadow plumbing','pDAI contract perimeter', 0.15 + contractPulse*0.6 + ((model.signalBrain?.contractIntel?.approvalCount||0)>0?0.1:0), `Contract pulse ${pct(contractPulse)} with ${(model.signalBrain?.contractIntel?.approvalCount||0)} approval logs.`);
+    push('pDAI contract perimeter','Formal peg execution', 0.1 + (slotAwake?0.35:0) + (((model.signalBrain?.chainDig?.proofChallenges||[]).filter(x=>x.pass).length)/5)*0.35, slotAwake?'Slots have awakened.':'Slots still null-null.');
+    const strongest=edges.reduce((a,b)=>b.score>a.score?b:a, edges[0]||{from:'—',to:'—',score:0,reason:'—'});
+    const pathScore=clamp(edges.reduce((a,e)=>a+e.score,0)/(edges.length||1),0,1);
+    return {edges,strongest,pathScore,summary:`${strongest.from} → ${strongest.to} is the strongest active move edge at ${pct(strongest.score)}.`};
+  }
+
+  function buildRivalModels(model, items){
+    const txt=(items||[]).map(x=>`${x.title||''} ${x.text||''}`.toLowerCase()).join(' \n');
+    const has=(arr)=>arr.reduce((a,t)=>a+(txt.includes(t)?1:0),0);
+    const intake=has(['sdk','api','bridge','usdc','marketplace','stableswap','gasless','wallet']);
+    const peg=has(['pdai to $1','1:1','156:1','31.62','600bn','supply control','buyback','burn']);
+    const generic=has(['pcock','weekly close','easter','support','community','chart']);
+    const chainPass=((model.signalBrain?.chainDig?.proofChallenges||[]).filter(x=>x.pass).length)||0;
+    const slotAwake=!(model.slotProbe?.allZero && model.slotProbe?.equal);
+    const models=[
+      {name:'Peg preparation / choreography', score:clamp(0.2 + peg/12*0.35 + intake/14*0.2 + (model.signalBrain?.moveBuilder?.confidence||0)*0.12 + chainPass/5*0.13 - (slotAwake?0:0.04),0,1), because:`Peg cues ${peg}, intake cues ${intake}, proof passes ${chainPass}.`},
+      {name:'Generic Liberty ecosystem expansion', score:clamp(0.25 + intake/14*0.35 + generic/10*0.2 + (model.signalBrain?.intakePressure?.score||0)*0.12 - peg/20*0.08,0,1), because:`Expansion cues ${generic}, intake cues ${intake}.`},
+      {name:'Narrative overshoot / dot-connecting ahead of proof', score:clamp(0.18 + (model.contradictionLoad||0)*0.3 + ((model.signalBrain?.contractIntel?.windowPulse||[]).every(w=>(w.score||0)===0)?0.12:0) + ((slotAwake?0:0.12)) - chainPass/10,0,1), because:`Contradiction load ${pct(model.contradictionLoad||0)} and slot state ${slotAwake?'awake':'null-null'}.`}
+    ].sort((a,b)=>b.score-a.score);
+    const winner=models[0];
+    return {models,winner,summary:`Best current explanatory frame: ${winner.name} (${pct(winner.score)}).`};
+  }
+
+  function buildContractBaseline(model, hist){
+    const h=(hist||[]).slice(-10);
+    const cur=model.signalBrain?.contractIntel||{};
+    const prev=h.map(x=>x.signalBrain?.contractIntel).filter(Boolean);
+    const avg=(key)=> prev.length ? prev.reduce((a,x)=>a+asNum(x[key]||0),0)/prev.length : 0;
+    const transferAvg=avg('transferCount');
+    const approvalAvg=avg('approvalCount');
+    const standoutAvg=avg('standoutScore');
+    const reservePrev=h.map(x=>x.publicAnchors?.find(a=>norm(a.address)===norm('0x947b4633e32e0c7f2c76753b43f008480715416d'))?.reserve0).filter(x=>Number.isFinite(x));
+    const reserveAvg=reservePrev.length?reservePrev.reduce((a,b)=>a+b,0)/reservePrev.length:0;
+    const curReserve=asNum(model.publicAnchors?.find(a=>norm(a.address)===norm('0x947b4633e32e0c7f2c76753b43f008480715416d'))?.reserve0||0);
+    const z=(curv,avgv)=> avgv>0 ? (curv-avgv)/avgv : 0;
+    const anomalies=[
+      {name:'Transfer pulse vs baseline', value:z(cur.transferCount||0,transferAvg), text:`${cur.transferCount||0} now vs ${fmt(transferAvg,1)} avg.`},
+      {name:'Approval pulse vs baseline', value:z(cur.approvalCount||0,approvalAvg), text:`${cur.approvalCount||0} now vs ${fmt(approvalAvg,1)} avg.`},
+      {name:'Contract standout vs baseline', value:z(cur.standoutScore||0,standoutAvg), text:`${pct(cur.standoutScore||0)} now vs ${pct(standoutAvg)} avg.`},
+      {name:'Native rail reserve vs baseline', value:reserveAvg>0?(curReserve-reserveAvg)/reserveAvg:0, text:`${fmt(curReserve,3)} now vs ${fmt(reserveAvg,3)} avg.`}
+    ].sort((a,b)=>Math.abs(b.value)-Math.abs(a.value));
+    const strongest=anomalies[0]||{name:'—',value:0,text:'—'};
+    return {anomalies,strongest,summary:`Largest contract/local deviation: ${strongest.name} (${fmt(strongest.value*100,1)}%).`};
+  }
+
+  function buildEntityConvergence(model, items){
+    const entities=[];
+    const push=(name,count,why)=>entities.push({name,count,why,score:clamp((count/18)*0.5 + (/0x/i.test(name)?0.16:0) + (/liberty|x9oeb|5ef7|pdai|156:1/i.test(name.toLowerCase())?0.2:0) + ((model.signalBrain?.chainDig?.candidateDig||[]).some(c=>short(c.address,10,8).includes(name.slice(0,6)) )?0.1:0),0,1)});
+    const corpus=(items||[]).map(x=>`${x.title||''} ${x.text||''}`.toLowerCase());
+    const countTerm=(term)=>corpus.reduce((a,t)=>a+(t.includes(term)?1:0),0);
+    const named=['x9oeb','sfvcy','7pr6k','xutw9','liberty','marketplace','stableswap','5ef7','156:1','1:1','pdai','supply control'];
+    for(const n of named){ const c=countTerm(n); if(c) push(n,c,`${c} corpus hit(s).`); }
+    for(const c of (model.signalBrain?.chainDig?.candidateDig||[]).slice(0,4)){ push(short(c.address,10,8), (c.graphTouches||0)+(c.recentTransfers||0), `candidate score ${pct(c.score)} • graph ${c.graphTouches} • transfers ${c.recentTransfers}`); }
+    entities.sort((a,b)=>b.score-a.score);
+    return {entities:entities.slice(0,8),summary:entities[0]?`${entities[0].name} is the top convergence entity at ${pct(entities[0].score)}.`:'No convergence entity yet.'};
+  }
+
+  function buildProbePlanner(model){
+    const challenges=(model.signalBrain?.chainDig?.proofChallenges||[]);
+    const tasks=[];
+    const add=(priority,title,why)=>tasks.push({priority,title,why,score:clamp(priority,0,1)});
+    if(challenges.find(x=>x.claim.includes('anchor motion') && !x.pass)) add(0.92,'Deepen reserve-window archaeology around strongest Maria windows','Top windows still are not producing decisive anchor motion.');
+    if(model.slotProbe?.allZero && model.slotProbe?.equal) add(0.88,'Keep slot-awakening watch at window boundaries','Null-null equality is still the biggest missing structural proof.');
+    if((model.signalBrain?.contractIntel?.approvalCount||0)>0) add(0.82,'Rank approval spenders by recurrence and adjacency','Approvals exist inside the pDAI contract and may reveal hidden prep routes.');
+    if((model.signalBrain?.chainDig?.candidateDig||[])[0]?.windowHits===0) add(0.79,'Force candidate/window overlap hunts on top chain-dig addresses','The top candidate is active but not yet aligning strongly with timing windows.');
+    if((model.signalBrain?.contractBaseline?.strongest?.name||'').includes('Transfer') || (model.signalBrain?.contractBaseline?.strongest?.name||'').includes('Approval')) add(0.74,'Explain why the contract baseline anomaly is rising or falling','Contract-local deviations need to be tied to a real move stage, not just counted.');
+    if((model.signalBrain?.rivalModels?.winner?.name||'').includes('Generic Liberty ecosystem expansion')) add(0.7,'Disprove the generic-expansion rival model','Need more chain evidence that Liberty chatter is peg-prep rather than ordinary growth.');
+    tasks.sort((a,b)=>b.score-a.score);
+    return {tasks,summary:tasks[0]?`Top next proof task: ${tasks[0].title}.`:'No urgent probe tasks.'};
+  }
+
+
   function buildThinking(model){
     const observations=[];
     const hypotheses=[];
@@ -1516,6 +1618,9 @@ async function reserveEvidenceForWindows(chain, windows){
     if(model.signalBrain.contractIntel) observations.push(`pDAI contract standout score reads ${pct(model.signalBrain.contractIntel.standoutScore)} with ${model.signalBrain.contractIntel.transferCount} transfer logs and ${model.signalBrain.contractIntel.approvalCount} approval logs.`);
     if(model.signalBrain.moveBuilder) observations.push(`Move builder says: ${model.signalBrain.moveBuilder.stateText}.`);
     if(model.signalBrain.contractInnerEye) observations.push(`pDAI inner eye stance: ${model.signalBrain.contractInnerEye.stance}.`);
+    if(model.signalBrain.causalGraph) observations.push(`Causal graph: ${model.signalBrain.causalGraph.summary}`);
+    if(model.signalBrain.contractBaseline) observations.push(`Contract baseline: ${model.signalBrain.contractBaseline.summary}`);
+    if(model.signalBrain.entityConvergence) observations.push(`Entity convergence: ${model.signalBrain.entityConvergence.summary}`);
     hypotheses.push(model.phase==='surface-leading' ? 'Public-surface mutation is outrunning the current interior watcher map.' : 'Surface/interior balance is changing.');
     if(model.windows.some(w=>w.code==='x9oeb')) hypotheses.push('x9oeb remains the highest-weight social sync key currently loaded.');
     if(model.harvestedSocial.some(x=>/liberty/i.test(x.title+' '+x.text))) hypotheses.push('LibertySwap-related narrative may be acting as an intake-pressure sync layer.');
@@ -1526,6 +1631,8 @@ async function reserveEvidenceForWindows(chain, windows){
     if((model.signalBrain.contractIntel?.standoutScore||0)>.55) hypotheses.push('The pDAI contract itself is now standing out enough that direct token-contract evidence deserves more weight in the peg case.');
     if((model.signalBrain.moveBuilder?.dominant?.score||0)>.55) hypotheses.push(`Move builder favors ${model.signalBrain.moveBuilder.dominant.name.toLowerCase()} (${pct(model.signalBrain.moveBuilder.dominant.score)}).`);
     if((model.signalBrain.intakePressure?.score||0)>.55) hypotheses.push('Macro intake pressure may now be a structural prerequisite signal rather than just narrative noise.');
+    if(model.signalBrain.rivalModels?.winner) hypotheses.push(`Rival-model eliminator currently favors: ${model.signalBrain.rivalModels.winner.name} (${pct(model.signalBrain.rivalModels.winner.score)}).`);
+    if((model.signalBrain.contractBaseline?.strongest?.value||0)>0.1 || (model.signalBrain.contractBaseline?.strongest?.value||0)<-0.1) hypotheses.push(`The pDAI contract/local baseline has a meaningful deviation in ${model.signalBrain.contractBaseline.strongest.name.toLowerCase()}.`);
     hypotheses.push(...(model.signalBrain.theoryLedger||[]).slice(0,2).map(t=>`${t.name} (${pct(t.score)})`));
     hypotheses.push(...(model.signalBrain.claimLedger||[]).slice(0,2).map(t=>`${t.clue} (${pct(clamp(t.support-t.contradiction,0,1))})`));
     if(model.slotProbe.allZero && model.slotProbe.equal) contradictions.push('Slot probe is null-null equality; this is absence, not symmetry.');
@@ -1545,6 +1652,7 @@ async function reserveEvidenceForWindows(chain, windows){
     next.push('Keep checking watched slots for the first non-zero awakening.');
     next.push('Compare native optical-rail thinning against 5EF7 growth to test the thin-LP corridor theory.');
     next.push('Feed transcript lines, frame notes, and symbolic observations into the research corpus to deepen Maria dissection.');
+    if(model.signalBrain.probePlanner?.tasks?.length) next.unshift(model.signalBrain.probePlanner.tasks[0].title);
     return {observations,hypotheses,contradictions,next};
   }
 
@@ -1594,6 +1702,11 @@ async function reserveEvidenceForWindows(chain, windows){
     baseModel.signalBrain.contractIntel = await buildPdaiContractIntel(chain, windows, promoted, hist);
     baseModel.signalBrain.contractInnerEye = buildContractInnerEye(baseModel, hist);
     baseModel.signalBrain.moveBuilder = buildMoveBuilder(baseModel, [...social,...research,...histSocial], hist);
+    baseModel.signalBrain.causalGraph = buildCausalGraph(baseModel, [...social,...research,...histSocial]);
+    baseModel.signalBrain.contractBaseline = buildContractBaseline(baseModel, hist);
+    baseModel.signalBrain.entityConvergence = buildEntityConvergence(baseModel, [...social,...research,...histSocial]);
+    baseModel.signalBrain.rivalModels = buildRivalModels(baseModel, [...social,...research,...histSocial]);
+    baseModel.signalBrain.probePlanner = buildProbePlanner(baseModel);
     const thinking = buildThinking(baseModel);
     const v30Actions=[
       {kind:'social-delta',status:'ok',findings:[delta.length?`${delta.length} new social item(s)`:'no new social items this cycle']},
@@ -1608,13 +1721,18 @@ async function reserveEvidenceForWindows(chain, windows){
       {kind:'chain-proof-challenges',status:'ok',findings:(baseModel.signalBrain.chainDig?.proofChallenges||[]).map(s=>`${s.pass?'PASS':'FAIL'} ${s.claim}`)},
       {kind:'chain-graph',status:'ok',findings:(baseModel.signalBrain.chainDig?.transferGraph?.topEdges||[]).slice(0,3).map(e=>`${short(e.from,8,6)}→${short(e.to,8,6)} (${e.count})`)},
       {kind:'pdai-contract-intel',status:'ok',findings:(baseModel.signalBrain.contractIntel?.verdicts||[]).map(v=>`${v.kind}: ${v.verdict}`)},
-      {kind:'move-builder',status:'ok',findings:[baseModel.signalBrain.moveBuilder?.stateText||'no move state', ...((baseModel.signalBrain.moveBuilder?.verdicts||[]).map(v=>`${v.kind}: ${v.verdict}`)).slice(0,3)]}
+      {kind:'move-builder',status:'ok',findings:[baseModel.signalBrain.moveBuilder?.stateText||'no move state', ...((baseModel.signalBrain.moveBuilder?.verdicts||[]).map(v=>`${v.kind}: ${v.verdict}`)).slice(0,3)]},
+      {kind:'causal-graph',status:'ok',findings:(baseModel.signalBrain.causalGraph?.edges||[]).slice(0,3).map(e=>`${e.from}→${e.to} ${pct(e.score)}`)},
+      {kind:'rival-models',status:'ok',findings:(baseModel.signalBrain.rivalModels?.models||[]).map(m=>`${m.name}: ${pct(m.score)}`)},
+      {kind:'contract-baseline',status:'ok',findings:(baseModel.signalBrain.contractBaseline?.anomalies||[]).slice(0,3).map(a=>`${a.name}: ${fmt(a.value*100,1)}%`)},
+      {kind:'entity-convergence',status:'ok',findings:(baseModel.signalBrain.entityConvergence?.entities||[]).slice(0,4).map(e=>`${e.name}: ${pct(e.score)}`)},
+      {kind:'probe-planner',status:'ok',findings:(baseModel.signalBrain.probePlanner?.tasks||[]).slice(0,3).map(t=>`${t.title} ${pct(t.score)}`)}
     ];
     const allThoughts=[...thinking.observations.slice(0,3), ...thinking.contradictions.slice(0,2), ...thinking.hypotheses.slice(0,3)];
     const model={...baseModel, thoughts:allThoughts, thoughtSummary:allThoughts.join(' '), v30Thoughts:allThoughts, v30Actions, v30Goal:'Let the tool prove or falsify its own theories by digging the chain directly: windows, reserves, candidates, graphs, slots, and LP attrition.', v30Thinking:thinking, v30Speculation:baseModel.signalBrain.spec, v30Eta:baseModel.signalBrain.eta, v30Godmode:baseModel.signalBrain};
     model.pegProgress = computePegProgress({...model, v30Promoted: promoted});
-    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*8 + (model.signalBrain.contractIntel?.standoutScore||0)*8 + (model.signalBrain.moveBuilder?.confidence||0)*10 + (model.signalBrain.contractInnerEye?.score||0)*6 - contradictionLoad*16, 0, 100);
-    model.v30Brief = `V29 regime: ${model.phase}
+    model.score = clamp((model.pegProgress*100) + (delta.length?6:0) + (promoted.length?4:0) + model.signalBrain.numericRes*8 + (model.signalBrain.contractIntel?.standoutScore||0)*8 + (model.signalBrain.moveBuilder?.confidence||0)*10 + (model.signalBrain.contractInnerEye?.score||0)*6 + (model.signalBrain.causalGraph?.pathScore||0)*8 + (model.signalBrain.rivalModels?.winner?.score||0)*4 + Math.min(Math.abs(model.signalBrain.contractBaseline?.strongest?.value||0),1)*5 + (model.signalBrain.entityConvergence?.entities?.[0]?.score||0)*5 - contradictionLoad*16, 0, 100);
+    model.v30Brief = `V32 regime: ${model.phase}
 Score: ${fmt(model.score,1)}
 Peg progress: ${pct(model.pegProgress)}
 Public vs interior: ${pct(model.publicStrength)} / ${pct(model.interiorStrength)}
@@ -1626,6 +1744,11 @@ Top claim: ${model.signalBrain.claimLedger[0]?.clue||model.signalBrain.theoryLed
 pDAI contract pulse: ${pct(model.signalBrain.contractIntel?.standoutScore||0)}
 Move state: ${model.signalBrain.moveBuilder?.stateText||'—'}
 pDAI inner eye: ${model.signalBrain.contractInnerEye?.stance||'—'}
+Causal graph: ${model.signalBrain.causalGraph?.summary||'—'}
+Rival model winner: ${model.signalBrain.rivalModels?.winner?.name||'—'}
+Contract baseline: ${model.signalBrain.contractBaseline?.summary||'—'}
+Entity convergence: ${model.signalBrain.entityConvergence?.summary||'—'}
+Top proof task: ${model.signalBrain.probePlanner?.tasks?.[0]?.title||'—'}
 Thoughts: ${model.v30Thoughts.join(' | ')}
 Actions: ${v30Actions.map(a=>`${a.kind}: ${a.findings.join(' ; ')}`).join(' | ')}
 Promoted: ${promoted.join(', ')||'—'}`;
@@ -1692,7 +1815,7 @@ Promoted: ${promoted.join(', ')||'—'}`;
     $('courtroomList').innerHTML=(model.signalBrain.courtroom||[]).map(c=>uiItem(`<strong>${c.clue}</strong> • ${c.verdict.toUpperCase()} • ${pct(c.courtroomScore)}<br><span class="small">Witnesses: ${c.witnessCount} • Support ${pct(c.support)} • Contradiction ${pct(c.contradiction)}</span><br><span class="small">Observed: ${c.observed}</span>`, c.verdict==='near-confirmed'?'good':c.verdict==='strong'?'info':'warn')).join('') || uiItem('No courtroom entries yet.','warn');
     $('witnessList').innerHTML=(model.signalBrain.witnessBoard||[]).map(w=>uiItem(`<strong>${w.name}</strong> • ${pct(w.resonance)}<br><span class="small">Count: ${w.count} • Platforms: ${(w.platforms||[]).join(', ')||'history'}</span><br><span class="small">${w.summary}</span>`, w.resonance>.68?'good':'info')).join('') || uiItem('No witness convergence yet.','warn');
     $('scenarioTree').innerHTML=(model.signalBrain.scenarioTree||[]).map(s=>uiItem(`<strong>${s.name}</strong> • ${pct(s.score)}<br><span class="small">${s.reason}</span>`, s.score>.66?'good':s.score>.45?'info':'warn')).join('') || uiItem('No scenario tree yet.','warn');
-    $('gmSummary').innerHTML=[...(model.signalBrain.omegaSummary||[]).map(x=>uiItem(x,'good')), uiItem(`pDAI contract pulse ${pct(model.signalBrain.contractIntel?.standoutScore||0)} • transfers ${model.signalBrain.contractIntel?.transferCount||0} • approvals ${model.signalBrain.contractIntel?.approvalCount||0}.`,'info')].join('');
+    $('gmSummary').innerHTML=[...(model.signalBrain.omegaSummary||[]).map(x=>uiItem(x,'good')), uiItem(`pDAI contract pulse ${pct(model.signalBrain.contractIntel?.standoutScore||0)} • transfers ${model.signalBrain.contractIntel?.transferCount||0} • approvals ${model.signalBrain.contractIntel?.approvalCount||0}.`,'info'), uiItem(`Causal path ${pct(model.signalBrain.causalGraph?.pathScore||0)} • rival model ${model.signalBrain.rivalModels?.winner?.name||'—'}.`,'good')].join('');
 
     $('selfProofList').innerHTML=(model.signalBrain.chainDig?.selfProof||[]).map(s=>uiItem(`<strong>${s.kind}</strong> • ${String(s.verdict).toUpperCase()}<br><span class="small">${s.text}</span>`, /active|observed|primed|thinning/i.test(String(s.verdict))?'good':'warn')).join('') || uiItem('No self-proof verdicts yet.','warn');
     $('chainDigList').innerHTML=[
