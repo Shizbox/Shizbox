@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V37 Kinematic Verification Engine</title>
+<title>pDAI Peg Prover • V38 Active Proof Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V37 Kinematic Verification Engine</h1>
-      <div class="sub">V37 adds kinematic verification: 11-block symmetry sniffing, zero-write trace checks, gated-calldata hash hunting, deterministic gas fingerprinting, dust-attrition monitoring, and square-law structural tests on top of the infrastructure proof stack.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V38 Active Proof Auditor</h1>
+      <div class="sub">V38 audits the full proving stack and upgrades it into an active proof engine: persistent social memory, live block-drift compensation, deep-sweep proving cycles, method-capability auditing, evidence-ledger gating, and smarter relayer/manifold/slot verification while the page stays open.</div>
       <div class="chips">
-        <div class="chip good">Imports V31–V35 bundle JSON</div>
-        <div class="chip info">Adds relayer → manifold fingerprinting</div>
-        <div class="chip warn">Adds discharge nexus + intake delta + trie touch</div>
-        <div class="chip bad">Treats reserve normalization as a kill-switch against the thesis</div>
+        <div class="chip good">Imports prior V31–V37 bundle JSON</div>
+        <div class="chip info">Adds active deep-sweep proof cycles</div>
+        <div class="chip warn">Adds social-memory retention + live block drift</div>
+        <div class="chip bad">Audits RPC method support and refuses fake proof</div>
       </div>
     </div>
     <div>
@@ -113,7 +113,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V36 settings</div>
+    <div class="boxTitle">V38 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Fallback RPCs</label><textarea id="sRpcs" placeholder="one per line"></textarea></div>
@@ -131,6 +131,9 @@
       <div class="field"><label>Manual social / transcripts / lines</label><textarea id="sManualSocial" placeholder='JSON array or lines like: Mar 31 0432 pm 136s 202604030953 x9oeb'></textarea></div>
       <div class="field"><label>Research corpus / notes</label><textarea id="sResearchCorpus" placeholder="notes, transcripts, frame observations"></textarea></div>
       <div class="field"><label>Speculation level (1-10)</label><input id="sSpeculateLevel" value="8" /></div>
+      <div class="field"><label>Deep sweep every N cycles</label><input id="sDeepSweepEvery" value="4" /></div>
+      <div class="field"><label>Relayer / manifold hints</label><textarea id="sRelayerHints" placeholder="0x4fd0..., 0x6bf2..., 0xda9a..., fragments or exact addresses"></textarea></div>
+      <div class="field"><label>Social memory days</label><input id="sSocialMemoryDays" value="45" /></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
@@ -164,7 +167,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card">
-          <div class="label">V36 infrastructure verdict</div>
+          <div class="label">V38 infrastructure verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div id="summaryPills" style="margin-top:12px"></div>
@@ -188,7 +191,7 @@
   <div class="tri">
     <div class="panel">
       <div class="boxTitle">Model competition</div>
-      <div class="small">V37 still ranks competing explanations, but now adds machine-regularity checks so repeated mechanical structure can support the thesis without pretending shell proof already exists.</div>
+      <div class="small">V38 still ranks competing explanations, but now audits the proving stack and adds active machine-regularity checks so repeated structure can support the thesis without pretending shell proof already exists.</div>
       <div id="modelList" style="margin-top:12px"></div>
     </div>
     <div class="panel">
@@ -359,10 +362,32 @@
     </div>
     <div class="panel">
       <div class="boxTitle">Snapshot history</div>
-      <div class="small">Recent V36 snapshots from this browser. Importing an older bundle also seeds history for attrition, intake drift, and manifold persistence.</div>
+      <div class="small">Recent V38 snapshots from this browser. Importing an older bundle also seeds history for attrition, intake drift, manifold persistence, and social-memory retention.</div>
       <div id="historyList"></div>
     </div>
   </div>
+
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">System audit + probe capabilities</div>
+      <div class="small">Audits the proving stack live: social retention, real versus synthetic windows, live block pace, deep-sweep state, and which RPC methods are actually working.</div>
+      <div id="auditPills" style="margin-top:10px"></div>
+      <div id="systemAuditList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Maria / social memory engine</div>
+      <div class="small">Retains timing memory from imported bundles, cached socials, manual corpus, and current feeds so the engine does not go blind when a fresh cycle loads with empty windows.</div>
+      <div id="socialMemoryList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Evidence ledger + active prove loop</div>
+      <div class="small">Separates hard proof from soft cues, then tells the engine what to attack on the next proving cycle.</div>
+      <div id="evidenceLedgerList"></div>
+      <div id="proveLoopList"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -409,10 +434,13 @@
     socialProxy:'',
     manualSocial:'',
     researchCorpus:'',
-    speculateLevel:8
+    speculateLevel:8,
+    deepSweepEvery:4,
+    relayerHints:'',
+    socialMemoryDays:45
   };
 
-  const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:''};
+  const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false};
 
   function $(id){ return document.getElementById(id); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -571,9 +599,21 @@
   async function collectSocial(imported){
     const lists=[];
     if(imported?.socialCache) lists.push(imported.socialCache);
+    if(imported?.lastGood?.social) lists.push(imported.lastGood.social);
     if(imported?.lastGood?.harvestedSocial) lists.push(imported.lastGood.harvestedSocial);
     if(imported?.lastGood?.newSocial) lists.push(imported.lastGood.newSocial);
-    if(Array.isArray(imported?.history)) imported.history.forEach(h=>{ if(Array.isArray(h.newSocial)) lists.push(h.newSocial); if(Array.isArray(h.harvestedSocial)) lists.push(h.harvestedSocial); });
+    if(Array.isArray(imported?.history)) imported.history.forEach(h=>{
+      if(Array.isArray(h.social)) lists.push(h.social);
+      if(Array.isArray(h.newSocial)) lists.push(h.newSocial);
+      if(Array.isArray(h.harvestedSocial)) lists.push(h.harvestedSocial);
+    });
+    if(Array.isArray(state.history)) state.history.forEach(h=>{
+      if(Array.isArray(h.social)) lists.push(h.social);
+      if(Array.isArray(h.newSocial)) lists.push(h.newSocial);
+      if(Array.isArray(h.harvestedSocial)) lists.push(h.harvestedSocial);
+    });
+    if(Array.isArray(state.lastGood?.social)) lists.push(state.lastGood.social);
+    if(Array.isArray(state.lastGood?.harvestedSocial)) lists.push(state.lastGood.harvestedSocial);
     lists.push(state.socialCache || []);
     lists.push(parseManualSocial(state.settings.manualSocial));
     lists.push(parseManualSocial(state.settings.researchCorpus));
@@ -588,17 +628,51 @@
         }
       }catch{}
     }
-    const merged=uniq(lists.flat().map(normalizeSocialItem).filter(Boolean), x=>x.id || `${x.platform}:${x.title}:${x.publishedAt}`);
+    const cutoff=Date.now() - Math.max(1, Number(state.settings.socialMemoryDays||45))*86400000;
+    const merged=uniq(lists.flat().map(normalizeSocialItem).filter(Boolean).filter(x=>{
+      const ts=new Date(x.publishedAt).getTime();
+      return !Number.isFinite(ts) || ts>=cutoff;
+    }), x=>x.id || `${x.platform}:${x.title}:${x.publishedAt}`);
     merged.sort((a,b)=>new Date(b.publishedAt).getTime()-new Date(a.publishedAt).getTime());
-    return merged.slice(0,260);
+    return merged.slice(0,420);
   }
 
-  function buildWindows(latestBlock, latestTsMs, items){
+  async function measureBlockPace(latestBlock){
+    const configured=Number(state.settings.blockSec)||10.2;
+    const rows=[];
+    for(let i=0;i<8;i++){
+      const bn=Math.max(0, Number(latestBlock||0)-i);
+      try{
+        const blk=await getBlock(hex(bn));
+        if(!blk?.timestamp) continue;
+        rows.push({number:parseInt(blk.number||hex(bn),16), ts:Number(parseBig(blk.timestamp))});
+      }catch{}
+    }
+    rows.sort((a,b)=>a.number-b.number);
+    const diffs=[];
+    for(let i=1;i<rows.length;i++){
+      const db=rows[i].number-rows[i-1].number;
+      const dt=rows[i].ts-rows[i-1].ts;
+      if(db>0 && dt>0) diffs.push(dt/db);
+    }
+    const blockSec=diffs.length ? diffs.reduce((a,b)=>a+b,0)/diffs.length : configured;
+    const drift=configured ? (blockSec-configured)/configured : 0;
+    return {
+      blockSec,
+      configured,
+      drift,
+      samples:diffs.length,
+      summary:diffs.length ? `Live block pace ${blockSec.toFixed(3)}s vs configured ${configured.toFixed(3)}s.` : `Using configured block pace ${configured.toFixed(3)}s because live calibration is unavailable.`
+    };
+  }
+
+  function buildWindows(latestBlock, latestTsMs, items, liveBlockSec){
     return (items||[]).map(item=>{
       const ts=new Date(item.publishedAt).getTime();
+      const secPerBlock=Number(liveBlockSec)||Number(state.settings.blockSec)||10.2;
       const ageSec=isNaN(ts) ? 0 : Math.max(0, (latestTsMs-ts)/1000);
-      const approxBlock=Math.max(0, Math.round(latestBlock - ageSec/(Number(state.settings.blockSec)||10.2)));
-      const blocks=Math.max(1, item.durationSec ? item.durationSec/(Number(state.settings.blockSec)||10.2) : 1);
+      const approxBlock=Math.max(0, Math.round(latestBlock - ageSec/secPerBlock));
+      const blocks=Math.max(1, item.durationSec ? item.durationSec/secPerBlock : 1);
       return Object.assign({}, item, {
         approxBlock,
         blocks,
@@ -618,6 +692,7 @@
     const latestBlock=Number(await rpc('eth_blockNumber',[]));
     const latestBlk=await getBlock('latest');
     const latestTsMs=Number(parseBig(latestBlk.timestamp))*1000;
+    const blockPace=await measureBlockPace(latestBlock);
     const total=await readTotalSupply(state.settings.target);
     const burned=await readBalance(state.settings.target, state.settings.dead);
 
@@ -658,11 +733,11 @@
 
     const hotWatcher=Object.entries(nodeBalances).sort((a,b)=>(b[1].pdai||0)-(a[1].pdai||0))[0]?.[0] || '5EF7';
 
-    return {latestBlock, latestTsMs, total, burned, publicAnchors, nodeBalances, watchTiers, slotProbe, dnaProbe, hotWatcher};
+    return {latestBlock, latestTsMs, total, burned, publicAnchors, nodeBalances, watchTiers, slotProbe, dnaProbe, hotWatcher, blockPace, liveBlockSec:blockPace.blockSec};
   }
 
   async function analyzeTargetLogs(chain, windows){
-    const fromBlock=Math.max(0, chain.latestBlock - Number(state.settings.scanBlocks||300));
+    const fromBlock=Math.max(0, chain.latestBlock - Number(state.settings.scanBlocks||300) * (state.deepMode ? 2 : 1));
     const logs=await getLogs({address:state.settings.target, fromBlock:hex(fromBlock), toBlock:hex(chain.latestBlock)}).catch(()=>[]);
     const transferSig='0xddf252ad';
     const approvalSig='0x8c5be1e5';
@@ -979,7 +1054,7 @@
     (contractIntel.transfers||[]).slice(0,120).forEach(t=>{ addressSet.add(norm(t.from)); addressSet.add(norm(t.to)); });
     const seedFragments=['4fd0','0x4fd0'];
     const addressHits=[...addressSet].filter(a=>a && seedFragments.some(f=>a.includes(f.replace(/^0x/,'')))).slice(0,12);
-    const summary=addressHits.length ? `Relayer-style address fragment hits: ${addressHits.map(addrShort).join(', ')}.` : (narrative.length ? `Gasless / relayer narrative is active in ${narrative.length} social item(s), but no address-level 4fd0-style hit is currently proved.` : 'Relayer watch is quiet: no narrative or address-level signal is loaded.');
+    const summary=addressHits.length ? `Relayer-style address fragment hits: ${addressHits.map(addrShort).join(', ')}.` : (narrative.length ? `Gasless / relayer narrative is active in ${narrative.length} social item(s), but no address-level 4fd0-style hit is currently proved.` : ((social||[]).length ? 'Relayer watch is quiet on the currently loaded social set.' : 'Relayer watch is quiet: no narrative or address-level signal is loaded.'));
     return {narrativeHits:narrative.length, addressHits, summary};
   }
 
@@ -987,8 +1062,10 @@
 
   function relayerSeeds(){
     const seeds=['4fd0'];
-    const hinted=(String(state.settings.stableHints||'').match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>norm(x).replace(/^0x/,'').slice(0,8)).filter(Boolean);
-    return uniq([...seeds, ...hinted].map(x=>String(x||'').toLowerCase()), x=>x);
+    const hinted=(String(`${state.settings.stableHints||''}
+${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>norm(x).replace(/^0x/,'').slice(0,8)).filter(Boolean);
+    const fragments=String(state.settings.relayerHints||'').split(/\n|,/).map(x=>x.trim().toLowerCase().replace(/^0x/,'')).filter(Boolean).map(x=>x.slice(0,8));
+    return uniq([...seeds, ...hinted, ...fragments].map(x=>String(x||'').toLowerCase()), x=>x);
   }
 
   async function buildRelayerFingerprint(social, spenderLab, contractIntel, windows){
@@ -1325,7 +1402,7 @@
     return {score, support, tripwires, summary, leadSpender:spender, dischargeCandidate, accumulator, gaslessHits:gaslessHits.length, topToucher, sameCode};
   }
 
-  function buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt){
+  function buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt, windows){
     const prep=clamp((intakePressure.score + thinLP.snapScore + (candidates[0]?.score||0) + Math.min((chain.nodeBalances?.['5EF7']?.pdai||0)/1e9,1) + (executionHunt.leadSpender?Math.min(executionHunt.leadSpender.score,1):0))/5,0,1);
     const exec=clamp((nullAwakening.score + contractInnerEye.score + Math.min((contractIntel.mints.count+contractIntel.burns.count)/2,.5) + reserveArchaeology.filter(x=>x.status==='reactive').length/6 + executionHunt.tripwires.filter(x=>x.fire).length/5*0.45)/4.45,0,1);
     const debt=clamp(1 - ((exec*.56)+(Math.min((contractIntel.approvalCount/6),1)*.12)+(reserveArchaeology.filter(x=>x.status==='reactive').length/6*.10)+(nullAwakening.score*.14)+(executionHunt.score*.08)),0,1);
@@ -1344,7 +1421,9 @@
     const disconfirm=[];
     if(nullAwakening.status==='dormant') disconfirm.push('Watched slots are still null-null, so structural execution proof is missing.');
     if((contractIntel.mints.count+contractIntel.burns.count)===0) disconfirm.push('There is still no mint/burn shell evidence inside the pDAI contract.');
-    if(!reserveArchaeology.some(x=>x.status==='reactive')) disconfirm.push('Top windows are not producing decisive reserve archaeology hits.');
+    const hasRealWindows=(windows||[]).some(w=>!String(w.phase||'').startsWith('synthetic'));
+    if(!hasRealWindows) disconfirm.push('No live Maria / social windows are loaded right now, so window-based proof is partially blinded.');
+    else if(!reserveArchaeology.some(x=>x.status==='reactive')) disconfirm.push('Top windows are not producing decisive reserve archaeology hits.');
     if(candidates[0] && candidates[0].stance!=='discharging') disconfirm.push('The top shadow candidate is not yet discharging into an obvious terminal move.');
     if(executionHunt.tripwires.find(x=>x.name==='optical-rail-shock' && !x.fire)) disconfirm.push('The optical rail has not shown a high-magnitude shock near a priority social window yet.');
 
@@ -1379,6 +1458,80 @@
     ];
 
     return {prep, exec, debt, clarity, stateText, verdict, hint, supports, disconfirm, proveNext, weaken, pressure};
+  }
+
+  
+  function buildSystemAudit(chain, social, windows, attritionAbsolute, relayerWatch, trieTouch, zeroingAnalysis, relayerFingerprint, manifoldTracker){
+    const realWindows=(windows||[]).filter(w=>!String(w.phase||'').startsWith('synthetic')).length;
+    const synthetic=(windows||[]).length-realWindows;
+    const rows=[];
+    rows.push({label:'Live block pace', value:`${Number(chain.blockPace?.blockSec||state.settings.blockSec||10.2).toFixed(3)} s/block`, hint:chain.blockPace?.summary||'Using configured block pace.', cls:Math.abs(Number(chain.blockPace?.drift||0))<0.08?'good':'warn'});
+    rows.push({label:'Social retention', value:`${(social||[]).length} items`, hint:realWindows?`${realWindows} real window(s) loaded.`:'No real windows are loaded right now.', cls:(social||[]).length?'good':'warn'});
+    rows.push({label:'Window mix', value:`${realWindows} real / ${synthetic} synthetic`, hint:'Synthetic windows are only a fallback when social timing is missing.', cls:realWindows?'good':'warn'});
+    rows.push({label:'Deep proving cycle', value:state.deepMode?'active':'standard', hint:`Cycle ${state.cycle||0} • deep every ${Math.max(1, Number(state.settings.deepSweepEvery||4))} cycle(s).`, cls:state.deepMode?'good':'info'});
+    rows.push({label:'Relayer proof path', value:(relayerFingerprint?.hardHits||0)?`${relayerFingerprint.hardHits} hard hit(s)`:(relayerFingerprint?.manifoldCalls||0)?`${relayerFingerprint.manifoldCalls} manifold call(s)`:'no hard hits', hint:relayerWatch?.summary||'No relayer summary.', cls:(relayerFingerprint?.hardHits||0)?'good':(relayerFingerprint?.manifoldCalls||0)?'warn':'info'});
+    rows.push({label:'RPC deep methods', value:`getProof ${trieTouch?.supported?'ok':'blocked'} • trace ${zeroingAnalysis?.supported?'ok':'blocked'}`, hint:'The tool now audits whether deep methods are actually available before trusting them.', cls:(trieTouch?.supported||zeroingAnalysis?.supported)?'good':'warn'});
+    rows.push({label:'Recurring manifold memory', value:manifoldTracker?.lead ? `${manifoldTracker.lead.snapshots} snapshot(s)` : 'none yet', hint:manifoldTracker?.summary||'No manifold summary.', cls:(manifoldTracker?.lead?.snapshots||0)>=2?'good':'info'});
+    const summary=`Audit: ${(social||[]).length} social item(s), ${realWindows} real window(s), live block pace ${(chain.blockPace?.blockSec||state.settings.blockSec||10.2).toFixed(3)}s, deep mode ${state.deepMode?'on':'off'}, relayer hard hits ${relayerFingerprint?.hardHits||0}.`;
+    return {rows, summary, pills:[state.deepMode?'deep-cycle':'standard-cycle', realWindows?`${realWindows} real windows`:'no real windows', trieTouch?.supported?'getProof ok':'getProof blocked', zeroingAnalysis?.supported?'trace ok':'trace blocked']};
+  }
+
+  function buildSocialMemory(social, windows){
+    const items=social||[];
+    const byPlat={};
+    items.forEach(x=>{ const k=x.platform||x.source||'unknown'; byPlat[k]=(byPlat[k]||0)+1; });
+    const maria=items.filter(x=>String(x.platform||'').toLowerCase()==='youtube' || String(x.kind||'').toLowerCase()==='short');
+    const codeMap=new Map();
+    maria.forEach(x=>{ const k=x.code||'uncoded'; const row=codeMap.get(k)||{code:k,count:0,duration:0,phase:x.phase||'—'}; row.count+=1; row.duration=Math.max(row.duration, Number(x.durationSec||0)); codeMap.set(k,row); });
+    const codes=[...codeMap.values()].sort((a,b)=>b.count-a.count || b.duration-a.duration).slice(0,8);
+    const realWindows=(windows||[]).filter(w=>!String(w.phase||'').startsWith('synthetic'));
+    const rows=[
+      {label:'Loaded social memory', value:`${items.length} item(s)`, hint:`Platforms: ${Object.entries(byPlat).map(([k,v])=>`${k} ${v}`).join(' • ')||'none'}`},
+      {label:'Maria/video items', value:`${maria.length}`, hint:`Codes: ${codes.map(x=>x.code).join(', ')||'none'}`},
+      {label:'Real timing windows', value:`${realWindows.length}`, hint:realWindows[0]?`Top window ${realWindows[0].code||realWindows[0].phase||'window'} @ block ${Math.round(realWindows[0].approxBlock||0)}`:'No real windows loaded; synthetic fallback may be used.'},
+      {label:'Memory retention', value:`${Math.max(1, Number(state.settings.socialMemoryDays||45))} day(s)`, hint:'Older items remain available for window scoring and correlation.'}
+    ];
+    const summary=items.length ? `Social memory is retaining ${items.length} item(s) with ${realWindows.length} real timing window(s).` : 'No social memory is currently loaded; the tool can still probe chain state but window-based proof is weakened.';
+    return {rows, summary, codes};
+  }
+
+  function buildEvidenceLedger(clarifier, nullAwakening, contractIntel, reserveArchaeology, relayerFingerprint, dischargeRouter, symmetrySniffer, zeroingAnalysis, gateWatch, gasFingerprint, attritionAbsolute, intakeDelta, trieTouch, manifoldTracker){
+    const rows=[];
+    rows.push({name:'Slot wake / shell fracture', kind:'hard', score:nullAwakening?.score||0, status:(nullAwakening?.score||0)>0?'proved':'missing', why:nullAwakening?.reasons?.[0]||'No slot wake observed.'});
+    rows.push({name:'Mint / burn shell evidence', kind:'hard', score:clamp(Math.min(((contractIntel?.mints?.count||0)+(contractIntel?.burns?.count||0))/2,1),0,1), status:((contractIntel?.mints?.count||0)+(contractIntel?.burns?.count||0))?'proved':'missing', why:`Mint ${contractIntel?.mints?.count||0} • burn ${contractIntel?.burns?.count||0}.`});
+    rows.push({name:'Relayer → manifold call', kind:'hard', score:clamp((relayerFingerprint?.hardHits||0)/2,0,1), status:(relayerFingerprint?.hardHits||0)?'proved':(relayerFingerprint?.manifoldCalls||0)?'near':'missing', why:relayerFingerprint?.summary||'No relayer/manifold hard hit yet.'});
+    rows.push({name:'Terminal discharge routing', kind:'hard', score:clamp((dischargeRouter?.terminalHits||0)/2,0,1), status:(dischargeRouter?.terminalHits||0)?'near':'missing', why:dischargeRouter?.summary||'No terminal discharge summary.'});
+    rows.push({name:'Reactive reserve window hit', kind:'hard', score:clamp((reserveArchaeology||[]).filter(x=>x.status==='reactive').length/3,0,1), status:(reserveArchaeology||[]).some(x=>x.status==='reactive')?'near':'missing', why:(reserveArchaeology||[]).some(x=>x.status==='reactive')?'At least one anchor reacted inside a loaded timing window.':'No decisive anchor motion overlaps a top window yet.'});
+    rows.push({name:'Trie touch while zero', kind:'hard', score:clamp((trieTouch?.cocked||0)/2,0,1), status:(trieTouch?.cocked||0)?'near':(trieTouch?.supported?'watching':'unsupported'), why:trieTouch?.summary||'No trie-touch summary.'});
+    rows.push({name:'Recurring spender manifold', kind:'soft', score:manifoldTracker?.lead?.score||0, status:(manifoldTracker?.lead?.snapshots||0)>=2?'observed':'weak', why:manifoldTracker?.summary||'No recurring manifold memory yet.'});
+    rows.push({name:'Approval-led shell', kind:'soft', score:clamp(Math.min((contractIntel?.approvalCount||0)/8,1),0,1), status:(contractIntel?.approvalCount||0)?'observed':'quiet', why:`Approvals ${contractIntel?.approvalCount||0}.`});
+    rows.push({name:'Optical-rail attrition', kind:'soft', score:attritionAbsolute?.score||0, status:attritionAbsolute?.state||'unknown', why:attritionAbsolute?.summary||'No attrition summary.'});
+    rows.push({name:'Bridged intake delta', kind:'soft', score:intakeDelta?.score||0, status:intakeDelta?.state||'unknown', why:intakeDelta?.summary||'No intake-delta summary.'});
+    rows.push({name:'11-block symmetry', kind:'soft', score:symmetrySniffer?.score||0, status:(symmetrySniffer?.lead?.score||0)>.72?'observed':'weak', why:symmetrySniffer?.summary||'No symmetry summary.'});
+    rows.push({name:'Zero-write trace hint', kind:'soft', score:zeroingAnalysis?.score||0, status:(zeroingAnalysis?.zeroish||0)?'observed':(zeroingAnalysis?.supported?'watching':'unsupported'), why:zeroingAnalysis?.summary||'No zero-write summary.'});
+    rows.push({name:'Gated calldata hash', kind:'soft', score:gateWatch?.score||0, status:(gateWatch?.rows||[]).length?'observed':'quiet', why:gateWatch?.summary||'No gate-watch summary.'});
+    rows.push({name:'Symbolic gas fingerprint', kind:'soft', score:gasFingerprint?.score||0, status:(gasFingerprint?.exact||0)?'observed':'quiet', why:gasFingerprint?.summary||'No gas summary.'});
+    const hard=rows.filter(x=>x.kind==='hard').reduce((a,x)=>a+x.score,0)/Math.max(1, rows.filter(x=>x.kind==='hard').length);
+    const soft=rows.filter(x=>x.kind==='soft').reduce((a,x)=>a+x.score,0)/Math.max(1, rows.filter(x=>x.kind==='soft').length);
+    const summary=`Evidence ledger: hard ${pct(hard)} • soft ${pct(soft)} • clarity ${pct(clarifier?.clarity||0)}.`;
+    return {rows, hard, soft, summary};
+  }
+
+  function buildProveLoop(chain, social, windows, systemAudit, evidenceLedger, clarifier, candidates, spenderLab){
+    const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
+    const rem=(state.cycle||0) % every;
+    const nextDeep=rem===0 ? 0 : every-rem;
+    const primaryTarget=spenderLab?.[0]?.address || candidates?.[0]?.address || '';
+    const realWindows=(windows||[]).filter(w=>!String(w.phase||'').startsWith('synthetic')).length;
+    const rows=[
+      {label:'Cycle mode', value:state.deepMode?'deep proving':'standard proving', hint:`Cycle ${state.cycle||0}. While this page stays open, the engine keeps probing on the refresh loop.`},
+      {label:'Next deep sweep', value:state.deepMode?'now':`in ${nextDeep} cycle(s)`, hint:'Deep sweeps expand scan depth and selector / trace sampling.'},
+      {label:'Primary target', value:primaryTarget ? addrShort(primaryTarget) : 'none yet', hint:primaryTarget ? 'Current best live contract / candidate to chase.' : 'No live target promoted yet.'},
+      {label:'Window state', value:realWindows?`${realWindows} real window(s)`:'synthetic fallback', hint:realWindows ? 'Real social timing anchors are loaded.' : 'Load/import Maria/social data to strengthen timing proof.'},
+      {label:'Hard gate still missing', value:clarifier?.disconfirm?.[0] || 'none', hint:evidenceLedger?.summary||''}
+    ];
+    const summary=`Prove loop is ${state.deepMode?'running a deep sweep':'running a standard sweep'} with ${(social||[]).length} social item(s) and ${realWindows} real window(s).`;
+    return {rows, summary};
   }
 
   function buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP, executionHunt, routeClusters){
@@ -1595,7 +1748,7 @@
     const chain=await buildChainState(imported);
     const social=await collectSocial(imported);
     if(social.length) saveSocialCache(social);
-    const windows=buildWindows(chain.latestBlock, chain.latestTsMs, social);
+    const windows=buildWindows(chain.latestBlock, chain.latestTsMs, social, chain.liveBlockSec);
     const contractIntel=await analyzeTargetLogs(chain, windows);
     const spenderLab=await buildSpenderLab(contractIntel, windows);
     const candidates=buildCandidates(contractIntel, spenderLab, windows, imported);
@@ -1624,7 +1777,11 @@
     const gasFingerprint=await buildGasFingerprint(spenderLab, contractIntel, candidates);
     const dustAttrition=await buildDustAttrition(contractIntel);
     const squareLaw=buildSquareLaw(chain);
-    const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt);
+    const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt, windows);
+    const socialMemory=buildSocialMemory(social, windows);
+    const systemAudit=buildSystemAudit(chain, social, windows, attritionAbsolute, relayerWatch, trieTouch, zeroingAnalysis, relayerFingerprint, manifoldTracker);
+    const evidenceLedger=buildEvidenceLedger(clarifier, nullAwakening, contractIntel, reserveArchaeology, relayerFingerprint, dischargeRouter, symmetrySniffer, zeroingAnalysis, gateWatch, gasFingerprint, attritionAbsolute, intakeDelta, trieTouch, manifoldTracker);
+    const proveLoop=buildProveLoop(chain, social, windows, systemAudit, evidenceLedger, clarifier, candidates, spenderLab);
     if(manifoldTracker.lead && manifoldTracker.lead.snapshots>=2) clarifier.supports.push(`Recurring spender manifold ${addrShort(manifoldTracker.lead.address)} persists across ${manifoldTracker.lead.snapshots} loaded snapshot(s).`);
     if(relayerWatch.narrativeHits && !relayerWatch.addressHits.length) clarifier.disconfirm.push('Gasless / relayer narrative is active, but address-level relayer proof is still unresolved.');
     if(attritionAbsolute.state==='thickening-or-replenished') clarifier.disconfirm.push('Native optical rail is thickening or being replenished across loaded history, which weakens the attrition-only case.');
@@ -1659,7 +1816,7 @@
       dnaProbe:chain.dnaProbe,
       social,
       windows,
-      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters, relayerFingerprint, dischargeNexus, trieTouch, intakeDelta, killSwitch, infraMatrix, symmetrySniffer, zeroingAnalysis, gateWatch, gasFingerprint, dustAttrition, squareLaw},
+      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters, relayerFingerprint, dischargeNexus, trieTouch, intakeDelta, killSwitch, infraMatrix, symmetrySniffer, zeroingAnalysis, gateWatch, gasFingerprint, dustAttrition, squareLaw, socialMemory, systemAudit, evidenceLedger, proveLoop},
       spenderLab,
       candidates,
       reserveArchaeology,
@@ -1679,6 +1836,10 @@
       gasFingerprint,
       dustAttrition,
       squareLaw,
+      socialMemory,
+      systemAudit,
+      evidenceLedger,
+      proveLoop,
       clarifier,
       score:clarifier.clarity*100,
       pegProgress:clarifier.prep,
@@ -1952,6 +2113,23 @@
     state.history.slice(-8).reverse().forEach(h=>{
       pushItem(hl, `${fmtTs(h.createdAt||h.latestTsMs)} • clarity ${pct(h.clarifier?.clarity||0)} • prep ${pct(h.clarifier?.prep||0)} • execution ${pct(h.clarifier?.exec||0)} • ${h.clarifier?.stateText||'—'}`, 'info');
     });
+    clearEl($('auditPills')); (model.systemAudit?.pills||[]).forEach(x=>pushPill($('auditPills'), x));
+    clearEl($('systemAuditList'));
+    pushItem($('systemAuditList'), model.systemAudit?.summary || 'No system audit summary yet.', 'info');
+    (model.systemAudit?.rows||[]).forEach(x=>pushItem($('systemAuditList'), `${x.label}: ${x.value} • ${x.hint}`, x.cls||'info'));
+
+    clearEl($('socialMemoryList'));
+    pushItem($('socialMemoryList'), model.socialMemory?.summary || 'No social-memory summary yet.', (model.socialMemory?.rows||[]).length?'info':'warn');
+    (model.socialMemory?.rows||[]).forEach(x=>pushItem($('socialMemoryList'), `${x.label}: ${x.value} • ${x.hint}`, /No real windows|No social memory/.test(String(x.hint)+String(x.value))?'warn':'info'));
+    (model.socialMemory?.codes||[]).forEach(x=>pushItem($('socialMemoryList'), `Code ${x.code} • count ${x.count} • duration ${x.duration||0}s • phase ${x.phase}`, 'info'));
+
+    clearEl($('evidenceLedgerList'));
+    pushItem($('evidenceLedgerList'), model.evidenceLedger?.summary || 'No evidence ledger summary yet.', 'info');
+    (model.evidenceLedger?.rows||[]).forEach(x=>pushItem($('evidenceLedgerList'), `${x.kind.toUpperCase()} • ${x.name}: ${pct(x.score)} • ${x.status} • ${x.why}`, x.kind==='hard' ? (x.status==='proved'?'good':x.status==='near'?'warn':'bad') : (x.score>.6?'good':x.score>.35?'warn':'info')));
+
+    clearEl($('proveLoopList'));
+    pushItem($('proveLoopList'), model.proveLoop?.summary || 'No prove-loop summary yet.', state.deepMode?'good':'info');
+    (model.proveLoop?.rows||[]).forEach(x=>pushItem($('proveLoopList'), `${x.label}: ${x.value} • ${x.hint}`, /missing|synthetic fallback/.test(String(x.value))?'warn':'info'));
   }
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
@@ -1959,7 +2137,10 @@
   async function sync(){
     if(state.syncing) return;
     state.syncing=true;
-    $('syncStatus').textContent='syncing'; $('syncStatus').className='status info';
+    state.cycle=(state.cycle||0)+1;
+    const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
+    state.deepMode = ((state.cycle % every)===0);
+    $('syncStatus').textContent=state.deepMode?'deep proving':'syncing'; $('syncStatus').className='status info';
     try{
       state.settings=loadSettings();
       const model=await buildModel();
@@ -1997,6 +2178,9 @@
     $('sManualSocial').value=state.settings.manualSocial||'';
     $('sResearchCorpus').value=state.settings.researchCorpus||'';
     $('sSpeculateLevel').value=state.settings.speculateLevel||8;
+    $('sDeepSweepEvery').value=state.settings.deepSweepEvery||4;
+    $('sRelayerHints').value=state.settings.relayerHints||'';
+    $('sSocialMemoryDays').value=state.settings.socialMemoryDays||45;
   }
   function pullSettings(){
     state.settings.privateRpc=$('sPrivateRpc').value.trim();
@@ -2015,6 +2199,9 @@
     state.settings.manualSocial=$('sManualSocial').value;
     state.settings.researchCorpus=$('sResearchCorpus').value;
     state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8;
+    state.settings.deepSweepEvery=Math.max(1, Number($('sDeepSweepEvery').value)||4);
+    state.settings.relayerHints=$('sRelayerHints').value;
+    state.settings.socialMemoryDays=Math.max(1, Number($('sSocialMemoryDays').value)||45);
     saveSettings();
     if(state.timer) clearInterval(state.timer);
     state.timer=setInterval(sync, Math.max(12000, state.settings.autoRefresh||30000));
@@ -2029,11 +2216,11 @@
   $('settingsBtn').onclick=()=> $('settingsBox').classList.toggle('open');
   $('saveSettingsBtn').onclick=()=>{ try{ pullSettings(); sync(); }catch(e){ alert('Settings error: '+(e.message||String(e))); } };
   $('clearSettingsBtn').onclick=()=>{ state.settings=JSON.parse(JSON.stringify(DEFAULTS)); saveSettings(); pushSettings(); };
-  $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local V35 history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
+  $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local V38 history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v35-history.json', state.history);
-  $('exportBtn').onclick=()=> downloadJson('pdai-v35-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v38-history.json', state.history);
+  $('exportBtn').onclick=()=> downloadJson('pdai-v38-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
     try{
@@ -2049,7 +2236,7 @@
       if(bundle.lastGood) saveLastGood(bundle.lastGood);
       render(safeImportedRender(bundle));
       $('syncStatus').textContent='bundle loaded'; $('syncStatus').className='status info';
-      $('lastSync').textContent='Imported bundle loaded. Refresh to run live V35 logic.';
+      $('lastSync').textContent='Imported bundle loaded. Refresh to run live V38 logic.';
     }catch(err){ alert('Import failed: '+(err.message||String(err))); }
     e.target.value='';
   });
