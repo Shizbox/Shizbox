@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V36 Infrastructure Proof Engine</title>
+<title>pDAI Peg Prover • V37 Kinematic Verification Engine</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,8 +84,8 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V36 Infrastructure Proof Engine</h1>
-      <div class="sub">V36 pushes the hunt from proof-of-prep toward proof-of-infrastructure: relayer→manifold fingerprinting, discharge-nexus convergence, trie-touch mutation checks, intake-pressure deltas, and kill-switch reserve normalization all get their own lanes.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V37 Kinematic Verification Engine</h1>
+      <div class="sub">V37 adds kinematic verification: 11-block symmetry sniffing, zero-write trace checks, gated-calldata hash hunting, deterministic gas fingerprinting, dust-attrition monitoring, and square-law structural tests on top of the infrastructure proof stack.</div>
       <div class="chips">
         <div class="chip good">Imports V31–V35 bundle JSON</div>
         <div class="chip info">Adds relayer → manifold fingerprinting</div>
@@ -188,7 +188,7 @@
   <div class="tri">
     <div class="panel">
       <div class="boxTitle">Model competition</div>
-      <div class="small">V36 ranks competing explanations so the tool can tell you whether it is seeing peg preparation, infrastructure priming, ecosystem growth, routine churn, or dot-connecting overshoot.</div>
+      <div class="small">V37 still ranks competing explanations, but now adds machine-regularity checks so repeated mechanical structure can support the thesis without pretending shell proof already exists.</div>
       <div id="modelList" style="margin-top:12px"></div>
     </div>
     <div class="panel">
@@ -289,6 +289,43 @@
       <div id="infraMatrixList"></div>
     </div>
   </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">11-block symmetry sniffer</div>
+      <div class="small">Top candidate activity is tested for palindromic or near-palindromic heartbeat structure across 11-block windows, with social windows preferred when available.</div>
+      <div id="symmetryList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Low-free / zero-write analysis</div>
+      <div class="small">Sample spender-adjacent transaction traces are checked for SSTORE patterns that may indicate storage clearing or zero-value priming. This lane stays cautious when RPC trace support is limited.</div>
+      <div id="zeroingList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Lu-user-token gate watch</div>
+      <div class="small">Repeated non-address 32-byte calldata words are surfaced so gated execution hashes can be distinguished from ordinary address and amount arguments.</div>
+      <div id="gateList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Deterministic gas fingerprint</div>
+      <div class="small">Sample spender / candidate / relayer-adjacent transactions are checked for repeated or numerically meaningful gas prices that would be unusual for ordinary retail flow.</div>
+      <div id="gasFingerList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Massless dust attrition</div>
+      <div class="small">Recent graph participants with dust-scale transfers are rebalanced against live balances to see whether the observed graph is being swept toward zero.</div>
+      <div id="dustList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Square-law structural proof</div>
+      <div class="small">The core/native imbalance is translated into leverage, square-root pressure, and nearest-square structure. This is structural math, not a direct $1 oracle proof.</div>
+      <div id="squareLawList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
 
   <div class="twocol">
     <div class="panel">
@@ -433,6 +470,16 @@
   async function getStorageAt(address,slot,block='latest'){ return rpc('eth_getStorageAt',[address,slot,block]); }
   async function getLogs(filter){ return rpc('eth_getLogs',[filter]); }
   async function getBlock(numberOrTag='latest'){ return rpc('eth_getBlockByNumber',[typeof numberOrTag==='string' ? numberOrTag : hex(numberOrTag), false]); }
+  async function getTx(hash){ return rpc('eth_getTransactionByHash',[hash]); }
+  async function getReceipt(hash){ return rpc('eth_getTransactionReceipt',[hash]); }
+  async function getProof(address, slots=[], block='latest'){ return rpc('eth_getProof',[address, slots, block]); }
+  async function traceTx(hash){
+    try{ return await rpc('debug_traceTransaction',[hash,{}]); }
+    catch(e1){
+      try{ return await rpc('debug_traceTransaction',[hash,{disableStorage:false,disableStack:false,enableMemory:false,enableReturnData:false}]); }
+      catch(e2){ throw e2; }
+    }
+  }
 
   async function readBalance(token,address){ const raw=await ethCall(token, sigData('0x70a08231',address)).catch(()=> '0x0'); return Number(parseBig(raw))/1e18; }
   async function readTotalSupply(token){ const raw=await ethCall(token,'0x18160ddd').catch(()=> '0x0'); return Number(parseBig(raw))/1e18; }
@@ -1346,6 +1393,203 @@
     return tasks.sort((a,b)=>b.score-a.score);
   }
 
+
+  function blockCountMapForAddress(transfers, address, fromBlock, toBlock){
+    const map=new Map();
+    for(let b=fromBlock;b<=toBlock;b++) map.set(b,0);
+    for(const t of (transfers||[])){
+      const blk=Number(t.block||0);
+      if(blk<fromBlock || blk>toBlock) continue;
+      if(norm(t.from)===norm(address) || norm(t.to)===norm(address)) map.set(blk,(map.get(blk)||0)+1);
+    }
+    return [...map.entries()].sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+  }
+
+  function buildSymmetrySniffer(contractIntel, windows, candidates){
+    const preferred=(windows||[]).filter(w=>Math.round(w.blocks||0)>=10 && Math.round(w.blocks||0)<=12).slice(0,6);
+    const candidateRows=(candidates||[]).slice(0,4);
+    const addresses=uniq(candidateRows.map(x=>x.address).filter(isAddr), x=>norm(x));
+    const recentBlocks=uniq((contractIntel.transfers||[]).map(t=>Number(t.block||0)).filter(Boolean).sort((a,b)=>a-b), x=>x).slice(0,12);
+    const synthetic=[];
+    if(!preferred.length){
+      for(const b of recentBlocks.slice(0,4)) synthetic.push({id:`synthetic:${b}`,title:`Synthetic 11-block window @ ${b}`,fromBlock:b,toBlock:b+10,blocks:11,phase:'synthetic',publishedAt:''});
+    }
+    const baseWindows=preferred.length ? preferred : synthetic;
+    const rows=[];
+    for(const addr of addresses){
+      for(const w of baseWindows){
+        const from=Number(w.fromBlock||0), to=from+10;
+        const counts=blockCountMapForAddress(contractIntel.transfers||[], addr, from, to);
+        const total=counts.reduce((a,b)=>a+b,0);
+        if(!total) continue;
+        let pairScore=0;
+        for(let i=0;i<5;i++){
+          const a=counts[i]||0, b=counts[10-i]||0;
+          pairScore += 1 - Math.min(Math.abs(a-b)/Math.max(1,a,b),1);
+        }
+        const symmetry=pairScore/5;
+        const activeBlocks=counts.filter(x=>x>0).length;
+        const score=clamp(symmetry*0.72 + Math.min(total/12,0.16) + Math.min(activeBlocks/11,0.12),0,1);
+        rows.push({address:addr, window:w.title||w.id||'window', fromBlock:from, counts, total, activeBlocks, symmetry, score});
+      }
+    }
+    rows.sort((a,b)=>b.score-a.score);
+    const lead=rows[0]||null;
+    let summary='No 11-block mechanical symmetry stands out yet.';
+    if(lead) summary=`Lead 11-block window ${lead.window} around ${addrShort(lead.address)} scores ${pct(lead.symmetry)} symmetry across ${lead.activeBlocks} active block(s) and ${lead.total} candidate-touch txs.`;
+    return {rows:rows.slice(0,8), lead, summary, score:lead?lead.score:0};
+  }
+
+  function zeroishWord(x){ return /^0x?0+$/.test(String(x||'')); }
+
+  async function buildZeroingAnalysis(spenderLab, contractIntel){
+    const spenders=(spenderLab||[]).slice(0,2).map(x=>norm(x.address));
+    const hashes=uniq([
+      ...(contractIntel.approvals||[]).filter(a=>spenders.includes(norm(a.spender))).map(a=>a.tx),
+      ...(contractIntel.transfers||[]).filter(t=>spenders.includes(norm(t.from)) || spenders.includes(norm(t.to))).map(t=>t.tx)
+    ].filter(Boolean), x=>x).slice(0,3);
+    if(!hashes.length) return {supported:false, rows:[], summary:'No spender-adjacent tx hashes are available for zero-write tracing yet.', score:0, zeroish:0};
+    const rows=[];
+    try{
+      for(const hash of hashes){
+        const trace=await traceTx(hash);
+        const logs=Array.isArray(trace?.structLogs) ? trace.structLogs : [];
+        const sstores=logs.filter(l=>l.op==='SSTORE');
+        let zeroish=0;
+        for(const l of sstores){
+          const st=Array.isArray(l.stack) ? l.stack : [];
+          const tail=st.slice(-2);
+          if(tail.some(zeroishWord)) zeroish += 1;
+        }
+        rows.push({hash, sstores:sstores.length, zeroish, caution:'potential-zero-write'});
+      }
+    }catch(err){
+      return {supported:false, rows:[], summary:`debug_traceTransaction is unavailable on the active RPC: ${err.message||String(err)}`, score:0, zeroish:0};
+    }
+    const zeroish=rows.reduce((a,x)=>a+x.zeroish,0);
+    let summary='Trace support is live, but no likely zero-write pattern stands out yet.';
+    if(zeroish) summary=`Trace support is live and ${zeroish} potential zero-write SSTORE pattern(s) were seen in sampled spender-adjacent tx traces.`;
+    return {supported:true, rows, summary, score:clamp((zeroish?0.64:0)+Math.min(rows.reduce((a,x)=>a+x.sstores,0)/10,0.18),0,1), zeroish};
+  }
+
+  function isAddressWord(word){ const w=String(word||'').replace(/^0x/,'').toLowerCase(); return /^0{24}[a-f0-9]{40}$/.test(w) && !/^0{64}$/.test(w); }
+  function isSmallNumericWord(word){
+    try{ return BigInt('0x'+String(word||'').replace(/^0x/,'')) <= 10000000000000000000000n; }
+    catch{ return false; }
+  }
+  function splitWords(input){
+    const h=String(input||'').replace(/^0x/,'');
+    const body=h.length>8 ? h.slice(8) : '';
+    const out=[];
+    for(let i=0;i+64<=body.length;i+=64) out.push('0x'+body.slice(i,i+64));
+    return out;
+  }
+
+  async function buildGateWatch(spenderLab, contractIntel, candidates){
+    const hotAddrs=new Set([...(spenderLab||[]).slice(0,3).map(x=>norm(x.address)), ...(candidates||[]).slice(0,3).map(x=>norm(x.address))]);
+    const hashes=uniq([
+      ...(contractIntel.approvals||[]).filter(a=>hotAddrs.has(norm(a.spender)) || hotAddrs.has(norm(a.owner))).map(a=>a.tx),
+      ...(contractIntel.transfers||[]).filter(t=>hotAddrs.has(norm(t.from)) || hotAddrs.has(norm(t.to))).map(t=>t.tx)
+    ].filter(Boolean), x=>x).slice(0,10);
+    if(!hashes.length) return {rows:[], summary:'No sampled calldata is available for gate-hash hunting yet.', score:0};
+    const wordMap=new Map();
+    for(const hash of hashes){
+      try{
+        const tx=await getTx(hash);
+        for(const word of splitWords(tx?.input||'')){
+          const key=norm(word);
+          if(!/^0x[a-f0-9]{64}$/.test(key)) continue;
+          if(key===norm(NULL32) || isAddressWord(key) || isSmallNumericWord(key)) continue;
+          const row=wordMap.get(key)||{word:key,count:0,txs:new Set()};
+          row.count += 1;
+          row.txs.add(hash);
+          wordMap.set(key,row);
+        }
+      }catch{}
+    }
+    const rows=[...wordMap.values()].map(x=>({word:x.word,count:x.count,txs:x.txs.size,score:clamp(Math.min(x.count/4,0.6)+Math.min(x.txs/4,0.4),0,1)})).filter(x=>x.txs>=2).sort((a,b)=>b.score-a.score);
+    const lead=rows[0]||null;
+    let summary='No repeated non-address calldata hash stands out yet.';
+    if(lead) summary=`Repeated calldata word ${lead.word.slice(0,18)}… appears across ${lead.txs} sampled tx(s), which makes it a gate-like execution candidate worth keeping on watch.`;
+    return {rows:rows.slice(0,8), lead, summary, score:lead?lead.score:0};
+  }
+
+  function nearConst(val, target, tol=0.02){ return Math.abs(Number(val)-Number(target))<=tol; }
+
+  async function buildGasFingerprint(spenderLab, contractIntel, candidates){
+    const hot=new Set([...(spenderLab||[]).slice(0,3).map(x=>norm(x.address)), ...(candidates||[]).slice(0,3).map(x=>norm(x.address))]);
+    const hashes=uniq([
+      ...(contractIntel.approvals||[]).filter(a=>hot.has(norm(a.spender)) || hot.has(norm(a.owner))).map(a=>a.tx),
+      ...(contractIntel.transfers||[]).filter(t=>hot.has(norm(t.from)) || hot.has(norm(t.to))).map(t=>t.tx)
+    ].filter(Boolean), x=>x).slice(0,10);
+    if(!hashes.length) return {rows:[], summary:'No tx sample is available for gas fingerprinting yet.', score:0, exact:0, plateau:0};
+    const rows=[]; const bins=new Map();
+    for(const hash of hashes){
+      try{
+        const [tx,rcpt]=await Promise.all([getTx(hash), getReceipt(hash)]);
+        const wei=BigInt(rcpt?.effectiveGasPrice || tx?.gasPrice || '0x0');
+        const gwei=Number(wei)/1e9;
+        const rounded=gwei.toFixed(3);
+        bins.set(rounded,(bins.get(rounded)||0)+1);
+        const exact=nearConst(gwei,111.111,0.02) || nearConst(gwei,155.155,0.02) || nearConst(gwei,156.000,0.02);
+        rows.push({hash, gwei, rounded, exact, score:clamp((exact?0.7:0)+0.1,0,1)});
+      }catch{}
+    }
+    const plateau=[...bins.entries()].sort((a,b)=>b[1]-a[1])[0]||null;
+    const exactCount=rows.filter(x=>x.exact).length;
+    let summary='No deterministic gas constant stands out in the sampled tx set.';
+    if(exactCount) summary=`${exactCount} sampled tx(s) hit a monitored symbolic gas band (111.111 / 155.155 / 156.000 gwei ± tolerance).`;
+    else if(plateau && plateau[1]>=3) summary=`Sampled tx gas clusters around ${plateau[0]} gwei across ${plateau[1]} tx(s), which is more repeatable than ordinary retail flow.`;
+    return {rows:rows.slice(0,10), summary, score:clamp((exactCount?0.74:0)+Math.min(((plateau&&plateau[1])||0)/6,0.22),0,1), exact:exactCount, plateau:(plateau&&plateau[1])||0, plateauValue:(plateau&&plateau[0])||''};
+  }
+
+  async function buildDustAttrition(contractIntel){
+    const tiny=(contractIntel.transfers||[]).filter(t=>Number(t.amount||0) < 0.001);
+    const addrs=uniq(tiny.flatMap(t=>[t.from,t.to]).filter(isAddr), x=>norm(x)).slice(0,12);
+    if(!addrs.length) return {rows:[], summary:'No recent dust-scale transfer participants were observed in the sampled graph.', score:0, zeroed:0};
+    const rows=[];
+    for(const address of addrs){
+      try{
+        const bal=await readBalance(state.settings.target, address);
+        rows.push({address, balance:bal, zeroed:bal<1e-9, score:bal<1e-9?0.72:bal<0.001?0.34:0.08});
+      }catch{}
+    }
+    rows.sort((a,b)=>a.balance-b.balance);
+    const zeroed=rows.filter(x=>x.zeroed).length;
+    let summary='Dust-scale participants exist, but no clear zero-sweep stands out yet.';
+    if(zeroed) summary=`${zeroed} sampled dust participant(s) now read effectively zero balance, which is consistent with recent-graph dust attrition.`;
+    return {rows:rows.slice(0,12), summary, score:clamp((zeroed?0.62:0)+Math.min(rows.length/12,0.16),0,1), zeroed};
+  }
+
+  function reserveOfTarget(anchor){
+    if(!anchor) return 0;
+    const t0=norm(anchor.token0), t1=norm(anchor.token1), tgt=norm(state.settings.target);
+    if(t0===tgt) return Number(anchor.reserve0||0);
+    if(t1===tgt) return Number(anchor.reserve1||0);
+    return Number(anchor.reserve0||0);
+  }
+
+  function buildSquareLaw(chain){
+    const native=(chain.publicAnchors||[]).find(a=>a.type==='public-native');
+    const coreBal=Number((chain.nodeBalances||{})['5EF7']?.pdai || 0);
+    const nativeBal=reserveOfTarget(native);
+    if(!nativeBal || !coreBal) return {rows:[], summary:'Square-law simulation is unavailable because the current core/native balances are incomplete.', score:0};
+    const ratio=coreBal/nativeBal;
+    const root=Math.sqrt(ratio);
+    const nearest=Math.round(root);
+    const nearestSq=nearest*nearest;
+    const deviation=Math.abs(ratio-nearestSq)/ratio;
+    const score=clamp(Math.min(ratio/400,0.62) + Math.max(0,0.26-Math.min(deviation,0.26)) + 0.08,0,1);
+    const summary=`Core/native ratio is ${ratio.toFixed(2)}x and sqrt(ratio) is ${root.toFixed(3)}. That is structural leverage, not a direct $1 proof, but it does show how little public rail thickness remains relative to warehoused core balance.`;
+    const rows=[
+      {label:'Core/native ratio', value:ratio.toFixed(2)+'x', hint:`core ${fmtShort(coreBal)} vs native ${fmtShort(nativeBal)}`},
+      {label:'Square-root leverage', value:root.toFixed(3)+'x', hint:'sqrt(core/native)'},
+      {label:'Nearest square', value:`${nearestSq} (${nearest}²)`, hint:`deviation ${(deviation*100).toFixed(2)}%`},
+      {label:'Interpretation', value:deviation<0.02?'near-perfect-square-structure':'highly-lopsided-structure', hint:'structure only; external price/oracle still missing'}
+    ];
+    return {rows, summary, score, ratio, root, deviation};
+  }
+
   async function buildModel(){
     const imported=state.importedBundle;
     const chain=await buildChainState(imported);
@@ -1374,6 +1618,12 @@
     const intakeDelta=buildIntakeDelta(chain, social);
     const killSwitch=buildKillSwitch(chain, attritionAbsolute, intakeDelta, contractIntel);
     const infraMatrix=buildInfraMatrix(relayerFingerprint, attritionAbsolute, dischargeNexus, trieTouch, intakeDelta, killSwitch);
+    const symmetrySniffer=buildSymmetrySniffer(contractIntel, windows, candidates);
+    const zeroingAnalysis=await buildZeroingAnalysis(spenderLab, contractIntel);
+    const gateWatch=await buildGateWatch(spenderLab, contractIntel, candidates);
+    const gasFingerprint=await buildGasFingerprint(spenderLab, contractIntel, candidates);
+    const dustAttrition=await buildDustAttrition(contractIntel);
+    const squareLaw=buildSquareLaw(chain);
     const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt);
     if(manifoldTracker.lead && manifoldTracker.lead.snapshots>=2) clarifier.supports.push(`Recurring spender manifold ${addrShort(manifoldTracker.lead.address)} persists across ${manifoldTracker.lead.snapshots} loaded snapshot(s).`);
     if(relayerWatch.narrativeHits && !relayerWatch.addressHits.length) clarifier.disconfirm.push('Gasless / relayer narrative is active, but address-level relayer proof is still unresolved.');
@@ -1386,6 +1636,14 @@
     else if(trieTouch.supported) clarifier.proveNext.push('Wait for a trie fingerprint change before claiming zero-value slot priming.');
     if(intakeDelta.state==='warehousing-rise') clarifier.supports.push('Bridged intake is rising while native deployment stays relatively muted.');
     if(killSwitch.active) clarifier.disconfirm.push('Reserve normalization / kill-switch pressure is active and weakens the one-way starvation thesis.');
+    if((symmetrySniffer.lead?.score||0)>.72) clarifier.supports.push(`A strong 11-block heartbeat appears around ${addrShort(symmetrySniffer.lead.address)}.`);
+    else clarifier.proveNext.push('Wait for a higher-confidence 11-block symmetry hit before calling the flow deterministic.');
+    if((zeroingAnalysis.zeroish||0)>0) clarifier.supports.push('Sampled spender-adjacent traces show potential zero-write storage behavior.');
+    else if(zeroingAnalysis.supported) clarifier.proveNext.push('Keep tracing spender-adjacent txs for zero-write SSTORE patterns.');
+    if((gateWatch.rows||[]).length) clarifier.supports.push('Repeated non-address calldata words suggest a possible execution gate parameter.');
+    if((gasFingerprint.exact||0)>0) clarifier.supports.push('Sampled txs hit monitored symbolic gas bands, which is unusual for ordinary retail flow.');
+    if((dustAttrition.zeroed||0)>0) clarifier.supports.push('Recent graph dust participants are being swept toward zero in the sampled holder set.');
+    if((squareLaw.score||0)>.6) clarifier.supports.push('Core/native structure is already highly lopsided on a square-law basis.');
     const probePlanner=buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP, executionHunt, routeClusters);
     return {
       createdAt:Date.now(),
@@ -1401,7 +1659,7 @@
       dnaProbe:chain.dnaProbe,
       social,
       windows,
-      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters, relayerFingerprint, dischargeNexus, trieTouch, intakeDelta, killSwitch, infraMatrix},
+      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters, relayerFingerprint, dischargeNexus, trieTouch, intakeDelta, killSwitch, infraMatrix, symmetrySniffer, zeroingAnalysis, gateWatch, gasFingerprint, dustAttrition, squareLaw},
       spenderLab,
       candidates,
       reserveArchaeology,
@@ -1415,6 +1673,12 @@
       intakeDelta,
       killSwitch,
       infraMatrix,
+      symmetrySniffer,
+      zeroingAnalysis,
+      gateWatch,
+      gasFingerprint,
+      dustAttrition,
+      squareLaw,
       clarifier,
       score:clarifier.clarity*100,
       pegProgress:clarifier.prep,
@@ -1475,6 +1739,12 @@
       intakeDelta:{state:'imported',summary:'Imported snapshot',rows:[],score:0},
       killSwitch:{active:false,rows:[],summary:'Imported snapshot',score:0},
       infraMatrix:{rows:[],inevitability:0,summary:'Imported snapshot'},
+      symmetrySniffer:{rows:[],summary:'Imported snapshot',score:0},
+      zeroingAnalysis:{supported:false,rows:[],summary:'Imported snapshot',score:0,zeroish:0},
+      gateWatch:{rows:[],summary:'Imported snapshot',score:0},
+      gasFingerprint:{rows:[],summary:'Imported snapshot',score:0,exact:0,plateau:0},
+      dustAttrition:{rows:[],summary:'Imported snapshot',score:0,zeroed:0},
+      squareLaw:{rows:[],summary:'Imported snapshot',score:0},
       clarifier,
       score:last.score||0,
       pegProgress:last.pegProgress||0,
@@ -1606,6 +1876,30 @@
     clearEl($('infraMatrixList'));
     pushItem($('infraMatrixList'), model.infraMatrix?.summary || 'No infrastructure matrix summary yet.', 'info');
     (model.infraMatrix?.rows||[]).forEach(x=>pushItem($('infraMatrixList'), `${x.name}: ${pct(x.score)} • ${x.hint}`, x.score>.62?'good':x.score>.35?'warn':'info'));
+
+    clearEl($('symmetryList'));
+    pushItem($('symmetryList'), model.symmetrySniffer?.summary || 'No symmetry summary yet.', (model.symmetrySniffer?.lead?.score||0)>.72?'good':'info');
+    (model.symmetrySniffer?.rows||[]).forEach(x=>pushItem($('symmetryList'), `${addrShort(x.address)} • ${x.window} • symmetry ${pct(x.symmetry)} • active ${x.activeBlocks}/11 • tx ${x.total} • counts ${x.counts.join('/')}`, x.score>.72?'good':x.score>.5?'warn':'info'));
+
+    clearEl($('zeroingList'));
+    pushItem($('zeroingList'), model.zeroingAnalysis?.summary || 'No zero-write summary yet.', (model.zeroingAnalysis?.zeroish||0)?'good':model.zeroingAnalysis?.supported?'warn':'info');
+    (model.zeroingAnalysis?.rows||[]).forEach(x=>pushItem($('zeroingList'), `${addrShort(x.hash)} • SSTORE ${x.sstores} • potential-zero ${x.zeroish}`, x.zeroish?'good':'info'));
+
+    clearEl($('gateList'));
+    pushItem($('gateList'), model.gateWatch?.summary || 'No gate-watch summary yet.', (model.gateWatch?.rows||[]).length?'warn':'info');
+    (model.gateWatch?.rows||[]).forEach(x=>pushItem($('gateList'), `${x.word.slice(0,18)}… • txs ${x.txs} • hits ${x.count} • ${pct(x.score)}`, x.score>.6?'good':'warn'));
+
+    clearEl($('gasFingerList'));
+    pushItem($('gasFingerList'), model.gasFingerprint?.summary || 'No gas-fingerprint summary yet.', (model.gasFingerprint?.exact||0)?'good':(model.gasFingerprint?.plateau||0)>=3?'warn':'info');
+    (model.gasFingerprint?.rows||[]).forEach(x=>pushItem($('gasFingerList'), `${addrShort(x.hash)} • ${x.gwei.toFixed(6)} gwei${x.exact?' • symbolic-band':''}`, x.exact?'good':'info'));
+
+    clearEl($('dustList'));
+    pushItem($('dustList'), model.dustAttrition?.summary || 'No dust-attrition summary yet.', (model.dustAttrition?.zeroed||0)?'warn':'info');
+    (model.dustAttrition?.rows||[]).forEach(x=>pushItem($('dustList'), `${addrShort(x.address)} • balance ${fmtNum(x.balance)}${x.zeroed?' • zeroed':''}`, x.zeroed?'good':x.balance<0.001?'warn':'info'));
+
+    clearEl($('squareLawList'));
+    pushItem($('squareLawList'), model.squareLaw?.summary || 'No square-law summary yet.', (model.squareLaw?.score||0)>.6?'good':'info');
+    (model.squareLaw?.rows||[]).forEach(x=>pushItem($('squareLawList'), `${x.label}: ${x.value} • ${x.hint}`, /near-perfect|Core\/native ratio/.test(String(x.label)+String(x.value))?'info':'info'));
 
     const wb=$('windowBody'); clearEl(wb);
     (model.reserveArchaeology||[]).forEach(row=>{
