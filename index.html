@@ -355,6 +355,7 @@
   function tryJson(s,fallback){ try{return JSON.parse(s);}catch{return fallback;} }
   function addrShort(a){ return a ? `${a.slice(0,10)}…${a.slice(-8)}` : '—'; }
   function norm(a){ return String(a||'').trim().toLowerCase(); }
+  function isAddr(a){ return /^0x[a-fA-F0-9]{40}$/.test(String(a||'').trim()); }
   function uniq(arr, keyFn){ const seen=new Set(); return arr.filter(x=>{ const k=keyFn(x); if(seen.has(k)) return false; seen.add(k); return true; }); }
   function pad32(hexNoPrefix){ return hexNoPrefix.replace(/^0x/,'').padStart(64,'0'); }
   function encAddr(addr){ return pad32(norm(addr).replace(/^0x/,'')); }
