@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V34 Execution-Hunt Clarifier</title>
+<title>pDAI Peg Prover • V35 Manifold Proof Hunter</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,12 +84,12 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V34 Execution-Hunt Clarifier</h1>
-      <div class="sub">V34 pushes the clarifier into execution-hunt mode: it maps spender contracts, same-code route clusters, discharge paths, relayer / gasless narrative pressure, and hard tripwires so the tool can separate staged preparation from a real peg engine coming online.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V35 Manifold Proof Hunter</h1>
+      <div class="sub">V35 turns the execution hunt into a proof hunter: it tracks recurring spender manifolds across history, traces discharge routes into core / dead / anchor lanes, scores optical-rail attrition as an absolute structural condition, and separates gasless narrative pressure from actual relayer-address evidence.</div>
       <div class="chips">
         <div class="chip good">Imports V31/V32/V33 bundle JSON</div>
-        <div class="chip info">Adds spender bytecode + route cluster mapper</div>
-        <div class="chip warn">Tracks discharge paths and optical-rail tripwires</div>
+        <div class="chip info">Adds historical spender-manifold tracking</div>
+        <div class="chip warn">Adds discharge router + attrition absolute</div>
         <div class="chip bad">Refuses to call execution without shell / slot proof</div>
       </div>
     </div>
@@ -164,7 +164,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card">
-          <div class="label">V33 clarifier verdict</div>
+          <div class="label">V35 clarifier verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div id="summaryPills" style="margin-top:12px"></div>
@@ -239,6 +239,25 @@
     </div>
   </div>
 
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Historical manifold tracker</div>
+      <div class="small">Approval recipients are aggregated across imported and local snapshots so recurring spender manifolds rise above one-off approvals.</div>
+      <div id="manifoldList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Discharge router</div>
+      <div class="small">The live candidate is traced to its strongest inbound and outbound counterparties, with explicit flags for spender manifolds, 5EF7, dead, and anchor pairs.</div>
+      <div id="routeTraceList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Attrition absolute + relayer watch</div>
+      <div class="small">Native/Core history is scored for optical-rail attrition while gasless / relayer clues are separated into narrative pressure versus address-level proof.</div>
+      <div id="attritionList" style="margin-top:12px"></div>
+      <div id="relayerList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
   <div class="twocol">
     <div class="panel">
       <div class="boxTitle">Reserve archaeology</div>
@@ -271,7 +290,7 @@
     </div>
     <div class="panel">
       <div class="boxTitle">Snapshot history</div>
-      <div class="small">Recent V33 snapshots from this browser. Importing an older bundle also seeds history for attrition and clarification drift.</div>
+      <div class="small">Recent V35 snapshots from this browser. Importing an older bundle also seeds history for attrition and manifold drift.</div>
       <div id="historyList"></div>
     </div>
   </div>
@@ -741,6 +760,149 @@
     return state.importedBundle?.lastGood?.publicAnchors?.find(a=>a.type==='public-native') || null;
   }
 
+  function mergedSnapshots(){
+    const rows=[...(state.importedBundle?.history||[]), ...(state.history||[])];
+    if(state.importedBundle?.lastGood) rows.push(state.importedBundle.lastGood);
+    if(state.lastGood) rows.push(state.lastGood);
+    const seen=new Set();
+    return rows.filter(Boolean).sort((a,b)=>snapshotTime(a)-snapshotTime(b)).filter(h=>{
+      const key=`${h.latestBlock||0}|${h.latestTsMs||0}|${h.createdAt||0}`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function snapshotTime(h){
+    return Number(h?.latestTsMs || h?.createdAt || 0) || 0;
+  }
+
+  async function buildManifoldTracker(spenderLab, contractIntel, windows){
+    const agg=new Map();
+    const combined=mergedSnapshots();
+    const touchersSet=new Set((contractIntel.topTouchers||[]).map(x=>norm(x.address)));
+    const ingest=(address,count,ts,source)=>{
+      if(!isAddr(address)) return;
+      const key=norm(address);
+      const row=agg.get(key)||{address, snapshots:0, approvals:0, maxCount:0, lastSeen:0, sources:new Set(), current:0};
+      row.snapshots+=1;
+      row.approvals+=Number(count||0);
+      row.maxCount=Math.max(row.maxCount, Number(count||0));
+      row.lastSeen=Math.max(row.lastSeen, Number(ts||0));
+      row.sources.add(source||'history');
+      agg.set(key,row);
+    };
+
+    combined.forEach(h=>{
+      const ts=snapshotTime(h);
+      const rows=[];
+      (h.spenderLab||[]).forEach(x=>rows.push({address:x.address,count:x.count||0,source:'spenderLab'}));
+      (h.signalBrain?.contractIntel?.topSpenders||[]).forEach(x=>rows.push({address:x.address,count:x.count||0,source:'contractIntel'}));
+      const dedup=new Map();
+      rows.forEach(x=>{ const k=norm(x.address); if(!k) return; if(!dedup.has(k) || (dedup.get(k).count||0)<(x.count||0)) dedup.set(k,x); });
+      dedup.forEach(x=>ingest(x.address,x.count,ts,x.source));
+    });
+
+    (spenderLab||[]).forEach(x=>{
+      const key=norm(x.address);
+      const row=agg.get(key)||{address:x.address, snapshots:0, approvals:0, maxCount:0, lastSeen:0, sources:new Set(), current:0};
+      row.current=x.count||0;
+      row.lastSeen=Math.max(row.lastSeen, Date.now());
+      row.sources.add('current');
+      agg.set(key,row);
+    });
+
+    const rows=[];
+    for(const row of agg.values()){
+      const current=(spenderLab||[]).find(x=>norm(x.address)===norm(row.address));
+      const winHits=windows.filter(w=>(contractIntel.approvals||[]).some(a=>norm(a.spender)===norm(row.address) && a.block>=w.fromBlock && a.block<=w.toBlock)).length;
+      const meta=current ? {kind:current.kind, impl:current.impl, codeSize:current.codeSize, markers:current.markers||[], adjacency:current.adjacency||0} : await classifyAddress(row.address, touchersSet, winHits);
+      const score=clamp(Math.min(row.snapshots/6,1)*0.28 + Math.min(row.approvals/6,1)*0.22 + Math.min(row.maxCount/4,1)*0.14 + (current?0.14:0) + (meta.markers?.includes('transferFrom')?0.12:0) + Math.min(winHits/4,0.10),0,1);
+      rows.push(Object.assign({}, row, meta, {windowHits:winHits, sources:[...row.sources], score}));
+    }
+    rows.sort((a,b)=>b.score-a.score);
+    const lead=rows[0]||null;
+    const summary=lead ? `Historical manifold lead is ${addrShort(lead.address)} across ${lead.snapshots} snapshot(s) with ${fmtNum(lead.approvals)} aggregated approval hits.` : 'No recurring manifold lead is visible across imported history yet.';
+    return {rows:rows.slice(0,10), lead, summary};
+  }
+
+  function classifyRouteRole(address, spenderLab, chain, executionHunt){
+    const a=norm(address);
+    if(!a) return 'unknown';
+    if((spenderLab||[]).some(x=>norm(x.address)===a)) return 'spender manifold';
+    if(norm(((state.settings.watchers||{})['5EF7'])||'')===a) return '5EF7 core';
+    if(norm(state.settings.dead||'')===a) return 'dead sink';
+    const anchor=(chain.publicAnchors||[]).find(x=>norm(x.address)===a);
+    if(anchor) return `${anchor.name}`;
+    if(executionHunt?.accumulator && norm(executionHunt.accumulator.address)===a) return 'shadow accumulator';
+    if(executionHunt?.topToucher && norm(executionHunt.topToucher.address)===a) return 'top toucher';
+    return 'counterparty';
+  }
+
+  function buildDischargeRouter(contractIntel, spenderLab, chain, executionHunt, windows){
+    const seed=executionHunt?.dischargeCandidate || executionHunt?.accumulator || null;
+    if(!seed || !isAddr(seed.address)) return {summary:'No discharge-route seed is available yet.', rows:[], seed:null, terminalHits:0};
+    const map=new Map();
+    for(const t of (contractIntel.transfers||[])){
+      const isOut=norm(t.from)===norm(seed.address);
+      const isIn=norm(t.to)===norm(seed.address);
+      if(!isOut && !isIn) continue;
+      const cp=isOut ? t.to : t.from;
+      if(!isAddr(cp)) continue;
+      const k=norm(cp);
+      const row=map.get(k)||{address:cp,in:0,out:0,count:0,windowHits:0};
+      row.count+=1;
+      if(isOut) row.out+=Number(t.amount||0); else row.in+=Number(t.amount||0);
+      row.windowHits += windows.some(w=>t.block>=w.fromBlock && t.block<=w.toBlock) ? 1 : 0;
+      map.set(k,row);
+    }
+    const rows=[...map.values()].map(x=>Object.assign({}, x, {role:classifyRouteRole(x.address, spenderLab, chain, executionHunt), net:Number(x.in||0)-Number(x.out||0)})).sort((a,b)=>(b.out-a.out) || (b.count-a.count));
+    const terminalHits=rows.filter(x=>x.out>0 && /spender manifold|5EF7 core|dead sink|Native pDAI\/WPLS|ATROPA\/DAI core|Bridged DAI\/WPLS/i.test(x.role)).length;
+    const lead=rows[0];
+    let summary=`Route seed ${addrShort(seed.address)} is ${seed.stance||'active'} with net ${fmtNum(seed.net||0)} pDAI.`;
+    if(lead) summary += ` Strongest visible route is ${addrShort(lead.address)} (${lead.role}) with out ${fmtNum(lead.out)} and in ${fmtNum(lead.in)}.`;
+    if(!rows.length) summary += ' No direct current transfer path stands out in the scan range.';
+    return {summary, rows:rows.slice(0,10), seed, terminalHits};
+  }
+
+  function buildAttritionAbsolute(chain){
+    const series=mergedSnapshots().map(h=>{
+      const native=(h.publicAnchors||[]).find(a=>a.type==='public-native');
+      const core=(h.nodeBalances||{})['5EF7']?.pdai || 0;
+      const ts=snapshotTime(h);
+      return native && native.reserve0!==undefined ? {ts,native:Number(native.reserve0||0), core:Number(core||0), ratio:native.reserve0?Number(core||0)/Number(native.reserve0||1):0} : null;
+    }).filter(Boolean).sort((a,b)=>a.ts-b.ts);
+    if(!series.length) return {state:'unknown', summary:'No native/core history is loaded yet.', rows:[]};
+    const first=series[0], last=series[series.length-1];
+    const nativeDelta=(last.native-first.native)/(first.native||1);
+    const coreDelta=(last.core-first.core)/(first.core||1);
+    const ratioDelta=(last.ratio-first.ratio)/(first.ratio||1);
+    let stateText='flat-or-noisy';
+    if(nativeDelta<-0.02 && coreDelta>=-0.01) stateText='bleeding-optical-rail';
+    else if(nativeDelta>0.02) stateText='thickening-or-replenished';
+    const score=clamp((nativeDelta<0?Math.min(Math.abs(nativeDelta)/0.1,1)*0.5:0) + (coreDelta>0?Math.min(coreDelta/0.1,1)*0.2:0) + (ratioDelta>0?Math.min(ratioDelta/0.2,1)*0.3:0),0,1);
+    const summary=`Native reserve ${nativeDelta<0?'fell':'moved'} ${pct(Math.abs(nativeDelta))} across loaded history while core moved ${coreDelta>=0?'+':''}${pct(Math.abs(coreDelta))}; ratio now ${fmtNum(last.ratio)}x.`;
+    const rows=[
+      {label:'State', value:stateText, hint:'optical rail versus core across imported + local history'},
+      {label:'Native change', value:(nativeDelta>=0?'+':'-')+pct(Math.abs(nativeDelta)), hint:`first ${fmtShort(first.native)} → now ${fmtShort(last.native)}`},
+      {label:'Core change', value:(coreDelta>=0?'+':'-')+pct(Math.abs(coreDelta)), hint:`first ${fmtShort(first.core)} → now ${fmtShort(last.core)}`},
+      {label:'Ratio change', value:(ratioDelta>=0?'+':'-')+pct(Math.abs(ratioDelta)), hint:`first ${fmtNum(first.ratio)}x → now ${fmtNum(last.ratio)}x`}
+    ];
+    return {state:stateText, score, summary, rows, samples:series.length, first, last, nativeDelta, coreDelta, ratioDelta};
+  }
+
+  function buildRelayerWatch(social, spenderLab, contractIntel){
+    const narrative=(social||[]).filter(x=>/gasless|zkx|drift incident|full gas abstraction|libertyshield|shield/i.test(`${x.title||''} ${x.text||''}`));
+    const addressSet=new Set();
+    (spenderLab||[]).forEach(x=>addressSet.add(norm(x.address)));
+    (contractIntel.topTouchers||[]).slice(0,20).forEach(x=>addressSet.add(norm(x.address)));
+    (contractIntel.transfers||[]).slice(0,120).forEach(t=>{ addressSet.add(norm(t.from)); addressSet.add(norm(t.to)); });
+    const seedFragments=['4fd0','0x4fd0'];
+    const addressHits=[...addressSet].filter(a=>a && seedFragments.some(f=>a.includes(f.replace(/^0x/,'')))).slice(0,12);
+    const summary=addressHits.length ? `Relayer-style address fragment hits: ${addressHits.map(addrShort).join(', ')}.` : (narrative.length ? `Gasless / relayer narrative is active in ${narrative.length} social item(s), but no address-level 4fd0-style hit is currently proved.` : 'Relayer watch is quiet: no narrative or address-level signal is loaded.');
+    return {narrativeHits:narrative.length, addressHits, summary};
+  }
+
   function buildThinLP(chain){
     const native=chain.publicAnchors.find(a=>a.type==='public-native');
     const core=chain.publicAnchors.find(a=>a.type==='core');
@@ -989,7 +1151,15 @@
     const rivalModels=buildRivalModels(intakePressure, thinLP, nullAwakening, contractIntel, reserveArchaeology);
     const routeClusters=buildRouteClusters(spenderLab, candidates, contractIntel);
     const executionHunt=buildExecutionHunt(chain, social, spenderLab, candidates, contractIntel, reserveArchaeology, routeClusters);
+    const manifoldTracker=await buildManifoldTracker(spenderLab, contractIntel, windows);
+    const dischargeRouter=buildDischargeRouter(contractIntel, spenderLab, chain, executionHunt, windows);
+    const attritionAbsolute=buildAttritionAbsolute(chain);
+    const relayerWatch=buildRelayerWatch(social, spenderLab, contractIntel);
     const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt);
+    if(manifoldTracker.lead && manifoldTracker.lead.snapshots>=2) clarifier.supports.push(`Recurring spender manifold ${addrShort(manifoldTracker.lead.address)} persists across ${manifoldTracker.lead.snapshots} loaded snapshot(s).`);
+    if(relayerWatch.narrativeHits && !relayerWatch.addressHits.length) clarifier.disconfirm.push('Gasless / relayer narrative is active, but address-level relayer proof is still unresolved.');
+    if(attritionAbsolute.state==='thickening-or-replenished') clarifier.disconfirm.push('Native optical rail is thickening or being replenished across loaded history, which weakens the attrition-only case.');
+    if(dischargeRouter.terminalHits>0) clarifier.supports.push(`Discharge router already touches ${dischargeRouter.terminalHits} terminal lane(s) such as spender/core/dead/anchor nodes.`);
     const probePlanner=buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP, executionHunt, routeClusters);
     return {
       createdAt:Date.now(),
@@ -1009,6 +1179,10 @@
       spenderLab,
       candidates,
       reserveArchaeology,
+      manifoldTracker,
+      dischargeRouter,
+      attritionAbsolute,
+      relayerWatch,
       clarifier,
       score:clarifier.clarity*100,
       pegProgress:clarifier.prep,
@@ -1059,6 +1233,10 @@
       spenderLab:(last.signalBrain?.contractIntel?.topSpenders||[]).map(x=>({address:x.address,count:x.count,kind:'Imported',impl:'',codeSize:0,markers:[],windowHits:0,adjacency:0,score:clamp(x.count/4,0,1)})),
       candidates:(last.signalBrain?.shadowMachineMap||[]).map(x=>({address:x.address,count:x.count||0,label:x.label||'imported',net:0,in:0,out:0,windowHits:0,spenderAdj:0,warehousing:0,discharge:0,score:x.score||0,stance:'imported'})),
       reserveArchaeology:(last.signalBrain?.windowForensics||[]).slice(0,6).map(x=>({window:x, contractScore:x.score||0, reserveScore:0, bestAnchor:'Imported', bestMotion:0, status:'imported'})),
+      manifoldTracker:{rows:[],lead:null,summary:'Imported snapshot'},
+      dischargeRouter:{rows:[],seed:null,summary:'Imported snapshot',terminalHits:0},
+      attritionAbsolute:{state:'imported',summary:'Imported snapshot',rows:[]},
+      relayerWatch:{narrativeHits:0,addressHits:[],summary:'Imported snapshot'},
       clarifier,
       score:last.score||0,
       pegProgress:last.pegProgress||0,
@@ -1140,6 +1318,29 @@
 
     clearEl($('tripwireList'));
     (model.signalBrain?.executionHunt?.tripwires||[]).forEach(x=>pushItem($('tripwireList'), `${x.name}: ${x.text}`, x.fire?'good':'warn'));
+
+    clearEl($('manifoldList'));
+    pushItem($('manifoldList'), model.manifoldTracker?.summary || 'No manifold summary yet.', 'info');
+    (model.manifoldTracker?.rows||[]).forEach(x=>{
+      const cls=x.score>.6?'good':x.score>.35?'info':'warn';
+      const src=(x.sources||[]).join('/');
+      pushItem($('manifoldList'), `${addrShort(x.address)} • ${x.kind||'—'} • ${pct(x.score)} • snapshots ${x.snapshots||0} • approvals ${fmtNum(x.approvals||0)} • max ${x.maxCount||0} • window hits ${x.windowHits||0}${src?` • ${src}`:''}`, cls);
+    });
+
+    clearEl($('routeTraceList'));
+    pushItem($('routeTraceList'), model.dischargeRouter?.summary || 'No discharge router summary yet.', 'info');
+    (model.dischargeRouter?.rows||[]).forEach(x=>{
+      const cls=/spender manifold|5EF7 core|dead sink/i.test(x.role)?'good':(x.out>0?'warn':'info');
+      pushItem($('routeTraceList'), `${addrShort(x.address)} • ${x.role} • out ${fmtNum(x.out)} • in ${fmtNum(x.in)} • count ${x.count} • window hits ${x.windowHits}`, cls);
+    });
+
+    clearEl($('attritionList'));
+    pushItem($('attritionList'), model.attritionAbsolute?.summary || 'No attrition summary yet.', model.attritionAbsolute?.state==='bleeding-optical-rail'?'good':model.attritionAbsolute?.state==='thickening-or-replenished'?'warn':'info');
+    (model.attritionAbsolute?.rows||[]).forEach(x=>pushItem($('attritionList'), `${x.label}: ${x.value} • ${x.hint}`, /bleeding/.test(String(x.value))?'good':'info'));
+
+    clearEl($('relayerList'));
+    pushItem($('relayerList'), model.relayerWatch?.summary || 'No relayer watch summary yet.', (model.relayerWatch?.addressHits||[]).length?'good':(model.relayerWatch?.narrativeHits||0)?'warn':'info');
+    if((model.relayerWatch?.addressHits||[]).length) (model.relayerWatch.addressHits||[]).forEach(a=>pushItem($('relayerList'), `${addrShort(a)} • fragment match`, 'good'));
 
     const wb=$('windowBody'); clearEl(wb);
     (model.reserveArchaeology||[]).forEach(row=>{
@@ -1269,11 +1470,11 @@
   $('settingsBtn').onclick=()=> $('settingsBox').classList.toggle('open');
   $('saveSettingsBtn').onclick=()=>{ try{ pullSettings(); sync(); }catch(e){ alert('Settings error: '+(e.message||String(e))); } };
   $('clearSettingsBtn').onclick=()=>{ state.settings=JSON.parse(JSON.stringify(DEFAULTS)); saveSettings(); pushSettings(); };
-  $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local V33 history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
+  $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local V35 history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v33-history.json', state.history);
-  $('exportBtn').onclick=()=> downloadJson('pdai-v33-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v35-history.json', state.history);
+  $('exportBtn').onclick=()=> downloadJson('pdai-v35-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
     try{
@@ -1289,7 +1490,7 @@
       if(bundle.lastGood) saveLastGood(bundle.lastGood);
       render(safeImportedRender(bundle));
       $('syncStatus').textContent='bundle loaded'; $('syncStatus').className='status info';
-      $('lastSync').textContent='Imported bundle loaded. Refresh to run live V33 logic.';
+      $('lastSync').textContent='Imported bundle loaded. Refresh to run live V35 logic.';
     }catch(err){ alert('Import failed: '+(err.message||String(err))); }
     e.target.value='';
   });
