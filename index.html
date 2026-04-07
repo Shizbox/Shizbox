@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V33 Clarifier</title>
+<title>pDAI Peg Prover • V34 Execution-Hunt Clarifier</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V33 Clarifier</h1>
-      <div class="sub">V33 keeps the single-file peg terminal shape, but shifts the core from broad choreography to clarification: reserve-window archaeology, approval-spender fingerprinting, candidate discharge watch, model competition, and an explicit “what would prove or kill the peg thesis next” lane.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V34 Execution-Hunt Clarifier</h1>
+      <div class="sub">V34 pushes the clarifier into execution-hunt mode: it maps spender contracts, same-code route clusters, discharge paths, relayer / gasless narrative pressure, and hard tripwires so the tool can separate staged preparation from a real peg engine coming online.</div>
       <div class="chips">
-        <div class="chip good">Imports V31/V32 bundle JSON</div>
-        <div class="chip info">Adds reserve archaeology + spender lab</div>
-        <div class="chip warn">Separates prep evidence from execution evidence</div>
-        <div class="chip bad">States disconfirming evidence explicitly</div>
+        <div class="chip good">Imports V31/V32/V33 bundle JSON</div>
+        <div class="chip info">Adds spender bytecode + route cluster mapper</div>
+        <div class="chip warn">Tracks discharge paths and optical-rail tripwires</div>
+        <div class="chip bad">Refuses to call execution without shell / slot proof</div>
       </div>
     </div>
     <div>
@@ -218,6 +218,24 @@
       <div class="boxTitle">Slot + shell state</div>
       <div class="small">Null-null equality, DNA slot behavior, token-shell pulse, and contract-local wake-up are tracked separately.</div>
       <div id="shellList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Execution hunt matrix</div>
+      <div class="small">This lane tests the strongest active peg-engine hypotheses: spender activation, discharge routing, gasless / relayer pressure, and whether the same-code plumber cluster is tightening.</div>
+      <div id="huntList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Route-cluster mapper</div>
+      <div class="small">Addresses that share bytecode size and sit on the same pDAI graph are grouped so factory-style plumbing is easier to see.</div>
+      <div id="clusterList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Tripwires</div>
+      <div class="small">Hard alerts that should flip the case fast if they fire.</div>
+      <div id="tripwireList" style="margin-top:12px"></div>
     </div>
   </div>
 
@@ -829,10 +847,66 @@
     return {models, winner:models[0], runnerUp:models[1], summary:`Best current explanatory frame: ${models[0].name} (${pct(models[0].score)}).`};
   }
 
-  function buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels){
-    const prep=clamp((intakePressure.score + thinLP.snapScore + (candidates[0]?.score||0) + Math.min((chain.nodeBalances?.['5EF7']?.pdai||0)/1e9,1))/4,0,1);
-    const exec=clamp((nullAwakening.score + contractInnerEye.score + Math.min((contractIntel.mints.count+contractIntel.burns.count)/2,.5) + reserveArchaeology.filter(x=>x.status==='reactive').length/6)/4,0,1);
-    const debt=clamp(1 - ((exec*.58)+(Math.min((contractIntel.approvalCount/6),1)*.14)+(reserveArchaeology.filter(x=>x.status==='reactive').length/6*.12)+(nullAwakening.score*.16)),0,1);
+  function buildRouteClusters(spenderLab, candidates, contractIntel){
+    const rows=[];
+    const combined=uniq([...(spenderLab||[]), ...(candidates||[])].filter(x=>x && x.address), x=>norm(x.address));
+    const groups=new Map();
+    for(const row of combined){
+      const key=`${row.codeSize||0}|${(row.kind||row.codeType||'unknown').toLowerCase()}`;
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(row);
+    }
+    for(const [key, members] of groups.entries()){
+      if(members.length<2) continue;
+      const codeSize=members[0].codeSize||0;
+      const addrs=members.map(x=>x.address);
+      const edges=(contractIntel.topContractPairs||[]).filter(p=>addrs.some(a=>norm(p.edge.split('>')[0])===norm(a) || norm(p.edge.split('>')[1])===norm(a)));
+      const windowHits=members.reduce((a,x)=>a+(x.windowHits||0),0);
+      const approvals=members.reduce((a,x)=>a+(x.count||0),0);
+      const score=clamp((members.length/5)*0.34 + Math.min(windowHits/10,0.22) + Math.min(edges.length/6,0.18) + (codeSize>=10000?0.18:0) + Math.min(approvals/8,0.08),0,1);
+      const routeEdge=edges[0]?.edge||'';
+      rows.push({key, codeSize, members:members.map(x=>x.address), memberCount:members.length, approvals, windowHits, score, routeEdge});
+    }
+    return rows.sort((a,b)=>b.score-a.score).slice(0,8);
+  }
+
+  function buildExecutionHunt(chain, social, spenderLab, candidates, contractIntel, reserveArchaeology, routeClusters){
+    const spender=spenderLab[0];
+    const second=spenderLab[1];
+    const dischargeCandidate=(candidates||[]).find(x=>norm(x.address).startsWith('0xb7ac0922')) || (candidates||[]).find(x=>x.stance==='discharging') || candidates[0];
+    const accumulator=(candidates||[]).find(x=>norm(x.address).startsWith('0x5f4bc671')) || candidates[0];
+    const topToucher=contractIntel.topTouchers?.[0];
+    const gaslessHits=(social||[]).filter(x=>/gasless|zkx|drift incident|full gas abstraction|shield/i.test(`${x.title||''} ${x.text||''}`));
+    const pcockWindow=(reserveArchaeology||[]).find(x=>(x.window?.code||'').toLowerCase()==='pcock');
+    const xutw9Window=(reserveArchaeology||[]).find(x=>(x.window?.code||'').toLowerCase()==='xutw9');
+    const sameCode=(routeClusters||[])[0];
+    const likelyTripwire=Math.max((pcockWindow?.bestMotion||0),(xutw9Window?.bestMotion||0));
+    const support=[];
+    if(spender) support.push({title:'Spender lead', text:`${addrShort(spender.address)} leads the approval surface with ${spender.count} approval hits as a ${spender.kind}${spender.markers?.includes('transferFrom')?' carrying transferFrom markers':''}.`, score:clamp(spender.score,0,1)});
+    if(second) support.push({title:'Secondary spender', text:`${addrShort(second.address)} remains on deck with ${second.count} approval hits.`, score:clamp(second.score*0.9,0,1)});
+    if(dischargeCandidate) support.push({title:'Discharge path', text:`${addrShort(dischargeCandidate.address)} shows ${dischargeCandidate.windowHits||0} window hits and net ${fmtNum(dischargeCandidate.net)} pDAI.`, score:clamp(dischargeCandidate.score*0.9 + (dischargeCandidate.stance==='discharging'?0.08:0),0,1)});
+    if(accumulator) support.push({title:'Accumulator', text:`${addrShort(accumulator.address)} still looks ${accumulator.stance} with net ${fmtNum(accumulator.net)} pDAI.`, score:clamp(accumulator.score*0.88,0,1)});
+    if(sameCode) support.push({title:'Same-code cluster', text:`${sameCode.memberCount} route addresses share code size ${sameCode.codeSize} and overlap the pDAI graph${sameCode.routeEdge?` via ${sameCode.routeEdge}`:''}.`, score:clamp(sameCode.score,0,1)});
+    if(gaslessHits.length) support.push({title:'Relayer narrative', text:`${gaslessHits.length} social item(s) mention gasless / ZKX / Drift-style abstraction, which fits assisted-routing hypotheses.`, score:clamp(0.42+Math.min(gaslessHits.length/6,0.28),0,1)});
+    if(topToucher) support.push({title:'Perimeter concentration', text:`Top pDAI contract toucher is ${addrShort(topToucher.address)} with ${topToucher.count} log edges.`, score:clamp(Math.min(topToucher.count/180,1)*0.7,0,1)});
+
+    const tripwires=[
+      {name:'spender-activation', fire:!!spender && spender.markers?.includes('transferFrom') && spender.count>=3, text:spender?`${addrShort(spender.address)} already looks capable of pull-based routing; a fresh window-local spike would matter immediately.`:'No spender lead yet.', severity:spender?clamp(spender.score,0,1):0},
+      {name:'discharge-into-plumbing', fire:!!dischargeCandidate && dischargeCandidate.stance==='discharging' && (dischargeCandidate.windowHits||0)>=8, text:dischargeCandidate?`${addrShort(dischargeCandidate.address)} is discharging with ${(dischargeCandidate.windowHits||0)} window hits.`:'No discharge candidate yet.', severity:dischargeCandidate?clamp(dischargeCandidate.score,0,1):0},
+      {name:'optical-rail-shock', fire:likelyTripwire>=500000, text:`Largest tracked reserve-window motion is ${fmtShort(likelyTripwire)} pDAI; alert threshold is 500K within a high-priority window.`, severity:clamp(Math.min(likelyTripwire/500000,1),0,1)},
+      {name:'slot-wake', fire:!chain.slotProbe.allZero, text:chain.slotProbe.allZero?'Slots are still null-null.':'A watched slot is non-zero.', severity:chain.slotProbe.allZero?0:1},
+      {name:'shell-fracture', fire:(contractIntel.mints.count+contractIntel.burns.count)>0, text:`Mint/burn evidence ${(contractIntel.mints.count+contractIntel.burns.count)>0?'exists':'is still absent'}.`, severity:(contractIntel.mints.count+contractIntel.burns.count)>0?1:0}
+    ];
+
+    const score=clamp((support.reduce((a,x)=>a+x.score,0)/Math.max(1,support.length))*0.62 + (tripwires.filter(x=>x.fire).length/5)*0.38,0,1);
+    const summary=spender ? `Execution hunt centers on spender ${addrShort(spender.address)}, discharge node ${addrShort(dischargeCandidate?.address||'')}, and the ${sameCode?sameCode.memberCount:0}-member same-code route cluster.` : 'Execution hunt is still waiting for a convincing spender lead.';
+    return {score, support, tripwires, summary, leadSpender:spender, dischargeCandidate, accumulator, gaslessHits:gaslessHits.length, topToucher, sameCode};
+  }
+
+  function buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt){
+    const prep=clamp((intakePressure.score + thinLP.snapScore + (candidates[0]?.score||0) + Math.min((chain.nodeBalances?.['5EF7']?.pdai||0)/1e9,1) + (executionHunt.leadSpender?Math.min(executionHunt.leadSpender.score,1):0))/5,0,1);
+    const exec=clamp((nullAwakening.score + contractInnerEye.score + Math.min((contractIntel.mints.count+contractIntel.burns.count)/2,.5) + reserveArchaeology.filter(x=>x.status==='reactive').length/6 + executionHunt.tripwires.filter(x=>x.fire).length/5*0.45)/4.45,0,1);
+    const debt=clamp(1 - ((exec*.56)+(Math.min((contractIntel.approvalCount/6),1)*.12)+(reserveArchaeology.filter(x=>x.status==='reactive').length/6*.10)+(nullAwakening.score*.14)+(executionHunt.score*.08)),0,1);
     const edge=Math.max(0,(rivalModels.winner?.score||0)-(rivalModels.runnerUp?.score||0));
     const clarity=clamp((prep*.28)+(exec*.34)+(edge*.22)+((1-debt)*.16),0,1);
 
@@ -842,24 +916,29 @@
     if(thinLP.snapScore>.45) supports.push(`Thin-LP corridor theory still has lift: core/native ratio ${thinLP.coreRatio.toFixed(2)}x.`);
     if(candidates[0]?.warehousing>0) supports.push(`Top candidate ${addrShort(candidates[0].address)} is still absorbing more pDAI than it emits.`);
     if(contractIntel.approvalCount>0) supports.push(`Approval pulse is live with ${contractIntel.approvalCount} recent approval events.`);
+    if(executionHunt.leadSpender) supports.push(`Lead spender ${addrShort(executionHunt.leadSpender.address)} is now the most concrete execution-hunt contract.`);
+    if(executionHunt.sameCode) supports.push(`A ${executionHunt.sameCode.memberCount}-address same-code route cluster is visible around the pDAI graph.`);
 
     const disconfirm=[];
     if(nullAwakening.status==='dormant') disconfirm.push('Watched slots are still null-null, so structural execution proof is missing.');
     if((contractIntel.mints.count+contractIntel.burns.count)===0) disconfirm.push('There is still no mint/burn shell evidence inside the pDAI contract.');
     if(!reserveArchaeology.some(x=>x.status==='reactive')) disconfirm.push('Top windows are not producing decisive reserve archaeology hits.');
     if(candidates[0] && candidates[0].stance!=='discharging') disconfirm.push('The top shadow candidate is not yet discharging into an obvious terminal move.');
+    if(executionHunt.tripwires.find(x=>x.name==='optical-rail-shock' && !x.fire)) disconfirm.push('The optical rail has not shown a high-magnitude shock near a priority social window yet.');
 
     const proveNext=[
       'A watched slot flipping from null to non-zero.',
       'A strong Maria / social window causing direct reserve motion at an anchor pair.',
       'Top approval spender contracts fingerprinting as active routing / proxy manifolds.',
-      'Top candidate flipping from accumulation to discharge into 5EF7, dead, or anchor pairs.'
+      'Top candidate flipping from accumulation to discharge into 5EF7, dead, or anchor pairs.',
+      'A same-code plumber cluster starting to fire in the same social window.'
     ];
     const weaken=[
       'Prep signals staying high while shell and slot evidence stay flat across multiple refreshes.',
       'Core/native ratio normalizing without a corresponding shell wake-up.',
       'Approval pulse fading while promoted candidates lose flow dominance.',
-      'The winner model being overtaken by ecosystem expansion or overshoot.'
+      'The winner model being overtaken by ecosystem expansion or overshoot.',
+      'Lead spender contracts staying present without graduating into route-specific behavior.'
     ];
 
     let stateText='unclear';
@@ -872,7 +951,7 @@
     const hint=`Prep ${pct(prep)} • Execution ${pct(exec)} • Debt ${pct(debt)} • Model edge ${pct(edge)}.`;
     const pressure=[
       {name:'Preparation', score:prep, hint:'intake + warehousing + thin-LP corridor'},
-      {name:'Execution', score:exec, hint:'slot wake-up + shell evidence + reserve reactivity'},
+      {name:'Execution', score:exec, hint:'slot wake-up + shell evidence + reserve reactivity + hunt tripwires'},
       {name:'Contradiction debt', score:debt, hint:'missing shell / reserve / slot proof'},
       {name:'Model edge', score:edge, hint:'gap between winner and runner-up'}
     ];
@@ -880,11 +959,13 @@
     return {prep, exec, debt, clarity, stateText, verdict, hint, supports, disconfirm, proveNext, weaken, pressure};
   }
 
-  function buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP){
+  function buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP, executionHunt, routeClusters){
     const tasks=[];
     tasks.push({title:'Deepen reserve-window archaeology around strongest windows', why:'Clarification improves fastest when a social window and anchor reserve motion overlap.', score:.93});
     if(nullAwakening.status==='dormant') tasks.push({title:'Keep slot-awakening watch at window boundaries', why:'Null-null equality is still the biggest missing structural proof.', score:.89});
     if(spenderLab.length) tasks.push({title:'Rank approval spenders by proxy / selector fingerprint', why:'Approval recipients may reveal the real manifolds earlier than legacy watchers do.', score:.85});
+    if(routeClusters.length) tasks.push({title:'Map same-code route clusters and their graph edges', why:'Factory-style plumber contracts can expose the real routing lane before the shell wakes up.', score:.84});
+    if(executionHunt.leadSpender) tasks.push({title:'Inspect lead spender for pull-based routing behavior', why:'The approval leader is the best live execution-hunt target right now.', score:.83});
     if(candidates[0] && candidates[0].stance!=='discharging') tasks.push({title:'Watch top candidate for first discharge phase', why:'Accumulation is useful, but discharge is the more terminal clue.', score:.81});
     if(thinLP.snapScore>.4) tasks.push({title:'Monitor native optical rail attrition versus 5EF7 growth', why:'If the peg setup is real, the public rail should stay mathematically thin.', score:.77});
     return tasks.sort((a,b)=>b.score-a.score);
@@ -906,8 +987,10 @@
     const contractInnerEye=buildContractInnerEye(contractIntel, reserveArchaeology);
     const moveBuilder=buildMoveBuilder(intakePressure, thinLP, nullAwakening, contractInnerEye, candidates, reserveArchaeology, contractIntel);
     const rivalModels=buildRivalModels(intakePressure, thinLP, nullAwakening, contractIntel, reserveArchaeology);
-    const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels);
-    const probePlanner=buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP);
+    const routeClusters=buildRouteClusters(spenderLab, candidates, contractIntel);
+    const executionHunt=buildExecutionHunt(chain, social, spenderLab, candidates, contractIntel, reserveArchaeology, routeClusters);
+    const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt);
+    const probePlanner=buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP, executionHunt, routeClusters);
     return {
       createdAt:Date.now(),
       latestBlock:chain.latestBlock,
@@ -922,7 +1005,7 @@
       dnaProbe:chain.dnaProbe,
       social,
       windows,
-      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner},
+      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters},
       spenderLab,
       candidates,
       reserveArchaeology,
@@ -972,7 +1055,7 @@
       dnaProbe:last.dnaProbe||{raw:NULL32,implAddress:''},
       social,
       windows:last.windows || buildWindows(last.latestBlock||0,last.latestTsMs||Date.now(),social),
-      signalBrain:last.signalBrain||{},
+      signalBrain:Object.assign({executionHunt:{support:[],tripwires:[],summary:'Imported snapshot',score:0},routeClusters:[]}, last.signalBrain||{}),
       spenderLab:(last.signalBrain?.contractIntel?.topSpenders||[]).map(x=>({address:x.address,count:x.count,kind:'Imported',impl:'',codeSize:0,markers:[],windowHits:0,adjacency:0,score:clamp(x.count/4,0,1)})),
       candidates:(last.signalBrain?.shadowMachineMap||[]).map(x=>({address:x.address,count:x.count||0,label:x.label||'imported',net:0,in:0,out:0,windowHits:0,spenderAdj:0,warehousing:0,discharge:0,score:x.score||0,stance:'imported'})),
       reserveArchaeology:(last.signalBrain?.windowForensics||[]).slice(0,6).map(x=>({window:x, contractScore:x.score||0, reserveScore:0, bestAnchor:'Imported', bestMotion:0, status:'imported'})),
@@ -1046,6 +1129,17 @@
     pushItem($('shellList'), `Slot state: ${model.slotProbe.summary}.`, model.signalBrain?.nullAwakening?.status==='awake'?'good':'bad');
     pushItem($('shellList'), `DNA slot: ${model.dnaProbe.implAddress ? addrShort(model.dnaProbe.implAddress) : 'empty / none seen'}.`, model.dnaProbe.implAddress?'warn':'info');
     (model.signalBrain?.contractInnerEye?.verdicts||[]).forEach(v=>pushItem($('shellList'), v, 'info'));
+
+    clearEl($('huntList'));
+    pushItem($('huntList'), model.signalBrain?.executionHunt?.summary || 'No execution-hunt summary yet.', 'info');
+    (model.signalBrain?.executionHunt?.support||[]).forEach(x=>pushItem($('huntList'), `${x.title}: ${x.text} • ${pct(x.score)}`, x.score>.6?'good':x.score>.35?'info':'warn'));
+
+    clearEl($('clusterList'));
+    (model.signalBrain?.routeClusters||[]).forEach(x=>pushItem($('clusterList'), `${x.memberCount} addr cluster • code ${x.codeSize} • approvals ${x.approvals} • window hits ${x.windowHits}${x.routeEdge?` • edge ${x.routeEdge}`:''} • ${pct(x.score)}`, x.score>.6?'good':'info'));
+    if(!(model.signalBrain?.routeClusters||[]).length) pushItem($('clusterList'), 'No same-code route clusters stand out yet.', 'warn');
+
+    clearEl($('tripwireList'));
+    (model.signalBrain?.executionHunt?.tripwires||[]).forEach(x=>pushItem($('tripwireList'), `${x.name}: ${x.text}`, x.fire?'good':'warn'));
 
     const wb=$('windowBody'); clearEl(wb);
     (model.reserveArchaeology||[]).forEach(row=>{
