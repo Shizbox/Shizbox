@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V38 Active Proof Auditor</title>
+<title>pDAI Peg Prover • V39 Integrated Predator Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -41,7 +41,7 @@
   .settings{display:none;margin-top:14px}.settings.open{display:block}
   .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
   .field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
-  input,textarea{width:100%;padding:10px 12px;border-radius:12px;background:#08111a;color:var(--text);border:1px solid var(--line);font:inherit}
+  input,textarea,select{width:100%;padding:10px 12px;border-radius:12px;background:#08111a;color:var(--text);border:1px solid var(--line);font:inherit}
   textarea{min-height:88px;resize:vertical}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:20px;padding:14px}
   .label{font-size:.69rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
@@ -85,12 +85,12 @@
   <div class="panel grid2">
     <div>
       <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V38 Active Proof Auditor</h1>
-      <div class="sub">V38 audits the full proving stack and upgrades it into an active proof engine: persistent social memory, live block-drift compensation, deep-sweep proving cycles, method-capability auditing, evidence-ledger gating, and smarter relayer/manifold/slot verification while the page stays open.</div>
+      <div class="sub">V39 keeps your exact V38 tool and layers every improvement directly into it: predator-mode lead execution, source-coverage guarding, restored multi-source social ingestion, tripwire promotion, lane conservation, Sybil seeding, dust/gateword decoding, and harder proof weighting without wiping prior logic.</div>
       <div class="chips">
-        <div class="chip good">Imports prior V31–V37 bundle JSON</div>
-        <div class="chip info">Adds active deep-sweep proof cycles</div>
-        <div class="chip warn">Adds social-memory retention + live block drift</div>
-        <div class="chip bad">Audits RPC method support and refuses fake proof</div>
+        <div class="chip good">Imports prior V31–V38 bundle JSON</div>
+        <div class="chip info">Adds integrated V39 predator lead cycles</div>
+        <div class="chip warn">Restores multi-source social coverage + source health</div>
+        <div class="chip bad">Promotes hard tripwires instead of narrative-only debt collapse</div>
       </div>
     </div>
     <div>
@@ -113,7 +113,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V38 settings</div>
+    <div class="boxTitle">V39 integrated settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Fallback RPCs</label><textarea id="sRpcs" placeholder="one per line"></textarea></div>
@@ -134,6 +134,17 @@
       <div class="field"><label>Deep sweep every N cycles</label><input id="sDeepSweepEvery" value="4" /></div>
       <div class="field"><label>Relayer / manifold hints</label><textarea id="sRelayerHints" placeholder="0x4fd0..., 0x6bf2..., 0xda9a..., fragments or exact addresses"></textarea></div>
       <div class="field"><label>Social memory days</label><input id="sSocialMemoryDays" value="45" /></div>
+      <div class="field"><label>Hunt mode</label><select id="sHuntMode"><option value="observe">observe</option><option value="hunt">hunt</option><option value="predator">predator</option><option value="siege">siege</option></select></div>
+      <div class="field"><label>Burst scan blocks</label><input id="sBurstScanBlocks" value="2200" /></div>
+      <div class="field"><label>Max lead expansions / cycle</label><input id="sMaxLeadExpansionsPerCycle" value="8" /></div>
+      <div class="field"><label>Neighbor block burst</label><input id="sNeighborBlockBurst" value="33" /></div>
+      <div class="field"><label>Route depth burst</label><input id="sRouteDepthBurst" value="4" /></div>
+      <div class="field"><label>Allowance diff every N cycles</label><input id="sAllowanceDiffEvery" value="1" /></div>
+      <div class="field"><label>Slot classification every N cycles</label><input id="sSlotClassificationEvery" value="1" /></div>
+      <div class="field"><label>Source coverage check every N cycles</label><input id="sSourceCoverageCheckEvery" value="1" /></div>
+      <div class="field"><label>Revisit stalled leads every N cycles</label><input id="sRevisitStalledLeadsEvery" value="3" /></div>
+      <div class="field"><label>Social window burst</label><select id="sSocialWindowBurst"><option value="true">true</option><option value="false">false</option></select></div>
+      <div class="field"><label>Aggressive followups</label><input id="sAggressiveFollowups" value="3" /></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
@@ -388,6 +399,41 @@
     </div>
   </div>
 
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">V39 source coverage guardian</div>
+      <div class="small">Every social source family is audited so the terminal knows when feeds are live, stale, dark, or underfed instead of pretending social timing is complete.</div>
+      <div id="sourceCoverageSummary" class="item info" style="margin-top:12px">No source coverage summary yet.</div>
+      <div id="sourceCoverageList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">V39 predator lead executor</div>
+      <div class="small">Meaningful clues are turned into active leads and automatically expanded into lane, seed, allowance, slot, dust, gateword, and timing follow-ups.</div>
+      <div id="leadSummary" class="item info" style="margin-top:12px">No lead execution summary yet.</div>
+      <div class="tableWrap"><table><thead><tr><th>Lead</th><th>Status</th><th>Score</th><th>Evidence</th></tr></thead><tbody id="leadBody"></tbody></table></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">V39 promoted tripwires</div>
+      <div class="small">Hard tripwires are surfaced separately so contradiction debt only falls when the engine actually proves something stronger than vibes.</div>
+      <div id="tripwireSummaryV39" class="item info" style="margin-top:12px">No promoted tripwires yet.</div>
+      <div id="tripwireListV39"></div>
+    </div>
+  </div>
+
+  <div class="twocol">
+    <div class="panel">
+      <div class="boxTitle">V39 module stack</div>
+      <div class="small">Each active lead shows which V39 proof modules actually fired during the cycle.</div>
+      <div id="v39ModuleList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">V39 integration ledger</div>
+      <div class="small">This confirms the old V38 logic was carried forward and then tightened with predator-mode, source coverage, and tripwire weighting.</div>
+      <div id="v39IntegrationList"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -437,10 +483,21 @@
     speculateLevel:8,
     deepSweepEvery:4,
     relayerHints:'',
-    socialMemoryDays:45
+    socialMemoryDays:45,
+    huntMode:'predator',
+    burstScanBlocks:2200,
+    maxLeadExpansionsPerCycle:8,
+    neighborBlockBurst:33,
+    routeDepthBurst:4,
+    allowanceDiffEvery:1,
+    slotClassificationEvery:1,
+    sourceCoverageCheckEvery:1,
+    revisitStalledLeadsEvery:3,
+    socialWindowBurst:true,
+    aggressiveFollowups:3
   };
 
-  const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false};
+  const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[]};
 
   function $(id){ return document.getElementById(id); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -463,6 +520,21 @@
   function clearEl(el){ while(el.firstChild) el.removeChild(el.firstChild); }
   function pushItem(el,text,cls='info'){ const d=document.createElement('div'); d.className=`item ${cls}`; d.textContent=text; el.appendChild(d); }
   function pushPill(el,text){ const s=document.createElement('span'); s.className='pill'; s.textContent=text; el.appendChild(s); }
+  function avg(arr){ const xs=(Array.isArray(arr)?arr:[]).map(Number).filter(Number.isFinite); return xs.length ? xs.reduce((a,b)=>a+b,0)/xs.length : 0; }
+  function stddev(arr){ const xs=(Array.isArray(arr)?arr:[]).map(Number).filter(Number.isFinite); if(!xs.length) return 0; const m=avg(xs); return Math.sqrt(avg(xs.map(x=>(x-m)*(x-m)))); }
+  function scoreRatio(a,b,tol){ const delta=Math.abs(Number(a||0)-Number(b||0)); const t=Math.max(Math.abs(Number(tol)||1),1e-9); return clamp(1-(delta/t),0,1); }
+  function hashish(text){ let h=2166136261; const s=String(text||''); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return 'h'+((h>>>0).toString(16)); }
+  function parseMaybeJson(s){ try{return JSON.parse(String(s||''));}catch{return null;} }
+  function inferPlatform(url,name=''){ const u=String(url||'').toLowerCase(); const n=String(name||'').toLowerCase(); if(u.includes('x.com')||u.includes('twitter.com')||n.includes('twitter')||n==='x') return 'x'; if(u.includes('t.me')||n.includes('telegram')) return 'telegram'; if(u.includes('youtube.com')||u.includes('youtu.be')||n.includes('youtube')) return 'youtube'; if(u.includes('rumble.com')||n.includes('rumble')) return 'rumble'; if(n.includes('manual')) return 'manual'; if(n.includes('corpus')) return 'corpus'; return 'unknown'; }
+  function asTsMs(v){ if(v===null||v===undefined||v==='') return 0; if(typeof v==='number' && Number.isFinite(v)) return v>1e12? v : v>1e9 ? v*1000 : v; const t=Date.parse(String(v)); return Number.isFinite(t)?t:0; }
+  function normalizeText(s){ return String(s||'').replace(/\s+/g,' ').trim(); }
+  function shortHash(hash=''){ const h=String(hash||''); return h ? `${h.slice(0,10)}…${h.slice(-8)}` : '—'; }
+  function parseSourceList(raw){ const parsed=parseMaybeJson(raw); if(Array.isArray(parsed)){ return parsed.map(x=> typeof x==='string' ? ({url:x,name:inferPlatform(x,x),headers:{}}) : ({url:String(x.url||x.href||'').trim(), name:String(x.name||x.id||inferPlatform(x.url,x.name)).trim() || inferPlatform(x.url,x.name), headers:(x.headers&&typeof x.headers==='object')?x.headers:{}})).filter(x=>x.url); } return String(raw||'').split(/[\n,]+/).map(s=>s.trim()).filter(Boolean).map(url=>({url,name:inferPlatform(url,url),headers:{}})); }
+  function normalizeProxyItem(raw, sourceName='proxy', seq=0){ if(!raw) return null; const obj=typeof raw==='object' ? Object.assign({}, raw) : {text:String(raw)}; const text=normalizeText(obj.text||obj.body||obj.content||obj.caption||obj.message||obj.title||''); const title=normalizeText(obj.title||text||'Untitled'); const url=String(obj.url||obj.link||obj.href||'').trim(); const platform=obj.platform||inferPlatform(url,sourceName)||sourceName; const author=normalizeText(obj.author||obj.user||obj.channel||obj.account||obj.handle||''); const tsMs=asTsMs(obj.tsMs||obj.timestamp||obj.ts||obj.publishedAt||obj.date||obj.createdAt||obj.time) || Date.now()-seq*1000; const publishedAt=obj.publishedAt || new Date(tsMs).toISOString(); const item={ id:String(obj.id||obj.guid||'').trim() || hashish([sourceName,platform,author,url,tsMs,title,text,seq].join('|')), title, text:text||title, platform, source:sourceName||platform, author, url, publishedAt, durationSec:Number(obj.durationSec||extractDuration(title+' '+text)||0), phase:obj.phase||detectPhase(title+' '+text), code:obj.code||extractCode(title+' '+text) }; return normalizeSocialItem(item); }
+  function extractItemsFromPayload(payload, sourceName='proxy'){ if(!payload) return []; if(Array.isArray(payload)) return payload.map((x,i)=>normalizeProxyItem(x,sourceName,i)).filter(Boolean); if(Array.isArray(payload.items)) return payload.items.map((x,i)=>normalizeProxyItem(x,sourceName,i)).filter(Boolean); if(Array.isArray(payload.rows)) return payload.rows.map((x,i)=>normalizeProxyItem(x,sourceName,i)).filter(Boolean); if(Array.isArray(payload.sources)){ let out=[]; payload.sources.forEach((src,idx)=>{ const name=src.name||src.id||sourceName||`source-${idx}`; out=out.concat(extractItemsFromPayload(src.items||src.rows||src, name)); }); return out; } const one=normalizeProxyItem(payload,sourceName,0); return one?[one]:[]; }
+  async function loadRemoteSocialSource(source){ try{ const res=await fetch(source.url,{headers:source.headers||{}}); if(!res.ok) throw new Error(`HTTP ${res.status}`); const ctype=String(res.headers.get('content-type')||'').toLowerCase(); let payload; if(ctype.includes('json')) payload=await res.json(); else { const txt=await res.text(); payload=parseMaybeJson(txt); if(!payload){ payload=txt.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,idx)=>({text:line, platform:source.name||inferPlatform(source.url,source.name), tsMs:Date.now()-idx*1000})); } } return {ok:true, items:extractItemsFromPayload(payload, source.name||inferPlatform(source.url,source.name)||'proxy'), error:''}; }catch(err){ return {ok:false, items:[], error:err.message||String(err)}; } }
+  function computeSourceHealth(source, items, ok, error=''){ const now=Date.now(); const d24=now-86400000; const d7=now-7*86400000; const rows=Array.isArray(items)?items:[]; const itemCount24h=rows.filter(x=>asTsMs(x.publishedAt)>=d24).length; const itemCount7d=rows.filter(x=>asTsMs(x.publishedAt)>=d7).length; const pDAIMatchCount=rows.filter(x=>/\bpdai\b/i.test(`${x.title||''} ${x.text||''}`)).length; const lastItemAt=rows.length ? Math.max(...rows.map(x=>asTsMs(x.publishedAt)||0)) : 0; let health='green'; if(!ok||error) health='red'; else if(!rows.length||itemCount7d===0) health='yellow'; return {name:source.name||inferPlatform(source.url,source.name)||'proxy', family:inferPlatform(source.url,source.name), configured:true, reachable:!!ok, lastFetchOkAt:ok?now:0, lastItemAt, itemCount24h, itemCount7d, pDAIMatchCount, failureStreak:ok?0:1, health, notes:error?[error]:[]}; }
+
 
   function saveSettings(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings)); }
   function saveHistory(v){ state.history=v; localStorage.setItem(HISTORY_KEY, JSON.stringify(v)); }
@@ -598,6 +670,7 @@
 
   async function collectSocial(imported){
     const lists=[];
+    state.sourceHealth=[];
     if(imported?.socialCache) lists.push(imported.socialCache);
     if(imported?.lastGood?.social) lists.push(imported.lastGood.social);
     if(imported?.lastGood?.harvestedSocial) lists.push(imported.lastGood.harvestedSocial);
@@ -615,29 +688,38 @@
     if(Array.isArray(state.lastGood?.social)) lists.push(state.lastGood.social);
     if(Array.isArray(state.lastGood?.harvestedSocial)) lists.push(state.lastGood.harvestedSocial);
     lists.push(state.socialCache || []);
-    lists.push(parseManualSocial(state.settings.manualSocial));
-    lists.push(parseManualSocial(state.settings.researchCorpus));
 
-    if(state.settings.socialProxy){
-      try{
-        const r=await fetch(state.settings.socialProxy);
-        if(r.ok){
-          const data=await r.json();
-          const items=Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
-          lists.push(items);
+    const manualItems=parseManualSocial(state.settings.manualSocial);
+    const corpusItems=parseManualSocial(state.settings.researchCorpus);
+    if(manualItems.length){ lists.push(manualItems); state.sourceHealth.push(computeSourceHealth({name:'manual',url:'manual://inline'}, manualItems, true)); }
+    if(corpusItems.length){ lists.push(corpusItems); state.sourceHealth.push(computeSourceHealth({name:'corpus',url:'corpus://inline'}, corpusItems, true)); }
+
+    const proxyRaw=state.settings.socialProxy;
+    if(proxyRaw){
+      const sources=parseSourceList(proxyRaw);
+      if(sources.length){
+        for(const source of sources){
+          const result=await loadRemoteSocialSource(source);
+          lists.push(result.items);
+          state.sourceHealth.push(computeSourceHealth(source, result.items, result.ok, result.error));
         }
-      }catch{}
+      }else{
+        const result=await loadRemoteSocialSource({url:proxyRaw,name:inferPlatform(proxyRaw,proxyRaw),headers:{}});
+        lists.push(result.items);
+        state.sourceHealth.push(computeSourceHealth({url:proxyRaw,name:inferPlatform(proxyRaw,proxyRaw)}, result.items, result.ok, result.error));
+      }
     }
     const cutoff=Date.now() - Math.max(1, Number(state.settings.socialMemoryDays||45))*86400000;
-    const merged=uniq(lists.flat().map(normalizeSocialItem).filter(Boolean).filter(x=>{
-      const ts=new Date(x.publishedAt).getTime();
-      return !Number.isFinite(ts) || ts>=cutoff;
-    }), x=>x.id || `${x.platform}:${x.title}:${x.publishedAt}`);
-    merged.sort((a,b)=>new Date(b.publishedAt).getTime()-new Date(a.publishedAt).getTime());
-    return merged.slice(0,420);
+    const merged=uniq(lists.flat().map(x=> normalizeSocialItem(x) || normalizeProxyItem(x,'proxy')).filter(Boolean).filter(x=>{
+      const ts=asTsMs(x.publishedAt);
+      return !Number.isFinite(ts) || !ts || ts>=cutoff;
+    }), x=>x.id || `${x.platform}:${x.author||''}:${x.title}:${x.publishedAt}`);
+    merged.sort((a,b)=>asTsMs(b.publishedAt)-asTsMs(a.publishedAt));
+    return merged.slice(0,640);
   }
 
-  async function measureBlockPace(latestBlock){
+  async function measureBlockPace
+(latestBlock){
     const configured=Number(state.settings.blockSec)||10.2;
     const rows=[];
     for(let i=0;i<8;i++){
@@ -1743,7 +1825,7 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     return {rows, summary, score, ratio, root, deviation};
   }
 
-  async function buildModel(){
+  async function buildModelBase(){
     const imported=state.importedBundle;
     const chain=await buildChainState(imported);
     const social=await collectSocial(imported);
@@ -1846,6 +1928,115 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
       historySeeded:(imported?.history||[]).length
     };
   }
+
+  function v39SafeArray(v){ return Array.isArray(v) ? v : []; }
+  function v39SafeObject(v){ return v && typeof v==='object' ? v : {}; }
+  function v39Num(v, d=0){ const n=Number(v); return Number.isFinite(n) ? n : d; }
+  function v39UniqBy(arr,keyFn){ const seen=new Set(); return (Array.isArray(arr)?arr:[]).filter(x=>{ const k=keyFn(x); if(seen.has(k)) return false; seen.add(k); return true; }); }
+  function v39NormalizeAddress(a){ return norm(a); }
+  function v39ExtractTransfers(bundle){ return v39SafeArray(bundle?.lastGood?.signalBrain?.contractIntel?.transfers).map(t=>({block:v39Num(t.block), from:v39NormalizeAddress(t.from), to:v39NormalizeAddress(t.to), amount:v39Num(t.amount), tx:String(t.tx||'').toLowerCase()})); }
+  function v39ExtractCandidates(bundle){ return v39SafeArray(bundle?.lastGood?.candidates).map(c=>Object.assign({}, c, {address:v39NormalizeAddress(c.address)})); }
+  function v39ExtractSpenders(bundle){ return v39SafeArray(bundle?.lastGood?.spenderLab).map(s=>Object.assign({}, s, {address:v39NormalizeAddress(s.address)})); }
+  function v39ExtractDischargeRows(bundle){ return v39SafeArray(bundle?.lastGood?.dischargeNexus?.rows).map(r=>Object.assign({}, r, {address:v39NormalizeAddress(r.address), sources:v39SafeArray(r.sources).map(v39NormalizeAddress)})); }
+  function v39ExtractZeroRows(bundle){ return v39SafeArray(bundle?.lastGood?.zeroingAnalysis?.rows); }
+  function v39ExtractGateRows(bundle){ return v39SafeArray(bundle?.lastGood?.gateWatch?.rows); }
+  function v39ExtractDustRows(bundle){ return v39SafeArray(bundle?.lastGood?.dustAttrition?.rows).map(r=>Object.assign({}, r, {address:v39NormalizeAddress(r.address)})); }
+  function v39BuildLead(kind,target,source,patch={}){ return {id:patch.id||hashish(`${kind}|${target}|${source}`), kind, target, source, suspicion:clamp(patch.suspicion??0.5,0,1), confidence:clamp(patch.confidence??0.3,0,1), urgency:clamp(patch.urgency??0.5,0,1), novelty:clamp(patch.novelty??0.5,0,1), proximityToTripwire:clamp(patch.proximityToTripwire??0.3,0,1), status:patch.status||'fresh', evidence:v39SafeArray(patch.evidence), nextActions:v39SafeArray(patch.nextActions), followupsRun:v39SafeArray(patch.followupsRun), payload:patch.payload||{}, lastTouchedBlock:patch.lastTouchedBlock||0, expiresAt:patch.expiresAt||0, score:0}; }
+  function v39BuildInitialLeads(bundle, socialState){
+    const leads=[];
+    v39ExtractCandidates(bundle).slice(0,8).forEach(candidate=>{ leads.push(v39BuildLead('wallet', candidate.address, 'candidates', { suspicion:clamp(0.55+(v39Num(candidate.score)*0.45),0,1), confidence:clamp(0.35+Math.min(0.4,v39Num(candidate.count||candidate.touches)/1000),0,1), urgency:candidate.stance==='accumulating'?0.72:0.5, novelty:0.55, proximityToTripwire:candidate.discharge?0.75:0.45, evidence:[`${addrShort(candidate.address)} candidate score ${v39Num(candidate.score).toFixed(3)}`, `touches ${candidate.count||candidate.touches||0}`, `net ${v39Num(candidate.net).toFixed(3)} pDAI`], nextActions:['lane-conservation','sybil-seed','half-life'], payload:candidate })); });
+    v39ExtractSpenders(bundle).slice(0,5).forEach(spender=>{ leads.push(v39BuildLead('spender', spender.address, 'spenderLab', { suspicion:clamp(0.45+(v39Num(spender.score)*0.45),0,1), confidence:0.45, urgency:0.78, novelty:0.48, proximityToTripwire:0.62, evidence:[`${addrShort(spender.address)} approval count ${spender.count||spender.current||0}`, `markers ${(spender.markers||[]).join(', ')||'none'}`], nextActions:['allowance-trap','constant-archaeology','shadow-router'], payload:spender })); });
+    const symLead=v39SafeObject(bundle?.lastGood?.symmetrySniffer?.lead);
+    if(symLead.address){ leads.push(v39BuildLead('window', v39NormalizeAddress(symLead.address), 'symmetrySniffer', { suspicion:clamp(0.55+v39Num(symLead.score)*0.35,0,1), confidence:0.42, urgency:0.81, novelty:0.66, proximityToTripwire:0.58, evidence:[`11-block symmetry ${Math.round(v39Num(symLead.symmetry)*100)}%`], nextActions:['palindrome','neighbor-burst','sybil-seed'], payload:symLead, lastTouchedBlock:v39Num(symLead.fromBlock) })); }
+    const dischargeLead=v39SafeObject(bundle?.lastGood?.dischargeNexus?.lead);
+    if(dischargeLead.address){ leads.push(v39BuildLead('route', v39NormalizeAddress(dischargeLead.address), 'dischargeNexus', { suspicion:clamp(0.52+v39Num(dischargeLead.score)*0.4,0,1), confidence:0.55, urgency:dischargeLead.terminal?0.86:0.6, novelty:0.5, proximityToTripwire:dischargeLead.terminal?0.82:0.55, evidence:[`${addrShort(dischargeLead.address)} route count ${dischargeLead.count||0}`, `source wallets ${dischargeLead.sourceCount||0}`], nextActions:['lane-conservation','allowance-trap','shadow-router'], payload:dischargeLead })); }
+    const zeroLead=v39ExtractZeroRows(bundle)[0];
+    if(zeroLead?.hash){ leads.push(v39BuildLead('slot', zeroLead.hash, 'zeroingAnalysis', { suspicion:0.71, confidence:0.4, urgency:0.74, novelty:0.62, proximityToTripwire:0.71, evidence:[`${zeroLead.zeroish||0} zeroish SSTOREs in ${shortHash(zeroLead.hash)}`], nextActions:['massless-exit','allowance-trap'], payload:zeroLead })); }
+    const gateLead=v39ExtractGateRows(bundle)[0];
+    if(gateLead?.word){ leads.push(v39BuildLead('manifold', gateLead.word, 'gateWatch', { suspicion:0.56, confidence:0.35, urgency:0.58, novelty:0.82, proximityToTripwire:0.45, evidence:[`repeated gate word ${String(gateLead.word).slice(0,18)}…`], nextActions:['gateword','constant-archaeology'], payload:gateLead })); }
+    v39ExtractDustRows(bundle).filter(row=>row.zeroed).slice(0,3).forEach(dust=>{ leads.push(v39BuildLead('dust', dust.address, 'dustAttrition', { suspicion:0.54, confidence:0.34, urgency:0.57, novelty:0.58, proximityToTripwire:0.44, evidence:[`${addrShort(dust.address)} dust balance ${v39Num(dust.balance).toFixed(6)}`], nextActions:['dust-constellation'], payload:dust })); });
+    v39SafeArray(socialState.socialCache).slice(0,3).forEach(item=>{ leads.push(v39BuildLead('social', item.url||item.id||item.title, 'social', { suspicion:/pdai|maria|alligator|peg/i.test(`${item.title||''} ${item.text||''}`)?0.64:0.36, confidence:0.32, urgency:0.62, novelty:0.74, proximityToTripwire:0.41, evidence:[`${item.platform||'social'} cue ${(item.title||item.text||'').slice(0,90)}`], nextActions:['window-correlation'], payload:item })); });
+    return v39UniqBy(leads, x=>x.id);
+  }
+  function v39ComputeLeadPriority(lead){ const score=clamp(lead.suspicion*0.42 + lead.urgency*0.22 + lead.novelty*0.16 + lead.proximityToTripwire*0.20,0,1); lead.score=score; return score; }
+  function v39FindTransfersForAddress(transfers,address){ const a=v39NormalizeAddress(address); return transfers.filter(t=>t.from===a || t.to===a); }
+  function v39GroupTransfersByTx(transfers){ const m=new Map(); transfers.forEach(t=>{ if(!m.has(t.tx)) m.set(t.tx,[]); m.get(t.tx).push(t); }); return m; }
+  function v39AnalyzeLaneConservation(target,transfers){ const lane=v39FindTransfersForAddress(transfers,target); const inbound=lane.filter(t=>t.to===v39NormalizeAddress(target)).map(t=>t.amount); const outbound=lane.filter(t=>t.from===v39NormalizeAddress(target)).map(t=>t.amount); const inSum=inbound.reduce((a,b)=>a+b,0); const outSum=outbound.reduce((a,b)=>a+b,0); const leakage=Math.abs(inSum-outSum); const ratio=inSum>0 ? 1-(leakage/inSum) : 0; return {inSum,outSum,leakage,conservation:clamp(ratio,0,1),cycles:lane.length}; }
+  function v39AnalyzePalindromePayload(symLead,transfers){ const fromBlock=v39Num(symLead?.fromBlock); if(!fromBlock) return {score:0,vectors:[],pairs:0}; const txs=transfers.filter(t=>t.block>=fromBlock && t.block<fromBlock+11); const amounts=txs.map(t=>t.amount).filter(v=>v>0); if(amounts.length<2) return {score:0,vectors:amounts,pairs:0}; const left=amounts.slice(0,Math.ceil(amounts.length/2)); const right=amounts.slice(Math.floor(amounts.length/2)).slice().reverse(); const pairs=Math.min(left.length,right.length); if(!pairs) return {score:0,vectors:amounts,pairs:0}; const pairScores=[]; for(let i=0;i<pairs;i++){ const tol=Math.max(left[i],right[i],1)*0.05; pairScores.push(scoreRatio(left[i],right[i],tol)); } return {score:clamp(avg(pairScores),0,1), vectors:amounts, pairs}; }
+  function v39AnalyzeDustConstellation(transfers,hubAddress){ const grouped=v39GroupTransfersByTx(transfers.filter(t=>t.from===v39NormalizeAddress(hubAddress))); const signatures=[]; for(const [tx,legs] of grouped.entries()){ if(legs.length<2) continue; const amounts=legs.map(leg=>leg.amount).sort((a,b)=>a-b); const recipients=legs.map(leg=>leg.to).sort(); signatures.push({tx, recipients, amounts, signature:hashish(`${recipients.join(',')}|${amounts.map(v=>v.toFixed(9)).join(',')}`)}); } const counts=new Map(); signatures.forEach(sig=>counts.set(sig.signature,(counts.get(sig.signature)||0)+1)); const repeated=signatures.filter(sig=>(counts.get(sig.signature)||0)>1); return {score:clamp(repeated.length ? repeated.length/Math.max(1,signatures.length) : 0,0,1), repeated, total:signatures.length}; }
+  function v39ParseHexAscii(word){ if(!word || typeof word!=='string' || !word.startsWith('0x')) return ''; const hex=word.slice(2); let out=''; for(let i=0;i<hex.length;i+=2){ const pair=hex.slice(i,i+2); if(pair==='00') continue; const code=parseInt(pair,16); if(Number.isFinite(code) && code>=32 && code<=126) out+=String.fromCharCode(code); } return out.trim(); }
+  function v39AnalyzeGateword(gateLead){ const word=String(gateLead?.word||''); const ascii=v39ParseHexAscii(word); const clusterLike=/cluster/i.test(ascii); return {word, ascii, score:clamp((clusterLike?0.75:0.35)+Math.min(0.15, String(gateLead?.count||0).length*0.02),0,1)}; }
+  function v39AnalyzeConstantArchaeology(gateLead, spenderLead){ const markers=v39SafeArray(spenderLead?.markers); const markerScore=markers.includes('transferFrom')?0.4:0.15; const codeSize=v39Num(spenderLead?.codeSize); const gateScore=gateLead?.word?0.25:0; const sizeScore=codeSize>0 ? clamp(Math.min(0.35,codeSize/50000),0,1):0; const constants=[]; if(gateLead?.word) constants.push(gateLead.word.slice(0,18)); if(codeSize) constants.push(`codeSize:${codeSize}`); return {score:clamp(markerScore+gateScore+sizeScore,0,1), constants}; }
+  function v39AnalyzeHalfLife(target, transfers, blockSec){ const addr=v39NormalizeAddress(target); const inbound=transfers.filter(t=>t.to===addr); const outbound=transfers.filter(t=>t.from===addr); if(!inbound.length || !outbound.length) return {score:0,dwellBlocks:[],halfLifeMs:0}; const dwell=[]; inbound.forEach(inTx=>{ const outTx=outbound.find(o=>o.block>=inTx.block); if(outTx) dwell.push(outTx.block-inTx.block); }); if(!dwell.length) return {score:0,dwellBlocks:[],halfLifeMs:0}; const dev=stddev(dwell); const mean=avg(dwell); const score=clamp(1-dev/Math.max(mean||1,1),0,1); return {score, dwellBlocks:dwell, halfLifeMs:mean*v39Num(blockSec,10.2)*1000}; }
+  function v39AnalyzeShadowRouter(dischargeRows,target){ const targetAddr=v39NormalizeAddress(target); const scores=new Map(); v39SafeArray(dischargeRows).forEach(row=>{ if(row.address===targetAddr) return; const overlap=v39SafeArray(row.sources).filter(src=>src===targetAddr).length; const base=clamp(v39Num(row.count)/50,0,1); if(overlap || row.role==='counterparty'){ scores.set(row.address,(scores.get(row.address)||0)+overlap*0.35 + base*0.4 + 0.15); } }); const ranked=[...scores.entries()].sort((a,b)=>b[1]-a[1]); return {score:clamp(ranked.length?ranked[0][1]:0,0,1), controller:ranked[0]?.[0]||'', ranked}; }
+  function v39ClassifyZeroWriteRow(row){ const zeroish=v39Num(row?.zeroish); const sstores=v39Num(row?.sstores); let family='temp-state'; if(zeroish>=8) family='balance-or-allowance'; else if(zeroish>=5) family='allowance-or-lock'; return {family, score:clamp((zeroish/Math.max(sstores||1,1))+Math.min(0.4,zeroish/20),0,1)}; }
+  function v39AnalyzeAllowanceTrap(bundle, spenderAddress){ const approvalCount=v39Num(bundle?.lastGood?.signalBrain?.contractIntel?.approvalCount); const spenders=v39ExtractSpenders(bundle); const spender=spenders.find(s=>s.address===v39NormalizeAddress(spenderAddress)) || v39SafeObject(bundle?.lastGood?.manifoldTracker?.lead); const score=clamp((approvalCount>=7?0.35:approvalCount/20)+(((spender.current||spender.count||0)>=2)?0.3:0.12)+(v39SafeArray(spender.markers).includes('transferFrom')?0.25:0.08),0,1); return {score, approvalCount, spender}; }
+  function v39AnalyzeSybilSeed(bundle, target, transfers){ const candidates=v39ExtractCandidates(bundle).slice(0,14); const lanePeers=candidates.map(c=>c.address); const addressSet=new Set(lanePeers); if(target) addressSet.add(v39NormalizeAddress(target)); const firstInbound=[]; for(const addr of addressSet){ const inbound=transfers.filter(t=>t.to===addr).slice().sort((a,b)=>a.block-b.block)[0]; if(inbound) firstInbound.push({address:addr, from:inbound.from, block:inbound.block, amount:inbound.amount}); } const grouped=new Map(); firstInbound.forEach(item=>{ const key=item.from||'0x0000000000000000000000000000000000000000'; if(!grouped.has(key)) grouped.set(key,[]); grouped.get(key).push(item); }); const ranked=[...grouped.entries()].sort((a,b)=>b[1].length-a[1].length); const leader=ranked[0]; const equalAmountish=leader ? stddev(leader[1].map(i=>i.amount)) <= Math.max(1,avg(leader[1].map(i=>i.amount))*0.03) : false; const tightBlocks=leader ? Math.max(...leader[1].map(i=>i.block)) - Math.min(...leader[1].map(i=>i.block)) <= 33 : false; return {score:clamp((leader?Math.min(0.55,leader[1].length/14):0)+(equalAmountish?0.2:0)+(tightBlocks?0.2:0),0,1), leader:leader?.[0]||'', cohort:leader?.[1]||[], equalAmountish, tightBlocks}; }
+  function v39SocialCorrelationScore(windows, range){ if(!windows.length || !range?.start || !range?.end) return 0; const overlaps=windows.filter(w=>w.startTsMs<=range.end && w.endTsMs>=range.start); return clamp(Math.min(1, overlaps.length/3),0,1); }
+  async function v39ExecuteLead(lead, ctx){
+    const transfers=ctx.transfers; const bundle=ctx.bundle; const result={leadId:lead.id, kind:lead.kind, target:lead.target, modules:[], score:0, tripwires:[], notes:[]};
+    const add=(name,score,detail={})=>result.modules.push({name, score:clamp(score,0,1), detail});
+    if(lead.kind==='wallet' || lead.kind==='route'){
+      const lane=v39AnalyzeLaneConservation(lead.target, transfers); add('lane-conservation', lane.conservation, lane);
+      const sybil=v39AnalyzeSybilSeed(bundle, lead.target, transfers); add('sybil-seed', sybil.score, sybil); if(sybil.score>=0.72 && sybil.cohort.length>=3) result.tripwires.push({name:'common-gas-seed-origin', score:sybil.score, detail:`${addrShort(sybil.leader)} first-funds ${sybil.cohort.length} cohort address(es)`});
+      const half=v39AnalyzeHalfLife(lead.target, transfers, ctx.settings.blockSec); add('recapture-half-life', half.score, half); if(half.score>=0.76 && half.dwellBlocks.length>=3) result.tripwires.push({name:'repeat-half-life-recapture', score:half.score, detail:`${addrShort(lead.target)} recaptures on stable dwell bands`});
+      const shadow=v39AnalyzeShadowRouter(v39ExtractDischargeRows(bundle), lead.target); add('shadow-router', shadow.score, shadow);
+    }
+    if(lead.kind==='spender' || lead.kind==='route'){
+      const allowance=v39AnalyzeAllowanceTrap(bundle, lead.target); add('allowance-trap', allowance.score, allowance); if(allowance.score>=0.78) result.tripwires.push({name:'approval-shell-active', score:allowance.score, detail:`${addrShort(lead.target)} sits on active approval surface`});
+      const gateLead=v39ExtractGateRows(bundle)[0]; const constants=v39AnalyzeConstantArchaeology(gateLead, lead.payload||{}); add('constant-archaeology', constants.score, constants);
+    }
+    if(lead.kind==='window'){
+      const pal=v39AnalyzePalindromePayload(lead.payload, transfers); add('palindrome-payload', pal.score, pal); if(pal.score>=0.82 && pal.pairs>=2) result.tripwires.push({name:'deterministic-payload-cycle', score:pal.score, detail:`Window around ${addrShort(lead.target)} shows mirrored amount behavior`});
+    }
+    if(lead.kind==='slot' || lead.source==='zeroingAnalysis'){
+      const zeroish=v39ClassifyZeroWriteRow(lead.payload); add('massless-exit', zeroish.score, zeroish); if(zeroish.score>=0.78 && zeroish.family==='balance-or-allowance') result.tripwires.push({name:'classified-zero-write', score:zeroish.score, detail:`${shortHash(lead.target)} classifies as ${zeroish.family}`});
+    }
+    if(lead.kind==='dust' || v39NormalizeAddress(lead.target)===v39NormalizeAddress('0x5f4bc6714ad363751ac0f4375618346fa4a15d08')){
+      const dust=v39AnalyzeDustConstellation(transfers, '0x5f4bc6714ad363751ac0f4375618346fa4a15d08'); add('dust-constellation', dust.score, dust); if(dust.score>=0.75 && dust.repeated.length) result.tripwires.push({name:'repeat-dust-template', score:dust.score, detail:`${dust.repeated.length} repeated dust signature(s)`});
+    }
+    if(lead.kind==='manifold' || lead.source==='gateWatch'){
+      const gate=v39AnalyzeGateword(lead.payload); add('gateword-decoder', gate.score, gate); if(gate.score>=0.72 && gate.ascii) result.notes.push(`decoded gateword: ${gate.ascii}`);
+    }
+    if(lead.kind==='social'){
+      const item=lead.payload||{}; const ts=asTsMs(item.publishedAt||item.tsMs); const start=ts ? ts-(33*v39Num(ctx.settings.blockSec,10.2)*1000) : 0; const end=ts ? ts+(33*v39Num(ctx.settings.blockSec,10.2)*1000) : 0; const corr=v39SocialCorrelationScore(v39SafeArray(ctx.socialState.windows), {start,end}); add('window-correlation', corr, {platform:item.platform, author:item.author, url:item.url, tsMs:ts}); if(corr>=0.72) result.tripwires.push({name:'social-window-overlap', score:corr, detail:`${item.platform||'social'} cue overlaps active window bands`});
+    }
+    result.score=clamp(avg(result.modules.map(m=>m.score))+Math.min(0.25,result.tripwires.length*0.08),0,1);
+    return result;
+  }
+  async function v39RunLeadEngine(ctx){ const leads=v39BuildInitialLeads(ctx.bundle, ctx.socialState); leads.forEach(v39ComputeLeadPriority); leads.sort((a,b)=>b.score-a.score); const active=leads.slice(0, Math.max(1, v39Num(ctx.settings.maxLeadExpansionsPerCycle,8))); const results=[]; const tripwires=[]; for(const lead of active){ const result=await v39ExecuteLead(lead, ctx); results.push(result); if(result.tripwires.length) tripwires.push(...result.tripwires); lead.status=result.tripwires.length?'promoted':result.score>=0.58?'expanding':'stalled'; lead.followupsRun.push(...result.modules.map(m=>m.name)); lead.evidence.push(...result.modules.map(m=>`${m.name}:${m.score.toFixed(3)}`), ...result.tripwires.map(t=>`${t.name}:${t.score.toFixed(3)}`)); lead.score=result.score; } return {leads, active, results, tripwires, summary:active.length ? `Executed ${active.length} lead(s) in ${ctx.settings.huntMode||'hunt'} mode; promoted ${tripwires.length} tripwire(s).` : 'No active leads available.'}; }
+  function v39SourceCoverage(socialState){ const rows=socialState.sourceHealth.length ? socialState.sourceHealth : [{name:'social', family:'manual', configured:false, reachable:false, lastFetchOkAt:0, lastItemAt:0, itemCount24h:0, itemCount7d:0, pDAIMatchCount:0, failureStreak:0, health:'red', notes:['No social source is configured.']}]; const green=rows.filter(r=>r.health==='green').length; const red=rows.filter(r=>r.health==='red').length; return {rows, summary:`Source coverage: ${green} green / ${red} red across ${rows.length} source family(ies).`}; }
+  function v39RegenEvidence(bundle, leadState, socialState){ const rows=[ {name:'Slot wake / shell fracture', kind:'hard', score:leadState.tripwires.some(t=>t.name==='classified-zero-write')?0.72:0, status:leadState.tripwires.some(t=>t.name==='classified-zero-write')?'observed':'missing', why:leadState.tripwires.some(t=>t.name==='classified-zero-write')?'Classified zero-write behavior now points at balance/allowance-class mutation.':'Watched slots still need a fresh live mutation.'}, {name:'Relayer → manifold call', kind:'hard', score:leadState.tripwires.some(t=>t.name==='approval-shell-active')?0.58:0, status:leadState.tripwires.some(t=>t.name==='approval-shell-active')?'observed':'missing', why:leadState.tripwires.some(t=>t.name==='approval-shell-active')?'Lead spender remains active on the approval surface.':'No relayer/manifold fingerprint is visible at hard-proof level yet.'}, {name:'Reactive reserve window hit', kind:'hard', score:socialState.windows.length?0.28:0, status:socialState.windows.length?'watching':'missing', why:socialState.windows.length?`Real timing windows are loaded (${socialState.windows.length}).`:'No decisive anchor motion overlaps a top window yet.'}, {name:'11-block symmetry', kind:'soft', score:v39Num(bundle?.lastGood?.symmetrySniffer?.score), status:'observed', why:bundle?.lastGood?.symmetrySniffer?.lead?.window?`Lead ${bundle.lastGood.symmetrySniffer.lead.window} remains on watch.`:'Symmetry watch active.'}, {name:'Zero-write trace hint', kind:'soft', score:v39Num(bundle?.lastGood?.zeroingAnalysis?.score), status:'observed', why:bundle?.lastGood?.zeroingAnalysis?.summary||'Trace support is live.'}, {name:'Social window coverage', kind:'soft', score:clamp(Math.min(0.95,socialState.windows.length/40),0,1), status:socialState.windows.length?'observed':'missing', why:socialState.windows.length?`Loaded ${socialState.socialCache.length} social item(s) and ${socialState.windows.length} real window(s).`:'Social timing is currently missing.'}, {name:'Aggressive lead follow-up', kind:'soft', score:clamp(Math.min(0.95,leadState.active.length/8),0,1), status:leadState.active.length?'observed':'missing', why:leadState.summary} ]; const hard=avg(rows.filter(r=>r.kind==='hard').map(r=>r.score)); const soft=avg(rows.filter(r=>r.kind==='soft').map(r=>r.score)); return {rows, hard, soft, summary:`Evidence ledger: hard ${(hard*100).toFixed(1)}% • soft ${(soft*100).toFixed(1)}%.`}; }
+  function v39RegenExecutionHunt(bundle, leadState){ const support=leadState.results.slice(0,6).map(r=>({title:`${r.kind} lead`, text:`${addrShort(r.target)} ran ${r.modules.length} module(s) and promoted ${r.tripwires.length} tripwire(s).`, score:r.score})); return {score:clamp(avg(leadState.results.map(r=>r.score)),0,1), support, summary:support.length ? `Aggressive execution hunt expanded ${support.length} lead(s).` : (bundle?.lastGood?.executionHunt?.summary || 'Execution hunt is quiet.')}; }
+  function v39RegenClarifier(bundle, socialState, leadState){ const prev=v39SafeObject(bundle?.lastGood?.clarifier); const socialBoost=socialState.windows.length ? clamp(Math.min(0.18,socialState.windows.length/100),0,1) : 0; const tripwireBoost=clamp(Math.min(0.45,leadState.tripwires.length*0.12),0,1); const activeLeadBoost=clamp(Math.min(0.16,leadState.active.length*0.02),0,1); const supportScores=leadState.results.flatMap(r=>r.modules.map(m=>m.score)); const hardTrip=clamp(avg(leadState.tripwires.map(t=>t.score)),0,1); const softScore=clamp(avg(supportScores),0,1); const prep=clamp(Math.max(v39Num(prev.prep,0.82), 0.68 + softScore*0.22),0,1); const exec=clamp(Math.max(v39Num(prev.exec,0.18), hardTrip*0.65 + tripwireBoost*0.35 + socialBoost*0.22),0,1); const hard=hardTrip; const soft=clamp((softScore+activeLeadBoost+socialBoost*0.5)/1.5,0,1); const debt=clamp(Math.min(v39Num(prev.debt,1), 1-(hard*0.5 + soft*0.3 + socialBoost*0.2)),0,1); const clarity=clamp(Math.max(v39Num(prev.clarity,0), (hard*0.45 + soft*0.3 + socialBoost*0.25)),0,1); const supports=[`Lead executor promoted ${leadState.tripwires.length} tripwire(s).`, `${socialState.socialCache.length} social item(s) and ${socialState.windows.length} real window(s) are loaded.`, `Aggressive hunt mode is ${state.settings.huntMode||'predator'}.`, `Hard evidence pressure now derives from tripwire promotion rather than anomaly vibes alone.`]; if(leadState.tripwires.length) supports.push(...leadState.tripwires.slice(0,4).map(t=>`${t.name} fired at ${Math.round(t.score*100)}%.`)); return {prep, exec, debt, clarity, hard, soft, stateText:exec>0.55?'execution-rising':'preparation-heavy', verdict:exec>0.55?'Tripwire pressure is rising toward execution':'Preparation still dominates, but the hunt engine is now active', hint:`Prep ${(prep*100).toFixed(1)}% • Execution ${(exec*100).toFixed(1)}% • Debt ${(debt*100).toFixed(1)}% • Clarity ${(clarity*100).toFixed(1)}%.`, supports, disconfirm:['Watched slots may still be null-null until a fresh live mutation appears.','Mint / burn shell evidence may still be absent.','Hard proof still depends on new live chain events, not only historical bundle structure.'], proveNext:['A watched slot flipping from null to non-zero.','A strong social window causing direct reserve motion at an anchor pair.','Allowance deltas or revoke waves around 5EF7 or lead spenders.','A same-code cluster showing common gas seeding or deterministic discharge.','A repeated lane showing stable conservation and low-variance half-life recapture.'], weaken:['Tripwires fail to recur across multiple cycles.','Social windows load but do not overlap meaningful chain motion.','Lead spender contracts remain noisy without route-specific behavior.','Candidate accumulation normalizes without discharge or slot movement.'], pressure:[{name:'Preparation', score:prep, hint:'warehousing + approvals + thin-LP + active route graph'},{name:'Execution', score:exec, hint:'tripwire promotion + real windows + route proof'},{name:'Contradiction debt', score:debt, hint:'missing shell / reserve / slot proof still matters'},{name:'Clarity', score:clarity, hint:'quality of converged evidence'}]}; }
+  function v39RegenSystemAudit(settings, socialState, leadState){ return {rows:[ {label:'V39 hunt mode', value:settings.huntMode||'hunt', hint:`Deep every ${v39Num(settings.deepSweepEvery,1)} cycle(s).`, cls:'good'}, {label:'Source coverage', value:`${socialState.sourceHealth.length} source families`, hint:socialState.sourceHealth.length?'Source guardian is live.':'No social source is configured.', cls:socialState.sourceHealth.length?'good':'warn'}, {label:'Aggressive lead executor', value:`${leadState.active.length} active lead(s)`, hint:leadState.summary, cls:leadState.active.length?'good':'info'}, {label:'Tripwire promotion', value:leadState.tripwires.length ? `${leadState.tripwires.length} hard hit(s)` : 'no hard hits', hint:leadState.tripwires.length?'Lead engine promoted at least one hard tripwire.':'Hard tripwires still need live chain confirmation.', cls:leadState.tripwires.length?'good':'warn'}], summary:`Audit: ${socialState.socialCache.length} social item(s), ${socialState.windows.length} real window(s), ${leadState.tripwires.length} tripwire(s), hunt mode ${settings.huntMode||'hunt'}.`, pills:[settings.huntMode||'hunt', socialState.windows.length?'real-windows':'synthetic-fallback', socialState.sourceHealth.some(x=>x.health==='red')?'social-red':'social-ok']}; }
+  function v39RegenProveLoop(settings,socialState,leadState,clarifier,evidence){ const primary=leadState.active[0]; return {rows:[ {label:'Cycle mode', value:settings.huntMode||'hunt', hint:'The engine expands meaningful leads automatically instead of waiting for manual follow-up.'}, {label:'Burst scan horizon', value:`${v39Num(settings.scanBlocks,300)} → ${v39Num(settings.burstScanBlocks,2200)} blocks`, hint:'Triggered leads can widen the search horizon automatically.'}, {label:'Primary target', value:primary?addrShort(primary.target):'none', hint:primary?`Current best live target from ${primary.source}.`:'No live target available.'}, {label:'Window state', value:socialState.windows.length?'real-window mode':'synthetic fallback', hint:socialState.windows.length?'Real social / timing windows are loaded.':'Load/import Maria/social data to strengthen timing proof.'}, {label:'Hard gate still missing', value:clarifier.exec>=0.55?'Execution pressure is rising, but shell proof still requires fresh hard hits.':'Structural execution proof is still incomplete.', hint:`Hard ${Math.round(evidence.hard*100)}% • soft ${Math.round(evidence.soft*100)}% • clarity ${Math.round(clarifier.clarity*100)}%.`}], summary:`Prove loop ran ${leadState.active.length} active lead(s) with ${socialState.socialCache.length} social item(s) and ${socialState.windows.length} real window(s).`}; }
+  function v39BuildSocialState(model){ const socialCache=v39UniqBy(v39SafeArray(model.social||state.socialCache).map(x=>normalizeSocialItem(x)||normalizeProxyItem(x,'proxy')).filter(Boolean), x=>x.id||`${x.platform}:${x.title}:${x.publishedAt}`); const windows=v39SafeArray(model.windows).filter(w=>!String(w.phase||'').startsWith('synthetic')).map((w,idx)=>({ id:w.id||`win:${idx}`, startTsMs:asTsMs(w.publishedAt||Date.now())-(Math.max(1,v39Num(w.blocks,1))*v39Num(state.settings.blockSec,10.2)*500), endTsMs:asTsMs(w.publishedAt||Date.now())+(Math.max(1,v39Num(w.blocks,1))*v39Num(state.settings.blockSec,10.2)*500), source:w.source||w.platform||'social', kind:w.phase||'social', code:w.code||'', title:w.title||'', platform:w.platform||w.source||'manual' })); return {socialCache, windows, sourceHealth:v39SafeArray(state.sourceHealth)}; }
+  function v39MergeUniqueText(a,b,maxItems=10){ return v39UniqBy([...(Array.isArray(a)?a:[]), ...(Array.isArray(b)?b:[])].filter(Boolean), x=>String(x)).slice(0,maxItems); }
+  function v39ApplyTripwiresIntoExecutionHunt(base, leadState){ const prior=v39SafeObject(base.signalBrain?.executionHunt); const extra=v39RegenExecutionHunt({lastGood:base}, leadState); base.signalBrain=base.signalBrain||{}; base.signalBrain.executionHunt=Object.assign({}, prior, extra); base.signalBrain.executionHunt.support=v39UniqBy([...(v39SafeArray(prior.support)), ...(v39SafeArray(extra.support))], x=>`${x.title}|${x.text}`).slice(0,10); base.signalBrain.executionHunt.tripwires=v39UniqBy([...(v39SafeArray(prior.tripwires)), ...leadState.tripwires.map(t=>({name:t.name, text:t.detail||t.name, fire:true, score:t.score}))], x=>`${x.name}|${x.text}`); }
+  async function applyV39IntegratedUpgrade(baseModel){
+    const carryClarifier=JSON.parse(JSON.stringify(baseModel.clarifier||{}));
+    const bundle={settings:state.settings, socialCache:baseModel.social||state.socialCache, lastGood:baseModel, history:[...(state.importedBundle?.history||[]), ...state.history]};
+    const socialState=v39BuildSocialState(baseModel);
+    const leadState=await v39RunLeadEngine({bundle, settings:state.settings, socialState, transfers:v39ExtractTransfers(bundle)});
+    const sourceCoverage=v39SourceCoverage(socialState);
+    const evidence=v39RegenEvidence(bundle, leadState, socialState);
+    const v39Clar=v39RegenClarifier(bundle, socialState, leadState);
+    const mergedClar={ ...carryClarifier, prep:Math.max(v39Num(carryClarifier.prep), v39Clar.prep), exec:Math.max(v39Num(carryClarifier.exec), v39Clar.exec), debt:Math.min(v39Num(carryClarifier.debt,1), v39Clar.debt), clarity:Math.max(v39Num(carryClarifier.clarity), v39Clar.clarity), hard:v39Clar.hard, soft:v39Clar.soft, stateText:v39Clar.stateText||carryClarifier.stateText, verdict:v39Clar.verdict||carryClarifier.verdict, hint:v39Clar.hint, supports:v39MergeUniqueText(carryClarifier.supports, v39Clar.supports, 14), disconfirm:v39MergeUniqueText(carryClarifier.disconfirm, v39Clar.disconfirm, 12), proveNext:v39MergeUniqueText(carryClarifier.proveNext, v39Clar.proveNext, 12), weaken:v39MergeUniqueText(carryClarifier.weaken, v39Clar.weaken, 12), pressure:v39Clar.pressure };
+    baseModel.clarifier=mergedClar;
+    v39ApplyTripwiresIntoExecutionHunt(baseModel, leadState);
+    const oldAudit=v39SafeObject(baseModel.systemAudit); const v39Audit=v39RegenSystemAudit(state.settings, socialState, leadState); baseModel.systemAudit={ rows:[...(v39SafeArray(oldAudit.rows)), ...(v39Audit.rows)], summary:`${oldAudit.summary||''}${oldAudit.summary?' • ':''}${v39Audit.summary}`, pills:v39UniqBy([...(v39SafeArray(oldAudit.pills)), ...(v39Audit.pills||[])], x=>x) };
+    const oldMem=v39SafeObject(baseModel.socialMemory); baseModel.socialMemory={ rows:[...(v39SafeArray(oldMem.rows)), ...[{label:'Source coverage guardian', value:`${sourceCoverage.rows.length} source(s)`, hint:sourceCoverage.summary},{label:'Predator windows', value:String(socialState.windows.length), hint:socialState.windows.length?'Real windows are active.':'No real social windows are active.'}]], summary:`${oldMem.summary||''}${oldMem.summary?' • ':''}${socialState.socialCache.length} social item(s) retained with ${socialState.windows.length} real window(s).`, codes:v39SafeArray(oldMem.codes) };
+    baseModel.evidenceLedger={ rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), ...(evidence.rows||[])], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}${evidence.summary}`, hard:evidence.hard, soft:evidence.soft };
+    baseModel.proveLoop=v39RegenProveLoop(state.settings, socialState, leadState, mergedClar, evidence);
+    baseModel.v39={ sourceCoverage, leadExecutor:leadState, tripwireEngine:{rows:leadState.tripwires, score:clamp(avg(leadState.tripwires.map(t=>t.score)),0,1), summary:leadState.tripwires.length?`${leadState.tripwires.length} tripwire(s) promoted this cycle.`:'No hard tripwires promoted this cycle.'}, moduleRows:leadState.results.flatMap(r=>r.modules.map(m=>({lead:r.target, kind:r.kind, name:m.name, score:m.score, detail:m.detail}))), integrationRows:[ `V38 logic preserved and carried forward under live V39 merge.`, `Predator hunt mode: ${state.settings.huntMode||'predator'}.`, `Source guardian audited ${sourceCoverage.rows.length} source family(ies).`, `Lead executor ran ${leadState.active.length} active lead(s).`, `Tripwire engine promoted ${leadState.tripwires.length} hard tripwire(s).`, `Social cache retained ${socialState.socialCache.length} item(s).`, `Real timing windows available: ${socialState.windows.length}.`, `Burst scan horizon configured at ${state.settings.scanBlocks||300} → ${state.settings.burstScanBlocks||2200} blocks.` ], carryForward:{clarifier:carryClarifier} };
+    baseModel.version='V39 Integrated Predator Auditor';
+    baseModel.score=mergedClar.clarity*100;
+    return baseModel;
+  }
+
+  async function buildModel(){ const base=await buildModelBase(); return applyV39IntegratedUpgrade(base); }
+
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
 
@@ -2130,6 +2321,31 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     clearEl($('proveLoopList'));
     pushItem($('proveLoopList'), model.proveLoop?.summary || 'No prove-loop summary yet.', state.deepMode?'good':'info');
     (model.proveLoop?.rows||[]).forEach(x=>pushItem($('proveLoopList'), `${x.label}: ${x.value} • ${x.hint}`, /missing|synthetic fallback/.test(String(x.value))?'warn':'info'));
+    renderV39(model);
+  }
+
+  function renderV39(model){
+    const v39=model.v39||{};
+    const sc=v39.sourceCoverage||{rows:[],summary:'No source coverage summary yet.'};
+    const lead=v39.leadExecutor||{active:[],summary:'No lead execution summary yet.'};
+    const trip=v39.tripwireEngine||{rows:[],summary:'No hard tripwires promoted this cycle.'};
+    $('socialMeta').textContent=`Social: ${(model.social||[]).length} item(s) • ${sc.rows.filter(x=>x.health==='green').length||0} green / ${sc.rows.filter(x=>x.health==='red').length||0} red source(s)`;
+    const scSummary=$('sourceCoverageSummary'); if(scSummary) scSummary.textContent=sc.summary||'No source coverage summary yet.';
+    clearEl($('sourceCoverageList'));
+    (sc.rows||[]).forEach(row=>pushItem($('sourceCoverageList'), `${row.name} • ${row.family} • ${row.health} • 24h ${row.itemCount24h||0} • 7d ${row.itemCount7d||0} • pDAI hits ${row.pDAIMatchCount||0}${row.lastItemAt?` • last ${fmtTs(row.lastItemAt)}`:''}${row.notes?.length?` • ${row.notes.join('; ')}`:''}`, row.health==='green'?'good':row.health==='yellow'?'warn':'bad'));
+    const leadSummary=$('leadSummary'); if(leadSummary) leadSummary.textContent=lead.summary||'No lead execution summary yet.';
+    const lb=$('leadBody'); clearEl(lb);
+    (lead.active||[]).forEach(row=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${escapeHtml(row.kind)}<br><span class="small mono">${escapeHtml(addrShort(row.target))}</span></td><td>${escapeHtml(row.status||'fresh')}</td><td>${pct(row.score||0)}</td><td>${escapeHtml((row.evidence||[]).slice(-3).join(' • '))}</td>`; lb.appendChild(tr); });
+    if(!(lead.active||[]).length){ const tr=document.createElement('tr'); tr.innerHTML='<td colspan="4">No active leads yet.</td>'; lb.appendChild(tr); }
+    const tripSummary=$('tripwireSummaryV39'); if(tripSummary) tripSummary.textContent=trip.summary||'No promoted tripwires yet.';
+    clearEl($('tripwireListV39'));
+    (trip.rows||[]).forEach(t=>pushItem($('tripwireListV39'), `${t.name}: ${t.detail||t.text||''} • ${pct(t.score||0)}`, 'good'));
+    if(!(trip.rows||[]).length) pushItem($('tripwireListV39'),'No hard tripwires promoted this cycle.','warn');
+    clearEl($('v39ModuleList'));
+    (v39.moduleRows||[]).slice(0,24).forEach(m=>pushItem($('v39ModuleList'), `${m.name} • ${pct(m.score||0)} • ${addrShort(m.lead)} • ${m.kind}`, m.score>.72?'good':m.score>.52?'warn':'info'));
+    if(!(v39.moduleRows||[]).length) pushItem($('v39ModuleList'),'No V39 module activity yet.','warn');
+    clearEl($('v39IntegrationList'));
+    (v39.integrationRows||[]).forEach(t=>pushItem($('v39IntegrationList'), t, 'info'));
   }
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
@@ -2181,6 +2397,17 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     $('sDeepSweepEvery').value=state.settings.deepSweepEvery||4;
     $('sRelayerHints').value=state.settings.relayerHints||'';
     $('sSocialMemoryDays').value=state.settings.socialMemoryDays||45;
+    $('sHuntMode').value=state.settings.huntMode||'predator';
+    $('sBurstScanBlocks').value=state.settings.burstScanBlocks||2200;
+    $('sMaxLeadExpansionsPerCycle').value=state.settings.maxLeadExpansionsPerCycle||8;
+    $('sNeighborBlockBurst').value=state.settings.neighborBlockBurst||33;
+    $('sRouteDepthBurst').value=state.settings.routeDepthBurst||4;
+    $('sAllowanceDiffEvery').value=state.settings.allowanceDiffEvery||1;
+    $('sSlotClassificationEvery').value=state.settings.slotClassificationEvery||1;
+    $('sSourceCoverageCheckEvery').value=state.settings.sourceCoverageCheckEvery||1;
+    $('sRevisitStalledLeadsEvery').value=state.settings.revisitStalledLeadsEvery||3;
+    $('sSocialWindowBurst').value=String(state.settings.socialWindowBurst!==false);
+    $('sAggressiveFollowups').value=state.settings.aggressiveFollowups||3;
   }
   function pullSettings(){
     state.settings.privateRpc=$('sPrivateRpc').value.trim();
@@ -2202,6 +2429,17 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     state.settings.deepSweepEvery=Math.max(1, Number($('sDeepSweepEvery').value)||4);
     state.settings.relayerHints=$('sRelayerHints').value;
     state.settings.socialMemoryDays=Math.max(1, Number($('sSocialMemoryDays').value)||45);
+    state.settings.huntMode=$('sHuntMode').value||'predator';
+    state.settings.burstScanBlocks=Math.max(300, Number($('sBurstScanBlocks').value)||2200);
+    state.settings.maxLeadExpansionsPerCycle=Math.max(1, Number($('sMaxLeadExpansionsPerCycle').value)||8);
+    state.settings.neighborBlockBurst=Math.max(1, Number($('sNeighborBlockBurst').value)||33);
+    state.settings.routeDepthBurst=Math.max(1, Number($('sRouteDepthBurst').value)||4);
+    state.settings.allowanceDiffEvery=Math.max(1, Number($('sAllowanceDiffEvery').value)||1);
+    state.settings.slotClassificationEvery=Math.max(1, Number($('sSlotClassificationEvery').value)||1);
+    state.settings.sourceCoverageCheckEvery=Math.max(1, Number($('sSourceCoverageCheckEvery').value)||1);
+    state.settings.revisitStalledLeadsEvery=Math.max(1, Number($('sRevisitStalledLeadsEvery').value)||3);
+    state.settings.socialWindowBurst=$('sSocialWindowBurst').value!=='false';
+    state.settings.aggressiveFollowups=Math.max(1, Number($('sAggressiveFollowups').value)||3);
     saveSettings();
     if(state.timer) clearInterval(state.timer);
     state.timer=setInterval(sync, Math.max(12000, state.settings.autoRefresh||30000));
@@ -2216,11 +2454,11 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
   $('settingsBtn').onclick=()=> $('settingsBox').classList.toggle('open');
   $('saveSettingsBtn').onclick=()=>{ try{ pullSettings(); sync(); }catch(e){ alert('Settings error: '+(e.message||String(e))); } };
   $('clearSettingsBtn').onclick=()=>{ state.settings=JSON.parse(JSON.stringify(DEFAULTS)); saveSettings(); pushSettings(); };
-  $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local V38 history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
+  $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v38-history.json', state.history);
-  $('exportBtn').onclick=()=> downloadJson('pdai-v38-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v39-history.json', state.history);
+  $('exportBtn').onclick=()=> downloadJson('pdai-v39-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
     try{
@@ -2236,7 +2474,7 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
       if(bundle.lastGood) saveLastGood(bundle.lastGood);
       render(safeImportedRender(bundle));
       $('syncStatus').textContent='bundle loaded'; $('syncStatus').className='status info';
-      $('lastSync').textContent='Imported bundle loaded. Refresh to run live V38 logic.';
+      $('lastSync').textContent='Imported bundle loaded. Refresh to run live integrated V39 logic.';
     }catch(err){ alert('Import failed: '+(err.message||String(err))); }
     e.target.value='';
   });
