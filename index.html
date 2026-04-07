@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V35 Manifold Proof Hunter</title>
+<title>pDAI Peg Prover • V36 Infrastructure Proof Engine</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V35 Manifold Proof Hunter</h1>
-      <div class="sub">V35 turns the execution hunt into a proof hunter: it tracks recurring spender manifolds across history, traces discharge routes into core / dead / anchor lanes, scores optical-rail attrition as an absolute structural condition, and separates gasless narrative pressure from actual relayer-address evidence.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V36 Infrastructure Proof Engine</h1>
+      <div class="sub">V36 pushes the hunt from proof-of-prep toward proof-of-infrastructure: relayer→manifold fingerprinting, discharge-nexus convergence, trie-touch mutation checks, intake-pressure deltas, and kill-switch reserve normalization all get their own lanes.</div>
       <div class="chips">
-        <div class="chip good">Imports V31/V32/V33 bundle JSON</div>
-        <div class="chip info">Adds historical spender-manifold tracking</div>
-        <div class="chip warn">Adds discharge router + attrition absolute</div>
-        <div class="chip bad">Refuses to call execution without shell / slot proof</div>
+        <div class="chip good">Imports V31–V35 bundle JSON</div>
+        <div class="chip info">Adds relayer → manifold fingerprinting</div>
+        <div class="chip warn">Adds discharge nexus + intake delta + trie touch</div>
+        <div class="chip bad">Treats reserve normalization as a kill-switch against the thesis</div>
       </div>
     </div>
     <div>
@@ -113,7 +113,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V33 settings</div>
+    <div class="boxTitle">V36 settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Fallback RPCs</label><textarea id="sRpcs" placeholder="one per line"></textarea></div>
@@ -164,7 +164,7 @@
     <div class="heroRight">
       <div class="summary">
         <div class="card">
-          <div class="label">V35 clarifier verdict</div>
+          <div class="label">V36 infrastructure verdict</div>
           <div class="value" id="verdict">—</div>
           <div class="hint" id="brief">—</div>
           <div id="summaryPills" style="margin-top:12px"></div>
@@ -188,7 +188,7 @@
   <div class="tri">
     <div class="panel">
       <div class="boxTitle">Model competition</div>
-      <div class="small">V33 ranks competing explanations so the tool can tell you whether it is seeing peg preparation, ecosystem growth, routine churn, or dot-connecting overshoot.</div>
+      <div class="small">V36 ranks competing explanations so the tool can tell you whether it is seeing peg preparation, infrastructure priming, ecosystem growth, routine churn, or dot-connecting overshoot.</div>
       <div id="modelList" style="margin-top:12px"></div>
     </div>
     <div class="panel">
@@ -258,6 +258,38 @@
     </div>
   </div>
 
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Relayer → manifold fingerprint</div>
+      <div class="small">Transaction calldata is sampled around spender approvals and spender-adjacent transfers to distinguish narrative gasless pressure from actual relayer/manifold execution evidence.</div>
+      <div id="relayerFingerprintList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Discharge nexus convergence</div>
+      <div class="small">If multiple shadow candidates begin discharging to the same address, the nexus should surface here before formal shell proof arrives.</div>
+      <div id="nexusList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Trie touch + kill-switch</div>
+      <div class="small">eth_getProof fingerprints are checked for zero-value storage mutations while reserve normalization is treated as a kill-switch against the peg thesis.</div>
+      <div id="trieList" style="margin-top:12px"></div>
+      <div id="killSwitchList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="twocol">
+    <div class="panel">
+      <div class="boxTitle">Intake delta board</div>
+      <div class="small">Bridged-rail deltas and stable warehousing pressure are tracked across loaded history to see whether outside capital is accumulating without obvious public deployment.</div>
+      <div id="intakeDeltaList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Infrastructure proof matrix</div>
+      <div class="small">Five forensic vectors are scored independently so the thesis can be strong without pretending execution is already live.</div>
+      <div id="infraMatrixList"></div>
+    </div>
+  </div>
+
   <div class="twocol">
     <div class="panel">
       <div class="boxTitle">Reserve archaeology</div>
@@ -290,7 +322,7 @@
     </div>
     <div class="panel">
       <div class="boxTitle">Snapshot history</div>
-      <div class="small">Recent V35 snapshots from this browser. Importing an older bundle also seeds history for attrition and manifold drift.</div>
+      <div class="small">Recent V36 snapshots from this browser. Importing an older bundle also seeds history for attrition, intake drift, and manifold persistence.</div>
       <div id="historyList"></div>
     </div>
   </div>
@@ -904,6 +936,186 @@
     return {narrativeHits:narrative.length, addressHits, summary};
   }
 
+  function fullSlot(slot){ return slot.startsWith('0x') && slot.length<66 ? '0x'+slot.slice(2).padStart(64,'0') : slot; }
+
+  function relayerSeeds(){
+    const seeds=['4fd0'];
+    const hinted=(String(state.settings.stableHints||'').match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>norm(x).replace(/^0x/,'').slice(0,8)).filter(Boolean);
+    return uniq([...seeds, ...hinted].map(x=>String(x||'').toLowerCase()), x=>x);
+  }
+
+  async function buildRelayerFingerprint(social, spenderLab, contractIntel, windows){
+    const leadSpenders=(spenderLab||[]).slice(0,3).map(x=>norm(x.address));
+    const txHashes=uniq([
+      ...(contractIntel.approvals||[]).filter(a=>leadSpenders.includes(norm(a.spender))).map(a=>a.tx),
+      ...(contractIntel.transfers||[]).filter(t=>leadSpenders.includes(norm(t.from)) || leadSpenders.includes(norm(t.to))).map(t=>t.tx)
+    ].filter(Boolean), x=>x).slice(0,18);
+    const seeds=relayerSeeds();
+    const narrativeHits=(social||[]).filter(x=>/gasless|zkx|drift incident|full gas abstraction|libertyshield|meta-?transaction|relayer/i.test(`${x.title||''} ${x.text||''}`)).length;
+    const rows=[];
+    for(const hash of txHashes){
+      try{
+        const tx=await getTx(hash);
+        if(!tx) continue;
+        const from=norm(tx.from), to=norm(tx.to);
+        const selector=(tx.input||'0x').slice(0,10).toLowerCase();
+        const block=parseInt(tx.blockNumber||'0x0',16);
+        const relayerish=seeds.some(s=>from.includes(s) || to.includes(s));
+        const spenderish=leadSpenders.includes(from) || leadSpenders.includes(to) || (contractIntel.approvals||[]).some(a=>a.tx===hash && leadSpenders.includes(norm(a.spender)));
+        const transferFromish=selector==='0x23b872dd' || String(tx.input||'').toLowerCase().includes('23b872dd');
+        const windowHit=(windows||[]).some(w=>block>=w.fromBlock && block<=w.toBlock);
+        const score=clamp((relayerish?0.38:0) + (spenderish?0.24:0) + (transferFromish?0.22:0) + (windowHit?0.16:0),0,1);
+        rows.push({hash, from:tx.from, to:tx.to, selector, block, relayerish, spenderish, transferFromish, windowHit, score});
+      }catch{}
+    }
+    rows.sort((a,b)=>b.score-a.score);
+    const hard=rows.filter(r=>r.relayerish && r.spenderish && r.transferFromish);
+    const manifold=rows.filter(r=>r.spenderish && r.transferFromish);
+    const stateText=hard.length ? 'relayer-linked-manifold-call' : manifold.length ? 'manifold-call-without-relayer-proof' : narrativeHits ? 'narrative-pressure-only' : 'quiet';
+    let summary='';
+    if(hard.length) summary=`Relayer/manifold hard hits ${hard.length}: spender-linked transferFrom calldata is visible in sampled txs.`;
+    else if(manifold.length) summary=`Sampled txs already include ${manifold.length} spender-linked transferFrom-style call(s), but they are not yet tied to a relayer-address fingerprint.`;
+    else if(narrativeHits) summary=`Gasless / relayer narrative is active in ${narrativeHits} social item(s), but sampled spender-adjacent calldata still lacks hard relayer/manifold proof.`;
+    else summary='No relayer/manifold fingerprint is visible in the current sampled calldata.';
+    const score=clamp((hard.length?0.75:0) + Math.min(manifold.length/6,0.32) + Math.min(narrativeHits/6,0.14),0,1);
+    return {rows:rows.slice(0,10), state:stateText, summary, score, narrativeHits, hardHits:hard.length, manifoldCalls:manifold.length};
+  }
+
+  function buildDischargeNexus(candidates, contractIntel, spenderLab, chain, windows, executionHunt){
+    const seeds=(candidates||[]).filter(x=>x.score>.18).slice(0,8);
+    const map=new Map();
+    for(const seed of seeds){
+      for(const t of (contractIntel.transfers||[])){
+        if(norm(t.from)!==norm(seed.address)) continue;
+        const k=norm(t.to);
+        if(!isAddr(k)) continue;
+        const row=map.get(k)||{address:t.to,total:0,count:0,windowHits:0,sources:new Set(),maxSourceScore:0};
+        row.total += Number(t.amount||0);
+        row.count += 1;
+        if((windows||[]).some(w=>t.block>=w.fromBlock && t.block<=w.toBlock)) row.windowHits += 1;
+        row.sources.add(norm(seed.address));
+        row.maxSourceScore=Math.max(row.maxSourceScore, Number(seed.score||0));
+        map.set(k,row);
+      }
+    }
+    const rows=[...map.values()].map(r=>{
+      const sourceCount=r.sources.size;
+      const role=classifyRouteRole(r.address, spenderLab, chain, executionHunt);
+      const terminal=/spender manifold|5EF7 core|dead sink|Native pDAI\/WPLS|ATROPA\/DAI core|Bridged DAI\/WPLS/i.test(role);
+      const score=clamp(Math.min(sourceCount/3,1)*0.42 + Math.min(r.count/6,0.14) + Math.min(r.total/5000,0.16) + (terminal?0.18:0) + Math.min(r.windowHits/6,0.10),0,1);
+      return {address:r.address,total:r.total,count:r.count,windowHits:r.windowHits,sourceCount,role,terminal,score,sources:[...r.sources]};
+    }).sort((a,b)=>b.score-a.score);
+    const lead=rows[0]||null;
+    let summary='No discharge nexus convergence is visible yet.';
+    if(lead) summary=`Lead nexus ${addrShort(lead.address)} (${lead.role}) aggregates ${lead.sourceCount} source wallet(s), ${fmtNum(lead.count)} route(s), and ${fmtShort(lead.total)} pDAI of outbound seed flow.`;
+    return {rows:rows.slice(0,10), lead, summary, score:lead?lead.score:0};
+  }
+
+  function previousTrieRow(address){
+    const hist=[...(state.history||[])].slice().reverse();
+    for(const h of hist){
+      const row=(h.trieTouch?.rows||[]).find(r=>norm(r.address)===norm(address));
+      if(row) return row;
+    }
+    return null;
+  }
+
+  async function buildTrieTouch(chain, spenderLab){
+    const targets=uniq([state.settings.target, (state.settings.watchers||{})['5EF7'], ...(spenderLab||[]).slice(0,2).map(x=>x.address)].filter(isAddr), x=>norm(x));
+    const rows=[];
+    try{
+      for(const address of targets){
+        const slots=norm(address)===norm(state.settings.target) ? (state.settings.slots||[]).map(fullSlot) : [];
+        const proof=await getProof(address, slots);
+        const storageHash=proof?.storageHash || '';
+        const codeHash=proof?.codeHash || '';
+        const nonce=parseInt(proof?.nonce||'0x0',16);
+        const slotZero=(proof?.storageProof||[]).length ? proof.storageProof.every(x=>norm(x.value||NULL32)===norm(NULL32)) : null;
+        const prev=previousTrieRow(address);
+        const changed=!!prev && (norm(prev.storageHash)!==norm(storageHash) || norm(prev.codeHash)!==norm(codeHash) || Number(prev.nonce||0)!==nonce);
+        const touchedWhileZero=changed && slotZero===true;
+        rows.push({address, storageHash, codeHash, nonce, slotZero, changed, touchedWhileZero});
+      }
+    }catch(err){
+      return {supported:false, rows:[], summary:`eth_getProof is unavailable on the active RPC: ${err.message||String(err)}`, score:0, changes:0, cocked:0};
+    }
+    const changes=rows.filter(x=>x.changed).length;
+    const cocked=rows.filter(x=>x.touchedWhileZero).length;
+    let summary='Trie fingerprints loaded; no prior fingerprint change is visible yet.';
+    if(cocked) summary=`${cocked} address(es) changed storageHash/codeHash/nonce while watched values stayed zero, which is consistent with zero-value priming.`;
+    else if(changes) summary=`${changes} address(es) changed trie fingerprint versus prior local history.`;
+    return {supported:true, rows, summary, score:clamp((cocked?0.72:0) + Math.min(changes/4,0.24),0,1), changes, cocked};
+  }
+
+  function pickBridgedStable(anchor){
+    if(!anchor) return 0;
+    const t0=norm(anchor.token0), t1=norm(anchor.token1);
+    if(t0===norm(state.settings.wpls)) return Number(anchor.reserve1||0);
+    if(t1===norm(state.settings.wpls)) return Number(anchor.reserve0||0);
+    if(t0===norm(state.settings.target)) return Number(anchor.reserve1||0);
+    if(t1===norm(state.settings.target)) return Number(anchor.reserve0||0);
+    return Math.min(Number(anchor.reserve0||0), Number(anchor.reserve1||0));
+  }
+
+  function buildIntakeDelta(chain, social){
+    const series=mergedSnapshots().map(h=>{
+      const bridged=(h.publicAnchors||[]).find(a=>a.type==='bridged');
+      const native=(h.publicAnchors||[]).find(a=>a.type==='public-native');
+      const core=(h.nodeBalances||{})['5EF7']?.pdai || 0;
+      return bridged && native ? {ts:snapshotTime(h), bridged:pickBridgedStable(bridged), native:Number(native.reserve0||0), core:Number(core||0)} : null;
+    }).filter(Boolean).sort((a,b)=>a.ts-b.ts);
+    if(!series.length) return {state:'unknown', summary:'No bridged-intake history is loaded yet.', rows:[], score:0};
+    const first=series[0], last=series[series.length-1];
+    const bridgedDelta=(last.bridged-first.bridged)/(first.bridged||1);
+    const nativeDelta=(last.native-first.native)/(first.native||1);
+    const coreDelta=(last.core-first.core)/(first.core||1);
+    const stableCueCount=(social||[]).reduce((a,x)=>a+(/usdc|usdt|dai|stable|bridge|route|marketplace|cross-chain/i.test(`${x.title||''} ${x.text||''}`)?1:0),0);
+    let stateText='flat';
+    if(bridgedDelta>0.03 && Math.abs(nativeDelta)<0.02) stateText='warehousing-rise';
+    else if(bridgedDelta< -0.03) stateText='intake-fading';
+    else if(bridgedDelta>0.03 && nativeDelta>0.02) stateText='deployed-back-to-rail';
+    const score=clamp((bridgedDelta>0?Math.min(bridgedDelta/0.12,1)*0.46:0) + (Math.abs(nativeDelta)<0.02?0.16:0) + (coreDelta>0?Math.min(coreDelta/0.05,1)*0.22:0) + Math.min(stableCueCount/10,0.16),0,1);
+    const summary=`Bridged stable side moved ${bridgedDelta>=0?'+':'-'}${pct(Math.abs(bridgedDelta))} across loaded history while native moved ${nativeDelta>=0?'+':'-'}${pct(Math.abs(nativeDelta))} and core moved ${coreDelta>=0?'+':'-'}${pct(Math.abs(coreDelta))}.`;
+    const rows=[
+      {label:'State', value:stateText, hint:'bridged stable side versus native/core'},
+      {label:'Bridged delta', value:(bridgedDelta>=0?'+':'-')+pct(Math.abs(bridgedDelta)), hint:`first ${fmtShort(first.bridged)} → now ${fmtShort(last.bridged)}`},
+      {label:'Stable cues', value:fmtNum(stableCueCount), hint:'social / narrative intake references'},
+      {label:'Core delta', value:(coreDelta>=0?'+':'-')+pct(Math.abs(coreDelta)), hint:`first ${fmtShort(first.core)} → now ${fmtShort(last.core)}`}
+    ];
+    return {state:stateText, summary, rows, score, series, bridgedDelta, nativeDelta, coreDelta, stableCueCount};
+  }
+
+  function buildKillSwitch(chain, attritionAbsolute, intakeDelta, contractIntel){
+    const native=(chain.publicAnchors||[]).find(a=>a.type==='public-native');
+    const nativeAddr=norm(native?.address||'');
+    const coreAddr=norm(((state.settings.watchers||{})['5EF7'])||'');
+    const nativeTouches=(contractIntel.transfers||[]).filter(t=>norm(t.to)===nativeAddr || norm(t.from)===nativeAddr).length;
+    const coreTouches=(contractIntel.transfers||[]).filter(t=>norm(t.to)===coreAddr || norm(t.from)===coreAddr).length;
+    const active = attritionAbsolute.state==='thickening-or-replenished' || Number(attritionAbsolute.ratioDelta||0)<-0.03 || intakeDelta.state==='deployed-back-to-rail';
+    const rows=[
+      {label:'Kill-switch state', value:active?'warming':'inactive', hint:'reserve normalization / ratio compression'},
+      {label:'Ratio delta', value:((attritionAbsolute.ratioDelta||0)>=0?'+':'-')+pct(Math.abs(attritionAbsolute.ratioDelta||0)), hint:'negative values weaken the one-way starvation story'},
+      {label:'Native touches', value:fmtNum(nativeTouches), hint:'recent pDAI transfers touching native rail address'},
+      {label:'Core touches', value:fmtNum(coreTouches), hint:'recent pDAI transfers touching 5EF7 address'}
+    ];
+    let summary='Kill-switch is inactive: the loaded history does not yet show clear reserve normalization.';
+    if(active) summary='Kill-switch is warming: loaded history now shows reserve normalization or capital returning toward the public rail.';
+    return {active, rows, summary, score:active?0.78:0};
+  }
+
+  function buildInfraMatrix(relayerFingerprint, attritionAbsolute, dischargeNexus, trieTouch, intakeDelta, killSwitch){
+    const rows=[
+      {name:'Relayer → manifold', score:relayerFingerprint.score||0, hint:relayerFingerprint.summary||'—'},
+      {name:'Optical attrition absolute', score:attritionAbsolute.score||0, hint:attritionAbsolute.summary||'—'},
+      {name:'Discharge nexus', score:dischargeNexus.score||0, hint:dischargeNexus.summary||'—'},
+      {name:'Trie touch / zero-value mutation', score:trieTouch.score||0, hint:trieTouch.summary||'—'},
+      {name:'Cross-chain intake delta', score:intakeDelta.score||0, hint:intakeDelta.summary||'—'}
+    ];
+    const inevitability=clamp(rows.reduce((a,x)=>a+x.score,0)/Math.max(rows.length,1) - (killSwitch.active?0.18:0),0,1);
+    const summary=`Infrastructure proof average ${pct(inevitability)}${killSwitch.active ? ' after kill-switch penalty' : ''}.`;
+    return {rows, inevitability, summary};
+  }
+
   function buildThinLP(chain){
     const native=chain.publicAnchors.find(a=>a.type==='public-native');
     const core=chain.publicAnchors.find(a=>a.type==='core');
@@ -1156,11 +1368,24 @@
     const dischargeRouter=buildDischargeRouter(contractIntel, spenderLab, chain, executionHunt, windows);
     const attritionAbsolute=buildAttritionAbsolute(chain);
     const relayerWatch=buildRelayerWatch(social, spenderLab, contractIntel);
+    const relayerFingerprint=await buildRelayerFingerprint(social, spenderLab, contractIntel, windows);
+    const dischargeNexus=buildDischargeNexus(candidates, contractIntel, spenderLab, chain, windows, executionHunt);
+    const trieTouch=await buildTrieTouch(chain, spenderLab);
+    const intakeDelta=buildIntakeDelta(chain, social);
+    const killSwitch=buildKillSwitch(chain, attritionAbsolute, intakeDelta, contractIntel);
+    const infraMatrix=buildInfraMatrix(relayerFingerprint, attritionAbsolute, dischargeNexus, trieTouch, intakeDelta, killSwitch);
     const clarifier=buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt);
     if(manifoldTracker.lead && manifoldTracker.lead.snapshots>=2) clarifier.supports.push(`Recurring spender manifold ${addrShort(manifoldTracker.lead.address)} persists across ${manifoldTracker.lead.snapshots} loaded snapshot(s).`);
     if(relayerWatch.narrativeHits && !relayerWatch.addressHits.length) clarifier.disconfirm.push('Gasless / relayer narrative is active, but address-level relayer proof is still unresolved.');
     if(attritionAbsolute.state==='thickening-or-replenished') clarifier.disconfirm.push('Native optical rail is thickening or being replenished across loaded history, which weakens the attrition-only case.');
     if(dischargeRouter.terminalHits>0) clarifier.supports.push(`Discharge router already touches ${dischargeRouter.terminalHits} terminal lane(s) such as spender/core/dead/anchor nodes.`);
+    if(relayerFingerprint.hardHits>0) clarifier.supports.push(`Sampled calldata already contains ${relayerFingerprint.hardHits} relayer-linked manifold call(s).`);
+    else if(relayerFingerprint.manifoldCalls>0) clarifier.proveNext.push('Tie the spender-linked transferFrom calldata to a relayer-style address or batch path.');
+    if(dischargeNexus.lead && dischargeNexus.lead.sourceCount>=2) clarifier.supports.push(`Multiple candidates converge on nexus ${addrShort(dischargeNexus.lead.address)}.`);
+    if(trieTouch.cocked>0) clarifier.supports.push(`Trie fingerprints changed while watched values stayed zero for ${trieTouch.cocked} address(es).`);
+    else if(trieTouch.supported) clarifier.proveNext.push('Wait for a trie fingerprint change before claiming zero-value slot priming.');
+    if(intakeDelta.state==='warehousing-rise') clarifier.supports.push('Bridged intake is rising while native deployment stays relatively muted.');
+    if(killSwitch.active) clarifier.disconfirm.push('Reserve normalization / kill-switch pressure is active and weakens the one-way starvation thesis.');
     const probePlanner=buildProbePlanner(clarifier, reserveArchaeology, spenderLab, candidates, nullAwakening, thinLP, executionHunt, routeClusters);
     return {
       createdAt:Date.now(),
@@ -1176,7 +1401,7 @@
       dnaProbe:chain.dnaProbe,
       social,
       windows,
-      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters},
+      signalBrain:{intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, moveBuilder, rivalModels, probePlanner, executionHunt, routeClusters, relayerFingerprint, dischargeNexus, trieTouch, intakeDelta, killSwitch, infraMatrix},
       spenderLab,
       candidates,
       reserveArchaeology,
@@ -1184,6 +1409,12 @@
       dischargeRouter,
       attritionAbsolute,
       relayerWatch,
+      relayerFingerprint,
+      dischargeNexus,
+      trieTouch,
+      intakeDelta,
+      killSwitch,
+      infraMatrix,
       clarifier,
       score:clarifier.clarity*100,
       pegProgress:clarifier.prep,
@@ -1238,6 +1469,12 @@
       dischargeRouter:{rows:[],seed:null,summary:'Imported snapshot',terminalHits:0},
       attritionAbsolute:{state:'imported',summary:'Imported snapshot',rows:[]},
       relayerWatch:{narrativeHits:0,addressHits:[],summary:'Imported snapshot'},
+      relayerFingerprint:{rows:[],state:'imported',summary:'Imported snapshot',score:0,hardHits:0,manifoldCalls:0},
+      dischargeNexus:{rows:[],lead:null,summary:'Imported snapshot',score:0},
+      trieTouch:{supported:false,rows:[],summary:'Imported snapshot',score:0,changes:0,cocked:0},
+      intakeDelta:{state:'imported',summary:'Imported snapshot',rows:[],score:0},
+      killSwitch:{active:false,rows:[],summary:'Imported snapshot',score:0},
+      infraMatrix:{rows:[],inevitability:0,summary:'Imported snapshot'},
       clarifier,
       score:last.score||0,
       pegProgress:last.pegProgress||0,
@@ -1342,6 +1579,33 @@
     clearEl($('relayerList'));
     pushItem($('relayerList'), model.relayerWatch?.summary || 'No relayer watch summary yet.', (model.relayerWatch?.addressHits||[]).length?'good':(model.relayerWatch?.narrativeHits||0)?'warn':'info');
     if((model.relayerWatch?.addressHits||[]).length) (model.relayerWatch.addressHits||[]).forEach(a=>pushItem($('relayerList'), `${addrShort(a)} • fragment match`, 'good'));
+
+    clearEl($('relayerFingerprintList'));
+    pushItem($('relayerFingerprintList'), model.relayerFingerprint?.summary || 'No relayer/manifold fingerprint summary yet.', (model.relayerFingerprint?.hardHits||0)?'good':(model.relayerFingerprint?.manifoldCalls||0)?'warn':'info');
+    (model.relayerFingerprint?.rows||[]).forEach(x=>{
+      const cls=x.relayerish && x.spenderish && x.transferFromish ? 'good' : x.spenderish && x.transferFromish ? 'warn' : 'info';
+      pushItem($('relayerFingerprintList'), `${addrShort(x.hash)} • ${addrShort(x.from)} → ${addrShort(x.to)} • ${x.selector||'0x'}${x.windowHit?' • window-hit':''}${x.relayerish?' • relayerish':''}${x.transferFromish?' • transferFrom':''}`, cls);
+    });
+
+    clearEl($('nexusList'));
+    pushItem($('nexusList'), model.dischargeNexus?.summary || 'No discharge nexus summary yet.', (model.dischargeNexus?.lead?.sourceCount||0)>=2?'good':'info');
+    (model.dischargeNexus?.rows||[]).forEach(x=>pushItem($('nexusList'), `${addrShort(x.address)} • ${x.role} • sources ${x.sourceCount} • out ${fmtShort(x.total)} • routes ${x.count} • window hits ${x.windowHits}`, x.terminal?'good':x.sourceCount>=2?'warn':'info'));
+
+    clearEl($('trieList'));
+    pushItem($('trieList'), model.trieTouch?.summary || 'No trie-touch summary yet.', (model.trieTouch?.cocked||0)?'good':(model.trieTouch?.changes||0)?'warn':'info');
+    (model.trieTouch?.rows||[]).forEach(x=>pushItem($('trieList'), `${addrShort(x.address)} • nonce ${x.nonce}${x.changed?' • changed':''}${x.touchedWhileZero?' • zero-value touch':''}${x.slotZero===true?' • slots-zero':''}`, x.touchedWhileZero?'good':x.changed?'warn':'info'));
+
+    clearEl($('killSwitchList'));
+    pushItem($('killSwitchList'), model.killSwitch?.summary || 'No kill-switch summary yet.', model.killSwitch?.active?'bad':'info');
+    (model.killSwitch?.rows||[]).forEach(x=>pushItem($('killSwitchList'), `${x.label}: ${x.value} • ${x.hint}`, /warming|inactive/.test(String(x.value)) ? (model.killSwitch?.active?'bad':'info') : 'info'));
+
+    clearEl($('intakeDeltaList'));
+    pushItem($('intakeDeltaList'), model.intakeDelta?.summary || 'No intake-delta summary yet.', model.intakeDelta?.state==='warehousing-rise'?'good':model.intakeDelta?.state==='deployed-back-to-rail'?'bad':'info');
+    (model.intakeDelta?.rows||[]).forEach(x=>pushItem($('intakeDeltaList'), `${x.label}: ${x.value} • ${x.hint}`, /warehousing-rise/.test(String(x.value))?'good':'info'));
+
+    clearEl($('infraMatrixList'));
+    pushItem($('infraMatrixList'), model.infraMatrix?.summary || 'No infrastructure matrix summary yet.', 'info');
+    (model.infraMatrix?.rows||[]).forEach(x=>pushItem($('infraMatrixList'), `${x.name}: ${pct(x.score)} • ${x.hint}`, x.score>.62?'good':x.score>.35?'warn':'info'));
 
     const wb=$('windowBody'); clearEl(wb);
     (model.reserveArchaeology||[]).forEach(row=>{
