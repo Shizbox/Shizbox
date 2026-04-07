@@ -497,7 +497,7 @@
     aggressiveFollowups:3
   };
 
-  const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[]};
+  const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[], persistIssue:''};
 
   function $(id){ return document.getElementById(id); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -525,22 +525,117 @@
   function scoreRatio(a,b,tol){ const delta=Math.abs(Number(a||0)-Number(b||0)); const t=Math.max(Math.abs(Number(tol)||1),1e-9); return clamp(1-(delta/t),0,1); }
   function hashish(text){ let h=2166136261; const s=String(text||''); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return 'h'+((h>>>0).toString(16)); }
   function parseMaybeJson(s){ try{return JSON.parse(String(s||''));}catch{return null;} }
-  function inferPlatform(url,name=''){ const u=String(url||'').toLowerCase(); const n=String(name||'').toLowerCase(); if(u.includes('x.com')||u.includes('twitter.com')||n.includes('twitter')||n==='x') return 'x'; if(u.includes('t.me')||n.includes('telegram')) return 'telegram'; if(u.includes('youtube.com')||u.includes('youtu.be')||n.includes('youtube')) return 'youtube'; if(u.includes('rumble.com')||n.includes('rumble')) return 'rumble'; if(n.includes('manual')) return 'manual'; if(n.includes('corpus')) return 'corpus'; return 'unknown'; }
+  function inferPlatform(url,name=''){ const u=String(url||'').toLowerCase(); const n=String(name||'').toLowerCase(); if(u.includes('x.com')||u.includes('twitter.com')||n.includes('twitter')||n==='x') return 'x'; if(u.includes('t.me')||n.includes('telegram')) return 'telegram'; if(u.includes('youtube.com')||u.includes('youtu.be')||n.includes('youtube')) return 'youtube'; if(u.includes('rumble.com')||n.includes('rumble')) return 'rumble'; if(n.includes('manual')) return 'manual'; if(n.includes('corpus')) return 'corpus'; if(n.includes('inline')) return 'manual'; return 'unknown'; }
   function asTsMs(v){ if(v===null||v===undefined||v==='') return 0; if(typeof v==='number' && Number.isFinite(v)) return v>1e12? v : v>1e9 ? v*1000 : v; const t=Date.parse(String(v)); return Number.isFinite(t)?t:0; }
   function normalizeText(s){ return String(s||'').replace(/\s+/g,' ').trim(); }
   function shortHash(hash=''){ const h=String(hash||''); return h ? `${h.slice(0,10)}…${h.slice(-8)}` : '—'; }
-  function parseSourceList(raw){ const parsed=parseMaybeJson(raw); if(Array.isArray(parsed)){ return parsed.map(x=> typeof x==='string' ? ({url:x,name:inferPlatform(x,x),headers:{}}) : ({url:String(x.url||x.href||'').trim(), name:String(x.name||x.id||inferPlatform(x.url,x.name)).trim() || inferPlatform(x.url,x.name), headers:(x.headers&&typeof x.headers==='object')?x.headers:{}})).filter(x=>x.url); } return String(raw||'').split(/[\n,]+/).map(s=>s.trim()).filter(Boolean).map(url=>({url,name:inferPlatform(url,url),headers:{}})); }
+  function readStoredJson(key, fallback){ for(const store of [localStorage, sessionStorage]){ try{ const v=store.getItem(key); if(v) return tryJson(v, fallback); }catch{} } return fallback; }
+  function trimLongText(s, max=900){ const text=String(s||''); return text.length>max ? text.slice(0,max)+'…' : text; }
+  function limitArray(arr, max){ return Array.isArray(arr) ? arr.slice(0, Math.max(0,max||0)) : []; }
+  function compactLeadResult(result){ const out=JSON.parse(JSON.stringify(result||{})); out.modules=limitArray((out.modules||[]).map(m=>({name:m.name, score:m.score, detail:typeof m.detail==='string'?trimLongText(m.detail,420):m.detail})), 16); out.tripwires=limitArray(out.tripwires||[], 10); out.notes=limitArray(out.notes||[], 12).map(x=>trimLongText(x,220)); out.evidence=limitArray(out.evidence||[], 20).map(x=>trimLongText(x,220)); return out; }
+  function compactSnapshotForStorage(model, level='normal'){
+    if(!model || typeof model!=='object') return model;
+    const m=JSON.parse(JSON.stringify(model));
+    const hardTight = level==='tight';
+    if(m.signalBrain?.contractIntel){
+      const ci=m.signalBrain.contractIntel;
+      ci.transfers=limitArray(ci.transfers, hardTight?60:180);
+      ci.approvals=limitArray(ci.approvals, hardTight?30:80);
+      ci.flow=limitArray(ci.flow, hardTight?16:40);
+      ci.topTouchers=limitArray(ci.topTouchers, hardTight?12:30);
+      ci.topSpenders=limitArray(ci.topSpenders, hardTight?12:30);
+      ci.windowPulse=limitArray(ci.windowPulse, hardTight?10:30);
+      ci.pairs=limitArray(ci.pairs, hardTight?8:20);
+    }
+    if(m.signalBrain?.spenderLab?.rows) m.signalBrain.spenderLab.rows=limitArray(m.signalBrain.spenderLab.rows, hardTight?10:24);
+    if(m.signalBrain?.candidateLadder?.rows) m.signalBrain.candidateLadder.rows=limitArray(m.signalBrain.candidateLadder.rows, hardTight?10:24);
+    if(m.signalBrain?.routeClusterMap?.rows) m.signalBrain.routeClusterMap.rows=limitArray(m.signalBrain.routeClusterMap.rows, hardTight?10:24);
+    if(m.signalBrain?.symmetrySniffer?.rows) m.signalBrain.symmetrySniffer.rows=limitArray(m.signalBrain.symmetrySniffer.rows, hardTight?6:16);
+    if(m.signalBrain?.zeroingAnalysis?.rows) m.signalBrain.zeroingAnalysis.rows=limitArray(m.signalBrain.zeroingAnalysis.rows, hardTight?6:16);
+    if(m.signalBrain?.gateWatch?.rows) m.signalBrain.gateWatch.rows=limitArray(m.signalBrain.gateWatch.rows, hardTight?6:16);
+    if(m.signalBrain?.gasFingerprint?.rows) m.signalBrain.gasFingerprint.rows=limitArray(m.signalBrain.gasFingerprint.rows, hardTight?6:16);
+    if(m.signalBrain?.dustAttrition?.rows) m.signalBrain.dustAttrition.rows=limitArray(m.signalBrain.dustAttrition.rows, hardTight?8:20);
+    if(m.reserveArchaeology) m.reserveArchaeology=limitArray(m.reserveArchaeology, hardTight?4:10);
+    if(m.publicAnchors) m.publicAnchors=limitArray(m.publicAnchors, 8);
+    if(m.spenderLab) m.spenderLab=limitArray(m.spenderLab, hardTight?10:24);
+    if(m.candidates) m.candidates=limitArray(m.candidates, hardTight?10:24);
+    if(m.social) m.social=limitArray((m.social||[]).map(x=>Object.assign({}, x, {title:trimLongText(x?.title,180), text:trimLongText(x?.text,360)})), hardTight?40:120);
+    if(m.windows) m.windows=limitArray(m.windows, hardTight?16:48);
+    if(m.history) delete m.history;
+    if(m.importedBundle) delete m.importedBundle;
+    if(m.v39){
+      if(m.v39.leadExecutor){
+        m.v39.leadExecutor.leads=limitArray(m.v39.leadExecutor.leads, hardTight?8:16);
+        m.v39.leadExecutor.active=limitArray(m.v39.leadExecutor.active, hardTight?6:12);
+        m.v39.leadExecutor.results=limitArray((m.v39.leadExecutor.results||[]).map(compactLeadResult), hardTight?6:12);
+        m.v39.leadExecutor.tripwires=limitArray(m.v39.leadExecutor.tripwires, hardTight?8:16);
+      }
+      m.v39.moduleRows=limitArray(m.v39.moduleRows, hardTight?16:48);
+      if(m.v39.integrationRows) m.v39.integrationRows=limitArray(m.v39.integrationRows, 12);
+    }
+    return m;
+  }
+  function compactHistoryForStorage(history, level='normal'){ return limitArray((history||[]).slice(-(level==='tight'?10:24)).map(x=>compactSnapshotForStorage(x, level)), level==='tight'?10:24); }
+  function compactSocialCacheForStorage(items, level='normal'){ return limitArray((items||[]).map(x=>Object.assign({}, x, {title:trimLongText(x?.title,180), text:trimLongText(x?.text,360)})), level==='tight'?80:220); }
+  function purgeLegacyStorage(){ for(const key of [LEGACY_KEYS.history, LEGACY_KEYS.social, LEGACY_KEYS.last]){ try{ localStorage.removeItem(key); }catch{} } }
+  function safeStorageSet(key, value, compactFn){
+    let payload=value;
+    let text='';
+    try{ text=JSON.stringify(payload); localStorage.setItem(key, text); state.persistIssue=''; return {ok:true, via:'local'}; }
+    catch(err1){
+      try{ purgeLegacyStorage(); localStorage.removeItem(key); text=JSON.stringify(payload); localStorage.setItem(key, text); state.persistIssue=''; return {ok:true, via:'local-retry'}; }catch{}
+      if(compactFn){
+        try{ payload=compactFn(value, 'tight'); text=JSON.stringify(payload); localStorage.setItem(key, text); state.persistIssue=''; return {ok:true, via:'local-tight'}; }catch{}
+      }
+      try{ sessionStorage.setItem(key, text || JSON.stringify(compactFn ? compactFn(value, 'tight') : value)); state.persistIssue='Browser storage quota hit; using session-only cache.'; return {ok:true, via:'session'}; }
+      catch(err2){ state.persistIssue='Browser storage quota hit and session cache also failed.'; return {ok:false, error:(err1 && (err1.message||String(err1))) || (err2 && (err2.message||String(err2))) || 'Storage write failed'}; }
+    }
+  }
+  function parseSourceList(raw){
+    const parsed=parseMaybeJson(raw);
+    if(parsed && typeof parsed==='object' && !Array.isArray(parsed) && (parsed.items||parsed.rows||parsed.sources)) return [{url:'inline://social',name:'inline',headers:{},inlinePayload:parsed}];
+    if(Array.isArray(parsed)){
+      const looksLikeInline=parsed.some(x=>x && typeof x==='object' && !(x.url||x.href));
+      if(looksLikeInline) return [{url:'inline://social',name:'inline',headers:{},inlinePayload:parsed}];
+      return parsed.map(x=> typeof x==='string' ? ({url:x,name:inferPlatform(x,x),headers:{}}) : ({url:String(x.url||x.href||'').trim(), name:String(x.name||x.id||inferPlatform(x.url,x.name)).trim() || inferPlatform(x.url,x.name), headers:(x.headers&&typeof x.headers==='object')?x.headers:{}, inlinePayload:x && (x.items||x.rows) ? x : null})).filter(x=>x.url || x.inlinePayload);
+    }
+    return String(raw||'').split(/[\n,]+/).map(s=>s.trim()).filter(Boolean).map(url=>({url,name:inferPlatform(url,url),headers:{}}));
+  }
   function normalizeProxyItem(raw, sourceName='proxy', seq=0){ if(!raw) return null; const obj=typeof raw==='object' ? Object.assign({}, raw) : {text:String(raw)}; const text=normalizeText(obj.text||obj.body||obj.content||obj.caption||obj.message||obj.title||''); const title=normalizeText(obj.title||text||'Untitled'); const url=String(obj.url||obj.link||obj.href||'').trim(); const platform=obj.platform||inferPlatform(url,sourceName)||sourceName; const author=normalizeText(obj.author||obj.user||obj.channel||obj.account||obj.handle||''); const tsMs=asTsMs(obj.tsMs||obj.timestamp||obj.ts||obj.publishedAt||obj.date||obj.createdAt||obj.time) || Date.now()-seq*1000; const publishedAt=obj.publishedAt || new Date(tsMs).toISOString(); const item={ id:String(obj.id||obj.guid||'').trim() || hashish([sourceName,platform,author,url,tsMs,title,text,seq].join('|')), title, text:text||title, platform, source:sourceName||platform, author, url, publishedAt, durationSec:Number(obj.durationSec||extractDuration(title+' '+text)||0), phase:obj.phase||detectPhase(title+' '+text), code:obj.code||extractCode(title+' '+text) }; return normalizeSocialItem(item); }
   function extractItemsFromPayload(payload, sourceName='proxy'){ if(!payload) return []; if(Array.isArray(payload)) return payload.map((x,i)=>normalizeProxyItem(x,sourceName,i)).filter(Boolean); if(Array.isArray(payload.items)) return payload.items.map((x,i)=>normalizeProxyItem(x,sourceName,i)).filter(Boolean); if(Array.isArray(payload.rows)) return payload.rows.map((x,i)=>normalizeProxyItem(x,sourceName,i)).filter(Boolean); if(Array.isArray(payload.sources)){ let out=[]; payload.sources.forEach((src,idx)=>{ const name=src.name||src.id||sourceName||`source-${idx}`; out=out.concat(extractItemsFromPayload(src.items||src.rows||src, name)); }); return out; } const one=normalizeProxyItem(payload,sourceName,0); return one?[one]:[]; }
-  async function loadRemoteSocialSource(source){ try{ const res=await fetch(source.url,{headers:source.headers||{}}); if(!res.ok) throw new Error(`HTTP ${res.status}`); const ctype=String(res.headers.get('content-type')||'').toLowerCase(); let payload; if(ctype.includes('json')) payload=await res.json(); else { const txt=await res.text(); payload=parseMaybeJson(txt); if(!payload){ payload=txt.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,idx)=>({text:line, platform:source.name||inferPlatform(source.url,source.name), tsMs:Date.now()-idx*1000})); } } return {ok:true, items:extractItemsFromPayload(payload, source.name||inferPlatform(source.url,source.name)||'proxy'), error:''}; }catch(err){ return {ok:false, items:[], error:err.message||String(err)}; } }
-  function computeSourceHealth(source, items, ok, error=''){ const now=Date.now(); const d24=now-86400000; const d7=now-7*86400000; const rows=Array.isArray(items)?items:[]; const itemCount24h=rows.filter(x=>asTsMs(x.publishedAt)>=d24).length; const itemCount7d=rows.filter(x=>asTsMs(x.publishedAt)>=d7).length; const pDAIMatchCount=rows.filter(x=>/\bpdai\b/i.test(`${x.title||''} ${x.text||''}`)).length; const lastItemAt=rows.length ? Math.max(...rows.map(x=>asTsMs(x.publishedAt)||0)) : 0; let health='green'; if(!ok||error) health='red'; else if(!rows.length||itemCount7d===0) health='yellow'; return {name:source.name||inferPlatform(source.url,source.name)||'proxy', family:inferPlatform(source.url,source.name), configured:true, reachable:!!ok, lastFetchOkAt:ok?now:0, lastItemAt, itemCount24h, itemCount7d, pDAIMatchCount, failureStreak:ok?0:1, health, notes:error?[error]:[]}; }
+  async function loadRemoteSocialSource(source){
+    try{
+      if(source.inlinePayload) return {ok:true, items:extractItemsFromPayload(source.inlinePayload, source.name||'inline'), error:''};
+      if(String(source.url||'').startsWith('data:')){
+        const raw=decodeURIComponent(String(source.url).split(',').slice(1).join(','));
+        const payload=parseMaybeJson(raw) || raw.split(/\r?\n/).map((line,idx)=>({text:line.trim(), platform:source.name||'manual', tsMs:Date.now()-idx*1000})).filter(x=>x.text);
+        return {ok:true, items:extractItemsFromPayload(payload, source.name||'inline'), error:''};
+      }
+      const res=await fetch(source.url,{headers:source.headers||{}});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const ctype=String(res.headers.get('content-type')||'').toLowerCase();
+      let payload;
+      if(ctype.includes('json')) payload=await res.json();
+      else {
+        const txt=await res.text();
+        payload=parseMaybeJson(txt);
+        if(!payload){
+          payload=txt.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map((line,idx)=>({text:line, platform:source.name||inferPlatform(source.url,source.name), tsMs:Date.now()-idx*1000}));
+        }
+      }
+      return {ok:true, items:extractItemsFromPayload(payload, source.name||inferPlatform(source.url,source.name)||'proxy'), error:''};
+    }catch(err){
+      return {ok:false, items:[], error:err.message||String(err)};
+    }
+  }
+  function computeSourceHealth(source, items, ok, error=''){ const now=Date.now(); const d24=now-86400000; const d7=now-7*86400000; const rows=Array.isArray(items)?items:[]; const itemCount24h=rows.filter(x=>asTsMs(x.publishedAt)>=d24).length; const itemCount7d=rows.filter(x=>asTsMs(x.publishedAt)>=d7).length; const pDAIMatchCount=rows.filter(x=>/\bpdai\b/i.test(`${x.title||''} ${x.text||''}`)).length; const lastItemAt=rows.length ? Math.max(...rows.map(x=>asTsMs(x.publishedAt)||0)) : 0; let health='green'; if(!ok||error) health='red'; else if(!rows.length||itemCount7d===0) health='yellow'; return {name:source.name||inferPlatform(source.url,source.name)||'proxy', family:inferPlatform(source.url,source.name), configured:!!(source.url||source.inlinePayload), reachable:!!ok, lastFetchOkAt:ok?now:0, lastItemAt, itemCount24h, itemCount7d, pDAIMatchCount, failureStreak:ok?0:1, health, notes:error?[error]:[]}; }
 
 
-  function saveSettings(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings)); }
-  function saveHistory(v){ state.history=v; localStorage.setItem(HISTORY_KEY, JSON.stringify(v)); }
-  function saveSocialCache(v){ state.socialCache=v; localStorage.setItem(SOCIAL_CACHE_KEY, JSON.stringify(v)); }
-  function saveLastGood(v){ state.lastGood=v; localStorage.setItem(LASTGOOD_KEY, JSON.stringify(v)); }
-  function migrateLegacy(key, fallback){ const v=localStorage.getItem(key); if(v) return tryJson(v, fallback); return fallback; }
+  function saveSettings(){ state.settings=Object.assign({}, state.settings); safeStorageSet(STORAGE_KEY, state.settings, x=>x); }
+  function saveHistory(v){ state.history=v; return safeStorageSet(HISTORY_KEY, v, compactHistoryForStorage); }
+  function saveSocialCache(v){ state.socialCache=v; return safeStorageSet(SOCIAL_CACHE_KEY, v, compactSocialCacheForStorage); }
+  function saveLastGood(v){ state.lastGood=v; return safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage); }
+  function migrateLegacy(key, fallback){ const v=readStoredJson(key, null); if(v!==null && v!==undefined) return v; return fallback; }
   function loadSettings(){ return Object.assign({}, DEFAULTS, migrateLegacy(STORAGE_KEY, migrateLegacy(LEGACY_KEYS.settings, DEFAULTS))||{}); }
   function loadHistory(){ return migrateLegacy(HISTORY_KEY, migrateLegacy(LEGACY_KEYS.history, [])) || []; }
   function loadSocialCache(){ return migrateLegacy(SOCIAL_CACHE_KEY, migrateLegacy(LEGACY_KEYS.social, [])) || []; }
@@ -620,7 +715,8 @@
     if(!raw || !String(raw).trim()) return out;
     const txt=String(raw).trim();
     const json=tryJson(txt,null);
-    if(Array.isArray(json)) return json.map(normalizeSocialItem).filter(Boolean);
+    if(Array.isArray(json)) return json.map(x=>normalizeSocialItem(x)||normalizeProxyItem(x,'manual')).filter(Boolean);
+    if(json && typeof json==='object') return extractItemsFromPayload(json, 'manual').filter(Boolean);
     txt.split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach((line,idx)=>{
       const item={id:`manual:${idx}:${line.slice(0,30)}`,title:line,text:line,platform:'manual',source:'manual'};
       const dur=line.match(/(\d+(?:\.\d+)?)\s*s\b/i); if(dur) item.durationSec=Number(dur[1]);
@@ -635,7 +731,6 @@
     });
     return out.filter(Boolean);
   }
-
   function normalizeSocialItem(x){
     if(!x) return null;
     const item=Object.assign({}, x);
@@ -2005,7 +2100,7 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     return result;
   }
   async function v39RunLeadEngine(ctx){ const leads=v39BuildInitialLeads(ctx.bundle, ctx.socialState); leads.forEach(v39ComputeLeadPriority); leads.sort((a,b)=>b.score-a.score); const active=leads.slice(0, Math.max(1, v39Num(ctx.settings.maxLeadExpansionsPerCycle,8))); const results=[]; const tripwires=[]; for(const lead of active){ const result=await v39ExecuteLead(lead, ctx); results.push(result); if(result.tripwires.length) tripwires.push(...result.tripwires); lead.status=result.tripwires.length?'promoted':result.score>=0.58?'expanding':'stalled'; lead.followupsRun.push(...result.modules.map(m=>m.name)); lead.evidence.push(...result.modules.map(m=>`${m.name}:${m.score.toFixed(3)}`), ...result.tripwires.map(t=>`${t.name}:${t.score.toFixed(3)}`)); lead.score=result.score; } return {leads, active, results, tripwires, summary:active.length ? `Executed ${active.length} lead(s) in ${ctx.settings.huntMode||'hunt'} mode; promoted ${tripwires.length} tripwire(s).` : 'No active leads available.'}; }
-  function v39SourceCoverage(socialState){ const rows=socialState.sourceHealth.length ? socialState.sourceHealth : [{name:'social', family:'manual', configured:false, reachable:false, lastFetchOkAt:0, lastItemAt:0, itemCount24h:0, itemCount7d:0, pDAIMatchCount:0, failureStreak:0, health:'red', notes:['No social source is configured.']}]; const green=rows.filter(r=>r.health==='green').length; const red=rows.filter(r=>r.health==='red').length; return {rows, summary:`Source coverage: ${green} green / ${red} red across ${rows.length} source family(ies).`}; }
+  function v39SourceCoverage(socialState){ const rows=socialState.sourceHealth.length ? socialState.sourceHealth : []; const green=rows.filter(r=>r.health==='green').length; const red=rows.filter(r=>r.health==='red').length; return {rows, summary:rows.length ? `Source coverage: ${green} green / ${red} red across ${rows.length} source family(ies).` : 'Source coverage: no social source is configured yet.'}; }
   function v39RegenEvidence(bundle, leadState, socialState){ const rows=[ {name:'Slot wake / shell fracture', kind:'hard', score:leadState.tripwires.some(t=>t.name==='classified-zero-write')?0.72:0, status:leadState.tripwires.some(t=>t.name==='classified-zero-write')?'observed':'missing', why:leadState.tripwires.some(t=>t.name==='classified-zero-write')?'Classified zero-write behavior now points at balance/allowance-class mutation.':'Watched slots still need a fresh live mutation.'}, {name:'Relayer → manifold call', kind:'hard', score:leadState.tripwires.some(t=>t.name==='approval-shell-active')?0.58:0, status:leadState.tripwires.some(t=>t.name==='approval-shell-active')?'observed':'missing', why:leadState.tripwires.some(t=>t.name==='approval-shell-active')?'Lead spender remains active on the approval surface.':'No relayer/manifold fingerprint is visible at hard-proof level yet.'}, {name:'Reactive reserve window hit', kind:'hard', score:socialState.windows.length?0.28:0, status:socialState.windows.length?'watching':'missing', why:socialState.windows.length?`Real timing windows are loaded (${socialState.windows.length}).`:'No decisive anchor motion overlaps a top window yet.'}, {name:'11-block symmetry', kind:'soft', score:v39Num(bundle?.lastGood?.symmetrySniffer?.score), status:'observed', why:bundle?.lastGood?.symmetrySniffer?.lead?.window?`Lead ${bundle.lastGood.symmetrySniffer.lead.window} remains on watch.`:'Symmetry watch active.'}, {name:'Zero-write trace hint', kind:'soft', score:v39Num(bundle?.lastGood?.zeroingAnalysis?.score), status:'observed', why:bundle?.lastGood?.zeroingAnalysis?.summary||'Trace support is live.'}, {name:'Social window coverage', kind:'soft', score:clamp(Math.min(0.95,socialState.windows.length/40),0,1), status:socialState.windows.length?'observed':'missing', why:socialState.windows.length?`Loaded ${socialState.socialCache.length} social item(s) and ${socialState.windows.length} real window(s).`:'Social timing is currently missing.'}, {name:'Aggressive lead follow-up', kind:'soft', score:clamp(Math.min(0.95,leadState.active.length/8),0,1), status:leadState.active.length?'observed':'missing', why:leadState.summary} ]; const hard=avg(rows.filter(r=>r.kind==='hard').map(r=>r.score)); const soft=avg(rows.filter(r=>r.kind==='soft').map(r=>r.score)); return {rows, hard, soft, summary:`Evidence ledger: hard ${(hard*100).toFixed(1)}% • soft ${(soft*100).toFixed(1)}%.`}; }
   function v39RegenExecutionHunt(bundle, leadState){ const support=leadState.results.slice(0,6).map(r=>({title:`${r.kind} lead`, text:`${addrShort(r.target)} ran ${r.modules.length} module(s) and promoted ${r.tripwires.length} tripwire(s).`, score:r.score})); return {score:clamp(avg(leadState.results.map(r=>r.score)),0,1), support, summary:support.length ? `Aggressive execution hunt expanded ${support.length} lead(s).` : (bundle?.lastGood?.executionHunt?.summary || 'Execution hunt is quiet.')}; }
   function v39RegenClarifier(bundle, socialState, leadState){ const prev=v39SafeObject(bundle?.lastGood?.clarifier); const socialBoost=socialState.windows.length ? clamp(Math.min(0.18,socialState.windows.length/100),0,1) : 0; const tripwireBoost=clamp(Math.min(0.45,leadState.tripwires.length*0.12),0,1); const activeLeadBoost=clamp(Math.min(0.16,leadState.active.length*0.02),0,1); const supportScores=leadState.results.flatMap(r=>r.modules.map(m=>m.score)); const hardTrip=clamp(avg(leadState.tripwires.map(t=>t.score)),0,1); const softScore=clamp(avg(supportScores),0,1); const prep=clamp(Math.max(v39Num(prev.prep,0.82), 0.68 + softScore*0.22),0,1); const exec=clamp(Math.max(v39Num(prev.exec,0.18), hardTrip*0.65 + tripwireBoost*0.35 + socialBoost*0.22),0,1); const hard=hardTrip; const soft=clamp((softScore+activeLeadBoost+socialBoost*0.5)/1.5,0,1); const debt=clamp(Math.min(v39Num(prev.debt,1), 1-(hard*0.5 + soft*0.3 + socialBoost*0.2)),0,1); const clarity=clamp(Math.max(v39Num(prev.clarity,0), (hard*0.45 + soft*0.3 + socialBoost*0.25)),0,1); const supports=[`Lead executor promoted ${leadState.tripwires.length} tripwire(s).`, `${socialState.socialCache.length} social item(s) and ${socialState.windows.length} real window(s) are loaded.`, `Aggressive hunt mode is ${state.settings.huntMode||'predator'}.`, `Hard evidence pressure now derives from tripwire promotion rather than anomaly vibes alone.`]; if(leadState.tripwires.length) supports.push(...leadState.tripwires.slice(0,4).map(t=>`${t.name} fired at ${Math.round(t.score*100)}%.`)); return {prep, exec, debt, clarity, hard, soft, stateText:exec>0.55?'execution-rising':'preparation-heavy', verdict:exec>0.55?'Tripwire pressure is rising toward execution':'Preparation still dominates, but the hunt engine is now active', hint:`Prep ${(prep*100).toFixed(1)}% • Execution ${(exec*100).toFixed(1)}% • Debt ${(debt*100).toFixed(1)}% • Clarity ${(clarity*100).toFixed(1)}%.`, supports, disconfirm:['Watched slots may still be null-null until a fresh live mutation appears.','Mint / burn shell evidence may still be absent.','Hard proof still depends on new live chain events, not only historical bundle structure.'], proveNext:['A watched slot flipping from null to non-zero.','A strong social window causing direct reserve motion at an anchor pair.','Allowance deltas or revoke waves around 5EF7 or lead spenders.','A same-code cluster showing common gas seeding or deterministic discharge.','A repeated lane showing stable conservation and low-variance half-life recapture.'], weaken:['Tripwires fail to recur across multiple cycles.','Social windows load but do not overlap meaningful chain motion.','Lead spender contracts remain noisy without route-specific behavior.','Candidate accumulation normalizes without discharge or slot movement.'], pressure:[{name:'Preparation', score:prep, hint:'warehousing + approvals + thin-LP + active route graph'},{name:'Execution', score:exec, hint:'tripwire promotion + real windows + route proof'},{name:'Contradiction debt', score:debt, hint:'missing shell / reserve / slot proof still matters'},{name:'Clarity', score:clarity, hint:'quality of converged evidence'}]}; }
@@ -2361,8 +2456,12 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
       state.settings=loadSettings();
       const model=await buildModel();
       render(model);
-      saveLastGood(snapshot(model));
-      const hist=loadHistory(); hist.push(snapshot(model)); saveHistory(hist.slice(-120));
+      const persistedLast=saveLastGood(snapshot(model));
+      const hist=loadHistory(); hist.push(snapshot(model));
+      const persistedHistory=saveHistory(hist.slice(-120));
+      const persistWarn=[persistedLast, persistedHistory].filter(x=>x && x.ok && x.via && x.via!=='local').map(x=>x.via);
+      if(persistWarn.length){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode`; }
+      else if(state.persistIssue){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${state.persistIssue}`; }
     }catch(err){
       console.error(err);
       const fallback = state.importedBundle ? safeImportedRender(state.importedBundle) : state.lastGood;
@@ -2474,7 +2573,7 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
       if(bundle.lastGood) saveLastGood(bundle.lastGood);
       render(safeImportedRender(bundle));
       $('syncStatus').textContent='bundle loaded'; $('syncStatus').className='status info';
-      $('lastSync').textContent='Imported bundle loaded. Refresh to run live integrated V39 logic.';
+      $('lastSync').textContent='Imported bundle loaded. Refresh to run live integrated V39 logic.' + (state.persistIssue?(' • '+state.persistIssue):'');
     }catch(err){ alert('Import failed: '+(err.message||String(err))); }
     e.target.value='';
   });
