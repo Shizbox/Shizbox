@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V42.3 Predictive Maria Filter Auditor</title>
+<title>pDAI Peg Prover • V42.4 Predictive Maria Filter Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,8 +84,8 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.3 Semantic Maria Closure Auditor</h1>
-      <div class="sub">V42.3 keeps your exact V38→V42.3 tool and layers predictive Maria filtering directly into it: recursive window density lift, nexus-lane auto-pinning, negative-evidence scoring, semantic motif recurrence, Stage 0.5 pre-shell trie gating, routed manifold ingress, and hard separation between hunt pressure and formal execution.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.4 Semantic Maria Closure Auditor</h1>
+      <div class="sub">V42.4 keeps your exact V38→V42.4 tool and layers Maria rehydration closure directly into it: cue-memory persistence, automatic social/window rebuilds, persistence-fault detection, recursive window density lift, nexus-lane auto-pinning, negative-evidence scoring, semantic motif recurrence, Stage 0.5 pre-shell trie gating, routed manifold ingress, and hard separation between hunt pressure and formal execution.</div>
       <div class="chips">
         <div class="chip good">Imports prior V31–V38 bundle JSON</div>
         <div class="chip info">Adds integrated V42.1 Maria corpus cycles</div>
@@ -529,8 +529,10 @@
     manualSocial:'',
     researchCorpus:'',
     mariaCueDrop:'',
+    mariaCueMemory:'',
     mariaGlossary:'',
     mariaMode:MARIA_MODE_DEFAULT,
+    mariaStateFault:'',
     speculateLevel:8,
     deepSweepEvery:4,
     relayerHints:'',
@@ -553,7 +555,7 @@
   };
 
   const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[], persistIssue:''};
-  state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]});
+  state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
 
   function $(id){ return document.getElementById(id); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -686,10 +688,43 @@
   }
   function computeSourceHealth(source, items, ok, error=''){ const now=Date.now(); const d24=now-86400000; const d7=now-7*86400000; const rows=Array.isArray(items)?items:[]; const itemCount24h=rows.filter(x=>asTsMs(x.publishedAt)>=d24).length; const itemCount7d=rows.filter(x=>asTsMs(x.publishedAt)>=d7).length; const pDAIMatchCount=rows.filter(x=>/\bpdai\b/i.test(`${x.title||''} ${x.text||''}`)).length; const lastItemAt=rows.length ? Math.max(...rows.map(x=>asTsMs(x.publishedAt)||0)) : 0; let health='green'; if(!ok||error) health='red'; else if(!rows.length||itemCount7d===0) health='yellow'; return {name:source.name||inferPlatform(source.url,source.name)||'proxy', family:inferPlatform(source.url,source.name), configured:!!(source.url||source.inlinePayload), reachable:!!ok, lastFetchOkAt:ok?now:0, lastItemAt, itemCount24h, itemCount7d, pDAIMatchCount, failureStreak:ok?0:1, health, notes:error?[error]:[]}; }
 
+  function collectMariaCueStrings(modelLike){
+    const rows=[];
+    const pushText=v=>{
+      if(v===null||v===undefined) return;
+      String(v).split(/\n+/).map(s=>normalizeText(s)).filter(Boolean).forEach(s=>rows.push(s));
+    };
+    const pushItem=x=>{
+      if(!x) return;
+      const blob=`${x.title||''} ${x.text||''} ${x.url||''}`;
+      if(!(x.isMaria || String(x.source||'').toLowerCase()==='maria' || looksMariaText(blob))) return;
+      const preferred=normalizeText(String(x.url||x.text||x.title||''));
+      if(preferred) rows.push(preferred);
+    };
+    const walk=obj=>{
+      if(!obj||typeof obj!=='object') return;
+      pushText(obj?.settings?.mariaCueDrop);
+      pushText(obj?.settings?.mariaCueMemory);
+      pushText(obj?.mariaCueDrop);
+      pushText(obj?.mariaCueMemory);
+      v39SafeArray(obj?.socialCache).forEach(pushItem);
+      v39SafeArray(obj?.social).forEach(pushItem);
+      v39SafeArray(obj?.windows).forEach(pushItem);
+      v39SafeArray(obj?.lastGood?.social).forEach(pushItem);
+      v39SafeArray(obj?.lastGood?.windows).forEach(pushItem);
+      v39SafeArray(obj?.history).forEach(h=>{
+        v39SafeArray(h?.social).forEach(pushItem);
+        v39SafeArray(h?.windows).forEach(pushItem);
+        pushText(h?.mariaCueDrop);
+        pushText(h?.mariaCueMemory);
+      });
+      if(obj?.importedBundle) walk(obj.importedBundle);
+    };
+    walk(modelLike);
+    return uniq(rows.filter(Boolean), x=>String(x).trim().toLowerCase());
+  }
   function deriveMariaCueDropFromState(modelLike){
-    const all=[...(Array.isArray(modelLike?.socialCache)?modelLike.socialCache:[]), ...(Array.isArray(modelLike?.social)?modelLike.social:[]), ...(Array.isArray(modelLike?.lastGood?.social)?modelLike.lastGood.social:[]), ...((Array.isArray(modelLike?.history)?modelLike.history:[]).flatMap(h=>Array.isArray(h?.social)?h.social:[]))];
-    const maria=uniq(all.filter(x=>x && (x.isMaria || String(x.source||'').toLowerCase()==='maria' || looksMariaText(`${x.title||''} ${x.text||''} ${x.url||''}`))), x=>String(x.url||x.text||x.title||x.id||'').trim()).map(x=>String(x.url||x.text||x.title||'').trim()).filter(Boolean);
-    return maria.join('\n');
+    return collectMariaCueStrings(modelLike).join('\n');
   }
   function deriveFocusNexusFromState(modelLike, focusWallet='', focusSpender=''){
     const transfers=[...(Array.isArray(modelLike?.signalBrain?.contractIntel?.transfers)?modelLike.signalBrain.contractIntel.transfers:[]), ...((Array.isArray(modelLike?.lastGood?.signalBrain?.contractIntel?.transfers)?modelLike.lastGood.signalBrain.contractIntel.transfers:[]))];
@@ -712,9 +747,20 @@
     const s=Object.assign({}, settings||{});
     if(!String(s.mariaMode||'').trim()) s.mariaMode=MARIA_MODE_DEFAULT;
     if(!String(s.mariaGlossary||'').trim()) s.mariaGlossary=DEFAULT_MARIA_GLOSSARY.join('\n');
-    if(!String(s.mariaCueDrop||'').trim()){
-      const derived=deriveMariaCueDropFromState(modelLike);
-      if(derived) s.mariaCueDrop=derived;
+    const derived=deriveMariaCueDropFromState(modelLike);
+    const mergedCueLines=uniq([
+      ...String(s.mariaCueDrop||'').split(/\n+/),
+      ...String(s.mariaCueMemory||'').split(/\n+/),
+      ...String(derived||'').split(/\n+/)
+    ].map(x=>normalizeText(x)).filter(Boolean), x=>x.toLowerCase());
+    const mergedCueDrop=mergedCueLines.join('\n');
+    if(mergedCueDrop){
+      s.mariaCueDrop=mergedCueDrop;
+      s.mariaCueMemory=mergedCueDrop;
+      s.mariaStateFault='';
+    }else{
+      const historicalMaria=collectMariaCueStrings(modelLike).length>0;
+      s.mariaStateFault=historicalMaria ? 'semantic-present-no-cues' : (String(s.mariaMode||'')===MARIA_MODE_DEFAULT && !String(s.mariaGlossary||'').trim() ? '' : 'semantic-present-no-cues');
     }
     const spender=v40NormalizeAddr(s.focusSpender)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.spender);
     const wallet=v40NormalizeAddr(s.focusWallet)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.wallet);
@@ -729,15 +775,36 @@
     return s;
   }
 
-  function saveSettings(){ state.settings=rehydrateMariaSettings(Object.assign({}, state.settings), {history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]}); safeStorageSet(STORAGE_KEY, state.settings, x=>x); }
+  function saveSettings(){
+    state.settings=rehydrateMariaSettings(Object.assign({}, state.settings), {history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
+    if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
+    safeStorageSet(STORAGE_KEY, state.settings, x=>x);
+  }
   function saveHistory(v){ state.history=v; return safeStorageSet(HISTORY_KEY, v, compactHistoryForStorage); }
   function saveSocialCache(v){ state.socialCache=v; return safeStorageSet(SOCIAL_CACHE_KEY, v, compactSocialCacheForStorage); }
-  function saveLastGood(v){ state.lastGood=v; state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:v,socialCache:state.socialCache,social:v?.social||[]}); const saved=safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage); safeStorageSet(STORAGE_KEY, state.settings, x=>x); return saved; }
+  function saveLastGood(v){
+    state.lastGood=v;
+    state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:v,socialCache:state.socialCache,social:v?.social||[],windows:v?.windows||[],importedBundle:state.importedBundle});
+    if(v && typeof v==='object'){
+      if(state.settings.mariaCueMemory && !v.mariaCueMemory) v.mariaCueMemory=state.settings.mariaCueMemory;
+      if(state.settings.mariaCueDrop && !v.mariaCueDrop) v.mariaCueDrop=state.settings.mariaCueDrop;
+    }
+    const saved=safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage);
+    safeStorageSet(STORAGE_KEY, state.settings, x=>x);
+    if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
+    return saved;
+  }
   function migrateLegacy(key, fallback){ const v=readStoredJson(key, null); if(v!==null && v!==undefined) return v; return fallback; }
-  function loadSettings(){ return rehydrateMariaSettings(Object.assign({}, DEFAULTS, migrateLegacy(STORAGE_KEY, migrateLegacy(LEGACY_KEYS.settings, DEFAULTS))||{}), {}); }
   function loadHistory(){ return migrateLegacy(HISTORY_KEY, migrateLegacy(LEGACY_KEYS.history, [])) || []; }
   function loadSocialCache(){ return migrateLegacy(SOCIAL_CACHE_KEY, migrateLegacy(LEGACY_KEYS.social, [])) || []; }
   function loadLastGood(){ return migrateLegacy(LASTGOOD_KEY, migrateLegacy(LEGACY_KEYS.last, null)); }
+  function loadSettings(){
+    const storedSettings=migrateLegacy(STORAGE_KEY, migrateLegacy(LEGACY_KEYS.settings, DEFAULTS))||{};
+    const hist=loadHistory();
+    const sc=loadSocialCache();
+    const lg=loadLastGood();
+    return rehydrateMariaSettings(Object.assign({}, DEFAULTS, storedSettings), {history:hist,lastGood:lg,socialCache:sc,social:lg?.social||[],windows:lg?.windows||[]});
+  }
 
   async function postJson(url, payload){ const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); }
 
@@ -1007,6 +1074,7 @@ function parseManualSocial(raw){
     const corpusItems=parseManualSocial(state.settings.researchCorpus);
     const mariaItems=v39UniqBy([
       ...parseMariaCueText(state.settings.mariaCueDrop),
+      ...parseMariaCueText(state.settings.mariaCueMemory),
       ...parseMariaCueText(state.settings.manualSocial),
       ...parseMariaCueText(state.settings.researchCorpus)
     ], x=>x.id||`${x.url||''}|${x.title||''}|${x.publishedAt||''}`);
@@ -2650,7 +2718,7 @@ function v40PickFocus(baseModel){
         {label:'V40 focus pack', value:`${addrShort(focus.spender)} / ${addrShort(focus.wallet)}`, hint:focus.summary, cls:'good'},
         {label:'V40 social blocker', value:(modules.find(m=>m.name==='social-correlation')?.windows||0)?'real windows present':'no real windows', hint:modules.find(m=>m.name==='social-correlation')?.summary||'Social correlation watch is active.', cls:(modules.find(m=>m.name==='social-correlation')?.windows||0)?'good':'warn'},
         {label:'V40 focus tripwires', value:`${tripwires.length} hard hit(s)`, hint:tripwires.length?tripwires.map(t=>t.name).join(', '):'No V40 focus tripwire promoted this cycle.', cls:tripwires.length?'good':'info'},
-        {label:'V42.3 focus nexus', value:state.settings.focusNexus?addrShort(state.settings.focusNexus):'auto-none', hint:(modules.find(m=>m.name==='routed-manifold-ingress')?.summary)||'Routed nexus promotion is active.', cls:state.settings.focusNexus?'good':'warn'}
+        {label:'V42.4 focus nexus', value:state.settings.focusNexus?addrShort(state.settings.focusNexus):'auto-none', hint:(modules.find(m=>m.name==='routed-manifold-ingress')?.summary)||'Routed nexus promotion is active.', cls:state.settings.focusNexus?'good':'warn'}
       ],
       summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V40 focus ${addrShort(focus.spender)} with ${tripwires.length} focus tripwire(s).`,
       pills:v39UniqBy([...(v39SafeArray(baseModel.systemAudit?.pills)), 'v40', tripwires.length?'focus-tripwire':'focus-watch', (modules.find(m=>m.name==='social-correlation')?.windows||0)?'social-real':'social-missing'], x=>x)
@@ -2661,7 +2729,7 @@ function v40PickFocus(baseModel){
         {label:'V40 focus spender', value:addrShort(focus.spender), hint:`Auto-lock is targeting the most persistent manifold in the current state.`},
         {label:'V40 focus wallet', value:addrShort(focus.wallet), hint:`Current preferred discharge wallet for the focus lane.`},
         {label:'V40 live gate', value:(modules.find(m=>m.name==='focus-pull-path')?.directWalletSpender||0)?'direct pull-path observed':((modules.find(m=>m.name==='routed-manifold-ingress')?.lanes||0)?'routed ingress observed':'waiting on direct pull-path'), hint:(modules.find(m=>m.name==='focus-pull-path')?.summary||modules.find(m=>m.name==='routed-manifold-ingress')?.summary||'Focus pull-path watch is active.')},
-        {label:'V42.3 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'No export is valid unless mariaCueDrop and mariaGlossary survive rehydration.'}
+        {label:'V42.4 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'No export is valid unless mariaCueDrop and mariaGlossary survive rehydration.'}
       ],
       summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V40 is waiting for the focus spender to graduate from approval-shell persistence into a direct wallet/core pull-path.`
     };
@@ -2674,7 +2742,7 @@ function v40PickFocus(baseModel){
         `Focus spender lock: ${focus.spender?addrShort(focus.spender):'auto-none'}.`,
         `Focus wallet lock: ${focus.wallet?addrShort(focus.wallet):'auto-none'}.`,
         `Focus core lock: ${focus.core?addrShort(focus.core):'auto-none'}.`,
-        `V40/V42.3 added pull-path, routed-ingress, window-gating, allowance-shock, terminal-discharge, trie-drift, pre-shell-trie, burn-rail, and social-blocker modules.`,
+        `V40/V42.4 added pull-path, routed-ingress, window-gating, allowance-shock, terminal-discharge, trie-drift, pre-shell-trie, burn-rail, and social-blocker modules.`,
         `V40 promoted ${tripwires.length} focus-layer tripwire(s).`
       ],
       summary:`V40 focus pack ${addrShort(focus.spender)} / ${addrShort(focus.wallet)} / ${addrShort(focus.core)} with ${tripwires.length} promoted focus tripwire(s).`
@@ -2732,7 +2800,7 @@ ${state.settings.researchCorpus||''}`);
     ];
     const windowRows=windows.slice(0,12).map(w=>({title:w.title||w.phase||'window', phase:w.phase||'maria', block:Math.round(w.approxBlock||0), range:`${Math.round(w.fromBlock||0)}→${Math.round(w.toBlock||0)}`, tags:(w.tags||[]).join(', ')}));
     const summary=items.length ? `V42 Maria engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), ${glossary.length} glossary mapping(s), and ${hypos.filter(h=>h.score>=0.55).length} active semantic hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and semantic hypotheses.';
-    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.3 layered Gemini's Maria corpus directly into V42.1.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
+    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.4 layered Gemini's Maria corpus directly into V42.1.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
   }
 
   function applyV41Upgrade
@@ -2774,7 +2842,7 @@ ${state.settings.researchCorpus||''}`);
       ...maria,
       summary:maria.summary
     };
-    baseModel.version='V42.3 Semantic Maria Closure Auditor';
+    baseModel.version='V42.4 Semantic Maria Closure Auditor';
     return baseModel;
   }
 
@@ -2868,26 +2936,26 @@ ${state.settings.researchCorpus||''}`);
         {name:'Negative evidence ledger', kind:'soft', score:1-(neg.score||0), status:(neg.misses||0)?'observed':'quiet', why:neg.summary||'Negative evidence scoring is idle.'},
         {name:'Semantic motif recurrence', kind:'soft', score:pget('motif-recurrence').score||0, status:(pget('motif-recurrence').spenderHits||0)>=3?'observed':'watching', why:pget('motif-recurrence').summary||'Motif recurrence watch is idle.'}
       ],
-      summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.3 predictive filtering added density lift, negative evidence, and motif recurrence.`
+      summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.4 predictive filtering added density lift, negative evidence, and motif recurrence.`
     };
     baseModel.systemAudit={
       ...baseModel.systemAudit,
       rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
-        {label:'V42.3 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'Maria cue drop and glossary are rehydrated from live state/history before export.', cls:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'good':'warn'},
-        {label:'V42.3 recursive density', value:(pget('window-density-lift').lift||0)?`${(pget('window-density-lift').lift||0).toFixed(2)}x`:'watching', hint:pget('window-density-lift').summary||'Window density lift is idle.', cls:(pget('window-density-lift').lift||0)>1.5?'good':'warn'},
-        {label:'V42.3 negative evidence', value:(neg.misses||0)?`${neg.misses}/${neg.checks}`:'clear', hint:(neg.reasons||[])[0]||neg.summary||'Negative evidence scoring is idle.', cls:(neg.misses||0)?'warn':'good'},
-        {label:'V42.3 motif recurrence', value:(pget('motif-recurrence').spenderHits||0)?`${pget('motif-recurrence').spenderHits} snapshot(s)`:'watching', hint:pget('motif-recurrence').summary||'Motif recurrence is idle.', cls:(pget('motif-recurrence').spenderHits||0)>=3?'good':'info'}
+        {label:'V42.4 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'Maria cue drop and glossary are rehydrated from live state/history before export.', cls:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'good':'warn'},
+        {label:'V42.4 recursive density', value:(pget('window-density-lift').lift||0)?`${(pget('window-density-lift').lift||0).toFixed(2)}x`:'watching', hint:pget('window-density-lift').summary||'Window density lift is idle.', cls:(pget('window-density-lift').lift||0)>1.5?'good':'warn'},
+        {label:'V42.4 negative evidence', value:(neg.misses||0)?`${neg.misses}/${neg.checks}`:'clear', hint:(neg.reasons||[])[0]||neg.summary||'Negative evidence scoring is idle.', cls:(neg.misses||0)?'warn':'good'},
+        {label:'V42.4 motif recurrence', value:(pget('motif-recurrence').spenderHits||0)?`${pget('motif-recurrence').spenderHits} snapshot(s)`:'watching', hint:pget('motif-recurrence').summary||'Motif recurrence is idle.', cls:(pget('motif-recurrence').spenderHits||0)>=3?'good':'info'}
       ],
-      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.3 enforces recursive window gating, negative evidence, nexus promotion, and motif recurrence.`
+      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.4 enforces recursive window gating, negative evidence, nexus promotion, and motif recurrence.`
     };
     baseModel.proveLoop={
       ...baseModel.proveLoop,
       rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
-        {label:'V42.3 recursive window gate', value:(pget('window-density-lift').lift||0)>1.5?'reactive':'watching', hint:pget('window-density-lift').summary||'Recursive window gate is idle.'},
-        {label:'V42.3 Stage 0.5', value:(prior.find(m=>m.name==='pre-shell-trie')?.currentHits||0)?'pre-shell activation':'watching', hint:prior.find(m=>m.name==='pre-shell-trie')?.summary||'Pre-shell trie gate is active.'},
-        {label:'V42.3 contradiction filter', value:(neg.misses||0)?`${neg.misses} miss(es)`:'clear', hint:neg.summary||'Negative evidence scoring is idle.'}
+        {label:'V42.4 recursive window gate', value:(pget('window-density-lift').lift||0)>1.5?'reactive':'watching', hint:pget('window-density-lift').summary||'Recursive window gate is idle.'},
+        {label:'V42.4 Stage 0.5', value:(prior.find(m=>m.name==='pre-shell-trie')?.currentHits||0)?'pre-shell activation':'watching', hint:prior.find(m=>m.name==='pre-shell-trie')?.summary||'Pre-shell trie gate is active.'},
+        {label:'V42.4 contradiction filter', value:(neg.misses||0)?`${neg.misses} miss(es)`:'clear', hint:neg.summary||'Negative evidence scoring is idle.'}
       ],
-      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.3 uses recursive window density, negative evidence, and motif recurrence to move from observation to predictive filtering.`
+      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.4 uses recursive window density, negative evidence, and motif recurrence to move from observation to predictive filtering.`
     };
     baseModel.clarifier={
       ...baseModel.clarifier,
@@ -2896,15 +2964,15 @@ ${state.settings.researchCorpus||''}`);
       supports:v40AppendUniqueText(baseModel.clarifier?.supports, [pget('window-density-lift').summary, pget('motif-recurrence').summary].filter(Boolean), 22),
       disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm, (neg.reasons||[]).slice(0,4), 22),
       proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext, ['Auto-promote nexus addresses that bridge focus wallet and focus spender inside the same Maria window.', 'Compare react33 versus base11 density before counting a Maria reaction as meaningful.', 'Use negative evidence to raise debt when expected semantic behavior fails to appear.'], 22),
-      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.3 density ${(pget('window-density-lift').lift||0).toFixed(2)}x • motif ${(pget('motif-recurrence').spenderHits||0)} • negative ${(neg.misses||0)}/${(neg.checks||0)}.`
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.4 density ${(pget('window-density-lift').lift||0).toFixed(2)}x • motif ${(pget('motif-recurrence').spenderHits||0)} • negative ${(neg.misses||0)}/${(neg.checks||0)}.`
     };
     baseModel.v42_3={
       laws:['persistence','split-scoring','semantic-ingress','recursive-window-gating','negative-evidence','motif-recurrence'],
       focusNexus:state.settings.focusNexus||'',
       predictiveModules:predictive,
-      summary:`V42.3 predictive Maria filtering is active around ${addrShort(focus.spender)} with nexus ${addrShort(state.settings.focusNexus||'')||'—'} and density lift ${(pget('window-density-lift').lift||0).toFixed(2)}x.`
+      summary:`V42.4 predictive Maria filtering is active around ${addrShort(focus.spender)} with nexus ${addrShort(state.settings.focusNexus||'')||'—'} and density lift ${(pget('window-density-lift').lift||0).toFixed(2)}x.`
     };
-    baseModel.version='V42.3 Predictive Maria Filter Auditor';
+    baseModel.version='V42.4 Predictive Maria Filter Auditor';
     return baseModel;
   }
   async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); return applyV42_3Upgrade(v41); }
@@ -3370,8 +3438,16 @@ ${state.settings.researchCorpus||''}`);
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_3-history.json', state.history);
-  $('exportBtn').onclick=()=> { state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]}); downloadJson('pdai-v42_3-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle}); };
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_4-history.json', state.history);
+  $('exportBtn').onclick=()=> {
+    state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
+    if(state.lastGood && typeof state.lastGood==='object'){
+      if(state.settings.mariaCueDrop && !state.lastGood.mariaCueDrop) state.lastGood.mariaCueDrop=state.settings.mariaCueDrop;
+      if(state.settings.mariaCueMemory && !state.lastGood.mariaCueMemory) state.lastGood.mariaCueMemory=state.settings.mariaCueMemory;
+    }
+    if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
+    downloadJson('pdai-v42_4-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+  };
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
     try{
