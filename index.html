@@ -465,6 +465,7 @@
   const HISTORY_KEY='pdai-v33-history';
   const SOCIAL_CACHE_KEY='pdai-v33-social-cache';
   const LASTGOOD_KEY='pdai-v33-last-good';
+  const MARIA_CUE_MEMORY_KEY='pdai-v33-maria-cue-memory';
   const LEGACY_KEYS={settings:'pdai-v31-settings', history:'pdai-v31-history', social:'pdai-v31-social-cache', last:'pdai-v31-last-good'};
   const NULL32='0x' + '0'.repeat(64);
   const TOPIC_TRANSFER='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55aeb';
@@ -588,6 +589,11 @@
   function normalizeText(s){ return String(s||'').replace(/\s+/g,' ').trim(); }
   function shortHash(hash=''){ const h=String(hash||''); return h ? `${h.slice(0,10)}…${h.slice(-8)}` : '—'; }
   function readStoredJson(key, fallback){ for(const store of [localStorage, sessionStorage]){ try{ const v=store.getItem(key); if(v) return tryJson(v, fallback); }catch{} } return fallback; }
+  function cueTextFromAny(v){ if(v===null||v===undefined) return ''; if(Array.isArray(v)) return v.map(x=>cueTextFromAny(x)).filter(Boolean).join('\n'); if(typeof v==='object') return cueTextFromAny(v.text||v.url||v.title||''); return String(v||'').trim(); }
+  function mergeCueLines(){ const parts=[...arguments].flatMap(x=>String(cueTextFromAny(x)||'').split(/\n+/)); return uniq(parts.map(normalizeText).filter(Boolean), x=>x.toLowerCase()).join('\n'); }
+  function loadMariaCueMemoryStore(){ return cueTextFromAny(readStoredJson(MARIA_CUE_MEMORY_KEY,'')); }
+  function saveMariaCueMemoryStore(v){ const txt=mergeCueLines(v); if(!txt) return {ok:false, via:'none'}; return safeStorageSet(MARIA_CUE_MEMORY_KEY, txt, x=>String(x||'')); }
+  function collectResearchCorpusText(modelLike){ const rows=[]; const pushText=v=>{ const text=cueTextFromAny(v); if(text) rows.push(text); }; const walk=obj=>{ if(!obj||typeof obj!=='object') return; pushText(obj?.settings?.researchCorpus); pushText(obj?.researchCorpus); (Array.isArray(obj?.history)?obj.history:[]).forEach(h=>pushText(h?.researchCorpus)); if(obj?.importedBundle) walk(obj.importedBundle); }; walk(modelLike); return uniq(rows.map(normalizeText).filter(Boolean), x=>x.toLowerCase()).join('\n\n'); }
   function trimLongText(s, max=900){ const text=String(s||''); return text.length>max ? text.slice(0,max)+'…' : text; }
   function limitArray(arr, max){ return Array.isArray(arr) ? arr.slice(0, Math.max(0,max||0)) : []; }
   function compactLeadResult(result){ const out=JSON.parse(JSON.stringify(result||{})); out.modules=limitArray((out.modules||[]).map(m=>({name:m.name, score:m.score, detail:typeof m.detail==='string'?trimLongText(m.detail,420):m.detail})), 16); out.tripwires=limitArray(out.tripwires||[], 10); out.notes=limitArray(out.notes||[], 12).map(x=>trimLongText(x,220)); out.evidence=limitArray(out.evidence||[], 20).map(x=>trimLongText(x,220)); return out; }
@@ -724,7 +730,7 @@
     return uniq(rows.filter(Boolean), x=>String(x).trim().toLowerCase());
   }
   function deriveMariaCueDropFromState(modelLike){
-    return collectMariaCueStrings(modelLike).join('\n');
+    return mergeCueLines(collectMariaCueStrings(modelLike), loadMariaCueMemoryStore());
   }
   function deriveFocusNexusFromState(modelLike, focusWallet='', focusSpender=''){
     const transfers=[...(Array.isArray(modelLike?.signalBrain?.contractIntel?.transfers)?modelLike.signalBrain.contractIntel.transfers:[]), ...((Array.isArray(modelLike?.lastGood?.signalBrain?.contractIntel?.transfers)?modelLike.lastGood.signalBrain.contractIntel.transfers:[]))];
@@ -748,20 +754,18 @@
     if(!String(s.mariaMode||'').trim()) s.mariaMode=MARIA_MODE_DEFAULT;
     if(!String(s.mariaGlossary||'').trim()) s.mariaGlossary=DEFAULT_MARIA_GLOSSARY.join('\n');
     const derived=deriveMariaCueDropFromState(modelLike);
-    const mergedCueLines=uniq([
-      ...String(s.mariaCueDrop||'').split(/\n+/),
-      ...String(s.mariaCueMemory||'').split(/\n+/),
-      ...String(derived||'').split(/\n+/)
-    ].map(x=>normalizeText(x)).filter(Boolean), x=>x.toLowerCase());
-    const mergedCueDrop=mergedCueLines.join('\n');
+    const mergedCueDrop=mergeCueLines(s.mariaCueDrop, s.mariaCueMemory, derived, loadMariaCueMemoryStore());
     if(mergedCueDrop){
       s.mariaCueDrop=mergedCueDrop;
       s.mariaCueMemory=mergedCueDrop;
       s.mariaStateFault='';
+      saveMariaCueMemoryStore(mergedCueDrop);
     }else{
-      const historicalMaria=collectMariaCueStrings(modelLike).length>0;
+      const historicalMaria=collectMariaCueStrings(modelLike).length>0 || !!loadMariaCueMemoryStore();
       s.mariaStateFault=historicalMaria ? 'semantic-present-no-cues' : (String(s.mariaMode||'')===MARIA_MODE_DEFAULT && !String(s.mariaGlossary||'').trim() ? '' : 'semantic-present-no-cues');
     }
+    const derivedCorpus=collectResearchCorpusText(modelLike);
+    if(derivedCorpus && !String(s.researchCorpus||'').trim()) s.researchCorpus=derivedCorpus;
     const spender=v40NormalizeAddr(s.focusSpender)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.spender);
     const wallet=v40NormalizeAddr(s.focusWallet)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.wallet);
     const core=v40NormalizeAddr(s.focusCore)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.core);
@@ -777,6 +781,7 @@
 
   function saveSettings(){
     state.settings=rehydrateMariaSettings(Object.assign({}, state.settings), {history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
+    if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
     if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
     safeStorageSet(STORAGE_KEY, state.settings, x=>x);
   }
@@ -1075,12 +1080,12 @@ function parseManualSocial(raw){
     const mariaItems=v39UniqBy([
       ...parseMariaCueText(state.settings.mariaCueDrop),
       ...parseMariaCueText(state.settings.mariaCueMemory),
-      ...parseMariaCueText(state.settings.manualSocial),
-      ...parseMariaCueText(state.settings.researchCorpus)
+      ...parseMariaCueText(loadMariaCueMemoryStore()),
+      ...parseMariaCueText(state.settings.manualSocial)
     ], x=>x.id||`${x.url||''}|${x.title||''}|${x.publishedAt||''}`);
     if(manualItems.length){ lists.push(manualItems); state.sourceHealth.push(computeSourceHealth({name:'manual',url:'manual://inline'}, manualItems, true)); }
     if(corpusItems.length){ lists.push(corpusItems); state.sourceHealth.push(computeSourceHealth({name:'corpus',url:'corpus://inline'}, corpusItems, true)); }
-    if(mariaItems.length){ lists.push(mariaItems); state.sourceHealth.push(computeSourceHealth({name:'maria',url:'maria://cue'}, mariaItems, true)); }
+    if(mariaItems.length){ lists.push(mariaItems); saveMariaCueMemoryStore(mariaItems.map(x=>x.url||x.text||x.title).join('\n')); state.sourceHealth.push(computeSourceHealth({name:'maria',url:'maria://cue'}, mariaItems, true)); }
 
     const proxyRaw=state.settings.socialProxy;
     if(proxyRaw){
@@ -2918,6 +2923,86 @@ ${state.settings.researchCorpus||''}`);
     return {name:'motif-recurrence', score, summary, spenderHits, gateWord:gateLead[0]||'', gateRepeats:gateLead[1]||0, gasBand:gasLead[0]||'', gasRepeats:gasLead[1]||0, nexusHits};
   }
 
+
+  function v42_5BuildMariaEventMemory(baseModel){
+    const cueText=mergeCueLines(state.settings.mariaCueDrop, state.settings.mariaCueMemory, loadMariaCueMemoryStore());
+    const cueCount=cueText ? cueText.split(/\n+/).filter(Boolean).length : 0;
+    const socialCount=(baseModel.social||[]).filter(x=>x && (x.isMaria || String(x.source||'').toLowerCase()==='maria')).length;
+    const windowCount=v42MariaWindows(baseModel).length;
+    const fault=String(state.settings.mariaStateFault||'');
+    const score=cueCount ? clamp(0.28 + Math.min(cueCount/10,0.22) + (socialCount?0.20:0) + (windowCount?0.20:0) - (fault?0.10:0),0,1) : 0;
+    const summary=cueCount ? `Maria event memory holds ${cueCount} cue line(s); live Maria social ${socialCount}, windows ${windowCount}${fault?` • fault ${fault}`:''}.` : 'No Maria event memory is loaded yet.';
+    return {name:'maria-event-memory', score, summary, cueCount, socialCount, windowCount, fault};
+  }
+  function v42_5BuildResearchBlueprint(baseModel){
+    const raw=collectResearchCorpusText({settings:state.settings, importedBundle:state.importedBundle, history:state.history, lastGood:state.lastGood});
+    const text=String(raw||'').trim();
+    if(!text) return {name:'research-blueprint', score:0, summary:'No research corpus is loaded for blueprint / absorber analysis.', tokens:[], stable:[], modular:false, absorber:false, architect:false};
+    const t=text.toLowerCase();
+    const findAll=(defs)=>defs.filter(([_,re])=>re.test(t)).map(([name])=>name);
+    const tokens=findAll([
+      ['g5',/g5|give me 5/i],
+      ['pi',/pi independence|pi/i],
+      ['rng',/rng|random number generator/i],
+      ['libertropomath',/libertropomath|math version 1\.1|math for short/i],
+      ['414 wallet',/414 wallet|414/i],
+      ['maria rachel',/maria rachel/i]
+    ]);
+    const stable=findAll([
+      ['dai',/dai/i],
+      ['usdc',/usdc/i],
+      ['usdt',/usdt/i]
+    ]);
+    const modular=/modular kit|series of machines|building blocks|blueprint|construction site|belongs together|central building block/i.test(text);
+    const absorber=/holds its own inventory|resupply mechanic|mints one new math|one new math to the contract itself|inventory keeps growing|absorber/i.test(text);
+    const architect=/who built it|set it in motion|maria rachel|414 wallet|architect/i.test(text);
+    const machine=/machine|vending machine|put something in at the front|something else comes out at the back|transform/i.test(text);
+    const score=clamp(Math.min(tokens.length/6,1)*0.38 + Math.min(stable.length/3,1)*0.12 + (modular?0.16:0) + (absorber?0.18:0) + (architect?0.08:0) + (machine?0.08:0),0,1);
+    const summary=modular ? `Research corpus maps a modular blueprint around ${tokens.slice(0,4).join(', ')||'pDAI building blocks'}${absorber?' with explicit absorber/resupply language':''}.` : `Research corpus is loaded but blueprint language is still weak.`;
+    return {name:'research-blueprint', score, summary, tokens, stable, modular, absorber, architect, machine, excerpt:trimLongText(text,260)};
+  }
+  function applyV42_5Upgrade(baseModel){
+    const memory=v42_5BuildMariaEventMemory(baseModel);
+    const research=v42_5BuildResearchBlueprint(baseModel);
+    baseModel.evidenceLedger={
+      ...baseModel.evidenceLedger,
+      rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)),
+        {name:'Maria event-memory closure', kind:'soft', score:memory.score||0, status:(memory.cueCount&&memory.windowCount)?'observed':memory.cueCount?'watching':'missing', why:memory.summary||'Maria event-memory watch is idle.'},
+        {name:'Research blueprint / absorber lane', kind:'soft', score:research.score||0, status:research.score>0.55?'observed':research.score>0?'watching':'missing', why:research.summary||'No research blueprint corpus is loaded.'}
+      ],
+      summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.5 adds Maria event-memory closure and blueprint corpus ingestion.`
+    };
+    baseModel.systemAudit={
+      ...baseModel.systemAudit,
+      rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+        {label:'V42.5 Maria event memory', value:memory.cueCount?`${memory.cueCount} cue(s)`:'missing', hint:memory.summary||'Maria event-memory watch is idle.', cls:(memory.cueCount&&memory.windowCount)?'good':memory.cueCount?'warn':'bad'},
+        {label:'V42.5 research corpus', value:research.tokens.length?research.tokens.join(', '):'none', hint:research.summary||'No research corpus loaded.', cls:research.score>0.55?'good':research.score>0?'warn':'info'},
+        {label:'V42.5 state fault', value:state.settings.mariaStateFault||'clear', hint:'Semantic-present-no-cues should trigger auto-rebuild from Maria cue memory before export.', cls:state.settings.mariaStateFault?'warn':'good'}
+      ],
+      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.5 enforces Maria event-memory closure and research blueprint ingestion.`
+    };
+    baseModel.proveLoop={
+      ...baseModel.proveLoop,
+      rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
+        {label:'V42.5 cue memory gate', value:memory.cueCount?`rehydrated ${memory.cueCount}`:'missing', hint:memory.summary||'Cue-memory gate is idle.'},
+        {label:'V42.5 blueprint lane', value:research.score>0.55?'absorber-active':'watching', hint:research.summary||'Blueprint lane is idle.'},
+        {label:'V42.5 next closure', value:(memory.cueCount&&memory.windowCount)?'window-ready':'needs cue rehydrate', hint:'Blueprint corpus informs machine semantics; Maria windows still close timing.'}
+      ],
+      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.5 keeps Maria timing and blueprint corpus separate: timing closes windows, research corpus closes machine semantics.`
+    };
+    baseModel.clarifier={
+      ...baseModel.clarifier,
+      clarity:clamp(Number(baseModel.clarifier?.clarity||0) + (memory.score||0)*0.02 + (research.score||0)*0.03,0,1),
+      debt:clamp(Number(baseModel.clarifier?.debt||0) + ((memory.cueCount && !memory.windowCount)?0.05:0),0,1),
+      supports:v40AppendUniqueText(baseModel.clarifier?.supports, [memory.windowCount?memory.summary:'', research.score?research.summary:''].filter(Boolean), 24),
+      disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm, [memory.cueCount && !memory.windowCount ? 'Maria cues are remembered but no live Maria windows were rebuilt from memory.' : '', !research.score && String(state.settings.researchCorpus||'').trim() ? 'Research corpus text is loaded but did not produce a strong blueprint/absorber signature.' : ''].filter(Boolean), 24),
+      proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext, ['If Maria cues are absent but cue memory exists, auto-rebuild social and windows before export.', 'Use research-corpus tags like G5 / Pi / RNG / Libertropomath to prioritize non-timing blueprint lanes.'], 24),
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.5 cue-memory ${(memory.cueCount||0)} • blueprint ${pct(research.score||0)}.`
+    };
+    baseModel.v42_5={memory, research, summary:`V42.5 event-memory closure ${memory.cueCount?`tracks ${memory.cueCount} Maria cue(s)`:'is waiting for Maria cues'} while research blueprint score is ${pct(research.score||0)}.`};
+    baseModel.version='V42.5 Event Memory + Blueprint Auditor';
+    return baseModel;
+  }
   function applyV42_3Upgrade(baseModel){
     const focus=baseModel.v40?.focus || v40PickFocus(baseModel);
     const prior=v39SafeArray(baseModel.v40?.modules);
@@ -2975,7 +3060,7 @@ ${state.settings.researchCorpus||''}`);
     baseModel.version='V42.4 Predictive Maria Filter Auditor';
     return baseModel;
   }
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); return applyV42_3Upgrade(v41); }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); return applyV42_5Upgrade(v42); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -3048,7 +3133,7 @@ ${state.settings.researchCorpus||''}`);
     $('syncStatus').textContent='synced'; $('syncStatus').className='status ok';
     $('rpcMeta').textContent='RPC: '+(state.rpcUsed||'bundle-only');
     $('lastSync').textContent='Last sync: '+fmtTs(model.latestTsMs || model.createdAt);
-    $('socialMeta').textContent=`Social: ${(model.social||[]).length} item(s)`;
+    $('socialMeta').textContent=`Social: ${(model.social||[]).length} item(s)` + (state.settings.mariaStateFault?` • fault ${state.settings.mariaStateFault}`:'');
     $('historyMeta').textContent=`History: ${state.history.length} local • ${model.historySeeded||0} imported`;
 
     $('mClarity').textContent=pct(model.clarifier.clarity);
@@ -3438,7 +3523,7 @@ ${state.settings.researchCorpus||''}`);
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_4-history.json', state.history);
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_5-history.json', state.history);
   $('exportBtn').onclick=()=> {
     state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
     if(state.lastGood && typeof state.lastGood==='object'){
@@ -3446,7 +3531,8 @@ ${state.settings.researchCorpus||''}`);
       if(state.settings.mariaCueMemory && !state.lastGood.mariaCueMemory) state.lastGood.mariaCueMemory=state.settings.mariaCueMemory;
     }
     if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
-    downloadJson('pdai-v42_4-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+    if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
+    downloadJson('pdai-v42_5-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   };
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
@@ -3456,6 +3542,8 @@ ${state.settings.researchCorpus||''}`);
       if(!bundle) throw new Error('Unrecognized bundle');
       state.importedBundle=bundle;
       state.settings=Object.assign({}, state.settings, bundle.settings||{});
+      state.settings=rehydrateMariaSettings(state.settings,{history:[...(loadHistory()||[]), ...(bundle.history||[])], lastGood:bundle.lastGood||state.lastGood, socialCache:bundle.socialCache||state.socialCache, social:bundle.lastGood?.social||[], windows:bundle.lastGood?.windows||[], importedBundle:bundle});
+      if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
       saveSettings();
       pushSettings();
       if(bundle.history?.length) saveHistory([...(loadHistory()||[]), ...bundle.history].slice(-120));
@@ -3477,17 +3565,3 @@ ${state.settings.researchCorpus||''}`);
 </script>
 </body>
 </html>
-const DEFAULT_MARIA_GLOSSARY = [
-  '111 spider = same-code route cluster / sybil plumbing',
-  'acoustic void = spender/core sink / manifold destination',
-  'taste tree = branching discharge graph / route tree',
-  'root of interest = first stable terminal destination',
-  'pulse = reserve shock / synchronized route burst / 11-block heartbeat',
-  'massless exit = zero-write / balance clearing / exit-state sweep',
-  'alligator = pull-based routing manifold / terminal snap logic',
-  'kinematic strings = hidden state changes / trie drift / slot priming',
-  'speaker = sink / emitter / execution surface',
-  'void = spender-core sink region'
-];
-
-
