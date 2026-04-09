@@ -84,8 +84,8 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.1 Maria Corpus Closure Auditor</h1>
-      <div class="sub">V42 keeps your exact V38→V41 tool and layers semantic Maria closure upgrades directly into it: default glossary mapping, semantic cue-to-chain scoring, locked focus-pack persistence, Maria-window closure tests, score-integrity separation between hunt pressure and formal execution, and harder proof gating without wiping prior logic.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.2 Semantic Maria Closure Auditor</h1>
+      <div class="sub">V42.2 keeps your exact V38→V42.1 tool and layers semantic Maria closure upgrades directly into it: persistence rehydration, routed manifold ingress, Maria-window gating, pre-shell trie staging, semantic nexus promotion, locked focus-pack persistence, and score-integrity separation between hunt pressure and formal execution.</div>
       <div class="chips">
         <div class="chip good">Imports prior V31–V38 bundle JSON</div>
         <div class="chip info">Adds integrated V42.1 Maria corpus cycles</div>
@@ -548,10 +548,12 @@
     aggressiveFollowups:3,
     focusSpender:'',
     focusWallet:'',
-    focusCore:''
+    focusCore:'',
+    focusNexus:''
   };
 
   const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[], persistIssue:''};
+  state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]});
 
   function $(id){ return document.getElementById(id); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -684,13 +686,55 @@
   }
   function computeSourceHealth(source, items, ok, error=''){ const now=Date.now(); const d24=now-86400000; const d7=now-7*86400000; const rows=Array.isArray(items)?items:[]; const itemCount24h=rows.filter(x=>asTsMs(x.publishedAt)>=d24).length; const itemCount7d=rows.filter(x=>asTsMs(x.publishedAt)>=d7).length; const pDAIMatchCount=rows.filter(x=>/\bpdai\b/i.test(`${x.title||''} ${x.text||''}`)).length; const lastItemAt=rows.length ? Math.max(...rows.map(x=>asTsMs(x.publishedAt)||0)) : 0; let health='green'; if(!ok||error) health='red'; else if(!rows.length||itemCount7d===0) health='yellow'; return {name:source.name||inferPlatform(source.url,source.name)||'proxy', family:inferPlatform(source.url,source.name), configured:!!(source.url||source.inlinePayload), reachable:!!ok, lastFetchOkAt:ok?now:0, lastItemAt, itemCount24h, itemCount7d, pDAIMatchCount, failureStreak:ok?0:1, health, notes:error?[error]:[]}; }
 
+  function deriveMariaCueDropFromState(modelLike){
+    const all=[...(Array.isArray(modelLike?.socialCache)?modelLike.socialCache:[]), ...(Array.isArray(modelLike?.social)?modelLike.social:[]), ...(Array.isArray(modelLike?.lastGood?.social)?modelLike.lastGood.social:[]), ...((Array.isArray(modelLike?.history)?modelLike.history:[]).flatMap(h=>Array.isArray(h?.social)?h.social:[]))];
+    const maria=uniq(all.filter(x=>x && (x.isMaria || String(x.source||'').toLowerCase()==='maria' || looksMariaText(`${x.title||''} ${x.text||''} ${x.url||''}`))), x=>String(x.url||x.text||x.title||x.id||'').trim()).map(x=>String(x.url||x.text||x.title||'').trim()).filter(Boolean);
+    return maria.join('\n');
+  }
+  function deriveFocusNexusFromState(modelLike, focusWallet='', focusSpender=''){
+    const transfers=[...(Array.isArray(modelLike?.signalBrain?.contractIntel?.transfers)?modelLike.signalBrain.contractIntel.transfers:[]), ...((Array.isArray(modelLike?.lastGood?.signalBrain?.contractIntel?.transfers)?modelLike.lastGood.signalBrain.contractIntel.transfers:[]))];
+    const wallet=norm(focusWallet), spender=norm(focusSpender);
+    const byTx={};
+    transfers.forEach(t=>{ const tx=String(t.tx||'').toLowerCase(); if(!tx) return; (byTx[tx]||(byTx[tx]=[])).push(t); });
+    const score={};
+    Object.values(byTx).forEach(rows=>{
+      const intoSpender=rows.filter(t=>norm(t.to)===spender && norm(t.from)!==wallet);
+      if(!intoSpender.length) return;
+      rows.forEach(t=>{
+        const mid=norm(t.to); if(!mid || mid===spender || mid===wallet) return;
+        const feedsMid=rows.some(r=>norm(r.to)===mid && norm(r.from)===wallet);
+        if(feedsMid) score[mid]=(score[mid]||0)+1;
+      });
+    });
+    return Object.entries(score).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
+  }
+  function rehydrateMariaSettings(settings, modelLike={}){
+    const s=Object.assign({}, settings||{});
+    if(!String(s.mariaMode||'').trim()) s.mariaMode=MARIA_MODE_DEFAULT;
+    if(!String(s.mariaGlossary||'').trim()) s.mariaGlossary=DEFAULT_MARIA_GLOSSARY.join('\n');
+    if(!String(s.mariaCueDrop||'').trim()){
+      const derived=deriveMariaCueDropFromState(modelLike);
+      if(derived) s.mariaCueDrop=derived;
+    }
+    const spender=v40NormalizeAddr(s.focusSpender)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.spender);
+    const wallet=v40NormalizeAddr(s.focusWallet)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.wallet);
+    const core=v40NormalizeAddr(s.focusCore)||v40NormalizeAddr(MARIA_CORPUS.focusDefaults.core);
+    s.focusSpender=spender||s.focusSpender||'';
+    s.focusWallet=wallet||s.focusWallet||'';
+    s.focusCore=core||s.focusCore||'';
+    if(!String(s.focusNexus||'').trim()){
+      const derivedNexus=deriveFocusNexusFromState(modelLike, s.focusWallet, s.focusSpender);
+      if(derivedNexus) s.focusNexus=derivedNexus;
+    }
+    return s;
+  }
 
-  function saveSettings(){ state.settings=Object.assign({}, state.settings); safeStorageSet(STORAGE_KEY, state.settings, x=>x); }
+  function saveSettings(){ state.settings=rehydrateMariaSettings(Object.assign({}, state.settings), {history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]}); safeStorageSet(STORAGE_KEY, state.settings, x=>x); }
   function saveHistory(v){ state.history=v; return safeStorageSet(HISTORY_KEY, v, compactHistoryForStorage); }
   function saveSocialCache(v){ state.socialCache=v; return safeStorageSet(SOCIAL_CACHE_KEY, v, compactSocialCacheForStorage); }
-  function saveLastGood(v){ state.lastGood=v; return safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage); }
+  function saveLastGood(v){ state.lastGood=v; state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:v,socialCache:state.socialCache,social:v?.social||[]}); return safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage); }
   function migrateLegacy(key, fallback){ const v=readStoredJson(key, null); if(v!==null && v!==undefined) return v; return fallback; }
-  function loadSettings(){ return Object.assign({}, DEFAULTS, migrateLegacy(STORAGE_KEY, migrateLegacy(LEGACY_KEYS.settings, DEFAULTS))||{}); }
+  function loadSettings(){ return rehydrateMariaSettings(Object.assign({}, DEFAULTS, migrateLegacy(STORAGE_KEY, migrateLegacy(LEGACY_KEYS.settings, DEFAULTS))||{}), {}); }
   function loadHistory(){ return migrateLegacy(HISTORY_KEY, migrateLegacy(LEGACY_KEYS.history, [])) || []; }
   function loadSocialCache(){ return migrateLegacy(SOCIAL_CACHE_KEY, migrateLegacy(LEGACY_KEYS.social, [])) || []; }
   function loadLastGood(){ return migrateLegacy(LASTGOOD_KEY, migrateLegacy(LEGACY_KEYS.last, null)); }
@@ -757,7 +801,7 @@
 
   function normalizeBundle(bundle){
     if(!bundle || typeof bundle!=='object') return null;
-    const settings=Object.assign({}, DEFAULTS, bundle.settings||{});
+    const settings=rehydrateMariaSettings(Object.assign({}, DEFAULTS, bundle.settings||{}), bundle);
     const history=Array.isArray(bundle.history) ? bundle.history : [];
     const socialCache=Array.isArray(bundle.socialCache) ? bundle.socialCache : [];
     const lastGood=bundle.lastGood || history[history.length-1] || null;
@@ -2454,12 +2498,60 @@ function v40PickFocus(baseModel){
       : `No real timing windows are loaded, and ${sources.length} source family(ies) are configured.`;
     return {name:'social-correlation', score, summary, windows:windows.length, sourceCount:sources.length};
   }
+  function v42MariaWindows(baseModel){ return v39SafeArray(baseModel.windows).filter(w=>w && !String(w.phase||'').startsWith('synthetic') && (w.isMaria || String(w.phase||'').startsWith('maria-') || String(w.source||'').toLowerCase()==='maria')); }
+  function v42TxInWindows(tx, windows){ const b=Number(tx?.block||0); return windows.some(w=>b>=Number(w.fromBlock||0) && b<=Number(w.toBlock||0)); }
+  function v42BuildRoutedIngress(baseModel, focus){
+    const transfers=v39SafeArray(baseModel.signalBrain?.contractIntel?.transfers);
+    const windows=v42MariaWindows(baseModel);
+    const spender=norm(focus.spender), wallet=norm(focus.wallet), core=norm(focus.core), configuredNexus=norm(state.settings.focusNexus||'');
+    const byTx={}; transfers.forEach(t=>{ const tx=String(t.tx||'').toLowerCase(); if(!tx) return; (byTx[tx]||(byTx[tx]=[])).push(t); });
+    const lanes=[]; const nexusHits={};
+    Object.entries(byTx).forEach(([tx,rows])=>{
+      const intoSpender=rows.filter(t=>norm(t.to)===spender);
+      if(!intoSpender.length) return;
+      rows.forEach(inLeg=>{
+        const nexus=norm(inLeg.from); if(!nexus || nexus===wallet || nexus===spender) return;
+        const fromWallet=rows.filter(r=>norm(r.to)===nexus && [wallet, core].includes(norm(r.from)));
+        const neighbor=rows.filter(r=>norm(r.to)===nexus && ![spender,nexus].includes(norm(r.from)));
+        if(!fromWallet.length && !neighbor.length) return;
+        const windowHit=v42TxInWindows(inLeg, windows);
+        const total=(fromWallet.concat(neighbor)).reduce((a,t)=>a+Math.abs(Number(t.amount||0)),0) + Math.abs(Number(inLeg.amount||0));
+        lanes.push({tx,nexus,windowHit,total,spenderIn:Number(inLeg.amount||0),fromWallet:fromWallet.length,neighbor:neighbor.length,rows});
+        nexusHits[nexus]=(nexusHits[nexus]||{count:0,window:0,total:0});
+        nexusHits[nexus].count+=1; nexusHits[nexus].total+=total; if(windowHit) nexusHits[nexus].window+=1;
+      });
+    });
+    lanes.sort((a,b)=>b.total-a.total);
+    const best=lanes[0]||null;
+    const bestNexus=best?.nexus || Object.entries(nexusHits).sort((a,b)=>(b[1].window*10+b[1].count+b[1].total/10000)-(a[1].window*10+a[1].count+a[1].total/10000))[0]?.[0] || configuredNexus;
+    if(bestNexus && !state.settings.focusNexus) state.settings.focusNexus=bestNexus;
+    const mariaHits=lanes.filter(x=>x.windowHit).length;
+    const score=clamp((best?0.34:0) + Math.min(lanes.length/6,0.18) + Math.min(mariaHits/4,0.18) + (bestNexus && bestNexus===configuredNexus?0.08:0) + Math.min((best?.total||0)/250000,0.22),0,1);
+    const summary=best ? `Routed ingress is live: ${addrShort(best.nexus)} handed ${fmtShort(best.spenderIn)} pDAI into ${addrShort(focus.spender)} inside ${lanes.length} routed lane(s)${mariaHits?`, with ${mariaHits} Maria-window hit(s)`:''}.` : `No routed manifold ingress into ${addrShort(focus.spender)} is visible yet.`;
+    return {name:'routed-manifold-ingress', score, summary, lanes:lanes.length, mariaHits, bestNexus:bestNexus||'', bestValue:best?.spenderIn||0, totalValue:lanes.reduce((a,x)=>a+x.total,0)};
+  }
+  function v42BuildWindowGating(baseModel, focus){
+    const windows=v42MariaWindows(baseModel); const transfers=v39SafeArray(baseModel.signalBrain?.contractIntel?.transfers); const wallet=norm(focus.wallet), spender=norm(focus.spender), core=norm(focus.core);
+    const gated=transfers.filter(t=>v42TxInWindows(t, windows));
+    const profile=gated.filter(t=>{ const from=norm(t.from), to=norm(t.to); return [wallet,spender,core].includes(from) || [wallet,spender,core].includes(to); });
+    const score=clamp((windows.length?0.18:0)+Math.min(profile.length/12,0.34)+Math.min(gated.length/40,0.18),0,1);
+    const summary=windows.length ? `${profile.length} focus-lane transaction(s) survive Maria window gating across ${windows.length} Maria window(s).` : 'No Maria windows are available for event-horizon gating.';
+    return {name:'window-gating', score, summary, windows:windows.length, profileCount:profile.length};
+  }
+  function v42BuildPreShellTrie(baseModel){
+    const windows=v42MariaWindows(baseModel); const trie=v39SafeObject(baseModel.trieTouch); const rows=v39SafeArray(trie.rows); const currentHits=rows.filter(r=>r.changed || r.touchedWhileZero).length; const hist=[...v39SafeArray(state.history), ...v39SafeArray(state.importedBundle?.history)];
+    const histHits=hist.filter(h=>((h.trieTouch?.rows)||[]).some(r=>r.changed || r.touchedWhileZero) || (h.signalBrain?.trieTouch?.rows||[]).some(r=>r.changed || r.touchedWhileZero)).length;
+    const score=clamp((currentHits?0.28:0)+Math.min(histHits/10,0.2)+(windows.length?0.12:0)+(currentHits&&windows.length?0.14:0),0,1);
+    const summary=currentHits?`Trie drift recurrence is acting like Stage 0.5 execution: ${currentHits} live drift hit(s), ${histHits} historical hit(s), ${windows.length} Maria window(s).`:`No live trie drift recurrence is visible inside the current Maria-timed state.`;
+    return {name:'pre-shell-trie', score, summary, currentHits, histHits, windows:windows.length};
+  }
   function v40BuildTripwires(focus, modules){
     const out=[];
     const by={}; modules.forEach(m=>by[m.name]=m);
     if((by['burn-rail']?.count||0)>0) out.push({name:'burn-rail-live', score:clamp(0.62 + Math.min((by['burn-rail'].count||0)/10,0.18),0,1), detail:by['burn-rail'].summary});
     if((by['terminal-discharge']?.score||0)>=0.66) out.push({name:'terminal-discharge-lane', score:by['terminal-discharge'].score, detail:by['terminal-discharge'].summary});
     if((by['focus-pull-path']?.score||0)>=0.68) out.push({name:'focus-spender-pull-shell', score:by['focus-pull-path'].score, detail:by['focus-pull-path'].summary});
+    if((by['routed-manifold-ingress']?.score||0)>=0.62) out.push({name:'routed-manifold-ingress', score:Math.max(by['routed-manifold-ingress']?.score||0,0.62), detail:by['routed-manifold-ingress'].summary});
     if((by['allowance-shock']?.zeroish||0)>0 || (by['allowance-shock']?.score||0)>=0.7) out.push({name:'allowance-shell-wave', score:Math.max(by['allowance-shock']?.score||0,0.71), detail:by['allowance-shock'].summary});
     if((by['trie-drift']?.currentHits||0)>0) out.push({name:'trie-drift-live', score:Math.max(by['trie-drift']?.score||0,0.67), detail:by['trie-drift'].summary});
     return out;
@@ -2468,11 +2560,14 @@ function v40PickFocus(baseModel){
     const get=n=>modules.find(m=>m.name===n)||{};
     const rows=[
       {name:'Focus spender manifold', kind:'hard', score:get('focus-pull-path').score||0, status:(get('focus-pull-path').score||0)>=0.68?'observed':'watching', why:get('focus-pull-path').summary||'Focus spender watch is active.'},
+      {name:'Routed manifold ingress', kind:'hard', score:get('routed-manifold-ingress').score||0, status:(get('routed-manifold-ingress').score||0)>=0.62?'observed':'watching', why:get('routed-manifold-ingress').summary||'Routed manifold ingress watch is active.'},
       {name:'Terminal discharge lane', kind:'hard', score:get('terminal-discharge').score||0, status:(get('terminal-discharge').score||0)>=0.66?'observed':'watching', why:get('terminal-discharge').summary||'Terminal discharge watch is active.'},
       {name:'Trie drift memory', kind:'hard', score:get('trie-drift').score||0, status:(get('trie-drift').currentHits||0)?'observed':'watching', why:get('trie-drift').summary||'Trie drift watch is active.'},
       {name:'Burn rail evidence', kind:'hard', score:get('burn-rail').score||0, status:(get('burn-rail').count||0)?'proved':'missing', why:get('burn-rail').summary||'Burn rail watch is active.'},
       {name:'Allowance shock shell', kind:'soft', score:get('allowance-shock').score||0, status:(get('allowance-shock').zeroish||0)?'observed':'watching', why:get('allowance-shock').summary||'Allowance watch is active.'},
-      {name:'Social correlation coverage', kind:'soft', score:get('social-correlation').score||0, status:(get('social-correlation').windows||0)?'observed':'missing', why:get('social-correlation').summary||'Social correlation watch is active.'}
+      {name:'Social correlation coverage', kind:'soft', score:get('social-correlation').score||0, status:(get('social-correlation').windows||0)?'observed':'missing', why:get('social-correlation').summary||'Social correlation watch is active.'},
+      {name:'Window gating', kind:'soft', score:get('window-gating').score||0, status:(get('window-gating').windows||0)?'observed':'missing', why:get('window-gating').summary||'Window gating is active.'},
+      {name:'Pre-shell trie stage', kind:'soft', score:get('pre-shell-trie').score||0, status:(get('pre-shell-trie').currentHits||0)?'observed':'watching', why:get('pre-shell-trie').summary||'Pre-shell trie watch is active.'}
     ];
     const hard=avg(rows.filter(r=>r.kind==='hard').map(r=>r.score));
     const soft=avg(rows.filter(r=>r.kind==='soft').map(r=>r.score));
@@ -2483,23 +2578,27 @@ function v40PickFocus(baseModel){
     const prior=v39SafeObject(baseModel.clarifier);
     const hard=avg(tripwires.map(t=>t.score));
     const socialScore=get('social-correlation').score||0;
-    const exec=clamp(Math.max(v39Num(prior.exec,0), (v39Num(prior.exec,0)*0.92) + (get('burn-rail').score||0)*0.14 + (get('focus-pull-path').score||0)*0.24 + (get('terminal-discharge').score||0)*0.22 + (get('trie-drift').score||0)*0.14 + (get('allowance-shock').score||0)*0.10),0,1);
+    const exec=clamp(Math.max(v39Num(prior.exec,0), (v39Num(prior.exec,0)*0.90) + (get('burn-rail').score||0)*0.12 + (get('focus-pull-path').score||0)*0.22 + (get('routed-manifold-ingress').score||0)*0.20 + (get('terminal-discharge').score||0)*0.18 + (get('trie-drift').score||0)*0.10 + (get('pre-shell-trie').score||0)*0.10 + (get('allowance-shock').score||0)*0.08 + (get('window-gating').score||0)*0.06),0,1);
     const prep=clamp(Math.max(v39Num(prior.prep,0), v39Num(prior.prep,0)*0.98 + 0.01),0,1);
     const debt=clamp(Math.min(v39Num(prior.debt,1), 1-(exec*0.46 + hard*0.24 + socialScore*0.12)),0,1);
     const clarity=clamp(Math.max(v39Num(prior.clarity,0), exec*0.58 + hard*0.22 + socialScore*0.08 + (get('focus-pull-path').score||0)*0.06 + (get('terminal-discharge').score||0)*0.06),0,1);
     const supports=[
       focus.summary,
       get('focus-pull-path').summary,
+      get('routed-manifold-ingress').summary,
       get('terminal-discharge').summary,
       get('trie-drift').summary,
+      get('pre-shell-trie').summary,
       get('burn-rail').summary,
       `V40 promoted ${tripwires.length} focus-layer tripwire(s).`
     ].filter(Boolean);
     const disconfirm=[];
     if(!(get('social-correlation').windows||0)) disconfirm.push('No real social windows are loaded, so V40 timing proof is still partially blinded.');
     if((get('focus-pull-path').directWalletSpender||0)===0) disconfirm.push('Focus spender still needs a direct wallet-local pull-path hit to close the remaining execution gap.');
+    if((get('routed-manifold-ingress').lanes||0)===0) disconfirm.push('No routed manifold ingress has been observed yet linking the focus wallet shell into the focus spender.');
     const proveNext=[
       `Catch ${addrShort(focus.spender)} on a direct wallet/core transferFrom-style path.`,
+      `Catch routed ingress through ${addrShort(state.settings.focusNexus||focus.spender)} during a Maria window and keep it pinned if it recurs.`,
       `Catch ${addrShort(focus.wallet)} flushing again into ${addrShort(focus.core)} or the focus spender.`,
       'Wait for a fresh slot wake or trie-drift recurrence before declaring formal shell execution.',
       'Restore real social windows so reserve shocks can be correlated in live time.'
@@ -2511,9 +2610,12 @@ function v40PickFocus(baseModel){
     const focus=v40PickFocus(baseModel);
     const modules=[
       v40BuildPullPath(baseModel, focus),
+      v42BuildRoutedIngress(baseModel, focus),
+      v42BuildWindowGating(baseModel, focus),
       v40BuildAllowanceShock(baseModel, focus),
       v40BuildTerminalDischarge(baseModel, focus),
       v40BuildTrieDrift(baseModel, focus),
+      v42BuildPreShellTrie(baseModel),
       v40BuildBurnRail(baseModel),
       v40BuildSocialBlocker(baseModel)
     ];
@@ -2547,7 +2649,8 @@ function v40PickFocus(baseModel){
       rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
         {label:'V40 focus pack', value:`${addrShort(focus.spender)} / ${addrShort(focus.wallet)}`, hint:focus.summary, cls:'good'},
         {label:'V40 social blocker', value:(modules.find(m=>m.name==='social-correlation')?.windows||0)?'real windows present':'no real windows', hint:modules.find(m=>m.name==='social-correlation')?.summary||'Social correlation watch is active.', cls:(modules.find(m=>m.name==='social-correlation')?.windows||0)?'good':'warn'},
-        {label:'V40 focus tripwires', value:`${tripwires.length} hard hit(s)`, hint:tripwires.length?tripwires.map(t=>t.name).join(', '):'No V40 focus tripwire promoted this cycle.', cls:tripwires.length?'good':'info'}
+        {label:'V40 focus tripwires', value:`${tripwires.length} hard hit(s)`, hint:tripwires.length?tripwires.map(t=>t.name).join(', '):'No V40 focus tripwire promoted this cycle.', cls:tripwires.length?'good':'info'},
+        {label:'V42.2 focus nexus', value:state.settings.focusNexus?addrShort(state.settings.focusNexus):'auto-none', hint:(modules.find(m=>m.name==='routed-manifold-ingress')?.summary)||'Routed nexus promotion is active.', cls:state.settings.focusNexus?'good':'warn'}
       ],
       summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V40 focus ${addrShort(focus.spender)} with ${tripwires.length} focus tripwire(s).`,
       pills:v39UniqBy([...(v39SafeArray(baseModel.systemAudit?.pills)), 'v40', tripwires.length?'focus-tripwire':'focus-watch', (modules.find(m=>m.name==='social-correlation')?.windows||0)?'social-real':'social-missing'], x=>x)
@@ -2557,7 +2660,8 @@ function v40PickFocus(baseModel){
       rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
         {label:'V40 focus spender', value:addrShort(focus.spender), hint:`Auto-lock is targeting the most persistent manifold in the current state.`},
         {label:'V40 focus wallet', value:addrShort(focus.wallet), hint:`Current preferred discharge wallet for the focus lane.`},
-        {label:'V40 live gate', value:(modules.find(m=>m.name==='focus-pull-path')?.directWalletSpender||0)?'direct pull-path observed':'waiting on direct pull-path', hint:modules.find(m=>m.name==='focus-pull-path')?.summary||'Focus pull-path watch is active.'}
+        {label:'V40 live gate', value:(modules.find(m=>m.name==='focus-pull-path')?.directWalletSpender||0)?'direct pull-path observed':((modules.find(m=>m.name==='routed-manifold-ingress')?.lanes||0)?'routed ingress observed':'waiting on direct pull-path'), hint:(modules.find(m=>m.name==='focus-pull-path')?.summary||modules.find(m=>m.name==='routed-manifold-ingress')?.summary||'Focus pull-path watch is active.')},
+        {label:'V42.2 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'No export is valid unless mariaCueDrop and mariaGlossary survive rehydration.'}
       ],
       summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V40 is waiting for the focus spender to graduate from approval-shell persistence into a direct wallet/core pull-path.`
     };
@@ -2570,7 +2674,7 @@ function v40PickFocus(baseModel){
         `Focus spender lock: ${focus.spender?addrShort(focus.spender):'auto-none'}.`,
         `Focus wallet lock: ${focus.wallet?addrShort(focus.wallet):'auto-none'}.`,
         `Focus core lock: ${focus.core?addrShort(focus.core):'auto-none'}.`,
-        `V40 added pull-path, allowance-shock, terminal-discharge, trie-drift, burn-rail, and social-blocker modules.`,
+        `V40/V42.2 added pull-path, routed-ingress, window-gating, allowance-shock, terminal-discharge, trie-drift, pre-shell-trie, burn-rail, and social-blocker modules.`,
         `V40 promoted ${tripwires.length} focus-layer tripwire(s).`
       ],
       summary:`V40 focus pack ${addrShort(focus.spender)} / ${addrShort(focus.wallet)} / ${addrShort(focus.core)} with ${tripwires.length} promoted focus tripwire(s).`
@@ -2628,7 +2732,7 @@ ${state.settings.researchCorpus||''}`);
     ];
     const windowRows=windows.slice(0,12).map(w=>({title:w.title||w.phase||'window', phase:w.phase||'maria', block:Math.round(w.approxBlock||0), range:`${Math.round(w.fromBlock||0)}→${Math.round(w.toBlock||0)}`, tags:(w.tags||[]).join(', ')}));
     const summary=items.length ? `V42 Maria engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), ${glossary.length} glossary mapping(s), and ${hypos.filter(h=>h.score>=0.55).length} active semantic hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and semantic hypotheses.';
-    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.1 layered Gemini's Maria corpus directly into V42.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
+    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.2 layered Gemini's Maria corpus directly into V42.1.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
   }
 
   function applyV41Upgrade
@@ -2670,11 +2774,36 @@ ${state.settings.researchCorpus||''}`);
       ...maria,
       summary:maria.summary
     };
-    baseModel.version='V42.1 Maria Corpus Closure Auditor';
+    baseModel.version='V42.2 Semantic Maria Closure Auditor';
     return baseModel;
   }
 
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); return applyV41Upgrade(v40); }
+
+  function applyV42_2Upgrade(baseModel){
+    const focus=baseModel.v40?.focus || v40PickFocus(baseModel);
+    const modules=v39SafeArray(baseModel.v40?.modules);
+    const get=n=>modules.find(m=>m.name===n)||{};
+    baseModel.systemAudit={
+      ...baseModel.systemAudit,
+      rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+        {label:'V42.2 Maria persistence', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'Maria cue drop and glossary are rehydrated from live state before export.', cls:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'good':'warn'},
+        {label:'V42.2 semantic ingress', value:(get('routed-manifold-ingress').lanes||0)?`${get('routed-manifold-ingress').lanes} lane(s)`:'watching', hint:get('routed-manifold-ingress').summary||'Routed manifold ingress watch is active.', cls:(get('routed-manifold-ingress').lanes||0)?'good':'warn'}
+      ],
+      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.2 enforces persistence law, split scoring, and semantic ingress.`
+    };
+    baseModel.proveLoop={
+      ...baseModel.proveLoop,
+      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.2 treats trie drift recurrence as Stage 0.5 execution pressure and routed ingress as the bridge between approval-shell suspicion and direct pull-path proof.`
+    };
+    baseModel.v42_2={
+      laws:['persistence','split-scoring','semantic-ingress'],
+      focusNexus:state.settings.focusNexus||'',
+      summary:`V42.2 semantic closure is active around ${addrShort(focus.spender)} with nexus ${addrShort(state.settings.focusNexus||'')||'—'}.`
+    };
+    baseModel.version='V42.2 Semantic Maria Closure Auditor';
+    return baseModel;
+  }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); return applyV42_2Upgrade(v41); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
