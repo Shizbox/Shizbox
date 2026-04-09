@@ -738,6 +738,100 @@
     return {settings, history, socialCache, lastGood};
   }
 
+  function looksMariaText(text){
+    const t=String(text||'').toLowerCase();
+    return /靈脅用|maria|alligator|kinematic|taste tree|acoustic void|111 spider|spider|massless exit|void|pulse|root of interest|scribe|x9oeb/.test(t);
+  }
+  function detectMariaTags(text){
+    const s=String(text||'');
+    const out=[];
+    const tags=[
+      ['111-spider',/111\s*spider|\bspider\b/i],
+      ['acoustic-void',/acoustic\s+void|\bspeaker\b|\byamaha\b/i],
+      ['taste-tree',/taste\s+tree/i],
+      ['alligator',/alligator/i],
+      ['kinematic',/kinematic/i],
+      ['massless-exit',/massless\s+exit/i],
+      ['pulse',/\bpulse\b/i],
+      ['root-of-interest',/root\s+of\s+interest/i],
+      ['void',/\bvoid\b/i],
+      ['pdai',/\bpdai\b/i],
+      ['maria',/靈脅用|maria/i],
+      ['youtube',/youtube\.com|youtu\.be/i],
+      ['live',/\blive\b/i]
+    ];
+    for(const [tag,re] of tags) if(re.test(s)) out.push(tag);
+    return uniq(out,x=>x);
+  }
+  function parseMariaCueText(raw){
+    const out=[];
+    if(!raw || !String(raw).trim()) return out;
+    const txt=String(raw).trim();
+    const json=tryJson(txt,null);
+    const pushCue=(obj, idx=0)=>{
+      const cue=normalizeSocialItem(Object.assign({
+        id:`maria:${idx}:${(obj.title||obj.text||obj.url||'cue').slice(0,40)}`,
+        platform: obj.platform || inferPlatform(obj.url,obj.source||obj.author||'maria') || 'maria',
+        source: obj.source || 'maria',
+        kind:'maria-cue',
+        isMaria:true,
+        title: obj.title || obj.text || obj.url || 'Maria cue',
+        text: obj.text || obj.notes || obj.title || obj.url || '',
+      }, obj));
+      if(cue) out.push(cue);
+    };
+    if(Array.isArray(json)){
+      json.forEach((x,i)=>pushCue(typeof x==='string'?{text:x,title:x}:x,i));
+      return out.filter(Boolean);
+    }
+    if(json && typeof json==='object'){
+      const rows=[...(Array.isArray(json.items)?json.items:[]), ...(Array.isArray(json.rows)?json.rows:[]), ...(Array.isArray(json.sources)?json.sources:[])];
+      if(rows.length){ rows.forEach((x,i)=>pushCue(typeof x==='string'?{text:x,title:x}:x,i)); return out.filter(Boolean); }
+      pushCue(json,0); return out.filter(Boolean);
+    }
+    txt.split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach((line,idx)=>{
+      const url=(line.match(/https?:\/\/\S+/i)||[])[0]||'';
+      const clean=line.replace(/https?:\/\/\S+/ig,'').trim();
+      const title=clean || url || `Maria cue ${idx+1}`;
+      const cue={
+        id:`maria:${idx}:${title.slice(0,40)}`,
+        title,
+        text:line,
+        url,
+        platform: inferPlatform(url,'maria') || 'maria',
+        source:'maria',
+        kind:'maria-cue',
+        isMaria:true,
+        tags:detectMariaTags(line)
+      };
+      const stamp=extractTimestamp(line); if(stamp) cue.publishedAt=stamp;
+      const dur=extractDuration(line); if(dur) cue.durationSec=dur;
+      const code=extractCode(line); if(code) cue.code=code;
+      out.push(normalizeSocialItem(cue));
+    });
+    return out.filter(Boolean);
+  }
+  function parseGlossary(raw){
+    const out=[];
+    if(!raw || !String(raw).trim()) return out;
+    const txt=String(raw).trim();
+    const json=tryJson(txt,null);
+    if(Array.isArray(json)){
+      return uniq(json.map(x=> typeof x==='string' ? x : `${x.symbol||x.key||''}=${x.meaning||x.value||''}`)
+        .map(s=>String(s||'').trim())
+        .filter(Boolean)
+        .map((line,idx)=>{
+          const m=line.match(/^\s*([^:=\-→>]+?)\s*(?:=>|->|→|:|=)\s*(.+?)\s*$/);
+          return m?{id:`gloss:${idx}:${m[1].trim()}`,symbol:m[1].trim(),meaning:m[2].trim()}:null;
+        }).filter(Boolean), x=>x.symbol.toLowerCase());
+    }
+    txt.split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach((line,idx)=>{
+      const m=line.match(/^\s*([^:=\-→>]+?)\s*(?:=>|->|→|:|=)\s*(.+?)\s*$/);
+      if(m) out.push({id:`gloss:${idx}:${m[1].trim()}`,symbol:m[1].trim(),meaning:m[2].trim()});
+    });
+    return uniq(out,x=>x.symbol.toLowerCase());
+  }
+
   function parseManualSocial(raw){
     const out=[];
     if(!raw || !String(raw).trim()) return out;
