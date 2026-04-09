@@ -475,6 +475,24 @@
     </div>
   </div>
 
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">V42.8 social conductor graph</div>
+      <div class="small">Tracks Maria, Darkly, and adjacent signal accounts as a timing/symbolic conductor graph instead of isolated posts.</div>
+      <div id="socialConductorList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Cue-bridge scoring</div>
+      <div class="small">Measures whether one social cue appears to acknowledge or amplify another before a matching chain lane activates.</div>
+      <div id="cueBridgeList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Symbolic mismatch ledger</div>
+      <div class="small">Raises contradiction when the cue calls for Spider, Pulse, Void, or Massless-Exit but the chain does not play the expected lane.</div>
+      <div id="symbolicMismatchList"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -3186,7 +3204,115 @@ ${state.settings.researchCorpus||''}`);
     baseModel.version='V42.4 Predictive Maria Filter Auditor';
     return baseModel;
   }
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); return applyV42_6Upgrade(v425); }
+  function v42_8SocialCorpus(baseModel){
+    const parts=[];
+    const s=state.settings||{};
+    ['manualSocial','researchCorpus','mariaCueDrop','mariaCueMemory','socialProxy'].forEach(k=>{ if(s[k]) parts.push(String(s[k])); });
+    const social=v39SafeArray(baseModel.social).concat(v39SafeArray(baseModel.lastGood?.social));
+    social.forEach(x=>{ if(x?.title) parts.push(String(x.title)); if(x?.text) parts.push(String(x.text)); if(x?.url) parts.push(String(x.url)); if(x?.source) parts.push(String(x.source)); });
+    const hist=loadHistory();
+    hist.slice(-40).forEach(h=>{ v39SafeArray(h.social).forEach(x=>{ if(x?.title) parts.push(String(x.title)); if(x?.text) parts.push(String(x.text)); if(x?.url) parts.push(String(x.url)); if(x?.source) parts.push(String(x.source)); }); });
+    return parts.join('\n').toLowerCase();
+  }
+  function v42_8ConductorGraph(baseModel){
+    const corpus=v42_8SocialCorpus(baseModel);
+    const socials=v39SafeArray(baseModel.social);
+    const hist=loadHistory();
+    const actorSeen=(needle)=> corpus.includes(needle);
+    const countActor=(needle)=>{
+      let n=0;
+      socials.forEach(x=>{ const t=`${x?.title||''} ${x?.text||''} ${x?.url||''} ${x?.source||''}`.toLowerCase(); if(t.includes(needle)) n++; });
+      hist.slice(-50).forEach(h=> v39SafeArray(h.social).forEach(x=>{ const t=`${x?.title||''} ${x?.text||''} ${x?.url||''} ${x?.source||''}`.toLowerCase(); if(t.includes(needle)) n++; }));
+      return n;
+    };
+    const actors=[
+      {key:'maria', label:'Maria / @靈脅用', seen:actorSeen('@靈脅用')||actorSeen('36lgatf')||actorSeen('maria'), mentions:countActor('@靈脅用')+countActor('36lgatfpmd8')+countActor('maria'), role:'primary conductor'},
+      {key:'darkly', label:'Darkly / @ADesignerDarkly', seen:actorSeen('adesignerdarkly')||actorSeen('message received')||actorSeen('timeline adjustment'), mentions:countActor('adesignerdarkly')+countActor('message received')+countActor('timeline adjustment'), role:'secondary conductor'},
+      {key:'research', label:'Research corpus narrators', seen:actorSeen('crypto exclusive')||actorSeen('reuben alex')||actorSeen('episode 2'), mentions:countActor('crypto exclusive')+countActor('reuben alex')+countActor('episode 2'), role:'blueprint narrator'}
+    ].map(a=>({...a, score:clamp((a.seen?0.45:0)+(Math.min(a.mentions,8)/8)*0.4+(a.key==='maria'||a.key==='darkly'?0.1:0),0,1)}));
+    const active=actors.filter(a=>a.seen);
+    const summary=active.length?`Social conductor graph sees ${active.length} active actor(s): ${active.map(a=>a.label.split(' / ')[0]).join(', ')}.`:'No social conductors are loaded in the current state.';
+    return {actors, activeCount:active.length, score:actors.reduce((a,b)=>a+(b.score||0),0)/actors.length, summary};
+  }
+  function v42_8CueBridge(baseModel, graph){
+    const corpus=v42_8SocialCorpus(baseModel);
+    const hasMaria=graph.actors.find(a=>a.key==='maria')?.seen;
+    const hasDarkly=graph.actors.find(a=>a.key==='darkly')?.seen;
+    const bridgeTerms=['message received','timeline adjustment','inevitable','acoustic-void','pulse','spider'];
+    const hits=bridgeTerms.filter(t=>corpus.includes(t));
+    const ingress=((v39SafeArray(baseModel.evidenceLedger?.rows).find(x=>/routed manifold ingress/i.test(x.name||''))||{}).score)||0;
+    const score=clamp((hasMaria&&hasDarkly?0.45:0)+(hits.length/bridgeTerms.length)*0.25+Math.min(ingress,0.3),0,1);
+    const bridged=!!(hasMaria&&hasDarkly&&hits.length);
+    const summary=bridged?`Cue-bridge is active: Maria and Darkly cues overlap with ${hits.length} shared bridge term(s) and routed-ingress score ${pct(ingress)}.`:'Cue-bridge is not yet closed; at least two conductor tracks plus bridge terms are needed.';
+    const rows=[
+      {label:'Actor overlap', value:hasMaria&&hasDarkly?'Maria ↔ Darkly':'insufficient', hint:'Needs at least two conductor tracks.'},
+      {label:'Shared bridge terms', value:hits.length?hits.join(', '):'none', hint:'Message received / timeline adjustment / pulse / spider style cues.'},
+      {label:'Chain follow-through', value:pct(ingress), hint:'Routed manifold ingress strengthens cue-bridge closure.'}
+    ];
+    return {score, summary, rows, bridged, terms:hits};
+  }
+  function v42_8SymbolicMismatch(baseModel){
+    const corpus=v42_8SocialCorpus(baseModel);
+    const hunt=(baseModel.signalBrain&&baseModel.signalBrain.executionHunt)||{};
+    const support=v39SafeArray(hunt.support);
+    const trip=v39SafeArray(hunt.tripwires);
+    const symRows=[];
+    function laneScore(name){
+      const f=support.find(x=>new RegExp(name,'i').test(x.title||''))||trip.find(x=>new RegExp(name,'i').test(x.name||''));
+      return Number(f?.score||0);
+    }
+    const checks=[
+      {term:'spider', expect:'route cluster', score:Math.max(laneScore('same-code cluster'), laneScore('route cluster'), laneScore('routed manifold ingress'))},
+      {term:'pulse', expect:'symmetry / heartbeat', score:Math.max(laneScore('11-block'), laneScore('pulse'), laneScore('window density'))},
+      {term:'massless-exit', expect:'dust attrition', score:Math.max(laneScore('dust'), laneScore('massless'), laneScore('zero-write'))},
+      {term:'void', expect:'low-log / sink region', score:Math.max(laneScore('acoustic-void'), laneScore('low-log'), laneScore('spender-core sink'))},
+      {term:'timeline adjustment', expect:'density lift / cue bridge', score:Math.max(laneScore('window density'), laneScore('routed manifold ingress'))}
+    ];
+    let mismatches=0, checksRun=0;
+    for (const c of checks){
+      const present=corpus.includes(c.term);
+      if(!present) continue;
+      checksRun++;
+      const mismatch=c.score<0.28;
+      if(mismatch) mismatches++;
+      symRows.push({label:c.term, expected:c.expect, observed:pct(c.score||0), mismatch, note:mismatch?`Cue called for ${c.expect}, but the chain stayed too quiet.`:`Cue expectation has some chain-side support.`});
+    }
+    const score=checksRun?mismatches/checksRun:0;
+    const summary=checksRun? (mismatches?`Symbolic mismatch ledger found ${mismatches}/${checksRun} cue-to-chain mismatch(es).`:`No symbolic mismatches were found across ${checksRun} active cue test(s).`) : 'No active symbolic cue terms were loaded, so mismatch scoring is idle.';
+    return {score, summary, rows:symRows, mismatches, checks:checksRun};
+  }
+  function applyV42_8Upgrade(baseModel){
+    const graph=v42_8ConductorGraph(baseModel);
+    const bridge=v42_8CueBridge(baseModel, graph);
+    const mismatch=v42_8SymbolicMismatch(baseModel);
+    baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)),
+      {name:'Social conductor graph', kind:'soft', score:graph.score||0, status:graph.activeCount>=2?'observed':'watching', why:graph.summary},
+      {name:'Cue-bridge scoring', kind:'soft', score:bridge.score||0, status:bridge.bridged?'observed':'watching', why:bridge.summary},
+      {name:'Symbolic mismatch ledger', kind:'soft', score:1-(mismatch.score||0), status:mismatch.checks? (mismatch.mismatches?'observed':'clear'):'idle', why:mismatch.summary}
+    ], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.8 adds a social conductor graph, cue-bridge scoring, and symbolic mismatch tracking.`};
+    baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+      {label:'V42.8 conductor graph', value:graph.activeCount?`${graph.activeCount} actor(s)`:'idle', hint:graph.summary, cls:graph.activeCount>=2?'good':graph.activeCount?'warn':'info'},
+      {label:'V42.8 cue bridge', value:bridge.bridged?'active':'watching', hint:bridge.summary, cls:bridge.bridged?'good':'warn'},
+      {label:'V42.8 mismatch ledger', value:mismatch.checks?`${mismatch.mismatches}/${mismatch.checks}`:'idle', hint:mismatch.summary, cls:mismatch.mismatches?'warn':'info'}
+    ], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.8 treats Maria, Darkly, and adjacent accounts as one conductor graph rather than isolated posts.`};
+    baseModel.proveLoop={...baseModel.proveLoop, rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
+      {label:'V42.8 conductor sync', value:graph.activeCount>=2?'multi-track':'single-track', hint:graph.summary},
+      {label:'V42.8 cue bridge', value:bridge.bridged?bridge.terms.join(', '):'not closed', hint:bridge.summary},
+      {label:'V42.8 symbolic mismatch', value:mismatch.checks?`${mismatch.mismatches} mismatch(es)`:'idle', hint:mismatch.summary}
+    ], summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.8 checks whether multiple conductors are calling the same move and penalizes symbolic misses.`};
+    baseModel.clarifier={...baseModel.clarifier,
+      clarity:clamp(Number(baseModel.clarifier?.clarity||0)+Math.min(graph.score||0,0.06)+Math.min(bridge.score||0,0.05)-(mismatch.score||0)*0.08,0,1),
+      debt:clamp(Number(baseModel.clarifier?.debt||0)+(mismatch.score||0)*0.1-Math.min(bridge.score||0,0.04),0,1),
+      supports:v40AppendUniqueText(baseModel.clarifier?.supports,[graph.summary, bridge.bridged?bridge.summary:''].filter(Boolean),24),
+      disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm,[mismatch.mismatches?mismatch.summary:''].filter(Boolean),24),
+      proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,['Use conductor graph actor overlap to prioritize new social windows before scanning generic churn.', 'Raise contradiction debt when Spider / Pulse / Massless-Exit cues fail their expected chain lanes.'],24),
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.8 conductors ${graph.activeCount} • bridge ${pct(bridge.score||0)} • mismatch ${mismatch.checks?`${mismatch.mismatches}/${mismatch.checks}`:'idle'}.`
+    };
+    baseModel.v42_8={graph, bridge, mismatch, summary:`V42.8 conductor graph tracks ${graph.activeCount} actor(s), cue-bridge ${pct(bridge.score||0)}, and symbolic mismatch ${mismatch.checks?`${mismatch.mismatches}/${mismatch.checks}`:'idle'}.`};
+    baseModel.version='V42.8 Social Conductor Graph Auditor';
+    return baseModel;
+  }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); const v426=applyV42_6Upgrade(v425); return applyV42_8Upgrade(v426); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -3525,6 +3651,7 @@ ${state.settings.researchCorpus||''}`);
     const intEl=$('v39IntegrationList');
     if(intEl && Array.isArray(v41.integrationRows)) v41.integrationRows.forEach(t=>pushItem(intEl, t, 'info'));
     renderV42_6(model);
+    renderV42_8(model);
   }
   function renderV42_6(model){
     const v426=model.v42_6||{};
