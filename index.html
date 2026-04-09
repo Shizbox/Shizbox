@@ -2999,8 +2999,7 @@ ${state.settings.researchCorpus||''}`);
     const pieces=[String(state.settings.researchCorpus||''), String(state.settings.mariaGlossary||''), String(state.settings.mariaCueDrop||''), String(state.settings.mariaCueMemory||''), String(state.importedBundle?.settings?.researchCorpus||''), String(state.importedBundle?.settings?.mariaGlossary||'')].filter(Boolean);
     const model=state.lastGood||{};
     if(model.v42_5?.research?.excerpt) pieces.push(String(model.v42_5.research.excerpt||''));
-    return pieces.join('
-').toLowerCase();
+    return pieces.join('\n').toLowerCase();
   }
   function v42_6BuildAbsorberChain(baseModel){
     const research=(baseModel.v42_5&&baseModel.v42_5.research)||{tokens:[],stable:[],modular:false,absorber:false};
