@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V39 Integrated Predator Auditor</title>
+<title>pDAI Peg Prover • V42.3 Predictive Maria Filter Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,8 +84,8 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.2 Semantic Maria Closure Auditor</h1>
-      <div class="sub">V42.2 keeps your exact V38→V42.1 tool and layers semantic Maria closure upgrades directly into it: persistence rehydration, routed manifold ingress, Maria-window gating, pre-shell trie staging, semantic nexus promotion, locked focus-pack persistence, and score-integrity separation between hunt pressure and formal execution.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.3 Semantic Maria Closure Auditor</h1>
+      <div class="sub">V42.3 keeps your exact V38→V42.3 tool and layers predictive Maria filtering directly into it: recursive window density lift, nexus-lane auto-pinning, negative-evidence scoring, semantic motif recurrence, Stage 0.5 pre-shell trie gating, routed manifold ingress, and hard separation between hunt pressure and formal execution.</div>
       <div class="chips">
         <div class="chip good">Imports prior V31–V38 bundle JSON</div>
         <div class="chip info">Adds integrated V42.1 Maria corpus cycles</div>
@@ -732,7 +732,7 @@
   function saveSettings(){ state.settings=rehydrateMariaSettings(Object.assign({}, state.settings), {history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]}); safeStorageSet(STORAGE_KEY, state.settings, x=>x); }
   function saveHistory(v){ state.history=v; return safeStorageSet(HISTORY_KEY, v, compactHistoryForStorage); }
   function saveSocialCache(v){ state.socialCache=v; return safeStorageSet(SOCIAL_CACHE_KEY, v, compactSocialCacheForStorage); }
-  function saveLastGood(v){ state.lastGood=v; state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:v,socialCache:state.socialCache,social:v?.social||[]}); return safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage); }
+  function saveLastGood(v){ state.lastGood=v; state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:v,socialCache:state.socialCache,social:v?.social||[]}); const saved=safeStorageSet(LASTGOOD_KEY, v, compactSnapshotForStorage); safeStorageSet(STORAGE_KEY, state.settings, x=>x); return saved; }
   function migrateLegacy(key, fallback){ const v=readStoredJson(key, null); if(v!==null && v!==undefined) return v; return fallback; }
   function loadSettings(){ return rehydrateMariaSettings(Object.assign({}, DEFAULTS, migrateLegacy(STORAGE_KEY, migrateLegacy(LEGACY_KEYS.settings, DEFAULTS))||{}), {}); }
   function loadHistory(){ return migrateLegacy(HISTORY_KEY, migrateLegacy(LEGACY_KEYS.history, [])) || []; }
@@ -2650,7 +2650,7 @@ function v40PickFocus(baseModel){
         {label:'V40 focus pack', value:`${addrShort(focus.spender)} / ${addrShort(focus.wallet)}`, hint:focus.summary, cls:'good'},
         {label:'V40 social blocker', value:(modules.find(m=>m.name==='social-correlation')?.windows||0)?'real windows present':'no real windows', hint:modules.find(m=>m.name==='social-correlation')?.summary||'Social correlation watch is active.', cls:(modules.find(m=>m.name==='social-correlation')?.windows||0)?'good':'warn'},
         {label:'V40 focus tripwires', value:`${tripwires.length} hard hit(s)`, hint:tripwires.length?tripwires.map(t=>t.name).join(', '):'No V40 focus tripwire promoted this cycle.', cls:tripwires.length?'good':'info'},
-        {label:'V42.2 focus nexus', value:state.settings.focusNexus?addrShort(state.settings.focusNexus):'auto-none', hint:(modules.find(m=>m.name==='routed-manifold-ingress')?.summary)||'Routed nexus promotion is active.', cls:state.settings.focusNexus?'good':'warn'}
+        {label:'V42.3 focus nexus', value:state.settings.focusNexus?addrShort(state.settings.focusNexus):'auto-none', hint:(modules.find(m=>m.name==='routed-manifold-ingress')?.summary)||'Routed nexus promotion is active.', cls:state.settings.focusNexus?'good':'warn'}
       ],
       summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V40 focus ${addrShort(focus.spender)} with ${tripwires.length} focus tripwire(s).`,
       pills:v39UniqBy([...(v39SafeArray(baseModel.systemAudit?.pills)), 'v40', tripwires.length?'focus-tripwire':'focus-watch', (modules.find(m=>m.name==='social-correlation')?.windows||0)?'social-real':'social-missing'], x=>x)
@@ -2661,7 +2661,7 @@ function v40PickFocus(baseModel){
         {label:'V40 focus spender', value:addrShort(focus.spender), hint:`Auto-lock is targeting the most persistent manifold in the current state.`},
         {label:'V40 focus wallet', value:addrShort(focus.wallet), hint:`Current preferred discharge wallet for the focus lane.`},
         {label:'V40 live gate', value:(modules.find(m=>m.name==='focus-pull-path')?.directWalletSpender||0)?'direct pull-path observed':((modules.find(m=>m.name==='routed-manifold-ingress')?.lanes||0)?'routed ingress observed':'waiting on direct pull-path'), hint:(modules.find(m=>m.name==='focus-pull-path')?.summary||modules.find(m=>m.name==='routed-manifold-ingress')?.summary||'Focus pull-path watch is active.')},
-        {label:'V42.2 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'No export is valid unless mariaCueDrop and mariaGlossary survive rehydration.'}
+        {label:'V42.3 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'No export is valid unless mariaCueDrop and mariaGlossary survive rehydration.'}
       ],
       summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V40 is waiting for the focus spender to graduate from approval-shell persistence into a direct wallet/core pull-path.`
     };
@@ -2674,7 +2674,7 @@ function v40PickFocus(baseModel){
         `Focus spender lock: ${focus.spender?addrShort(focus.spender):'auto-none'}.`,
         `Focus wallet lock: ${focus.wallet?addrShort(focus.wallet):'auto-none'}.`,
         `Focus core lock: ${focus.core?addrShort(focus.core):'auto-none'}.`,
-        `V40/V42.2 added pull-path, routed-ingress, window-gating, allowance-shock, terminal-discharge, trie-drift, pre-shell-trie, burn-rail, and social-blocker modules.`,
+        `V40/V42.3 added pull-path, routed-ingress, window-gating, allowance-shock, terminal-discharge, trie-drift, pre-shell-trie, burn-rail, and social-blocker modules.`,
         `V40 promoted ${tripwires.length} focus-layer tripwire(s).`
       ],
       summary:`V40 focus pack ${addrShort(focus.spender)} / ${addrShort(focus.wallet)} / ${addrShort(focus.core)} with ${tripwires.length} promoted focus tripwire(s).`
@@ -2732,7 +2732,7 @@ ${state.settings.researchCorpus||''}`);
     ];
     const windowRows=windows.slice(0,12).map(w=>({title:w.title||w.phase||'window', phase:w.phase||'maria', block:Math.round(w.approxBlock||0), range:`${Math.round(w.fromBlock||0)}→${Math.round(w.toBlock||0)}`, tags:(w.tags||[]).join(', ')}));
     const summary=items.length ? `V42 Maria engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), ${glossary.length} glossary mapping(s), and ${hypos.filter(h=>h.score>=0.55).length} active semantic hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and semantic hypotheses.';
-    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.2 layered Gemini's Maria corpus directly into V42.1.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
+    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.3 layered Gemini's Maria corpus directly into V42.1.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
   }
 
   function applyV41Upgrade
@@ -2774,36 +2774,140 @@ ${state.settings.researchCorpus||''}`);
       ...maria,
       summary:maria.summary
     };
-    baseModel.version='V42.2 Semantic Maria Closure Auditor';
+    baseModel.version='V42.3 Semantic Maria Closure Auditor';
     return baseModel;
   }
 
 
-  function applyV42_2Upgrade(baseModel){
+
+  function v42WindowSets(baseModel){
+    const all=v42MariaWindows(baseModel);
+    const pick=(kind)=>all.filter(w=>String(w.windowKind||w.phase||'').toLowerCase().includes(kind));
+    return {all, base:pick('base'), pulse:pick('pulse11'), react:pick('react33'), drift:pick('drift66')};
+  }
+  function v42WindowVolumeRows(transfers, windows, focus){
+    const wallet=norm(focus.wallet), spender=norm(focus.spender), core=norm(focus.core), nexus=norm(state.settings.focusNexus||'');
+    const inWin=transfers.filter(t=>v42TxInWindows(t, windows));
+    const total=inWin.reduce((a,t)=>a+Math.abs(Number(t.amount||0)),0);
+    const focusRows=inWin.filter(t=>[wallet,spender,core,nexus].includes(norm(t.from)) || [wallet,spender,core,nexus].includes(norm(t.to)));
+    const spenderRows=inWin.filter(t=>norm(t.from)===spender || norm(t.to)===spender);
+    const nexusRows=inWin.filter(t=>nexus && (norm(t.from)===nexus || norm(t.to)===nexus));
+    const walletRows=inWin.filter(t=>norm(t.from)===wallet || norm(t.to)===wallet);
+    const focusVol=focusRows.reduce((a,t)=>a+Math.abs(Number(t.amount||0)),0);
+    const spenderVol=spenderRows.reduce((a,t)=>a+Math.abs(Number(t.amount||0)),0);
+    const nexusVol=nexusRows.reduce((a,t)=>a+Math.abs(Number(t.amount||0)),0);
+    const walletVol=walletRows.reduce((a,t)=>a+Math.abs(Number(t.amount||0)),0);
+    return {count:inWin.length,total,focusVol,spenderVol,nexusVol,walletVol,density:total?focusVol/total:0,spenderShare:total?spenderVol/total:0,nexusShare:total?nexusVol/total:0,walletShare:total?walletVol/total:0};
+  }
+  function v42BuildWindowDensityLift(baseModel, focus){
+    const transfers=v39SafeArray(baseModel.signalBrain?.contractIntel?.transfers);
+    const sets=v42WindowSets(baseModel);
+    const base=v42WindowVolumeRows(transfers, sets.base, focus);
+    const react=v42WindowVolumeRows(transfers, sets.react, focus);
+    const pulse=v42WindowVolumeRows(transfers, sets.pulse, focus);
+    const lift=react.density/Math.max(base.density, 0.0001);
+    const spenderLift=react.spenderShare/Math.max(base.spenderShare, 0.0001);
+    const nexusLift=react.nexusShare/Math.max(base.nexusShare, 0.0001);
+    const score=clamp((sets.react.length?0.12:0) + Math.min(lift/6,0.34) + Math.min(spenderLift/6,0.26) + Math.min(nexusLift/6,0.18) + Math.min(pulse.spenderShare*1.2,0.10),0,1);
+    const summary=sets.react.length ? `Maria reaction density lift is ${lift.toFixed(2)}x (spender ${spenderLift.toFixed(2)}x, nexus ${nexusLift.toFixed(2)}x) versus base window around ${addrShort(focus.spender)}.` : 'No Maria reaction window is available for recursive density lift yet.';
+    return {name:'window-density-lift', score, summary, lift, spenderLift, nexusLift, baseDensity:base.density, reactDensity:react.density, pulseSpenderShare:pulse.spenderShare};
+  }
+  function v42BuildNegativeEvidence(baseModel, focus, priorModules){
+    const sets=v42WindowSets(baseModel);
+    const get=n=>(priorModules||[]).find(m=>m.name===n)||{};
+    let misses=0, checks=0; const reasons=[];
+    if(sets.all.length){
+      checks++;
+      if(!(get('window-density-lift').lift>1.5)){ misses++; reasons.push('Maria window density did not materially lift over base behavior.'); }
+      checks++;
+      if(!((get('routed-manifold-ingress').mariaHits||0)>0 || (get('focus-pull-path').directWalletSpender||0)>0)){ misses++; reasons.push('No direct or routed spender ingress landed inside the Maria windows.'); }
+      checks++;
+      if(!((baseModel.reserveArchaeology||[]).some(x=>x.status==='reactive'))){ misses++; reasons.push('Top Maria windows did not produce a decisive reserve archaeology hit.'); }
+      checks++;
+      if(!((baseModel.signalBrain?.dustAttrition?.score||0)>0.35)){ misses++; reasons.push('Dust attrition did not strengthen enough to satisfy a massless-exit style cue.'); }
+      checks++;
+      if(!((baseModel.signalBrain?.symmetrySniffer?.lead?.score||0)>0.72)){ misses++; reasons.push('Pulse cadence remained below the high-confidence symmetry threshold.'); }
+    }
+    const contradiction = checks ? misses/checks : 0;
+    const score=clamp(contradiction,0,1);
+    const summary=checks ? `${misses}/${checks} expected Maria-window closure behaviors failed to appear; contradiction debt should rise when expected behavior is absent.` : 'No Maria windows are active, so negative-evidence scoring is idle.';
+    return {name:'negative-evidence', score, summary, misses, checks, reasons};
+  }
+  function v42BuildMotifRecurrence(baseModel, focus){
+    const hist=[...v39SafeArray(state.history), ...v39SafeArray(state.importedBundle?.history), baseModel];
+    const focusSpender=norm(focus.spender), focusNexus=norm(state.settings.focusNexus||'');
+    const spenderHits=hist.filter(h=>norm(h?.manifoldTracker?.lead?.address||h?.signalBrain?.manifoldTracker?.lead?.address||'')===focusSpender).length;
+    const gateRows=hist.flatMap(h=>v39SafeArray(h?.gateWatch?.rows||h?.signalBrain?.gateWatch?.rows));
+    const gateMap={}; gateRows.forEach(r=>{ const k=String(r.word||'').slice(0,18); if(k) gateMap[k]=(gateMap[k]||0)+1; });
+    const gateLead=Object.entries(gateMap).sort((a,b)=>b[1]-a[1])[0]||[];
+    const gasRows=hist.flatMap(h=>v39SafeArray(h?.gasFingerprint?.rows||h?.signalBrain?.gasFingerprint?.rows));
+    const rounded=gasRows.map(r=>Number(r.gwei||0)).filter(Number.isFinite).map(x=>Math.round(x));
+    const gasMap={}; rounded.forEach(g=>gasMap[g]=(gasMap[g]||0)+1);
+    const gasLead=Object.entries(gasMap).sort((a,b)=>b[1]-a[1])[0]||[];
+    const nexusHits=hist.filter(h=>norm(h?.settings?.focusNexus||'')===focusNexus && focusNexus).length;
+    const score=clamp(Math.min(spenderHits/10,0.4) + Math.min((gateLead[1]||0)/6,0.26) + Math.min((gasLead[1]||0)/6,0.18) + Math.min(nexusHits/8,0.16),0,1);
+    const summary=spenderHits ? `Semantic motif recurrence: ${spenderHits} snapshot(s) repeat the focus spender, gate motif ${gateLead[0]||'—'} x${gateLead[1]||0}, gas motif ${gasLead[0]||'—'} x${gasLead[1]||0}${focusNexus?`, nexus recurrence ${nexusHits}`:''}.` : 'Motif recurrence is still too weak to harden a Maria symbol-to-chain signature.';
+    return {name:'motif-recurrence', score, summary, spenderHits, gateWord:gateLead[0]||'', gateRepeats:gateLead[1]||0, gasBand:gasLead[0]||'', gasRepeats:gasLead[1]||0, nexusHits};
+  }
+
+  function applyV42_3Upgrade(baseModel){
     const focus=baseModel.v40?.focus || v40PickFocus(baseModel);
-    const modules=v39SafeArray(baseModel.v40?.modules);
-    const get=n=>modules.find(m=>m.name===n)||{};
+    const prior=v39SafeArray(baseModel.v40?.modules);
+    const modules=[...prior, v42BuildWindowDensityLift(baseModel, focus)];
+    const predictive=[
+      modules[modules.length-1],
+      v42BuildNegativeEvidence(baseModel, focus, modules),
+      v42BuildMotifRecurrence(baseModel, focus)
+    ];
+    const pget=n=>predictive.find(m=>m.name===n)||{};
+    const neg=pget('negative-evidence');
+    baseModel.evidenceLedger={
+      ...baseModel.evidenceLedger,
+      rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)),
+        {name:'Maria window density lift', kind:'soft', score:pget('window-density-lift').score||0, status:(pget('window-density-lift').lift||0)>1.5?'observed':'watching', why:pget('window-density-lift').summary||'Window density lift is idle.'},
+        {name:'Negative evidence ledger', kind:'soft', score:1-(neg.score||0), status:(neg.misses||0)?'observed':'quiet', why:neg.summary||'Negative evidence scoring is idle.'},
+        {name:'Semantic motif recurrence', kind:'soft', score:pget('motif-recurrence').score||0, status:(pget('motif-recurrence').spenderHits||0)>=3?'observed':'watching', why:pget('motif-recurrence').summary||'Motif recurrence watch is idle.'}
+      ],
+      summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.3 predictive filtering added density lift, negative evidence, and motif recurrence.`
+    };
     baseModel.systemAudit={
       ...baseModel.systemAudit,
       rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
-        {label:'V42.2 Maria persistence', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'Maria cue drop and glossary are rehydrated from live state before export.', cls:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'good':'warn'},
-        {label:'V42.2 semantic ingress', value:(get('routed-manifold-ingress').lanes||0)?`${get('routed-manifold-ingress').lanes} lane(s)`:'watching', hint:get('routed-manifold-ingress').summary||'Routed manifold ingress watch is active.', cls:(get('routed-manifold-ingress').lanes||0)?'good':'warn'}
+        {label:'V42.3 persistence law', value:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'rehydrated':'partial', hint:'Maria cue drop and glossary are rehydrated from live state/history before export.', cls:(state.settings.mariaCueDrop&&state.settings.mariaGlossary)?'good':'warn'},
+        {label:'V42.3 recursive density', value:(pget('window-density-lift').lift||0)?`${(pget('window-density-lift').lift||0).toFixed(2)}x`:'watching', hint:pget('window-density-lift').summary||'Window density lift is idle.', cls:(pget('window-density-lift').lift||0)>1.5?'good':'warn'},
+        {label:'V42.3 negative evidence', value:(neg.misses||0)?`${neg.misses}/${neg.checks}`:'clear', hint:(neg.reasons||[])[0]||neg.summary||'Negative evidence scoring is idle.', cls:(neg.misses||0)?'warn':'good'},
+        {label:'V42.3 motif recurrence', value:(pget('motif-recurrence').spenderHits||0)?`${pget('motif-recurrence').spenderHits} snapshot(s)`:'watching', hint:pget('motif-recurrence').summary||'Motif recurrence is idle.', cls:(pget('motif-recurrence').spenderHits||0)>=3?'good':'info'}
       ],
-      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.2 enforces persistence law, split scoring, and semantic ingress.`
+      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.3 enforces recursive window gating, negative evidence, nexus promotion, and motif recurrence.`
     };
     baseModel.proveLoop={
       ...baseModel.proveLoop,
-      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.2 treats trie drift recurrence as Stage 0.5 execution pressure and routed ingress as the bridge between approval-shell suspicion and direct pull-path proof.`
+      rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
+        {label:'V42.3 recursive window gate', value:(pget('window-density-lift').lift||0)>1.5?'reactive':'watching', hint:pget('window-density-lift').summary||'Recursive window gate is idle.'},
+        {label:'V42.3 Stage 0.5', value:(prior.find(m=>m.name==='pre-shell-trie')?.currentHits||0)?'pre-shell activation':'watching', hint:prior.find(m=>m.name==='pre-shell-trie')?.summary||'Pre-shell trie gate is active.'},
+        {label:'V42.3 contradiction filter', value:(neg.misses||0)?`${neg.misses} miss(es)`:'clear', hint:neg.summary||'Negative evidence scoring is idle.'}
+      ],
+      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.3 uses recursive window density, negative evidence, and motif recurrence to move from observation to predictive filtering.`
     };
-    baseModel.v42_2={
-      laws:['persistence','split-scoring','semantic-ingress'],
+    baseModel.clarifier={
+      ...baseModel.clarifier,
+      debt:clamp(Number(baseModel.clarifier?.debt||0) + (neg.score||0)*0.16 - Math.min((pget('window-density-lift').score||0)*0.08,0.08),0,1),
+      clarity:clamp(Number(baseModel.clarifier?.clarity||0) + (pget('window-density-lift').score||0)*0.06 - (neg.score||0)*0.05 + (pget('motif-recurrence').score||0)*0.04,0,1),
+      supports:v40AppendUniqueText(baseModel.clarifier?.supports, [pget('window-density-lift').summary, pget('motif-recurrence').summary].filter(Boolean), 22),
+      disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm, (neg.reasons||[]).slice(0,4), 22),
+      proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext, ['Auto-promote nexus addresses that bridge focus wallet and focus spender inside the same Maria window.', 'Compare react33 versus base11 density before counting a Maria reaction as meaningful.', 'Use negative evidence to raise debt when expected semantic behavior fails to appear.'], 22),
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.3 density ${(pget('window-density-lift').lift||0).toFixed(2)}x • motif ${(pget('motif-recurrence').spenderHits||0)} • negative ${(neg.misses||0)}/${(neg.checks||0)}.`
+    };
+    baseModel.v42_3={
+      laws:['persistence','split-scoring','semantic-ingress','recursive-window-gating','negative-evidence','motif-recurrence'],
       focusNexus:state.settings.focusNexus||'',
-      summary:`V42.2 semantic closure is active around ${addrShort(focus.spender)} with nexus ${addrShort(state.settings.focusNexus||'')||'—'}.`
+      predictiveModules:predictive,
+      summary:`V42.3 predictive Maria filtering is active around ${addrShort(focus.spender)} with nexus ${addrShort(state.settings.focusNexus||'')||'—'} and density lift ${(pget('window-density-lift').lift||0).toFixed(2)}x.`
     };
-    baseModel.version='V42.2 Semantic Maria Closure Auditor';
+    baseModel.version='V42.3 Predictive Maria Filter Auditor';
     return baseModel;
   }
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); return applyV42_2Upgrade(v41); }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); return applyV42_3Upgrade(v41); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -3266,8 +3370,8 @@ ${state.settings.researchCorpus||''}`);
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v41-history.json', state.history);
-  $('exportBtn').onclick=()=> downloadJson('pdai-v41-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_3-history.json', state.history);
+  $('exportBtn').onclick=()=> { state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[]}); downloadJson('pdai-v42_3-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle}); };
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
     try{
