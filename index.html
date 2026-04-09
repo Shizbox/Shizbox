@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V40 Hyper Predator Auditor</h1>
-      <div class="sub">V40 keeps your exact V38→V39 tool and layers the next hunt upgrades directly into it: focus-spender targeting, pull-path watch, allowance-shock detection, trie-drift memory, terminal discharge lanes, burn-rail weighting, stronger persistence, and harder proof gating without wiping prior logic.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V41 Maria Research Engine Auditor</h1>
+      <div class="sub">V41 keeps your exact V38→V40 tool and layers Maria Research Engine upgrades directly into it: Maria/video cue ingestion, symbol-to-chain hypothesis mapping, real Maria windows, focus-spender targeting, pull-path watch, allowance-shock detection, trie-drift memory, terminal discharge lanes, burn-rail weighting, stronger persistence, and harder proof gating without wiping prior logic.</div>
       <div class="chips">
         <div class="chip good">Imports prior V31–V38 bundle JSON</div>
-        <div class="chip info">Adds integrated V40 hyper-predator lead cycles</div>
-        <div class="chip warn">Hardens multi-source social coverage + source health</div>
-        <div class="chip bad">Promotes hard tripwires with focus-spender proof weighting</div>
+        <div class="chip info">Adds integrated V41 Maria research cycles</div>
+        <div class="chip warn">Hardens Maria/social coverage + source health</div>
+        <div class="chip bad">Promotes hard tripwires while keeping Maria cues proof-gated</div>
       </div>
     </div>
     <div>
@@ -113,7 +113,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V40 integrated settings</div>
+    <div class="boxTitle">V41 integrated settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Fallback RPCs</label><textarea id="sRpcs" placeholder="one per line"></textarea></div>
@@ -130,6 +130,8 @@
       <div class="field"><label>Social proxy endpoint</label><input id="sSocialProxy" placeholder="optional endpoint returning items[]" /></div>
       <div class="field"><label>Manual social / transcripts / lines</label><textarea id="sManualSocial" placeholder='JSON array or lines like: Mar 31 0432 pm 136s 202604030953 x9oeb'></textarea></div>
       <div class="field"><label>Research corpus / notes</label><textarea id="sResearchCorpus" placeholder="notes, transcripts, frame observations"></textarea></div>
+      <div class="field"><label>Maria cue drop / URLs / live notes</label><textarea id="sMariaCueDrop" placeholder="paste Maria links, titles, timestamps, and visual observations"></textarea></div>
+      <div class="field"><label>Maria glossary / symbol map</label><textarea id="sMariaGlossary" placeholder="111 spider = same-code route cluster&#10;acoustic void = spender/core sink&#10;taste tree = branching route graph"></textarea></div>
       <div class="field"><label>Speculation level (1-10)</label><input id="sSpeculateLevel" value="8" /></div>
       <div class="field"><label>Deep sweep every N cycles</label><input id="sDeepSweepEvery" value="4" /></div>
       <div class="field"><label>Relayer / manifold hints</label><textarea id="sRelayerHints" placeholder="0x4fd0..., 0x6bf2..., 0xda9a..., fragments or exact addresses"></textarea></div>
@@ -405,7 +407,7 @@
 
   <div class="tri">
     <div class="panel">
-      <div class="boxTitle">V40 source coverage guardian</div>
+      <div class="boxTitle">V41 source coverage guardian</div>
       <div class="small">Every social source family is audited so the terminal knows when feeds are live, stale, dark, or underfed instead of pretending social timing is complete.</div>
       <div id="sourceCoverageSummary" class="item info" style="margin-top:12px">No source coverage summary yet.</div>
       <div id="sourceCoverageList"></div>
@@ -431,9 +433,27 @@
       <div id="v39ModuleList"></div>
     </div>
     <div class="panel">
-      <div class="boxTitle">V40 integration ledger</div>
+      <div class="boxTitle">V41 integration ledger</div>
       <div class="small">This confirms the old V38 logic was carried forward and then tightened with predator-mode, source coverage, and tripwire weighting.</div>
       <div id="v39IntegrationList"></div>
+    </div>
+  </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">V41 Maria research engine</div>
+      <div class="small">Maria broadcasts, livestreams, visual ciphers, lore notes, and manual drops are preserved as research leads that generate real timing windows without being treated as self-proving shell evidence.</div>
+      <div id="mariaEngineList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">V41 symbol → chain hypotheses</div>
+      <div class="small">Symbols are translated into testable chain-side mappings so the tool digs harder instead of disregarding Maria or mistaking symbolism for completed proof.</div>
+      <div id="mariaHypothesisList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">V41 Maria window reactor</div>
+      <div class="small">Every Maria cue can spawn tight, pulse, reaction, and drift windows for reserve, slot, spender, and route correlation.</div>
+      <div id="mariaWindowList"></div>
     </div>
   </div>
 
@@ -483,6 +503,8 @@
     socialProxy:'',
     manualSocial:'',
     researchCorpus:'',
+    mariaCueDrop:'',
+    mariaGlossary:'',
     speculateLevel:8,
     deepSweepEvery:4,
     relayerHints:'',
@@ -531,7 +553,7 @@
   function scoreRatio(a,b,tol){ const delta=Math.abs(Number(a||0)-Number(b||0)); const t=Math.max(Math.abs(Number(tol)||1),1e-9); return clamp(1-(delta/t),0,1); }
   function hashish(text){ let h=2166136261; const s=String(text||''); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return 'h'+((h>>>0).toString(16)); }
   function parseMaybeJson(s){ try{return JSON.parse(String(s||''));}catch{return null;} }
-  function inferPlatform(url,name=''){ const u=String(url||'').toLowerCase(); const n=String(name||'').toLowerCase(); if(u.includes('x.com')||u.includes('twitter.com')||n.includes('twitter')||n==='x') return 'x'; if(u.includes('t.me')||n.includes('telegram')) return 'telegram'; if(u.includes('youtube.com')||u.includes('youtu.be')||n.includes('youtube')) return 'youtube'; if(u.includes('rumble.com')||n.includes('rumble')) return 'rumble'; if(n.includes('manual')) return 'manual'; if(n.includes('corpus')) return 'corpus'; if(n.includes('inline')) return 'manual'; return 'unknown'; }
+  function inferPlatform(url,name=''){ const u=String(url||'').toLowerCase(); const n=String(name||'').toLowerCase(); if(u.includes('x.com')||u.includes('twitter.com')||n.includes('twitter')||n==='x') return 'x'; if(u.includes('t.me')||n.includes('telegram')) return 'telegram'; if(u.includes('youtube.com')||u.includes('youtu.be')||n.includes('youtube')) return 'youtube'; if(u.includes('rumble.com')||n.includes('rumble')) return 'rumble'; if(n.includes('maria')||/靈脅用/i.test(name||'')) return 'maria'; if(n.includes('manual')) return 'manual'; if(n.includes('corpus')) return 'corpus'; if(n.includes('inline')) return 'manual'; return 'unknown'; }
   function asTsMs(v){ if(v===null||v===undefined||v==='') return 0; if(typeof v==='number' && Number.isFinite(v)) return v>1e12? v : v>1e9 ? v*1000 : v; const t=Date.parse(String(v)); return Number.isFinite(t)?t:0; }
   function normalizeText(s){ return String(s||'').replace(/\s+/g,' ').trim(); }
   function shortHash(hash=''){ const h=String(hash||''); return h ? `${h.slice(0,10)}…${h.slice(-8)}` : '—'; }
@@ -748,6 +770,9 @@
     item.durationSec=Number(item.durationSec || extractDuration(item.title+' '+item.text) || 0);
     item.phase=item.phase || detectPhase(item.title+' '+item.text);
     item.code=item.code || extractCode(item.title+' '+item.text);
+    item.tags=uniq([...(Array.isArray(item.tags)?item.tags:[]), ...detectMariaTags(item.title+' '+item.text+' '+(item.author||'')+' '+(item.url||''))], x=>x);
+    item.isMaria=!!item.isMaria || looksMariaText(item.title+' '+item.text+' '+(item.author||'')+' '+(item.url||'')) || String(item.platform||'').toLowerCase()==='maria';
+    item.kind=item.kind || (item.isMaria?'maria-cue':'social');
     item.publishedAt=item.publishedAt || extractTimestamp(item.title+' '+item.text) || new Date().toISOString();
     return item;
   }
@@ -766,6 +791,7 @@
     if(/heat|sfvcy|gas|priority/.test(t)) return 'heat';
     if(/lock|scam|proxy|implementation/.test(t)) return 'lock';
     if(/init|route|sdk|api|bridge|usdc|eusdt|edai|swap/.test(t)) return 'intake';
+    if(looksMariaText(t)) return 'maria';
     return 'social';
   }
 
@@ -792,8 +818,14 @@
 
     const manualItems=parseManualSocial(state.settings.manualSocial);
     const corpusItems=parseManualSocial(state.settings.researchCorpus);
+    const mariaItems=v39UniqBy([
+      ...parseMariaCueText(state.settings.mariaCueDrop),
+      ...parseMariaCueText(state.settings.manualSocial),
+      ...parseMariaCueText(state.settings.researchCorpus)
+    ], x=>x.id||`${x.url||''}|${x.title||''}|${x.publishedAt||''}`);
     if(manualItems.length){ lists.push(manualItems); state.sourceHealth.push(computeSourceHealth({name:'manual',url:'manual://inline'}, manualItems, true)); }
     if(corpusItems.length){ lists.push(corpusItems); state.sourceHealth.push(computeSourceHealth({name:'corpus',url:'corpus://inline'}, corpusItems, true)); }
+    if(mariaItems.length){ lists.push(mariaItems); state.sourceHealth.push(computeSourceHealth({name:'maria',url:'maria://cue'}, mariaItems, true)); }
 
     const proxyRaw=state.settings.socialProxy;
     if(proxyRaw){
@@ -850,25 +882,46 @@
   }
 
   function buildWindows(latestBlock, latestTsMs, items, liveBlockSec){
-    return (items||[]).map(item=>{
-      const ts=new Date(item.publishedAt).getTime();
-      const secPerBlock=Number(liveBlockSec)||Number(state.settings.blockSec)||10.2;
-      const ageSec=isNaN(ts) ? 0 : Math.max(0, (latestTsMs-ts)/1000);
-      const approxBlock=Math.max(0, Math.round(latestBlock - ageSec/secPerBlock));
-      const blocks=Math.max(1, item.durationSec ? item.durationSec/secPerBlock : 1);
-      return Object.assign({}, item, {
-        approxBlock,
-        blocks,
-        fromBlock:Math.max(0, Math.floor(approxBlock)),
-        toBlock:Math.max(0, Math.ceil(approxBlock+blocks))
+    const secPerBlock=Number(liveBlockSec)||Number(state.settings.blockSec)||10.2;
+    const out=[];
+    (items||[]).forEach((item,idx)=>{
+      const ts=asTsMs(item.publishedAt)||latestTsMs||Date.now();
+      const ageSec=Math.max(0, ((latestTsMs||Date.now())-ts)/1000);
+      const approxBlock=Math.max(0, Math.round((latestBlock||0) - ageSec/secPerBlock));
+      const baseBlocks=Math.max(1, item.durationSec ? item.durationSec/secPerBlock : 1);
+      const isMaria=!!item.isMaria || looksMariaText(`${item.title||''} ${item.text||''} ${(item.author||'')}`);
+      const variants=[{suffix:'base', phase:item.phase||'social', blocks:Math.max(1,baseBlocks), shift:0, weight:0}];
+      if(isMaria){
+        variants.push({suffix:'tight', phase:'maria-tight', blocks:Math.max(3, Math.round(180/secPerBlock)), shift:0, weight:0.18});
+        variants.push({suffix:'pulse11', phase:'maria-pulse', blocks:11, shift:0, weight:0.22});
+        variants.push({suffix:'react33', phase:'maria-reaction', blocks:33, shift:0, weight:0.16});
+        variants.push({suffix:'drift66', phase:'maria-drift', blocks:66, shift:33, weight:0.08});
+      }
+      variants.forEach(v=>{
+        const center=approxBlock + (v.shift||0);
+        out.push(Object.assign({}, item, {
+          id:`${item.id||`win:${idx}`}:${v.suffix}`,
+          approxBlock:center,
+          blocks:v.blocks,
+          fromBlock:Math.max(0, Math.floor(center - (v.blocks/2))),
+          toBlock:Math.max(0, Math.ceil(center + (v.blocks/2))),
+          phase:v.phase,
+          isMaria,
+          real:true,
+          windowKind:v.suffix,
+          windowWeight:v.weight||0
+        }));
       });
-    }).sort((a,b)=>windowScore(b)-windowScore(a));
+    });
+    return out.sort((a,b)=>windowScore(b)-windowScore(a)).slice(0,360);
   }
 
   function windowScore(w){
-    const phaseBoost={scribe:.26,heat:.16,lock:.1,intake:.12,social:.06};
-    const dur=Math.min((Number(w.blocks)||1)/14,.25);
-    return clamp(.2 + dur + (phaseBoost[w.phase]||.05) + ((w.code||'').length ? .06 : 0), 0, 1);
+    const phaseBoost={scribe:.26,heat:.16,lock:.1,intake:.12,social:.06,maria:.16,'maria-tight':.34,'maria-pulse':.32,'maria-reaction':.22,'maria-drift':.14};
+    const dur=Math.min((Number(w.blocks)||1)/24,.25);
+    const mariaBoost=w.isMaria ? .18 : 0;
+    const tagBoost=(Array.isArray(w.tags)?Math.min(w.tags.length*0.02,.12):0);
+    return clamp(.18 + dur + (phaseBoost[w.phase]||.05) + ((w.code||'').length ? .06 : 0) + mariaBoost + tagBoost + (w.windowWeight||0), 0, 1);
   }
 
   async function buildChainState(imported){
@@ -1663,14 +1716,14 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     const items=social||[];
     const byPlat={};
     items.forEach(x=>{ const k=x.platform||x.source||'unknown'; byPlat[k]=(byPlat[k]||0)+1; });
-    const maria=items.filter(x=>String(x.platform||'').toLowerCase()==='youtube' || String(x.kind||'').toLowerCase()==='short');
+    const maria=items.filter(x=>x.isMaria || String(x.platform||'').toLowerCase()==='youtube' || String(x.platform||'').toLowerCase()==='maria' || String(x.kind||'').toLowerCase().includes('maria'));
     const codeMap=new Map();
     maria.forEach(x=>{ const k=x.code||'uncoded'; const row=codeMap.get(k)||{code:k,count:0,duration:0,phase:x.phase||'—'}; row.count+=1; row.duration=Math.max(row.duration, Number(x.durationSec||0)); codeMap.set(k,row); });
     const codes=[...codeMap.values()].sort((a,b)=>b.count-a.count || b.duration-a.duration).slice(0,8);
     const realWindows=(windows||[]).filter(w=>!String(w.phase||'').startsWith('synthetic'));
     const rows=[
       {label:'Loaded social memory', value:`${items.length} item(s)`, hint:`Platforms: ${Object.entries(byPlat).map(([k,v])=>`${k} ${v}`).join(' • ')||'none'}`},
-      {label:'Maria/video items', value:`${maria.length}`, hint:`Codes: ${codes.map(x=>x.code).join(', ')||'none'}`},
+      {label:'Maria/video items', value:`${maria.length}`, hint:`Codes/tags: ${codes.map(x=>x.code).join(', ')||'none'}`},
       {label:'Real timing windows', value:`${realWindows.length}`, hint:realWindows[0]?`Top window ${realWindows[0].code||realWindows[0].phase||'window'} @ block ${Math.round(realWindows[0].approxBlock||0)}`:'No real windows loaded; synthetic fallback may be used.'},
       {label:'Memory retention', value:`${Math.max(1, Number(state.settings.socialMemoryDays||45))} day(s)`, hint:'Older items remain available for window scoring and correlation.'}
     ];
@@ -2367,7 +2420,81 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     return baseModel;
   }
 
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); return applyV40Upgrade(v39); }
+
+  function v41BuildMariaResearch(baseModel){
+    const items=(baseModel.social||[]).filter(x=>x && (x.isMaria || looksMariaText(`${x.title||''} ${x.text||''} ${x.author||''} ${x.url||''}`)));
+    const windows=(baseModel.windows||[]).filter(w=>w && (w.isMaria || looksMariaText(`${w.title||''} ${w.text||''} ${w.phase||''}`)));
+    const glossary=parseGlossary(`${state.settings.mariaGlossary||''}
+${state.settings.researchCorpus||''}`);
+    const focus=baseModel.v40?.focus || {spender:'',wallet:'',core:''};
+    const routeScore=clamp(avg(((baseModel.routeClusters?.rows)||[]).map(r=>r.score||0)),0,1) || clamp(Number(baseModel.routeClusters?.score||0),0,1);
+    const nexusScore=clamp(Number(baseModel.dischargeNexus?.lead?.score||0),0,1);
+    const spenderScore=clamp(Number((baseModel.spenderLab||[])[0]?.score||0),0,1);
+    const symmetryScore=clamp(Number(baseModel.symmetrySniffer?.score||0),0,1);
+    const trieScore=clamp(Number(baseModel.trieTouch?.score||0),0,1);
+    const zeroScore=clamp(Number(baseModel.zeroingAnalysis?.score||0),0,1);
+    const reserveScore=clamp((baseModel.reserveArchaeology||[]).filter(x=>x.status==='reactive').length/3,0,1);
+    const hypos=[
+      {name:'111 spider → same-code route cluster', score:routeScore, detail:routeScore?`Route-cluster pressure is ${pct(routeScore)} with a same-code cluster already visible.`:'No same-code cluster has been promoted yet.'},
+      {name:'acoustic void → spender/core sink', score:clamp(Math.max(spenderScore, nexusScore),0,1), detail:(focus.spender||focus.core)?`Focus sink pack ${addrShort(focus.spender)} / ${addrShort(focus.core)} is active.`:'No focus sink pack is active yet.'},
+      {name:'taste tree → branching discharge graph', score:clamp(Math.max(nexusScore, Number(baseModel.dischargeRouter?.score||0), routeScore*0.8),0,1), detail:baseModel.dischargeNexus?.summary||'Branching discharge graph is still being mapped.'},
+      {name:'pulse → symmetry / reserve reaction', score:clamp(Math.max(symmetryScore*0.7, reserveScore),0,1), detail:reserveScore?`At least one reserve window is reactive.`:(baseModel.symmetrySniffer?.summary||'Pulse timing is still mostly synthetic.')},
+      {name:'massless exit / kinematic strings → trie / zero-write / slot watch', score:clamp(Math.max(trieScore*0.6, zeroScore*0.7, Number(baseModel.signalBrain?.nullAwakening?.score||0)),0,1), detail:`Trie ${pct(trieScore)} • zero-write ${pct(zeroScore)} • slots ${pct(Number(baseModel.signalBrain?.nullAwakening?.score||0))}.`}
+    ];
+    const rows=[
+      {label:'Maria cues loaded', value:String(items.length), hint:items.length?`Top cue: ${(items[0].title||'untitled').slice(0,90)}`:'Paste Maria URLs, titles, or visual notes to seed cue memory.'},
+      {label:'Maria real windows', value:String(windows.length), hint:windows.length?`Top Maria window ${windows[0].phase||'window'} @ block ${Math.round(windows[0].approxBlock||0)}`:'No Maria windows are active yet.'},
+      {label:'Glossary mappings', value:String(glossary.length), hint:glossary.length?glossary.slice(0,3).map(g=>`${g.symbol} → ${g.meaning}`).join(' • '):'No Maria glossary mappings are loaded yet.'},
+      {label:'Research stance', value:'lead-generating, proof-gated', hint:'Maria cues promote windows, targets, and hypotheses, but they do not by themselves count as formal shell proof.'}
+    ];
+    const windowRows=windows.slice(0,12).map(w=>({title:w.title||w.phase||'window', phase:w.phase||'maria', block:Math.round(w.approxBlock||0), range:`${Math.round(w.fromBlock||0)}→${Math.round(w.toBlock||0)}`, tags:(w.tags||[]).join(', ')}));
+    const summary=items.length ? `Maria Research Engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), and ${hypos.filter(h=>h.score>=0.55).length} active symbol-to-chain hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and testable hypotheses.';
+    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V41 layered Maria Research Engine directly on top of V40.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
+  }
+
+  function applyV41Upgrade(baseModel){
+    const maria=v41BuildMariaResearch(baseModel);
+    baseModel.socialMemory={
+      ...baseModel.socialMemory,
+      rows:[...(v39SafeArray(baseModel.socialMemory?.rows)),
+        {label:'Maria research cues', value:`${maria.cueCount}`, hint:maria.summary},
+        {label:'Maria windows', value:`${maria.windowCount}`, hint:maria.windowRows[0]?`${maria.windowRows[0].phase} @ block ${maria.windowRows[0].block}`:'No Maria window is active yet.'}
+      ],
+      summary:`${baseModel.socialMemory?.summary||''}${baseModel.socialMemory?.summary?' • ':''}${maria.summary}`
+    };
+    baseModel.systemAudit={
+      ...baseModel.systemAudit,
+      rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+        {label:'V41 Maria engine', value:maria.cueCount?`${maria.cueCount} cue(s)`:'idle', hint:maria.summary, cls:maria.cueCount?'good':'warn'},
+        {label:'V41 Maria windows', value:maria.windowCount?`${maria.windowCount} active`:'0 active', hint:maria.windowRows[0]?`${maria.windowRows[0].phase} @ block ${maria.windowRows[0].block}`:'No Maria window is active yet.', cls:maria.windowCount?'good':'warn'}
+      ],
+      summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}${maria.summary}`,
+      pills:v39UniqBy([...(v39SafeArray(baseModel.systemAudit?.pills)), 'v41', maria.cueCount?'maria-loaded':'maria-empty', maria.windowCount?'maria-windows':'maria-no-windows'], x=>x)
+    };
+    baseModel.proveLoop={
+      ...baseModel.proveLoop,
+      rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
+        {label:'V41 Maria cue state', value:maria.cueCount?`${maria.cueCount} cue(s)`:'empty', hint:maria.summary},
+        {label:'V41 Maria window mode', value:maria.windowCount?'real Maria windows':'synthetic/social fallback', hint:maria.windowCount?`Top Maria window ${maria.windowRows[0].phase} @ block ${maria.windowRows[0].block}`:'Load or paste Maria cues to create real windows.'}
+      ],
+      summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}${maria.summary}`
+    };
+    baseModel.clarifier={
+      ...baseModel.clarifier,
+      supports:v40AppendUniqueText(baseModel.clarifier?.supports, maria.cueCount?[`Maria cues are loaded as research leads: ${maria.cueCount} cue(s), ${maria.windowCount} Maria window(s).`]:[], 20),
+      disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm, maria.cueCount?[]:['No Maria cues are loaded, so Maria-side timing research is still blind.'], 18),
+      proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext, [maria.windowCount?'Drive reserve/slot/spender scans through the top Maria window set.':'Paste Maria drops or livestream links so V41 can generate real windows.', 'Use Maria hypotheses to prioritize chain scans, then wait for direct pull-path / slot / reserve closure.'], 18),
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}Maria cues ${maria.cueCount} • Maria windows ${maria.windowCount}.`
+    };
+    baseModel.v41={
+      ...maria,
+      summary:maria.summary
+    };
+    baseModel.version='V41 Maria Research Engine Auditor';
+    return baseModel;
+  }
+
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); return applyV41Upgrade(v40); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -2679,6 +2806,7 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     clearEl($('v39IntegrationList'));
     (v39.integrationRows||[]).forEach(t=>pushItem($('v39IntegrationList'), t, 'info'));
     renderV40(model);
+    renderV41(model);
   }
 
   function renderV40(model){
@@ -2694,6 +2822,16 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     const intEl=$('v39IntegrationList');
     (v40.integrationRows||[]).forEach(t=>pushItem(intEl, t, 'info'));
     const leadSummary=$('leadSummary'); if(leadSummary && v40.summary) leadSummary.textContent=(leadSummary.textContent||'') + ' • ' + v40.summary;
+  }
+
+
+  function renderV41(model){
+    const v41=model.v41||{};
+    const eng=$('mariaEngineList'); if(eng){ clearEl(eng); pushItem(eng, v41.summary||'No V41 Maria research summary yet.', v41.cueCount?'good':'warn'); (v41.rows||[]).forEach(r=>pushItem(eng, `${r.label}: ${r.value} • ${r.hint}`, /empty|No Maria/.test(`${r.value} ${r.hint}`)?'warn':'info')); }
+    const hypo=$('mariaHypothesisList'); if(hypo){ clearEl(hypo); (v41.hypotheses||[]).forEach(h=>pushItem(hypo, `${h.name} • ${pct(h.score||0)} • ${h.detail||''}`, (h.score||0)>.72?'good':(h.score||0)>.48?'warn':'info')); if(!(v41.hypotheses||[]).length) pushItem(hypo,'No Maria hypotheses yet.','warn'); }
+    const win=$('mariaWindowList'); if(win){ clearEl(win); (v41.windowRows||[]).forEach(w=>pushItem(win, `${(w.title||'window').slice(0,120)} • ${w.phase} • block ${w.block} • ${w.range}${w.tags?` • ${w.tags}`:''}`, 'info')); if(!(v41.windowRows||[]).length) pushItem(win,'No Maria windows yet.','warn'); }
+    const intEl=$('v39IntegrationList');
+    if(intEl && Array.isArray(v41.integrationRows)) v41.integrationRows.forEach(t=>pushItem(intEl, t, 'info'));
   }
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
@@ -2745,6 +2883,8 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     $('sSocialProxy').value=state.settings.socialProxy||'';
     $('sManualSocial').value=state.settings.manualSocial||'';
     $('sResearchCorpus').value=state.settings.researchCorpus||'';
+    $('sMariaCueDrop').value=state.settings.mariaCueDrop||'';
+    $('sMariaGlossary').value=state.settings.mariaGlossary||'';
     $('sSpeculateLevel').value=state.settings.speculateLevel||8;
     $('sDeepSweepEvery').value=state.settings.deepSweepEvery||4;
     $('sRelayerHints').value=state.settings.relayerHints||'';
@@ -2780,6 +2920,8 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     state.settings.socialProxy=$('sSocialProxy').value.trim();
     state.settings.manualSocial=$('sManualSocial').value;
     state.settings.researchCorpus=$('sResearchCorpus').value;
+    state.settings.mariaCueDrop=$('sMariaCueDrop').value;
+    state.settings.mariaGlossary=$('sMariaGlossary').value;
     state.settings.speculateLevel=Number($('sSpeculateLevel').value)||8;
     state.settings.deepSweepEvery=Math.max(1, Number($('sDeepSweepEvery').value)||4);
     state.settings.relayerHints=$('sRelayerHints').value;
@@ -2815,8 +2957,8 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v40-history.json', state.history);
-  $('exportBtn').onclick=()=> downloadJson('pdai-v40-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v41-history.json', state.history);
+  $('exportBtn').onclick=()=> downloadJson('pdai-v41-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
     try{
