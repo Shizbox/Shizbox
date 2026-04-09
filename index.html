@@ -457,6 +457,24 @@
     </div>
   </div>
 
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">V42.6 architecture claims panel</div>
+      <div class="small">Visual mechanism ideas are tracked as claims with pressure, proof, and contradiction so architecture maps do not get mistaken for closure.</div>
+      <div id="architectureClaimsList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Blueprint → chain matrix</div>
+      <div class="small">Each architectural claim is cross-referenced against research corpus language, Maria semantics, and live chain lanes.</div>
+      <div id="blueprintMatrixList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Absorber chain tracker</div>
+      <div class="small">Tracks the modular transformation chain such as pDAI → G5 → PI → RNG → MATH as separate blueprint stages instead of one blob.</div>
+      <div id="absorberChainList"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -2961,6 +2979,111 @@ ${state.settings.researchCorpus||''}`);
     const summary=modular ? `Research corpus maps a modular blueprint around ${tokens.slice(0,4).join(', ')||'pDAI building blocks'}${absorber?' with explicit absorber/resupply language':''}.` : `Research corpus is loaded but blueprint language is still weak.`;
     return {name:'research-blueprint', score, summary, tokens, stable, modular, absorber, architect, machine, excerpt:trimLongText(text,260)};
   }
+
+  function v42_6DefaultArchitectureClaims(){
+    return [
+      {key:'modular-blueprint', label:'Modular stablecoin transformation', corpus:['machine','building blocks','g5','pi','rng','libertropomath'], lane:'research-blueprint'},
+      {key:'absorber-lockup', label:'Absorption & lockup chain', corpus:['absorber','inventory','resupply','lockup','math'], lane:'absorber-chain'},
+      {key:'liberty-plumbing', label:'LibertySwap / routed plumbing', corpus:['plumbing','libertyswap','bridge','nexus','spender'], lane:'routed-manifold-ingress'},
+      {key:'activation-timing', label:'Activation window / timing oracle', corpus:['window','pulse','timing','maria'], lane:'maria-event-memory'},
+      {key:'self-reinforcing-flywheel', label:'Self-reinforcing peg flywheel', corpus:['flywheel','arbitrage','loop','self-reinforcing'], lane:'recapture'},
+      {key:'private-mm-surface', label:'Private market-maker / shield surface', corpus:['shield','zk','private','market maker','l2'], lane:'corpus-only'},
+      {key:'shell-ignition', label:'Formal shell ignition', corpus:['ignite','shell','peg formation','slot wake'], lane:'formal-exec'}
+    ];
+  }
+  function v42_6CorpusText(){
+    const pieces=[String(state.settings.researchCorpus||''), String(state.settings.mariaGlossary||''), String(state.settings.mariaCueDrop||''), String(state.settings.mariaCueMemory||''), String(state.importedBundle?.settings?.researchCorpus||''), String(state.importedBundle?.settings?.mariaGlossary||'')].filter(Boolean);
+    const model=state.lastGood||{};
+    if(model.v42_5?.research?.excerpt) pieces.push(String(model.v42_5.research.excerpt||''));
+    return pieces.join('
+').toLowerCase();
+  }
+  function v42_6BuildAbsorberChain(baseModel){
+    const research=(baseModel.v42_5&&baseModel.v42_5.research)||{tokens:[],stable:[],modular:false,absorber:false};
+    const corpus=v42_6CorpusText();
+    const has=(t)=>((research.tokens||[]).includes(t) || corpus.includes(String(t).toLowerCase()));
+    const rows=[
+      {label:'pDAI input', active:true, note:'Target stable side / entry building block.'},
+      {label:'G5', active:has('g5'), note:'Small-chip transform stage from corpus.'},
+      {label:'PI', active:has('pi'), note:'Larger transform stage / independence leg.'},
+      {label:'RNG', active:has('rng'), note:'Random / resupply mechanic stage.'},
+      {label:'MATH / Libertropomath', active:has('libertropomath'), note:'Absorber / inventory machine.'}
+    ];
+    const activeCount=rows.filter(x=>x.active).length;
+    const score=clamp((activeCount/rows.length)*0.68 + (research.absorber?0.18:0) + (research.modular?0.14:0),0,1);
+    const summary=activeCount>1 ? `Absorber chain tracks ${activeCount}/${rows.length} blueprint stages, ending at ${rows.filter(x=>x.active).slice(-1)[0].label}.` : 'Absorber chain is still mostly blueprint-only and needs more corpus support.';
+    return {name:'absorber-chain', score, summary, rows, activeCount};
+  }
+  function v42_6ClaimStatus(key, baseModel, absorber){
+    const support=v39SafeArray(baseModel.signalBrain?.executionHunt?.support);
+    const routedIngress=((support.find(x=>/routed manifold ingress/i.test(x.title||''))||{}).score)||0;
+    const memory=((baseModel.v42_5||{}).memory)||{};
+    const blueprint=((baseModel.v42_5||{}).research)||{};
+    const formal=Number(baseModel.clarifier?.formalExec||0);
+    const recapture=v39SafeArray(baseModel.signalBrain?.executionHunt?.tripwires).filter(x=>/recapture/i.test(x.name||'')).length;
+    if(key==='modular-blueprint') return {pressure:blueprint.score||0, proof:Math.min((blueprint.score||0)*0.55,0.55), note:(blueprint.summary||'Needs research corpus support.'), status:(blueprint.score||0)>0.55?'partially supported':'research-corpus only'};
+    if(key==='absorber-lockup') return {pressure:absorber.score, proof:Math.min(absorber.score*0.5,0.5), note:absorber.summary, status:absorber.score>0.55?'partially supported':'research-corpus only'};
+    if(key==='liberty-plumbing') return {pressure:Math.max(routedIngress,0.55), proof:Math.min(routedIngress*0.9,0.85), note:routedIngress?'Pinned nexus/spender ingress gives real plumbing support.':'Needs routed ingress / nexus confirmation.', status:routedIngress>0.45?'observed on-chain':'partially supported'};
+    if(key==='activation-timing') return {pressure:memory.score||0, proof:Math.min((memory.score||0)*0.45,0.4), note:(memory.score||0)?'Maria timing memory exists, but active windows still decide closure.':'No Maria event memory is loaded.', status:(memory.score||0)>0.45?'partially supported':'unresolved'};
+    if(key==='self-reinforcing-flywheel') return {pressure:clamp(0.25+recapture*0.12,0,0.8), proof:Math.min(recapture*0.15,0.45), note:recapture?'Repeat recapture tripwires suggest loop-like reinforcement.':'Still mostly architectural theory.', status:recapture?'partially supported':'research-corpus only'};
+    if(key==='private-mm-surface') return {pressure:0.22, proof:0.02, note:'Graphic/corpus hypothesis only; chain proof still weak.', status:'research-corpus only'};
+    if(key==='shell-ignition') return {pressure:Math.max(Number(baseModel.clarifier?.exec||0),0), proof:formal, note:formal>0?'Formal shell signal is live.':'Slots and shell fracture are still gated.', status:formal>0.05?'observed on-chain':'unresolved'};
+    return {pressure:0, proof:0, note:'Unresolved.', status:'unresolved'};
+  }
+  function v42_6BuildArchitectureClaims(baseModel){
+    const absorber=v42_6BuildAbsorberChain(baseModel);
+    const rows=v42_6DefaultArchitectureClaims().map(c=>{ const stat=v42_6ClaimStatus(c.key, baseModel, absorber); return {...c, ...stat, contradiction:clamp(Math.max((stat.pressure||0)-(stat.proof||0),0)*0.6,0,1)}; });
+    const summary=`Architecture claims panel tracks ${rows.length} mechanism claims with pressure/proof split so diagrams do not overrule chain closure.`;
+    return {name:'architecture-claims', score:rows.reduce((a,c)=>a+(c.proof||0),0)/Math.max(rows.length,1), summary, rows, absorber};
+  }
+  function v42_6BuildBlueprintMatrix(baseModel, arch){
+    const research=((baseModel.v42_5||{}).research)||{};
+    const memory=((baseModel.v42_5||{}).memory)||{};
+    const corpus=v42_6CorpusText();
+    const rows=arch.rows.map(r=>{
+      let lane='—', note=r.note||'';
+      if(r.key==='modular-blueprint') lane='Research blueprint / corpus';
+      else if(r.key==='absorber-lockup') lane='Absorber chain tracker';
+      else if(r.key==='liberty-plumbing') lane='Routed manifold ingress + focus nexus';
+      else if(r.key==='activation-timing') lane='Maria event-memory + recursive windows';
+      else if(r.key==='self-reinforcing-flywheel') lane='Recapture / conservation / flywheel theory';
+      else if(r.key==='private-mm-surface') lane='Corpus-only architecture claim';
+      else if(r.key==='shell-ignition') lane='Formal execution / slot wake / shell fracture';
+      const corpusHit=(r.corpus||[]).filter(t=>corpus.includes(String(t).toLowerCase())).slice(0,4);
+      if(r.key==='activation-timing' && !memory.cueCount) note='No active Maria event-memory is loaded in this export.';
+      if(r.key==='modular-blueprint' && !(research.score||0)) note='Research corpus is not loaded strongly enough for blueprint closure.';
+      return {claim:r.label, corpus:corpusHit.length?corpusHit.join(', '):'none', lane, status:r.status, note};
+    });
+    return {name:'blueprint-matrix', summary:'Blueprint-to-chain matrix cross-references diagram claims, corpus language, and live chain lanes.', rows};
+  }
+  function applyV42_6Upgrade(baseModel){
+    const architecture=v42_6BuildArchitectureClaims(baseModel);
+    const blueprintMatrix=v42_6BuildBlueprintMatrix(baseModel, architecture);
+    baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)),
+      {name:'Architecture claims panel', kind:'soft', score:architecture.score||0, status:'observed', why:architecture.summary||'Architecture claims are being tracked.'},
+      {name:'Absorber chain tracker', kind:'soft', score:architecture.absorber.score||0, status:(architecture.absorber.score||0)>0.55?'observed':'watching', why:architecture.absorber.summary||'Absorber chain is idle.'}
+    ], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.6 adds architecture claims, blueprint matrix, and absorber chain tracking.`};
+    baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+      {label:'V42.6 architecture claims', value:`${architecture.rows.length} tracked`, hint:architecture.summary||'Architecture claim panel is idle.', cls:'info'},
+      {label:'V42.6 absorber chain', value:`${architecture.absorber.activeCount||0} stage(s)`, hint:architecture.absorber.summary||'Absorber chain is idle.', cls:(architecture.absorber.score||0)>0.55?'good':'warn'},
+      {label:'V42.6 blueprint matrix', value:`${blueprintMatrix.rows.filter(x=>x.status==='observed on-chain').length} on-chain`, hint:'Each architecture claim is split into pressure/proof/contradiction via the matrix.', cls:'info'}
+    ], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.6 turns visual architecture claims into tracked, cross-referenced hypotheses.`};
+    baseModel.proveLoop={...baseModel.proveLoop, rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
+      {label:'V42.6 claims panel', value:'active', hint:architecture.summary||'Architecture claims panel is idle.'},
+      {label:'V42.6 absorber lane', value:(architecture.absorber.score||0)>0.55?'tracked':'watching', hint:architecture.absorber.summary||'Absorber chain is idle.'},
+      {label:'V42.6 matrix closure', value:blueprintMatrix.rows.filter(x=>x.status==='observed on-chain').length?`${blueprintMatrix.rows.filter(x=>x.status==='observed on-chain').length} claim(s)`:'none yet', hint:'Blueprint matrix keeps architectural claims separate from shell proof.'}
+    ], summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.6 tests architecture diagrams as hypotheses instead of treating them as proof.`};
+    baseModel.clarifier={...baseModel.clarifier,
+      supports:v40AppendUniqueText(baseModel.clarifier?.supports,[architecture.rows.find(x=>x.key==='liberty-plumbing')?.proof>0.4?'Architecture panel now treats the nexus/spender plumbing as a tracked on-chain claim.':'', (architecture.absorber.score||0)>0.55?architecture.absorber.summary:''].filter(Boolean),24),
+      disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm,[architecture.rows.find(x=>x.key==='shell-ignition')?.status==='unresolved'?'Architecture diagrams remain stronger than formal shell proof; ignition is still unresolved.':''].filter(Boolean),24),
+      proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,['Cross-reference new image/transcript claims through the blueprint matrix before promoting them to evidence.', 'Track absorber-chain stages (pDAI → G5 → PI → RNG → MATH) as separate blueprint claims rather than one blob.'],24),
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.6 claims ${architecture.rows.length} • absorber ${pct(architecture.absorber.score||0)}.`
+    };
+    baseModel.v42_6={architecture, blueprintMatrix, summary:`V42.6 tracks ${architecture.rows.length} architecture claim(s), with ${blueprintMatrix.rows.filter(x=>x.status==='observed on-chain').length} currently observed on-chain and absorber chain at ${pct(architecture.absorber.score||0)}.`};
+    baseModel.version='V42.6 Architecture Claims + Absorber Auditor';
+    return baseModel;
+  }
+
   function applyV42_5Upgrade(baseModel){
     const memory=v42_5BuildMariaEventMemory(baseModel);
     const research=v42_5BuildResearchBlueprint(baseModel);
@@ -3060,7 +3183,7 @@ ${state.settings.researchCorpus||''}`);
     baseModel.version='V42.4 Predictive Maria Filter Auditor';
     return baseModel;
   }
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); return applyV42_5Upgrade(v42); }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); return applyV42_6Upgrade(v425); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -3398,6 +3521,16 @@ ${state.settings.researchCorpus||''}`);
     const win=$('mariaWindowList'); if(win){ clearEl(win); (v41.windowRows||[]).forEach(w=>pushItem(win, `${(w.title||'window').slice(0,120)} • ${w.phase} • block ${w.block} • ${w.range}${w.tags?` • ${w.tags}`:''}`, 'info')); if(!(v41.windowRows||[]).length) pushItem(win,'No Maria windows yet.','warn'); }
     const intEl=$('v39IntegrationList');
     if(intEl && Array.isArray(v41.integrationRows)) v41.integrationRows.forEach(t=>pushItem(intEl, t, 'info'));
+    renderV42_6(model);
+  }
+  function renderV42_6(model){
+    const v426=model.v42_6||{};
+    const claims=$('architectureClaimsList');
+    if(claims){ clearEl(claims); pushItem(claims, v426.summary||'No V42.6 architecture summary yet.','info'); (((v426.architecture||{}).rows)||[]).forEach(r=>pushItem(claims, `${r.label} • pressure ${pct(r.pressure||0)} • proof ${pct(r.proof||0)} • contradiction ${pct(r.contradiction||0)} • ${r.status} • ${r.note||''}`, (r.proof||0)>.45?'good':(r.pressure||0)>.4?'warn':'info')); }
+    const matrix=$('blueprintMatrixList');
+    if(matrix){ clearEl(matrix); (((v426.blueprintMatrix||{}).rows)||[]).forEach(r=>pushItem(matrix, `${r.claim} • corpus ${r.corpus} • lane ${r.lane} • ${r.status} • ${r.note||''}`, r.status==='observed on-chain'?'good':r.status==='partially supported'?'warn':'info')); if(!(((v426.blueprintMatrix||{}).rows)||[]).length) pushItem(matrix,'No blueprint-to-chain matrix rows yet.','warn'); }
+    const absorber=$('absorberChainList');
+    if(absorber){ clearEl(absorber); pushItem(absorber, ((v426.architecture||{}).absorber||{}).summary||'No absorber-chain summary yet.', (((v426.architecture||{}).absorber||{}).score||0)>.55?'good':'warn'); ((((v426.architecture||{}).absorber||{}).rows)||[]).forEach(r=>pushItem(absorber, `${r.label} • ${r.active?'active':'watching'} • ${r.note||''}`, r.active?'good':'info')); }
   }
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
