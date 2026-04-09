@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V41 Maria Research Engine Auditor</h1>
-      <div class="sub">V41 keeps your exact V38→V40 tool and layers Maria Research Engine upgrades directly into it: Maria/video cue ingestion, symbol-to-chain hypothesis mapping, real Maria windows, focus-spender targeting, pull-path watch, allowance-shock detection, trie-drift memory, terminal discharge lanes, burn-rail weighting, stronger persistence, and harder proof gating without wiping prior logic.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42 Semantic Maria Closure Auditor</h1>
+      <div class="sub">V42 keeps your exact V38→V41 tool and layers semantic Maria closure upgrades directly into it: default glossary mapping, semantic cue-to-chain scoring, locked focus-pack persistence, Maria-window closure tests, score-integrity separation between hunt pressure and formal execution, and harder proof gating without wiping prior logic.</div>
       <div class="chips">
         <div class="chip good">Imports prior V31–V38 bundle JSON</div>
-        <div class="chip info">Adds integrated V41 Maria research cycles</div>
-        <div class="chip warn">Hardens Maria/social coverage + source health</div>
-        <div class="chip bad">Promotes hard tripwires while keeping Maria cues proof-gated</div>
+        <div class="chip info">Adds integrated V42 semantic Maria closure cycles</div>
+        <div class="chip warn">Hardens Maria/social coverage + semantic mapping</div>
+        <div class="chip bad">Locks focus pack and keeps Maria cues proof-gated</div>
       </div>
     </div>
     <div>
@@ -161,7 +161,7 @@
   <div class="five">
     <div class="card"><div class="label">Clarification</div><div class="value" id="mClarity">—</div><div class="hint">How decisive the current picture is</div></div>
     <div class="card"><div class="label">Prep evidence</div><div class="value" id="mPrep">—</div><div class="hint">Intake + warehousing + shadow routing</div></div>
-    <div class="card"><div class="label">Execution evidence</div><div class="value" id="mExec">—</div><div class="hint">Token shell + slots + burns/mints + reserve motion</div></div>
+    <div class="card"><div class="label">Execution-hunt pressure</div><div class="value" id="mExec">—</div><div class="hint">Spender / route / shell activation pressure (not formal proof)</div></div>
     <div class="card"><div class="label">Contradiction debt</div><div class="value" id="mDebt">—</div><div class="hint">How much is still missing</div></div>
     <div class="card"><div class="label">Dominant model</div><div class="value" id="mModel">—</div><div class="hint">Best current explanation</div></div>
   </div>
@@ -441,8 +441,8 @@
 
   <div class="tri">
     <div class="panel">
-      <div class="boxTitle">V41 Maria research engine</div>
-      <div class="small">Maria broadcasts, livestreams, visual ciphers, lore notes, and manual drops are preserved as research leads that generate real timing windows without being treated as self-proving shell evidence.</div>
+      <div class="boxTitle">V42 semantic Maria engine</div>
+      <div class="small">Maria broadcasts, livestreams, visual ciphers, lore notes, and manual drops are preserved as research leads that generate real timing windows, semantic mappings, and closure tests without being treated as self-proving shell evidence.</div>
       <div id="mariaEngineList"></div>
     </div>
     <div class="panel">
@@ -451,7 +451,7 @@
       <div id="mariaHypothesisList"></div>
     </div>
     <div class="panel">
-      <div class="boxTitle">V41 Maria window reactor</div>
+      <div class="boxTitle">V42 Maria window reactor</div>
       <div class="small">Every Maria cue can spawn tight, pulse, reaction, and drift windows for reserve, slot, spender, and route correlation.</div>
       <div id="mariaWindowList"></div>
     </div>
@@ -811,10 +811,12 @@
     });
     return out.filter(Boolean);
   }
-  function parseGlossary(raw){
-    const out=[];
-    if(!raw || !String(raw).trim()) return out;
-    const txt=String(raw).trim();
+
+function parseGlossary(raw){
+  const parseOne=(input, offset=0)=>{
+    const local=[];
+    if(!input || !String(input).trim()) return local;
+    const txt=String(input).trim();
     const json=tryJson(txt,null);
     if(Array.isArray(json)){
       return uniq(json.map(x=> typeof x==='string' ? x : `${x.symbol||x.key||''}=${x.meaning||x.value||''}`)
@@ -822,17 +824,38 @@
         .filter(Boolean)
         .map((line,idx)=>{
           const m=line.match(/^\s*([^:=\-→>]+?)\s*(?:=>|->|→|:|=)\s*(.+?)\s*$/);
-          return m?{id:`gloss:${idx}:${m[1].trim()}`,symbol:m[1].trim(),meaning:m[2].trim()}:null;
+          return m?{id:`gloss:${offset+idx}:${m[1].trim()}`,symbol:m[1].trim(),meaning:m[2].trim()}:null;
         }).filter(Boolean), x=>x.symbol.toLowerCase());
     }
     txt.split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach((line,idx)=>{
       const m=line.match(/^\s*([^:=\-→>]+?)\s*(?:=>|->|→|:|=)\s*(.+?)\s*$/);
-      if(m) out.push({id:`gloss:${idx}:${m[1].trim()}`,symbol:m[1].trim(),meaning:m[2].trim()});
+      if(m) local.push({id:`gloss:${offset+idx}:${m[1].trim()}`,symbol:m[1].trim(),meaning:m[2].trim()});
     });
-    return uniq(out,x=>x.symbol.toLowerCase());
-  }
+    return local;
+  };
+  const builtins=parseOne(DEFAULT_MARIA_GLOSSARY.join('\n'),0);
+  const custom=parseOne(raw,builtins.length+1);
+  return uniq([...builtins, ...custom], x=>x.symbol.toLowerCase());
+}
 
-  function parseManualSocial(raw){
+function v42GlossaryScore(gloss, metrics){
+  const t=`${gloss.symbol} ${gloss.meaning}`.toLowerCase();
+  if(/spider|cluster|sybil|plumb|route cluster/.test(t)) return metrics.routeScore;
+  if(/acoustic void|speaker|sink|manifold|core/.test(t)) return Math.max(metrics.spenderScore, metrics.nexusScore, metrics.coreScore);
+  if(/taste tree|branch|graph|root of interest|destination/.test(t)) return Math.max(metrics.routeScore*0.85, metrics.nexusScore, metrics.routerScore);
+  if(/pulse|heartbeat|11-block|reserve/.test(t)) return Math.max(metrics.symmetryScore*0.8, metrics.reserveScore, metrics.windowHitScore);
+  if(/massless exit|kinematic|trie|slot|zero-write|scribe/.test(t)) return Math.max(metrics.trieScore*0.85, metrics.zeroScore*0.9, metrics.slotScore);
+  if(/alligator|pull-based|snap/.test(t)) return Math.max(metrics.pullPathScore, metrics.spenderScore*0.9);
+  return avg([metrics.routeScore, metrics.spenderScore, metrics.nexusScore])*0.45;
+}
+
+function v42GlossaryCueHits(gloss, items){
+  const parts=[gloss.symbol, ...(String(gloss.meaning||'').split(/[\/|,;]+/).map(s=>s.trim()).filter(Boolean))].filter(Boolean);
+  const textFor=item=>`${item.title||''} ${item.text||''} ${(item.tags||[]).join(' ')} ${item.code||''}`.toLowerCase();
+  return items.filter(item=>parts.some(p=>p && textFor(item).includes(p.toLowerCase()))).length;
+}
+
+function parseManualSocial(raw){
     const out=[];
     if(!raw || !String(raw).trim()) return out;
     const txt=String(raw).trim();
@@ -1732,66 +1755,73 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     return {score, support, tripwires, summary, leadSpender:spender, dischargeCandidate, accumulator, gaslessHits:gaslessHits.length, topToucher, sameCode};
   }
 
-  function buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt, windows){
-    const prep=clamp((intakePressure.score + thinLP.snapScore + (candidates[0]?.score||0) + Math.min((chain.nodeBalances?.['5EF7']?.pdai||0)/1e9,1) + (executionHunt.leadSpender?Math.min(executionHunt.leadSpender.score,1):0))/5,0,1);
-    const exec=clamp((nullAwakening.score + contractInnerEye.score + Math.min((contractIntel.mints.count+contractIntel.burns.count)/2,.5) + reserveArchaeology.filter(x=>x.status==='reactive').length/6 + executionHunt.tripwires.filter(x=>x.fire).length/5*0.45)/4.45,0,1);
-    const debt=clamp(1 - ((exec*.56)+(Math.min((contractIntel.approvalCount/6),1)*.12)+(reserveArchaeology.filter(x=>x.status==='reactive').length/6*.10)+(nullAwakening.score*.14)+(executionHunt.score*.08)),0,1);
-    const edge=Math.max(0,(rivalModels.winner?.score||0)-(rivalModels.runnerUp?.score||0));
-    const clarity=clamp((prep*.28)+(exec*.34)+(edge*.22)+((1-debt)*.16),0,1);
 
-    const supports=[];
-    if((chain.nodeBalances?.['5EF7']?.pdai||0)>1e9) supports.push(`5EF7 remains structurally hot with ${fmtShort(chain.nodeBalances['5EF7'].pdai)} pDAI.`);
-    if(intakePressure.score>.5) supports.push(`Liberty/intake language and surface routing cues remain elevated at ${pct(intakePressure.score)}.`);
-    if(thinLP.snapScore>.45) supports.push(`Thin-LP corridor theory still has lift: core/native ratio ${thinLP.coreRatio.toFixed(2)}x.`);
-    if(candidates[0]?.warehousing>0) supports.push(`Top candidate ${addrShort(candidates[0].address)} is still absorbing more pDAI than it emits.`);
-    if(contractIntel.approvalCount>0) supports.push(`Approval pulse is live with ${contractIntel.approvalCount} recent approval events.`);
-    if(executionHunt.leadSpender) supports.push(`Lead spender ${addrShort(executionHunt.leadSpender.address)} is now the most concrete execution-hunt contract.`);
-    if(executionHunt.sameCode) supports.push(`A ${executionHunt.sameCode.memberCount}-address same-code route cluster is visible around the pDAI graph.`);
+function buildClarifier(chain, intakePressure, thinLP, nullAwakening, contractIntel, contractInnerEye, candidates, reserveArchaeology, rivalModels, executionHunt, windows){
+  const prep=clamp((intakePressure.score + thinLP.snapScore + (candidates[0]?.score||0) + Math.min((chain.nodeBalances?.['5EF7']?.pdai||0)/1e9,1) + (executionHunt.leadSpender?Math.min(executionHunt.leadSpender.score,1):0))/5,0,1);
+  const reactiveCount=reserveArchaeology.filter(x=>x.status==='reactive').length;
+  const mintBurnScore=Math.min((contractIntel.mints.count+contractIntel.burns.count)/2,.5);
+  const formalExec=clamp((nullAwakening.score*.45) + (mintBurnScore*.30) + (reactiveCount/6*.25),0,1);
+  const execHunt=clamp((contractInnerEye.score*.28) + (executionHunt.score*.30) + (Math.min((contractIntel.approvalCount/6),1)*.14) + (reactiveCount/6*.10) + (mintBurnScore*.08) + (nullAwakening.score*.10),0,1);
+  const debt=clamp(1 - ((formalExec*.52)+(execHunt*.16)+(Math.min((contractIntel.approvalCount/6),1)*.08)+(reactiveCount/6*.08)+(nullAwakening.score*.10)+(executionHunt.score*.06)),0,1);
+  const edge=Math.max(0,(rivalModels.winner?.score||0)-(rivalModels.runnerUp?.score||0));
+  const clarity=clamp((prep*.24)+(execHunt*.24)+(formalExec*.24)+(edge*.14)+((1-debt)*.14),0,1);
 
-    const disconfirm=[];
-    if(nullAwakening.status==='dormant') disconfirm.push('Watched slots are still null-null, so structural execution proof is missing.');
-    if((contractIntel.mints.count+contractIntel.burns.count)===0) disconfirm.push('There is still no mint/burn shell evidence inside the pDAI contract.');
-    const hasRealWindows=(windows||[]).some(w=>!String(w.phase||'').startsWith('synthetic'));
-    if(!hasRealWindows) disconfirm.push('No live Maria / social windows are loaded right now, so window-based proof is partially blinded.');
-    else if(!reserveArchaeology.some(x=>x.status==='reactive')) disconfirm.push('Top windows are not producing decisive reserve archaeology hits.');
-    if(candidates[0] && candidates[0].stance!=='discharging') disconfirm.push('The top shadow candidate is not yet discharging into an obvious terminal move.');
-    if(executionHunt.tripwires.find(x=>x.name==='optical-rail-shock' && !x.fire)) disconfirm.push('The optical rail has not shown a high-magnitude shock near a priority social window yet.');
+  const supports=[];
+  if((chain.nodeBalances?.['5EF7']?.pdai||0)>1e9) supports.push(`5EF7 remains structurally hot with ${fmtShort(chain.nodeBalances['5EF7'].pdai)} pDAI.`);
+  if(intakePressure.score>.5) supports.push(`Liberty/intake language and surface routing cues remain elevated at ${pct(intakePressure.score)}.`);
+  if(thinLP.snapScore>.45) supports.push(`Thin-LP corridor theory still has lift: core/native ratio ${thinLP.coreRatio.toFixed(2)}x.`);
+  if(candidates[0]?.warehousing>0) supports.push(`Top candidate ${addrShort(candidates[0].address)} is still absorbing more pDAI than it emits.`);
+  if(contractIntel.approvalCount>0) supports.push(`Approval pulse is live with ${contractIntel.approvalCount} recent approval events.`);
+  if(executionHunt.leadSpender) supports.push(`Lead spender ${addrShort(executionHunt.leadSpender.address)} is now the most concrete execution-hunt contract.`);
+  if(executionHunt.sameCode) supports.push(`A ${executionHunt.sameCode.memberCount}-address same-code route cluster is visible around the pDAI graph.`);
 
-    const proveNext=[
-      'A watched slot flipping from null to non-zero.',
-      'A strong Maria / social window causing direct reserve motion at an anchor pair.',
-      'Top approval spender contracts fingerprinting as active routing / proxy manifolds.',
-      'Top candidate flipping from accumulation to discharge into 5EF7, dead, or anchor pairs.',
-      'A same-code plumber cluster starting to fire in the same social window.'
-    ];
-    const weaken=[
-      'Prep signals staying high while shell and slot evidence stay flat across multiple refreshes.',
-      'Core/native ratio normalizing without a corresponding shell wake-up.',
-      'Approval pulse fading while promoted candidates lose flow dominance.',
-      'The winner model being overtaken by ecosystem expansion or overshoot.',
-      'Lead spender contracts staying present without graduating into route-specific behavior.'
-    ];
+  const disconfirm=[];
+  if(nullAwakening.status==='dormant') disconfirm.push('Watched slots are still null-null, so structural execution proof is missing.');
+  if((contractIntel.mints.count+contractIntel.burns.count)===0) disconfirm.push('There is still no mint/burn shell evidence inside the pDAI contract.');
+  const hasRealWindows=(windows||[]).some(w=>!String(w.phase||'').startsWith('synthetic'));
+  if(!hasRealWindows) disconfirm.push('No live Maria / social windows are loaded right now, so window-based proof is partially blinded.');
+  else if(!reserveArchaeology.some(x=>x.status==='reactive')) disconfirm.push('Top windows are not producing decisive reserve archaeology hits.');
+  if(candidates[0] && candidates[0].stance!=='discharging') disconfirm.push('The top shadow candidate is not yet discharging into an obvious terminal move.');
+  if(executionHunt.tripwires.find(x=>x.name==='optical-rail-shock' && !x.fire)) disconfirm.push('The optical rail has not shown a high-magnitude shock near a priority social window yet.');
 
-    let stateText='unclear';
-    if(prep>.58 && exec<.42) stateText='preparation-heavy';
-    if(prep>.58 && exec>.5) stateText='clarifying';
-    if(exec>.68) stateText='execution-leaning';
-    const verdict = rivalModels.winner?.name==='Peg preparation / choreography'
-      ? (exec>.6 ? 'peg thesis is getting harder to dismiss' : 'peg-prep thesis still leads, but execution proof is incomplete')
-      : `${rivalModels.winner?.name||'No model'} currently leads`;
-    const hint=`Prep ${pct(prep)} • Execution ${pct(exec)} • Debt ${pct(debt)} • Model edge ${pct(edge)}.`;
-    const pressure=[
-      {name:'Preparation', score:prep, hint:'intake + warehousing + thin-LP corridor'},
-      {name:'Execution', score:exec, hint:'slot wake-up + shell evidence + reserve reactivity + hunt tripwires'},
-      {name:'Contradiction debt', score:debt, hint:'missing shell / reserve / slot proof'},
-      {name:'Model edge', score:edge, hint:'gap between winner and runner-up'}
-    ];
+  const proveNext=[
+    'A watched slot flipping from null to non-zero.',
+    'A strong Maria / social window causing direct reserve motion at an anchor pair.',
+    'Top approval spender contracts fingerprinting as active routing / proxy manifolds.',
+    'Top candidate flipping from accumulation to discharge into 5EF7, dead, or anchor pairs.',
+    'A same-code plumber cluster starting to fire in the same social window.'
+  ];
+  const weaken=[
+    'Prep signals staying high while shell and slot evidence stay flat across multiple refreshes.',
+    'Core/native ratio normalizing without a corresponding shell wake-up.',
+    'Approval pulse fading while promoted candidates lose flow dominance.',
+    'The winner model being overtaken by ecosystem expansion or overshoot.',
+    'Lead spender contracts staying present without graduating into route-specific behavior.'
+  ];
 
-    return {prep, exec, debt, clarity, stateText, verdict, hint, supports, disconfirm, proveNext, weaken, pressure};
-  }
+  let stateText='unclear';
+  if(prep>.58 && formalExec<.24 && execHunt>.42) stateText='execution-rising';
+  else if(prep>.58 && execHunt<.42) stateText='preparation-heavy';
+  else if(execHunt>.55 && formalExec<.35) stateText='hunt-pressure-rising';
+  else if(formalExec>.5) stateText='formal-execution-rising';
+  const verdict = rivalModels.winner?.name==='Peg preparation / choreography'
+    ? (formalExec>.45 ? 'peg thesis is getting harder to dismiss' : 'peg-prep thesis still leads, but formal execution proof is incomplete')
+    : `${rivalModels.winner?.name||'No model'} currently leads`;
+  const hint=`Prep ${pct(prep)} • Hunt ${pct(execHunt)} • Formal ${pct(formalExec)} • Debt ${pct(debt)}.`;
+  const pressure=[
+    {name:'Preparation', score:prep, hint:'intake + warehousing + thin-LP corridor'},
+    {name:'Execution-hunt', score:execHunt, hint:'spender activation + route pressure + shell activation'},
+    {name:'Formal execution', score:formalExec, hint:'slot wake-up + mint/burn + reserve shock'},
+    {name:'Contradiction debt', score:debt, hint:'missing shell / reserve / slot proof'},
+    {name:'Model edge', score:edge, hint:'gap between winner and runner-up'}
+  ];
 
-  
-  function buildSystemAudit(chain, social, windows, attritionAbsolute, relayerWatch, trieTouch, zeroingAnalysis, relayerFingerprint, manifoldTracker){
+  return {prep, exec:execHunt, formalExec, debt, clarity, stateText, verdict, hint, supports, disconfirm, proveNext, weaken, pressure};
+}
+
+
+function buildSystemAudit
+(chain, social, windows, attritionAbsolute, relayerWatch, trieTouch, zeroingAnalysis, relayerFingerprint, manifoldTracker){
     const realWindows=(windows||[]).filter(w=>!String(w.phase||'').startsWith('synthetic')).length;
     const synthetic=(windows||[]).length-realWindows;
     const rows=[];
@@ -2293,24 +2323,30 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
     const n=Number(raw);
     return Number.isFinite(n)?n:0;
   }
-  function v40PickFocus(baseModel){
-    const spenders=v39SafeArray(baseModel.spenderLab);
-    const candidates=v39SafeArray(baseModel.candidates);
-    const manifoldLead=baseModel.manifoldTracker?.lead?.address;
-    const autoSpender = v40NormalizeAddr(state.settings.focusSpender) || v40NormalizeAddr(manifoldLead) || v40NormalizeAddr(spenders[0]?.address);
-    const autoWallet = v40NormalizeAddr(state.settings.focusWallet) || v40NormalizeAddr(candidates.find(x=>String(x.stance||'').toLowerCase()==='discharging')?.address) || v40NormalizeAddr(candidates[0]?.address);
-    const autoCore = v40NormalizeAddr(state.settings.focusCore) || v40NormalizeAddr((state.settings.watchers||{})['5EF7']) || v40NormalizeAddr(baseModel.dischargeNexus?.lead?.address);
-    const spenderRow=v40FindSpender(baseModel, autoSpender) || {};
-    const walletRow=v40FindCandidate(baseModel, autoWallet) || {};
-    return {
-      spender:autoSpender,
-      wallet:autoWallet,
-      core:autoCore,
-      spenderRow,
-      walletRow,
-      summary:autoSpender && autoWallet ? `Focus pack: spender ${addrShort(autoSpender)} • wallet ${addrShort(autoWallet)} • core ${addrShort(autoCore)}.` : 'Focus pack is incomplete; auto-targeting fell back to available leaders.'
-    };
-  }
+
+function v40PickFocus(baseModel){
+  const spenders=v39SafeArray(baseModel.spenderLab);
+  const candidates=v39SafeArray(baseModel.candidates);
+  const manifoldLead=baseModel.manifoldTracker?.lead?.address;
+  const autoSpender = v40NormalizeAddr(state.settings.focusSpender) || v40NormalizeAddr(manifoldLead) || v40NormalizeAddr(spenders[0]?.address);
+  const autoWallet = v40NormalizeAddr(state.settings.focusWallet) || v40NormalizeAddr(candidates.find(x=>String(x.stance||'').toLowerCase()==='discharging')?.address) || v40NormalizeAddr(candidates[0]?.address);
+  const autoCore = v40NormalizeAddr(state.settings.focusCore) || v40NormalizeAddr((state.settings.watchers||{})['5EF7']) || v40NormalizeAddr(baseModel.dischargeNexus?.lead?.address);
+  if(!state.settings.focusSpender && autoSpender) state.settings.focusSpender=autoSpender;
+  if(!state.settings.focusWallet && autoWallet) state.settings.focusWallet=autoWallet;
+  if(!state.settings.focusCore && autoCore) state.settings.focusCore=autoCore;
+  const spenderRow=v40FindSpender(baseModel, autoSpender) || {};
+  const walletRow=v40FindCandidate(baseModel, autoWallet) || {};
+  return {
+    spender:autoSpender,
+    wallet:autoWallet,
+    core:autoCore,
+    locked:!!(state.settings.focusSpender && state.settings.focusWallet && state.settings.focusCore),
+    spenderRow,
+    walletRow,
+    summary:autoSpender && autoWallet ? `Focus pack: spender ${addrShort(autoSpender)} • wallet ${addrShort(autoWallet)} • core ${addrShort(autoCore)}.` : 'Focus pack is incomplete; auto-targeting fell back to available leaders.'
+  };
+}
+
   function v40BuildPullPath(baseModel, focus){
     const transfers=v39SafeArray(baseModel.signalBrain?.contractIntel?.transfers);
     const approvals=v39SafeArray(baseModel.signalBrain?.contractIntel?.approvals);
@@ -2515,6 +2551,7 @@ ${state.settings.relayerHints||''}`).match(/0x[a-fA-F0-9]{8,40}/g)||[]).map(x=>n
   }
 
 
+
   function v41BuildMariaResearch(baseModel){
     const items=(baseModel.social||[]).filter(x=>x && (x.isMaria || looksMariaText(`${x.title||''} ${x.text||''} ${x.author||''} ${x.url||''}`)));
     const windows=(baseModel.windows||[]).filter(w=>w && (w.isMaria || looksMariaText(`${w.title||''} ${w.text||''} ${w.phase||''}`)));
@@ -2528,25 +2565,43 @@ ${state.settings.researchCorpus||''}`);
     const trieScore=clamp(Number(baseModel.trieTouch?.score||0),0,1);
     const zeroScore=clamp(Number(baseModel.zeroingAnalysis?.score||0),0,1);
     const reserveScore=clamp((baseModel.reserveArchaeology||[]).filter(x=>x.status==='reactive').length/3,0,1);
-    const hypos=[
+    const slotScore=clamp(Number(baseModel.signalBrain?.nullAwakening?.score||0),0,1);
+    const coreScore=((baseModel.signalBrain?.nodeBalances||baseModel.nodeBalances||{})['5EF7']?.pdai||0)>1e9 ? 0.9 : 0.2;
+    const routerScore=clamp(Number(baseModel.dischargeRouter?.score||0),0,1);
+    const pullPathScore=clamp(Number((baseModel.v40?.modules||[]).find(m=>m.name==='focus-pull-path')?.score||0),0,1);
+    const windowHitScore=clamp(windows.length ? Math.min(windows.length/15,1) : 0,0,1);
+    const metrics={routeScore,nexusScore,spenderScore,symmetryScore,trieScore,zeroScore,reserveScore,slotScore,coreScore,routerScore,pullPathScore,windowHitScore};
+
+    const baseHypos=[
       {name:'111 spider → same-code route cluster', score:routeScore, detail:routeScore?`Route-cluster pressure is ${pct(routeScore)} with a same-code cluster already visible.`:'No same-code cluster has been promoted yet.'},
       {name:'acoustic void → spender/core sink', score:clamp(Math.max(spenderScore, nexusScore),0,1), detail:(focus.spender||focus.core)?`Focus sink pack ${addrShort(focus.spender)} / ${addrShort(focus.core)} is active.`:'No focus sink pack is active yet.'},
-      {name:'taste tree → branching discharge graph', score:clamp(Math.max(nexusScore, Number(baseModel.dischargeRouter?.score||0), routeScore*0.8),0,1), detail:baseModel.dischargeNexus?.summary||'Branching discharge graph is still being mapped.'},
+      {name:'taste tree → branching discharge graph', score:clamp(Math.max(nexusScore, routerScore, routeScore*0.8),0,1), detail:baseModel.dischargeNexus?.summary||'Branching discharge graph is still being mapped.'},
       {name:'pulse → symmetry / reserve reaction', score:clamp(Math.max(symmetryScore*0.7, reserveScore),0,1), detail:reserveScore?`At least one reserve window is reactive.`:(baseModel.symmetrySniffer?.summary||'Pulse timing is still mostly synthetic.')},
-      {name:'massless exit / kinematic strings → trie / zero-write / slot watch', score:clamp(Math.max(trieScore*0.6, zeroScore*0.7, Number(baseModel.signalBrain?.nullAwakening?.score||0)),0,1), detail:`Trie ${pct(trieScore)} • zero-write ${pct(zeroScore)} • slots ${pct(Number(baseModel.signalBrain?.nullAwakening?.score||0))}.`}
+      {name:'massless exit / kinematic strings → trie / zero-write / slot watch', score:clamp(Math.max(trieScore*0.6, zeroScore*0.7, slotScore),0,1), detail:`Trie ${pct(trieScore)} • zero-write ${pct(zeroScore)} • slots ${pct(slotScore)}.`}
     ];
+
+    const semanticHypos=glossary.slice(0,16).map(g=>{
+      const cueHits=v42GlossaryCueHits(g, items);
+      const score=clamp(v42GlossaryScore(g, metrics) + Math.min(cueHits/3,0.18),0,1);
+      return {name:`${g.symbol} → ${g.meaning}`, score, cueHits, detail:`Cue hits ${cueHits} • semantic score ${pct(score)}.`};
+    }).filter(h=>h.score>0.22);
+
+    const hypos=v39UniqBy([...baseHypos, ...semanticHypos], h=>h.name).sort((a,b)=>b.score-a.score);
+    const mappedCount=semanticHypos.filter(h=>h.cueHits>0).length;
     const rows=[
       {label:'Maria cues loaded', value:String(items.length), hint:items.length?`Top cue: ${(items[0].title||'untitled').slice(0,90)}`:'Paste Maria URLs, titles, or visual notes to seed cue memory.'},
       {label:'Maria real windows', value:String(windows.length), hint:windows.length?`Top Maria window ${windows[0].phase||'window'} @ block ${Math.round(windows[0].approxBlock||0)}`:'No Maria windows are active yet.'},
       {label:'Glossary mappings', value:String(glossary.length), hint:glossary.length?glossary.slice(0,3).map(g=>`${g.symbol} → ${g.meaning}`).join(' • '):'No Maria glossary mappings are loaded yet.'},
-      {label:'Research stance', value:'lead-generating, proof-gated', hint:'Maria cues promote windows, targets, and hypotheses, but they do not by themselves count as formal shell proof.'}
+      {label:'Semantic cue matches', value:String(mappedCount), hint:mappedCount?semanticHypos.filter(h=>h.cueHits>0).slice(0,3).map(h=>h.name).join(' • '):'Cue text still needs more symbolic notes beyond raw URLs.'},
+      {label:'Research stance', value:'lead-generating, proof-gated', hint:'Maria cues promote windows, locked focus scans, and hypotheses, but they do not by themselves count as formal shell proof.'}
     ];
     const windowRows=windows.slice(0,12).map(w=>({title:w.title||w.phase||'window', phase:w.phase||'maria', block:Math.round(w.approxBlock||0), range:`${Math.round(w.fromBlock||0)}→${Math.round(w.toBlock||0)}`, tags:(w.tags||[]).join(', ')}));
-    const summary=items.length ? `Maria Research Engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), and ${hypos.filter(h=>h.score>=0.55).length} active symbol-to-chain hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and testable hypotheses.';
-    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V41 layered Maria Research Engine directly on top of V40.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
+    const summary=items.length ? `V42 Maria engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), ${glossary.length} glossary mapping(s), and ${hypos.filter(h=>h.score>=0.55).length} active semantic hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and semantic hypotheses.';
+    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42 layered semantic Maria closure directly on top of V41.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
   }
 
-  function applyV41Upgrade(baseModel){
+  function applyV41Upgrade
+(baseModel){
     const maria=v41BuildMariaResearch(baseModel);
     baseModel.socialMemory={
       ...baseModel.socialMemory,
@@ -2584,7 +2639,7 @@ ${state.settings.researchCorpus||''}`);
       ...maria,
       summary:maria.summary
     };
-    baseModel.version='V41 Maria Research Engine Auditor';
+    baseModel.version='V42 Semantic Maria Closure Auditor';
     return baseModel;
   }
 
@@ -2678,7 +2733,7 @@ ${state.settings.researchCorpus||''}`);
     $('brief').textContent=`Dominant model: ${model.signalBrain?.rivalModels?.winner?.name||'—'} • Hot watcher: ${model.hotWatcher||'—'} • Current shell stance: ${model.signalBrain?.contractInnerEye?.stance||'—'}.`;
 
     clearEl($('summaryPills'));
-    ['prep '+pct(model.clarifier.prep),'execution '+pct(model.clarifier.exec),'debt '+pct(model.clarifier.debt),'score '+fmtNum(model.score)].forEach(x=>pushPill($('summaryPills'),x));
+    ['prep '+pct(model.clarifier.prep),'hunt '+pct(model.clarifier.exec),'formal '+pct(model.clarifier.formalExec||0),'debt '+pct(model.clarifier.debt),'score '+fmtNum(model.score)].forEach(x=>pushPill($('summaryPills'),x));
     clearEl($('pressureBoard'));
     model.clarifier.pressure.forEach(x=>{
       const d=document.createElement('div'); d.className='lane';
@@ -2920,8 +2975,8 @@ ${state.settings.researchCorpus||''}`);
 
 
   function renderV41(model){
-    const v41=model.v41||{};
-    const eng=$('mariaEngineList'); if(eng){ clearEl(eng); pushItem(eng, v41.summary||'No V41 Maria research summary yet.', v41.cueCount?'good':'warn'); (v41.rows||[]).forEach(r=>pushItem(eng, `${r.label}: ${r.value} • ${r.hint}`, /empty|No Maria/.test(`${r.value} ${r.hint}`)?'warn':'info')); }
+    const v41=model.v42||model.v41||{};
+    const eng=$('mariaEngineList'); if(eng){ clearEl(eng); pushItem(eng, v41.summary||'No V42 Maria research summary yet.', v41.cueCount?'good':'warn'); (v41.rows||[]).forEach(r=>pushItem(eng, `${r.label}: ${r.value} • ${r.hint}`, /empty|No Maria/.test(`${r.value} ${r.hint}`)?'warn':'info')); }
     const hypo=$('mariaHypothesisList'); if(hypo){ clearEl(hypo); (v41.hypotheses||[]).forEach(h=>pushItem(hypo, `${h.name} • ${pct(h.score||0)} • ${h.detail||''}`, (h.score||0)>.72?'good':(h.score||0)>.48?'warn':'info')); if(!(v41.hypotheses||[]).length) pushItem(hypo,'No Maria hypotheses yet.','warn'); }
     const win=$('mariaWindowList'); if(win){ clearEl(win); (v41.windowRows||[]).forEach(w=>pushItem(win, `${(w.title||'window').slice(0,120)} • ${w.phase} • block ${w.block} • ${w.range}${w.tags?` • ${w.tags}`:''}`, 'info')); if(!(v41.windowRows||[]).length) pushItem(win,'No Maria windows yet.','warn'); }
     const intEl=$('v39IntegrationList');
@@ -3082,3 +3137,17 @@ ${state.settings.researchCorpus||''}`);
 </script>
 </body>
 </html>
+const DEFAULT_MARIA_GLOSSARY = [
+  '111 spider = same-code route cluster / sybil plumbing',
+  'acoustic void = spender/core sink / manifold destination',
+  'taste tree = branching discharge graph / route tree',
+  'root of interest = first stable terminal destination',
+  'pulse = reserve shock / synchronized route burst / 11-block heartbeat',
+  'massless exit = zero-write / balance clearing / exit-state sweep',
+  'alligator = pull-based routing manifold / terminal snap logic',
+  'kinematic strings = hidden state changes / trie drift / slot priming',
+  'speaker = sink / emitter / execution surface',
+  'void = spender-core sink region'
+];
+
+
