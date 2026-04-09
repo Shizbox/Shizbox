@@ -3663,6 +3663,30 @@ ${state.settings.researchCorpus||''}`);
     if(absorber){ clearEl(absorber); pushItem(absorber, ((v426.architecture||{}).absorber||{}).summary||'No absorber-chain summary yet.', (((v426.architecture||{}).absorber||{}).score||0)>.55?'good':'warn'); ((((v426.architecture||{}).absorber||{}).rows)||[]).forEach(r=>pushItem(absorber, `${r.label} • ${r.active?'active':'watching'} • ${r.note||''}`, r.active?'good':'info')); }
   }
 
+  function renderV42_8(model){
+    const v428=model.v42_8||{};
+    const graph=$('socialConductorList');
+    if(graph){
+      clearEl(graph);
+      pushItem(graph, v428.summary||'No V42.8 social conductor summary yet.', 'info');
+      (((v428.graph||{}).rows)||[]).forEach(r=>pushItem(graph, `${r.label} • ${r.role||'actor'} • seen ${r.seen?'yes':'no'} • mentions ${r.mentions||0}`, r.seen?'good':'info'));
+      if(!(((v428.graph||{}).rows)||[]).length) pushItem(graph,'No social conductor rows yet.','warn');
+    }
+    const bridge=$('cueBridgeList');
+    if(bridge){
+      clearEl(bridge);
+      pushItem(bridge, ((v428.bridge||{}).summary)||'No cue-bridge summary yet.', (((v428.bridge||{}).score)||0)>.55?'good':(((v428.bridge||{}).score)||0)>.25?'warn':'info');
+      (((v428.bridge||{}).rows)||[]).forEach(r=>pushItem(bridge, `${r.label}: ${r.value} • ${r.hint||''}`, /insufficient|not yet/i.test(`${r.value} ${r.hint||''}`)?'warn':'info'));
+    }
+    const mismatch=$('symbolicMismatchList');
+    if(mismatch){
+      clearEl(mismatch);
+      pushItem(mismatch, ((v428.mismatch||{}).summary)||'No symbolic mismatch summary yet.', ((v428.mismatch||{}).mismatches||0)>0?'warn':'good');
+      (((v428.mismatch||{}).rows)||[]).forEach(r=>pushItem(mismatch, `${r.label}: ${r.value} • ${r.hint||''}`, r.cls||(/mismatch/i.test(`${r.value} ${r.hint||''}`)?'warn':'info')));
+      if(!(((v428.mismatch||{}).rows)||[]).length && ((v428.mismatch||{}).checks||0)===0) pushItem(mismatch,'No active symbolic cue terms were loaded, so mismatch scoring is idle.','warn');
+    }
+  }
+
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 
   async function sync(){
