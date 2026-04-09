@@ -84,11 +84,11 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42 Semantic Maria Closure Auditor</h1>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.1 Maria Corpus Closure Auditor</h1>
       <div class="sub">V42 keeps your exact V38→V41 tool and layers semantic Maria closure upgrades directly into it: default glossary mapping, semantic cue-to-chain scoring, locked focus-pack persistence, Maria-window closure tests, score-integrity separation between hunt pressure and formal execution, and harder proof gating without wiping prior logic.</div>
       <div class="chips">
         <div class="chip good">Imports prior V31–V38 bundle JSON</div>
-        <div class="chip info">Adds integrated V42 semantic Maria closure cycles</div>
+        <div class="chip info">Adds integrated V42.1 Maria corpus cycles</div>
         <div class="chip warn">Hardens Maria/social coverage + semantic mapping</div>
         <div class="chip bad">Locks focus pack and keeps Maria cues proof-gated</div>
       </div>
@@ -470,7 +470,32 @@
   const TOPIC_TRANSFER='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55aeb';
   const TOPIC_APPROVAL='0x8c5be1e5ebec7d5bd14f714f1f9c8f49e6ab1b5d1b';
   const EIP1967_SLOT='0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
+
   const ZERO='0x0000000000000000000000000000000000000000';
+  const MARIA_MODE_DEFAULT='timing-and-symbolic-logic';
+  const MARIA_CORPUS = {
+    channel:'@靈脅用',
+    role:'Live Timing & Symbolic Logic layer for on-chain forensics',
+    mechanism:'Treat uploads/streams as block windows, then map symbols to chain hypotheses and close with chain evidence.',
+    focusDefaults:{
+      spender:'0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6',
+      wallet:'0x5f4bc6714ad363751ac0f4375618346fa4a15d08',
+      core:'0x5ef7aac0de4f2012cb36730da140025b113fada4'
+    }
+  };
+  const DEFAULT_MARIA_GLOSSARY = [
+    '111-spider = multi-legged routing from a single source to 10+ plumber contracts / same-code route cluster',
+    'acoustic-void = period of low-log activity in the focus lane despite bridge pressure / spender-core sink region',
+    'taste-tree = branching structure of the pDAI graph as it touches anchor pairs / route tree',
+    'pulse = recurring transaction heartbeat / 11-block symmetry / reserve-window reaction',
+    'massless-exit = small dust balances swept or atrophied toward zero / zero-sweep',
+    'alligator = core/native jaw spread / imbalance ready to snap shut',
+    'kinematic-strings = deterministic gas prices or repetitive calldata strings in spenders',
+    'root-of-interest = 5EF7 hot watcher or lead focus spender / first stable terminal destination',
+    'speaker = sink / emitter / execution surface',
+    'void = spender-core sink region',
+    'maria = live timing oracle / symbolic logic conductor sheet music for the prover'
+  ];
 
   const DEFAULTS={
     privateRpc:'',
@@ -505,6 +530,7 @@
     researchCorpus:'',
     mariaCueDrop:'',
     mariaGlossary:'',
+    mariaMode:MARIA_MODE_DEFAULT,
     speculateLevel:8,
     deepSweepEvery:4,
     relayerHints:'',
@@ -2328,9 +2354,13 @@ function v40PickFocus(baseModel){
   const spenders=v39SafeArray(baseModel.spenderLab);
   const candidates=v39SafeArray(baseModel.candidates);
   const manifoldLead=baseModel.manifoldTracker?.lead?.address;
-  const autoSpender = v40NormalizeAddr(state.settings.focusSpender) || v40NormalizeAddr(manifoldLead) || v40NormalizeAddr(spenders[0]?.address);
-  const autoWallet = v40NormalizeAddr(state.settings.focusWallet) || v40NormalizeAddr(candidates.find(x=>String(x.stance||'').toLowerCase()==='discharging')?.address) || v40NormalizeAddr(candidates[0]?.address);
-  const autoCore = v40NormalizeAddr(state.settings.focusCore) || v40NormalizeAddr((state.settings.watchers||{})['5EF7']) || v40NormalizeAddr(baseModel.dischargeNexus?.lead?.address);
+  const corpusSpender=v40NormalizeAddr(MARIA_CORPUS.focusDefaults.spender);
+  const corpusWallet=v40NormalizeAddr(MARIA_CORPUS.focusDefaults.wallet);
+  const corpusCore=v40NormalizeAddr(MARIA_CORPUS.focusDefaults.core);
+  const liveWallet=v40NormalizeAddr(candidates.find(x=>String(x.stance||'').toLowerCase()==='discharging')?.address) || v40NormalizeAddr(candidates[0]?.address);
+  const autoSpender = v40NormalizeAddr(state.settings.focusSpender) || corpusSpender || v40NormalizeAddr(manifoldLead) || v40NormalizeAddr(spenders[0]?.address);
+  const autoWallet = v40NormalizeAddr(state.settings.focusWallet) || liveWallet || corpusWallet;
+  const autoCore = v40NormalizeAddr(state.settings.focusCore) || corpusCore || v40NormalizeAddr((state.settings.watchers||{})['5EF7']) || v40NormalizeAddr(baseModel.dischargeNexus?.lead?.address);
   if(!state.settings.focusSpender && autoSpender) state.settings.focusSpender=autoSpender;
   if(!state.settings.focusWallet && autoWallet) state.settings.focusWallet=autoWallet;
   if(!state.settings.focusCore && autoCore) state.settings.focusCore=autoCore;
@@ -2589,6 +2619,7 @@ ${state.settings.researchCorpus||''}`);
     const hypos=v39UniqBy([...baseHypos, ...semanticHypos], h=>h.name).sort((a,b)=>b.score-a.score);
     const mappedCount=semanticHypos.filter(h=>h.cueHits>0).length;
     const rows=[
+      {label:'Maria mode', value:String(state.settings.mariaMode||MARIA_MODE_DEFAULT), hint:MARIA_CORPUS.role},
       {label:'Maria cues loaded', value:String(items.length), hint:items.length?`Top cue: ${(items[0].title||'untitled').slice(0,90)}`:'Paste Maria URLs, titles, or visual notes to seed cue memory.'},
       {label:'Maria real windows', value:String(windows.length), hint:windows.length?`Top Maria window ${windows[0].phase||'window'} @ block ${Math.round(windows[0].approxBlock||0)}`:'No Maria windows are active yet.'},
       {label:'Glossary mappings', value:String(glossary.length), hint:glossary.length?glossary.slice(0,3).map(g=>`${g.symbol} → ${g.meaning}`).join(' • '):'No Maria glossary mappings are loaded yet.'},
@@ -2597,7 +2628,7 @@ ${state.settings.researchCorpus||''}`);
     ];
     const windowRows=windows.slice(0,12).map(w=>({title:w.title||w.phase||'window', phase:w.phase||'maria', block:Math.round(w.approxBlock||0), range:`${Math.round(w.fromBlock||0)}→${Math.round(w.toBlock||0)}`, tags:(w.tags||[]).join(', ')}));
     const summary=items.length ? `V42 Maria engine loaded ${items.length} cue(s), ${windows.length} Maria window(s), ${glossary.length} glossary mapping(s), and ${hypos.filter(h=>h.score>=0.55).length} active semantic hypothesis/hypotheses.` : 'No Maria research cues are loaded yet. Paste Maria links, titles, or live notes to generate real windows and semantic hypotheses.';
-    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42 layered semantic Maria closure directly on top of V41.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
+    return {rows, hypotheses:hypos, windowRows, glossary, summary, cueCount:items.length, windowCount:windows.length, integrationRows:[`V42.1 layered Gemini's Maria corpus directly into V42.`,`Maria mode: ${state.settings.mariaMode||MARIA_MODE_DEFAULT}.`,`Corpus role: ${MARIA_CORPUS.role}.`,`Maria cues loaded: ${items.length}.`,`Maria windows generated: ${windows.length}.`,`Glossary mappings loaded: ${glossary.length}.`,`Cue-semantic matches: ${mappedCount}.`,`Maria cues are treated as research leads and timing markers, not self-proving shell evidence.`]};
   }
 
   function applyV41Upgrade
@@ -2639,7 +2670,7 @@ ${state.settings.researchCorpus||''}`);
       ...maria,
       summary:maria.summary
     };
-    baseModel.version='V42 Semantic Maria Closure Auditor';
+    baseModel.version='V42.1 Maria Corpus Closure Auditor';
     return baseModel;
   }
 
