@@ -479,6 +479,10 @@
 
 <script>
 (() => {
+  const __bootStatus = (msg, cls='bad') => { try { const el=document.getElementById('syncStatus'); if(el){ el.textContent=msg; el.className='status '+cls; } const ls=document.getElementById('lastSync'); if(ls && msg!==el?.textContent){ ls.textContent=msg; } } catch{} };
+  window.addEventListener('error', (ev) => { try { const msg='Startup error: ' + ((ev.error&&ev.error.message)||ev.message||'unknown'); __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent=msg; } catch{} });
+  window.addEventListener('unhandledrejection', (ev) => { try { const reason=ev.reason&&ev.reason.message ? ev.reason.message : String(ev.reason||'unknown'); __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Unhandled promise rejection: '+reason; } catch{} });
+  try {
   const STORAGE_KEY='pdai-v33-settings';
   const HISTORY_KEY='pdai-v33-history';
   const SOCIAL_CACHE_KEY='pdai-v33-social-cache';
@@ -3689,11 +3693,15 @@ ${state.settings.researchCorpus||''}`);
     e.target.value='';
   });
 
-  pushSettings();
-  if(state.timer) clearInterval(state.timer);
-  state.timer=setInterval(sync, Math.max(12000, state.settings.autoRefresh||30000));
-  if(state.lastGood){ try{ render(state.lastGood); $('syncStatus').textContent='cached'; $('syncStatus').className='status warn'; }catch{} }
-  sync();
+  const __start = () => {
+    try { pushSettings(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Startup settings error: '+(err.message||String(err)); throw err; }
+    if(state.timer) clearInterval(state.timer);
+    state.timer=setInterval(() => { try { sync(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Scheduled sync error: '+(err.message||String(err)); } }, Math.max(12000, state.settings.autoRefresh||30000));
+    if(state.lastGood){ try{ render(state.lastGood); $('syncStatus').textContent='cached'; $('syncStatus').className='status warn'; }catch{} }
+    Promise.resolve().then(() => sync()).catch(err => { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Initial sync error: '+(err.message||String(err)); });
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', __start, {once:true}); else __start();
+  } catch(err) { try { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Boot error: '+(err.message||String(err)); console.error(err); } catch{} }
 })();
 </script>
 </body>
