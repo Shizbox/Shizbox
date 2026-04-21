@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V42.9 Predator Gatekeeper Auditor</title>
+<title>pDAI Peg Prover • V43.0 Audit-Hardened Predator Gatekeeper Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.9 Predator Gatekeeper Auditor</h1>
-      <div class="sub">V42.9 upgrades your exact attached V42.4/V42.8 tool in place: automatic social-scout conductance, 9E6F gatekeeper watch, shadow-liquidity intake modeling, primed-storage synthesis, economic gravity flashpoint math, and a stricter separation between blueprint pressure and formal execution.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V43.0 Audit-Hardened Predator Gatekeeper Auditor</h1>
+      <div class="sub">V43.0 upgrades your attached V42.9 tool in place: deterministic bundle import, self-audit and consistency checks, stronger Maria rehydration, clearer lead-vs-focus logic, and an interactive flashpoint simulator layered on top of the existing social-scout, gatekeeper, priming, and gravity lanes.</div>
       <div class="chips">
-        <div class="chip good">Upgrades the attached V42.4 code in place</div>
-        <div class="chip info">Adds auto social-scout + conductance scoring</div>
-        <div class="chip warn">Adds 9E6F gatekeeper + shadow-liquidity lanes</div>
-        <div class="chip bad">Keeps admin / blueprint theories proof-gated behind chain closure</div>
+        <div class="chip good">Upgrades the attached V42.9 code in place</div>
+        <div class="chip info">Adds deterministic import + self-audit</div>
+        <div class="chip warn">Adds flashpoint simulator + provenance checks</div>
+        <div class="chip bad">Keeps governance / blueprint theories proof-gated behind chain closure</div>
       </div>
     </div>
     <div>
@@ -532,6 +532,32 @@
       <div id="alertBoardList"></div>
     </div>
   </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">V43 self-audit / consistency checks</div>
+      <div class="small">Checks whether the imported state, gravity math, slot gating, window hydration, and routed-ingress interpretations are internally coherent before the prover promotes them.</div>
+      <div id="selfAuditList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">State provenance / import hygiene</div>
+      <div class="small">Separates imported bundle facts, rebuilt cue state, and local session influence so the display stays deterministic instead of quietly mixing incompatible runs.</div>
+      <div id="stateProvenanceList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Flashpoint simulator</div>
+      <div class="small">Move a fraction of core against the visible native rail and see when the modeled discharge reaches quarter-rail, half-rail, parity, and overshoot territory.</div>
+      <div class="lane">
+        <div class="label">Core discharge fraction</div>
+        <input id="flashpointSlider" type="range" min="0" max="1" step="0.001" value="0.252" />
+        <div class="hint" id="flashpointSliderLabel">—</div>
+        <div class="hint" id="flashpointSimValue">—</div>
+        <div class="hint" id="flashpointCoverageLabel">—</div>
+      </div>
+      <div id="flashpointSimList"></div>
+    </div>
+  </div>
+
 
 </div>
 
@@ -3491,6 +3517,94 @@ ${state.settings.researchCorpus||''}`);
     const summary=ratio ? `Economic gravity flashpoint sits near ${flashPct.toFixed(3)}% of core: a discharge of about ${fmtShort(railEq)} pDAI would equal the visible native rail. Structural pressure is real, but discharge is not yet proven.` : 'Economic gravity flashpoint is waiting on anchor data.';
     return {score, rows, summary, ratio, flashPct};
   }
+  function v43CountCueLines(raw){ return mergeCueLines(raw).split(/\n+/).map(x=>x.trim()).filter(Boolean).length; }
+  function v43FindLeadSpender(baseModel){
+    return (baseModel.spenderLab||[])[0]?.address || (baseModel.signalBrain?.contractIntel?.topSpenders||[])[0]?.address || (baseModel.signalBrain?.executionHunt?.lead?.address) || '';
+  }
+  function v43GatherImportedSocial(imported){
+    const rows=[];
+    const pushMany=v=>{ if(Array.isArray(v)) rows.push(...v); };
+    pushMany(imported?.socialCache);
+    pushMany(imported?.lastGood?.social);
+    pushMany(imported?.lastGood?.newSocial);
+    pushMany(imported?.lastGood?.harvestedSocial);
+    (Array.isArray(imported?.history)?imported.history:[]).forEach(h=>{ pushMany(h?.social); pushMany(h?.newSocial); pushMany(h?.harvestedSocial); });
+    const synthetic=[
+      ...parseMariaCueText(imported?.settings?.mariaCueDrop),
+      ...parseMariaCueText(imported?.settings?.mariaCueMemory),
+      ...parseManualSocial(imported?.settings?.manualSocial),
+      ...parseManualSocial(imported?.settings?.researchCorpus)
+    ];
+    rows.push(...synthetic);
+    const social=uniq(rows.map(x=>normalizeSocialItem(x)||normalizeProxyItem(x,'bundle')).filter(Boolean), x=>x.id || `${x.url||''}|${x.title||''}|${x.publishedAt||''}`);
+    social.sort((a,b)=>asTsMs(b.publishedAt)-asTsMs(a.publishedAt));
+    const hydratedFromSettings = synthetic.length>0 && !(Array.isArray(imported?.lastGood?.social)&&imported.lastGood.social.length) && !(Array.isArray(imported?.socialCache)&&imported.socialCache.length);
+    return {social, hydratedFromSettings, syntheticCount:synthetic.length};
+  }
+  function v43ResolveImportedWindows(imported, social, last){
+    const historyWindows=[];
+    (Array.isArray(imported?.history)?imported.history:[]).forEach(h=>{ if(Array.isArray(h?.windows)) historyWindows.push(...h.windows); });
+    const existing=uniq([...(Array.isArray(last?.windows)?last.windows:[]), ...historyWindows].filter(Boolean), x=>x.id || `${x.title||''}|${x.fromBlock||''}|${x.toBlock||''}|${x.phase||''}`);
+    if(existing.length) return {windows:existing.slice(0,360), rebuilt:false};
+    const latestBlock=last?.latestBlock || (Array.isArray(imported?.history)&&imported.history.length ? imported.history[imported.history.length-1]?.latestBlock : 0) || 0;
+    const latestTsMs=last?.latestTsMs || (Array.isArray(imported?.history)&&imported.history.length ? imported.history[imported.history.length-1]?.latestTsMs : 0) || Date.now();
+    return {windows:buildWindows(latestBlock, latestTsMs, social, imported?.settings?.blockSec || state.settings.blockSec), rebuilt:!!social.length};
+  }
+  function v43BuildSourceProvenance(baseModel){
+    const imported=state.importedBundle;
+    const importedCueCount=v43CountCueLines(imported?.settings?.mariaCueDrop||imported?.settings?.mariaCueMemory);
+    const liveCueCount=v43CountCueLines(state.settings.mariaCueDrop||state.settings.mariaCueMemory);
+    const rows=[
+      {label:'Render source', value:imported?'imported bundle / cached model':'live scan / cached model', hint:imported?'Imported bundle is loaded; live sync may still overwrite after refresh.':'No imported bundle is pinned right now.', cls:imported?'warn':'good'},
+      {label:'Imported cue lines', value: importedCueCount || 0, hint: importedCueCount ? 'Cue URLs / notes exist inside imported settings.' : 'Imported settings do not currently carry cue lines.', cls: importedCueCount ? 'info' : 'warn'},
+      {label:'Rendered social / windows', value:`${(baseModel.social||[]).length} / ${(baseModel.windows||[]).length}`, hint:'Counts currently shown by the renderer.', cls:(baseModel.social||[]).length || (baseModel.windows||[]).length ? 'good' : 'warn'},
+      {label:'Local history influence', value: `${state.history.length} local snapshot(s)`, hint: imported ? 'Import no longer appends into prior local history automatically.' : 'Live mode continues to build local history.', cls: imported ? 'info' : 'info'},
+      {label:'Live cue memory', value: liveCueCount || 0, hint: liveCueCount ? 'Current settings also carry cue memory.' : 'Current settings do not add extra cue memory.', cls: liveCueCount ? 'info' : 'warn'}
+    ];
+    const summary = imported ? 'State provenance favors deterministic imported rendering first, then optional live refresh.' : 'State provenance favors live scanning, with cached bundle fallback if sync fails.';
+    return {rows, summary};
+  }
+  function v43BuildSelfAudit(baseModel){
+    const gravity=baseModel.v42_9?.gravity||{};
+    const core=Number(baseModel.nodeBalances?.['5EF7']?.pdai || baseModel.publicAnchors?.find(x=>String(x.role||'').includes('core'))?.reserve0 || 0);
+    const native=Number(baseModel.publicAnchors?.find(x=>String(x.role||'').includes('optical'))?.reserve0 || 0);
+    const calcFlash=core>0 ? (native/core)*100 : 0;
+    const flashDelta=Math.abs(calcFlash - Number(gravity.flashPct||0));
+    const focus=v40NormalizeAddr(baseModel.v40?.focus?.spender || state.settings.focusSpender || '');
+    const lead=v40NormalizeAddr(v43FindLeadSpender(baseModel));
+    const cueLines=v43CountCueLines(state.settings.mariaCueDrop||state.settings.mariaCueMemory||state.importedBundle?.settings?.mariaCueDrop||state.importedBundle?.settings?.mariaCueMemory);
+    const routedSupport=(baseModel.clarifier?.supports||[]).find(x=>/Routed ingress is live/i.test(String(x))) || '';
+    const routedGap=(baseModel.clarifier?.disconfirm||[]).find(x=>/No direct or routed spender ingress landed/i.test(String(x))) || '';
+    const rows=[
+      {label:'Flashpoint formula', value: calcFlash ? `${calcFlash.toFixed(3)}%` : 'watching', hint: flashDelta<0.005 ? 'Gravity flashpoint matches current core/native reserve math.' : `Displayed gravity differs by ${flashDelta.toFixed(3)} percentage point(s).`, cls: flashDelta<0.005 ? 'good' : 'bad'},
+      {label:'Null-gate proof cap', value: baseModel.slotProbe?.allZero ? 'capped by null-null' : 'slot wake visible', hint: baseModel.slotProbe?.allZero ? 'Formal execution should stay proof-gated while 7b12 / 0968 are still zero.' : 'Slot state is no longer fully null-null.', cls: baseModel.slotProbe?.allZero ? 'good' : 'warn'},
+      {label:'Cue hydration', value: `${cueLines} cue line(s) → ${(baseModel.social||[]).length} social / ${(baseModel.windows||[]).length} windows`, hint: cueLines && !(baseModel.social||[]).length ? 'Cue memory exists but was not hydrated into renderable social rows.' : 'Cue hydration looks internally consistent for the current render source.', cls: cueLines && !(baseModel.social||[]).length ? 'warn' : 'good'},
+      {label:'Lead vs focus spender', value: focus && lead ? (focus===lead ? 'aligned' : 'diverged') : 'partial', hint: `focus ${focus?addrShort(focus):'—'} • lead ${lead?addrShort(lead):'—'}`, cls: focus && lead && focus!==lead ? 'warn' : 'info'},
+      {label:'Routed-ingress interpretation', value: routedSupport && routedGap ? 'split signal' : (routedSupport ? 'ingress observed' : 'no ingress claim'), hint: routedSupport && routedGap ? 'Ingress exists, but current proof window overlap still reads zero. Treat this as outside-window pressure, not a formal contradiction.' : (routedSupport || 'No routed-ingress support text is currently loaded.'), cls: routedSupport && routedGap ? 'warn' : (routedSupport ? 'good' : 'info')}
+    ];
+    const summary='V43 self-audit checks math, proof gating, cue hydration, spender labeling, and routed-ingress phrasing before pressure claims are trusted.';
+    return {rows, summary};
+  }
+  function v43ComputeSimulator(model, pctValue){
+    const gravity=model?.v42_9?.gravity||{};
+    const core=Number(model?.nodeBalances?.['5EF7']?.pdai || 0);
+    const native=Number(model?.publicAnchors?.find(x=>String(x.role||'').includes('optical'))?.reserve0 || 0);
+    const pctNum=clamp(Number(pctValue)||0,0,100);
+    const amount=core*(pctNum/100);
+    const coverage=native>0 ? amount/native : 0;
+    return {core,native,pctNum,amount,coverage,flashPct:Number(gravity.flashPct||0)};
+  }
+  function applyV43Upgrade(baseModel){
+    const provenance=v43BuildSourceProvenance(baseModel);
+    const audit=v43BuildSelfAudit(baseModel);
+    baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+      {label:'V43 provenance', value: provenance.rows[0]?.value || 'watching', hint: provenance.summary, cls:'info'},
+      {label:'V43 self-audit', value: audit.rows.filter(r=>r.cls==='bad').length ? 'attention needed' : 'internally coherent', hint: audit.summary, cls:audit.rows.filter(r=>r.cls==='bad').length ? 'warn' : 'good'}
+    ], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V43 adds deterministic import hygiene, self-audit checks, and a live flashpoint simulator.`};
+    baseModel.v43={provenance, audit, summary:'V43 adds deterministic import handling, provenance tracking, self-audit checks, and an interactive flashpoint simulator.'};
+    baseModel.version='V43.0 Audit-Hardened Predator Gatekeeper Auditor';
+    return baseModel;
+  }
   function applyV42_9Upgrade(baseModel){
     const scout=v42_9BuildSocialScout(baseModel);
     const gatekeeper=v42_9BuildGatekeeper(baseModel, scout);
@@ -3531,7 +3645,7 @@ ${state.settings.researchCorpus||''}`);
     baseModel.version='V42.9 Predator Gatekeeper Auditor';
     return baseModel;
   }
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); const v426=applyV42_6Upgrade(v425); const v428=applyV42_8Upgrade(v426); return applyV42_9Upgrade(v428); }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); const v426=applyV42_6Upgrade(v425); const v428=applyV42_8Upgrade(v426); const v429=applyV42_9Upgrade(v428); return applyV43Upgrade(v429); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -3539,7 +3653,8 @@ ${state.settings.researchCorpus||''}`);
   function safeImportedRender(imported){
     const last=imported?.lastGood;
     if(!last) return null;
-    const social=uniq([...(imported.socialCache||[]), ...(last.newSocial||[]), ...(last.harvestedSocial||[])].map(normalizeSocialItem).filter(Boolean), x=>x.id || `${x.title}:${x.publishedAt}`);
+    const importedSocial=v43GatherImportedSocial(imported);
+    const social=importedSocial.social;
     const clarifier={
       prep:last.pegProgress || 0,
       exec:clamp((last.signalBrain?.moveBuilder?.stages?.[5]?.score || last.signalBrain?.contractInnerEye?.score || 0),0,1),
@@ -3572,7 +3687,7 @@ ${state.settings.researchCorpus||''}`);
       slotProbe:last.slotProbe||{values:{},allZero:true,summary:'imported'},
       dnaProbe:last.dnaProbe||{raw:NULL32,implAddress:''},
       social,
-      windows:last.windows || buildWindows(last.latestBlock||0,last.latestTsMs||Date.now(),social),
+      windows:v43ResolveImportedWindows(imported, social, last).windows,
       signalBrain:Object.assign({executionHunt:{support:[],tripwires:[],summary:'Imported snapshot',score:0},routeClusters:[]}, last.signalBrain||{}),
       spenderLab:(last.signalBrain?.contractIntel?.topSpenders||[]).map(x=>({address:x.address,count:x.count,kind:'Imported',impl:'',codeSize:0,markers:[],windowHits:0,adjacency:0,score:clamp(x.count/4,0,1)})),
       candidates:(last.signalBrain?.shadowMachineMap||[]).map(x=>({address:x.address,count:x.count||0,label:x.label||'imported',net:0,in:0,out:0,windowHits:0,spenderAdj:0,warehousing:0,discharge:0,score:x.score||0,stance:'imported'})),
@@ -3605,7 +3720,7 @@ ${state.settings.researchCorpus||''}`);
     $('rpcMeta').textContent='RPC: '+(state.rpcUsed||'bundle-only');
     $('lastSync').textContent='Last sync: '+fmtTs(model.latestTsMs || model.createdAt);
     $('socialMeta').textContent=`Social: ${(model.social||[]).length} item(s)` + (state.settings.mariaStateFault?` • fault ${state.settings.mariaStateFault}`:'');
-    $('historyMeta').textContent=`History: ${state.history.length} local • ${model.historySeeded||0} imported`;
+    $('historyMeta').textContent=`History: ${state.history.length} local • ${model.historySeeded||0} imported${state.importedIsolated?' • deterministic import':''}`;
 
     $('mClarity').textContent=pct(model.clarifier.clarity);
     $('mPrep').textContent=pct(model.clarifier.prep);
@@ -3872,6 +3987,7 @@ ${state.settings.researchCorpus||''}`);
     renderV42_6(model);
     renderV42_8(model);
     renderV42_9(model);
+    renderV43(model);
   }
   function renderV42_6(model){
     const v426=model.v42_6||{};
@@ -3948,6 +4064,52 @@ ${state.settings.researchCorpus||''}`);
     }
   }
 
+  function v43UpdateFlashpointSimulator(model, pctValue){
+    const sim=v43ComputeSimulator(model, pctValue);
+    const sliderLabel=$('flashpointSliderLabel');
+    const simValue=$('flashpointSimValue');
+    const coverageLabel=$('flashpointCoverageLabel');
+    if(sliderLabel) sliderLabel.textContent=`${sim.pctNum.toFixed(3)}% of core`;
+    if(simValue) simValue.textContent=`Discharge amount: ${fmtShort(sim.amount)} pDAI`;
+    if(coverageLabel) coverageLabel.textContent=`Visible native-rail coverage: ${sim.coverage.toFixed(2)}x`;
+    const list=$('flashpointSimList');
+    if(list){
+      clearEl(list);
+      pushItem(list, `Quarter rail is around ${(sim.flashPct/4).toFixed(3)}% of core; half rail is around ${(sim.flashPct/2).toFixed(3)}%; full parity is around ${sim.flashPct.toFixed(3)}%.`, 'info');
+      pushItem(list, `At the current slider position, the modeled discharge covers ${sim.coverage.toFixed(2)}x of the visible native rail.`, sim.coverage>=1?'good':sim.coverage>=0.5?'warn':'info');
+      pushItem(list, sim.coverage>=1 ? 'This crosses the current rail-equivalent threshold, but it is still structural math rather than observed discharge.' : 'This remains below current rail parity and should be treated as partial pressure only.', sim.coverage>=1?'warn':'info');
+    }
+  }
+  function renderV43(model){
+    window.__pdaiModel=model;
+    const v43=model.v43||{};
+    const audit=$('selfAuditList');
+    if(audit){
+      clearEl(audit);
+      pushItem(audit, v43.audit?.summary || 'No V43 self-audit summary yet.', 'info');
+      (v43.audit?.rows||[]).forEach(r=>pushItem(audit, `${r.label}: ${r.value} • ${r.hint||''}`, r.cls||'info'));
+    }
+    const prov=$('stateProvenanceList');
+    if(prov){
+      clearEl(prov);
+      pushItem(prov, v43.provenance?.summary || 'No provenance summary yet.', 'info');
+      (v43.provenance?.rows||[]).forEach(r=>pushItem(prov, `${r.label}: ${r.value} • ${r.hint||''}`, r.cls||'info'));
+      if(model.v43Meta?.hydratedFromSettings) pushItem(prov, `Imported render rebuilt social rows from ${model.v43Meta.syntheticSocialCount||0} cue-derived item(s) because the bundle did not carry expanded social rows.`, 'warn');
+    }
+    const slider=$('flashpointSlider');
+    const flash=Number(model?.v42_9?.gravity?.flashPct || 0.252);
+    if(slider){
+      slider.min='0';
+      slider.max=String(Math.max(flash*4, 1).toFixed(3));
+      slider.step='0.001';
+      if(!slider.dataset.bound){
+        slider.addEventListener('input', ()=> v43UpdateFlashpointSimulator(window.__pdaiModel, Number(slider.value)));
+        slider.dataset.bound='1';
+      }
+      if(!slider.value || Number(slider.value)>Number(slider.max)) slider.value=flash.toFixed(3);
+      v43UpdateFlashpointSimulator(model, Number(slider.value));
+    }
+  }
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 
@@ -4080,7 +4242,7 @@ ${state.settings.researchCorpus||''}`);
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_9-history.json', state.history);
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v43-history.json', state.history);
   $('exportBtn').onclick=()=> {
     state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
     if(state.lastGood && typeof state.lastGood==='object'){
@@ -4089,7 +4251,7 @@ ${state.settings.researchCorpus||''}`);
     }
     if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
     if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
-    downloadJson('pdai-v42_9-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+    downloadJson('pdai-v43-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   };
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
@@ -4103,12 +4265,13 @@ ${state.settings.researchCorpus||''}`);
       if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
       saveSettings();
       pushSettings();
-      if(bundle.history?.length) saveHistory([...(loadHistory()||[]), ...bundle.history].slice(-120));
-      if(bundle.socialCache?.length) saveSocialCache(bundle.socialCache);
+      saveHistory((bundle.history||[]).slice(-120));
+      saveSocialCache(bundle.socialCache||[]);
       if(bundle.lastGood) saveLastGood(bundle.lastGood);
+      state.importedIsolated=true;
       render(safeImportedRender(bundle));
       $('syncStatus').textContent='bundle loaded'; $('syncStatus').className='status info';
-      $('lastSync').textContent='Imported bundle loaded. Refresh to run live integrated V39 logic.' + (state.persistIssue?(' • '+state.persistIssue):'');
+      $('lastSync').textContent='Imported bundle loaded in deterministic mode. Refresh to run live integrated logic from this upgraded base.' + (state.persistIssue?(' • '+state.persistIssue):'');
     }catch(err){ alert('Import failed: '+(err.message||String(err))); }
     e.target.value='';
   });
