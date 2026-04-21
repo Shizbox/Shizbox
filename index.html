@@ -4734,6 +4734,387 @@ function v44EnsureUi(){
   document.getElementById('v44ModeBtn').onclick=()=>{ state.settings.f44Overdrive = state.settings.f44Overdrive===false; state.settings=v44ApplyOverdriveDefaults(state.settings); saveSettings(); try{ pushSettings(); }catch{} sync(); };
 }
 
+
+// ===== V45 AWACS + satellite backend patch =====
+const V45_AWACS_KEY='pdai-v45-awacs-intel';
+function v45LoadAwacsIntel(){ try{ return tryJson(localStorage.getItem(V45_AWACS_KEY), null); }catch{ return null; } }
+function v45SaveAwacsIntel(obj){ try{ if(!obj) localStorage.removeItem(V45_AWACS_KEY); else safeStorageSet(V45_AWACS_KEY, obj, x=>x); }catch{} }
+state.awacsIntel=v45LoadAwacsIntel();
+function v45ApplyDefaults(settings){
+  return {
+    ...settings,
+    awacsBaseUrl: String(settings.awacsBaseUrl||'http://localhost:8787').trim(),
+    awacsTargetUrl: String(settings.awacsTargetUrl||'').trim(),
+    awacsAutoUse: settings.awacsAutoUse!==false
+  };
+}
+const __loadSettingsV45 = loadSettings;
+loadSettings = function(){ return v45ApplyDefaults(__loadSettingsV45()); };
+state.settings=v45ApplyDefaults(state.settings||{});
+async function v45CallAwacs(path, payload){
+  const base=String(state.settings.awacsBaseUrl||'').trim().replace(/\/$/, '');
+  if(!base) throw new Error('AWACS backend URL is empty');
+  return await postJson(`${base}${path}`, payload||{});
+}
+async function v45UploadAwacs(path, file){
+  const base=String(state.settings.awacsBaseUrl||'').trim().replace(/\/$/, '');
+  if(!base) throw new Error('AWACS backend URL is empty');
+  const fd=new FormData();
+  fd.append('media', file);
+  const res=await fetch(`${base}${path}`, { method:'POST', body:fd });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+function v45BuildCorpusFromAwacs(intel){
+  const media=intel?.media||{}; const blocks=Array.isArray(media.transcriptBlocks)?media.transcriptBlocks:[]; const terms=((media.summary&&media.summary.topTerms)||[]).slice(0,20).map(x=>x.term||x.label).filter(Boolean);
+  const chunk=blocks.slice(0,40).map(b=>`[${Number(b.startSec||0).toFixed(1)}-${Number(b.endSec||0).toFixed(1)}] ${b.speaker?`(${b.speaker}) `:''}${b.text||''}`).join('\n');
+  return [`AWACS MEDIA INTEL`, media.summary?.title?`Title: ${media.summary.title}`:'', terms.length?`Terms: ${terms.join(', ')}`:'', chunk].filter(Boolean).join('\n');
+}
+function v45MergeAwacsCorpus(intel){
+  const corpus=v45BuildCorpusFromAwacs(intel).trim();
+  if(!corpus) return;
+  const existing=String(state.settings.researchCorpus||'');
+  if(existing.includes(corpus.slice(0,120))) return;
+  state.settings.researchCorpus=[existing, corpus].filter(Boolean).join('\n\n');
+  saveSettings();
+  try{ pushSettings(); }catch{}
+}
+function v45BuildAwacs(model){
+  const intel=state.awacsIntel||{}; const media=intel.media||null; const chain=intel.chain||null;
+  const rows=[];
+  rows.push({label:'Backend', value:String(state.settings.awacsBaseUrl||'unset'), hint:'AWACS backend is used for real transcript intake, OCR, speaker segmentation, and persistent strike indexing.', cls:'info'});
+  rows.push({label:'Media job', value:media?.jobId||'idle', hint:media?.summary?.title || 'No backend media intake has been stored yet.', cls:media?'good':'warn'});
+  rows.push({label:'Transcript blocks', value:`${Array.isArray(media?.transcriptBlocks)?media.transcriptBlocks.length:(media?.summary?.transcriptBlocks||0)}`, hint:'Timed subtitle / transcript blocks indexed by the backend.', cls:media?'good':'warn'});
+  rows.push({label:'OCR frames', value:`${Array.isArray(media?.ocrFrames)?media.ocrFrames.length:(media?.summary?.ocrFrames||0)}`, hint:'Frame OCR samples persisted by AWACS.', cls:(media?.summary?.ocrFrames||0)?'info':'warn'});
+  rows.push({label:'Speaker segments', value:`${Array.isArray(media?.speakerSegments)?media.speakerSegments.length:(media?.summary?.speakerSegments||0)}`, hint:'Speaker segmentation is backend-assisted and persistent.', cls:(media?.summary?.speakerSegments||0)?'info':'warn'});
+  rows.push({label:'Deep strike scan', value:chain?.scanId||'idle', hint:chain?`Blocks ${chain.summary?.fromBlock||'—'}-${chain.summary?.toBlock||'—'} • tx ${chain.summary?.txTouches||0} • logs ${chain.summary?.logHits||0} • traces ${chain.summary?.traceHits||0}`:'No backend strike scan stored yet.', cls:chain?'good':'warn'});
+  const summary = media || chain ? 'V45 AWACS is active: backend media intelligence and persistent chain indexing are available.' : 'V45 AWACS is waiting for backend media or strike results.';
+  const score = ((media?.summary?.transcriptBlocks||0)>0 ? 0.4 : 0) + ((media?.summary?.ocrFrames||0)>0 ? 0.15 : 0) + ((chain?.summary?.txTouches||0)>0 ? 0.25 : 0) + ((chain?.summary?.traceHits||0)>0 ? 0.2 : 0);
+  return {rows, summary, score:clamp(score,0,1)};
+}
+async function v45BuildStrikeFusion(model){
+  const chain=state.awacsIntel?.chain||null; const media=state.awacsIntel?.media||null;
+  const tasks=[];
+  if(!media) tasks.push('Run AWACS YouTube intake or upload a local video so transcript/OCR terms can be fused into blueprint search.');
+  if(media && !(media.summary?.transcriptBlocks>0)) tasks.push('Backend media job did not yield timed transcript blocks; fall back to subtitles, SRT, or a clearer source.');
+  if(!chain) tasks.push('Run a backend deep strike scan to persist tx/log/trace hits around focus actors.');
+  if(chain && (chain.summary?.directWalletToSpender||0)===0) tasks.push('Backend strike scan still has no direct focus wallet → spender touch; widen block span or add extra addresses.');
+  if(chain && (chain.summary?.traceHits||0)===0) tasks.push('Try a tracing-capable RPC so AWACS can capture call-path evidence, not only receipts and logs.');
+  if(model.slotProbe?.allZero!==false) tasks.push('Keep null-null hard gate dominant until 7b12 or 0968 actually wakes.');
+  return {rows:tasks.slice(0,8), summary:tasks.length?`V45 fusion produced ${tasks.length} next-step backend task(s).`:'V45 fusion is satisfied with current backend coverage.'};
+}
+async function applyV45Upgrade(baseModel){
+  const awacs=v45BuildAwacs(baseModel); const fusion=await v45BuildStrikeFusion(baseModel);
+  baseModel.v45={awacs, fusion, summary:'V45 adds a real backend lane for transcript fetching, OCR, speaker segmentation, and persistent chain indexing.'};
+  baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V45 AWACS backend', value: awacs.rows[1]?.value || 'idle', hint:awacs.summary, cls:awacs.score>.45?'good':'info'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V45 adds backend transcript/OCR/speaker/strike indexing.`};
+  baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'AWACS backend', kind:'soft', score:awacs.score||0, status:awacs.score>.45?'observed':'watching', why:awacs.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V45 adds backend media intelligence and persistent strike indexing.`};
+  baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[awacs.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(fusion.rows||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V45 AWACS ${pct(awacs.score||0)}.`};
+  baseModel.version='V45.0 AWACS + Satellite Backend Auditor';
+  return baseModel;
+}
+const __buildModelV45 = buildModel;
+buildModel = async function(){ const model = await __buildModelV45(); return await applyV45Upgrade(model); };
+function v45RenderPanel(model){
+  v45EnsureUi();
+  const awacs=(model&&model.v45&&model.v45.awacs)?model.v45.awacs:v45BuildAwacs(model||{});
+  const fusion=(model&&model.v45&&model.v45.fusion)?model.v45.fusion:{rows:['Run a sync to populate V45 backend fusion tasks.'], summary:'Waiting for sync.'};
+  const baseInput=document.getElementById('v45AwacsBase'); if(baseInput && baseInput.value!==String(state.settings.awacsBaseUrl||'')) baseInput.value=String(state.settings.awacsBaseUrl||'');
+  const urlInput=document.getElementById('v45AwacsUrl'); if(urlInput && !urlInput.value && state.settings.awacsTargetUrl) urlInput.value=state.settings.awacsTargetUrl;
+  clearEl($('v45AwacsList')); awacs.rows.forEach(r=>pushItem($('v45AwacsList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
+  clearEl($('v45FusionList')); (fusion.rows||[]).forEach(t=>pushItem($('v45FusionList'), t, 'info'));
+  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V45.0 AWACS + Satellite Backend Auditor';
+  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V45.0 upgrades your attached V44 tool in place: real backend transcript intake, OCR on sampled frames, speaker segmentation, persistent SQLite indexing, and deeper recent-block strike scans. Formal execution remains hard-gated by real slot / shell / reserve closure.';
+  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V44 code in place</div><div class="chip info">Adds AWACS backend transcript + OCR + speaker ingest</div><div class="chip warn">Adds persistent strike indexing and recall</div><div class="chip bad">Keeps backend blueprint intelligence proof-gated behind chain closure</div>';
+}
+const __renderV45 = render;
+render = function(model){ __renderV45(model); v45RenderPanel(model); };
+async function v45RunYoutubeIntake(){
+  const input=document.getElementById('v45AwacsUrl'); const url=String(input?.value||'').trim(); if(!url) throw new Error('Paste a YouTube URL first');
+  state.settings.awacsTargetUrl=url; saveSettings();
+  const out=await v45CallAwacs('/api/media/youtube-intake', { url });
+  state.awacsIntel={...(state.awacsIntel||{}), media:out}; v45SaveAwacsIntel(state.awacsIntel); v45MergeAwacsCorpus(state.awacsIntel);
+  await sync();
+}
+async function v45RunMediaUpload(file){
+  if(!file) throw new Error('Choose a local media file');
+  const out=await v45UploadAwacs('/api/media/upload', file);
+  state.awacsIntel={...(state.awacsIntel||{}), media:out}; v45SaveAwacsIntel(state.awacsIntel); v45MergeAwacsCorpus(state.awacsIntel);
+  await sync();
+}
+async function v45RunStrikeScan(){
+  const model=state.lastGood||{};
+  const out=await v45CallAwacs('/api/chain/strike', {
+    rpc: state.settings.privateRpc || (Array.isArray(state.settings.rpcs)?state.settings.rpcs[0]:'') || '',
+    target: state.settings.target || '',
+    focusSpender: state.settings.focusSpender || model?.v40?.focus?.spender || '',
+    focusWallet: state.settings.focusWallet || model?.v40?.focus?.wallet || '',
+    focusCore: state.settings.focusCore || model?.v40?.focus?.core || '',
+    focusNexus: state.settings.focusNexus || model?.v42_3?.focusNexus || '',
+    extraAddresses: [model?.v42_3?.focusNexus || '', model?.v40?.focus?.spender || '', model?.v40?.focus?.wallet || ''].filter(Boolean),
+    blockSpan: Math.max(400, Number(state.settings.burstScanBlocks||2200)),
+    maxTx: 180
+  });
+  state.awacsIntel={...(state.awacsIntel||{}), chain:out}; v45SaveAwacsIntel(state.awacsIntel);
+  await sync();
+}
+async function v45CheckHealth(){
+  const base=String(state.settings.awacsBaseUrl||'').trim().replace(/\/$/, ''); if(!base) throw new Error('AWACS backend URL is empty');
+  const res=await fetch(`${base}/api/health`); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json();
+}
+function v45EnsureUi(){
+  if(document.getElementById('v45AwacsPanel')) return;
+  const wrap=document.querySelector('.wrap'); if(!wrap) return;
+  const host=document.createElement('div'); host.className='twocol'; host.id='v45AwacsHost';
+  host.innerHTML=`<div class="panel" id="v45AwacsPanel"><div class="boxTitle">V45 AWACS backend</div><div class="small">Real backend lane for YouTube/subtitle intake, frame OCR, speaker segmentation, persistent SQLite indexing, and deep strike scans.</div><div class="field" style="margin-top:10px"><label>AWACS backend URL</label><input id="v45AwacsBase" placeholder="http://localhost:8787" /></div><div class="field" style="margin-top:10px"><label>YouTube URL</label><input id="v45AwacsUrl" placeholder="Paste a concrete YouTube URL for transcript intake" /></div><div class="btns" style="justify-content:flex-start;margin-top:12px"><button id="v45HealthBtn" class="secondary">Check backend</button><button id="v45YoutubeBtn">YouTube intake</button><button id="v45UploadBtn" class="secondary">Upload to AWACS</button><button id="v45StrikeBtn" class="secondary">Deep strike scan</button><button id="v45ClearBtn" class="secondary">Clear AWACS</button></div><input id="v45UploadFile" type="file" accept="video/*,audio/*,.srt,.vtt,.txt,.md,.json" style="display:none" /><div id="v45AwacsList" style="margin-top:12px"></div></div><div class="panel"><div class="boxTitle">V45 backend fusion tasks</div><div class="small">What the backend should hunt next after transcript, OCR, speaker, and chain indexing are combined with the existing cockpit logic.</div><div id="v45FusionList" style="margin-top:12px"></div></div>`;
+  const existing=document.getElementById('v44IntelTri'); if(existing && existing.parentNode===wrap) wrap.insertBefore(host, existing.nextSibling); else wrap.appendChild(host);
+  const baseInput=document.getElementById('v45AwacsBase');
+  baseInput.value=String(state.settings.awacsBaseUrl||'');
+  baseInput.addEventListener('change', ()=>{ state.settings.awacsBaseUrl=String(baseInput.value||'').trim(); saveSettings(); try{ pushSettings(); }catch{} sync(); });
+  document.getElementById('v45HealthBtn').onclick=async ()=>{ try{ const health=await v45CheckHealth(); alert(`AWACS ok\nTools: yt-dlp=${health.tools?.ytDlp?'yes':'no'}, ffmpeg=${health.tools?.ffmpeg?'yes':'no'}, tesseract=${health.tools?.tesseract?'yes':'no'}, python3=${health.tools?.python3?'yes':'no'}`); }catch(err){ alert('AWACS health failed: '+(err.message||String(err))); } };
+  document.getElementById('v45YoutubeBtn').onclick=()=> v45RunYoutubeIntake().catch(err=>alert('YouTube intake failed: '+(err.message||String(err))));
+  document.getElementById('v45UploadBtn').onclick=()=> document.getElementById('v45UploadFile').click();
+  document.getElementById('v45UploadFile').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ await v45RunMediaUpload(file); }catch(err){ alert('Upload to AWACS failed: '+(err.message||String(err))); } e.target.value=''; });
+  document.getElementById('v45StrikeBtn').onclick=()=> v45RunStrikeScan().catch(err=>alert('Deep strike scan failed: '+(err.message||String(err))));
+  document.getElementById('v45ClearBtn').onclick=()=>{ state.awacsIntel=null; v45SaveAwacsIntel(null); sync(); };
+}
+
+// ===== V46 single-html integrated AWACS / war-room patch =====
+const V46_LOCAL_KEY='pdai-v46-single-awacs';
+function v46LoadLocal(){ try{ return tryJson(localStorage.getItem(V46_LOCAL_KEY), null) || {mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; }catch{ return {mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; } }
+function v46SaveLocal(obj){ try{ safeStorageSet(V46_LOCAL_KEY, obj||{mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}, x=>x); }catch{} }
+state.v46Local=v46LoadLocal();
+function v46Uid(prefix='v46'){ return `${prefix}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2,8)}`; }
+function v46ConcreteUrl(url){ return /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/|clip\/)|youtu\.be\/|x\.com\/[^\/\s?#]+\/status\/|twitter\.com\/[^\/\s?#]+\/status\/|t\.me\/[^\/\s?#]+\/\d+)/i.test(String(url||'')); }
+function v46SourceGrade(url){ const info=v44SeedUrlInfo(url||''); if(v46ConcreteUrl(url)) return 'concrete'; if(info.seed) return 'source-coverage'; return url ? 'external-ref' : 'local'; }
+function v46CompactMedia(rec){
+  if(!rec) return null;
+  return { id:rec.id||v46Uid('media'), createdAt:rec.createdAt||Date.now(), label:rec.label||'media', kind:rec.kind||'media',
+    sourceUrl:rec.sourceUrl||'', sourceGrade:rec.sourceGrade||v46SourceGrade(rec.sourceUrl||''), summary:rec.summary||'',
+    blockCount:Number(rec.blockCount||0), sceneCount:Number(rec.sceneCount||0), durationSec:Number(rec.durationSec||0),
+    topTerms:Array.isArray(rec.topTerms)?rec.topTerms.slice(0,18):[], blocks:Array.isArray(rec.blocks)?rec.blocks.slice(0,120):[],
+    cues:Array.isArray(rec.cues)?rec.cues.slice(0,120):[], topScenes:Array.isArray(rec.topScenes)?rec.topScenes.slice(0,24):[],
+    audio:rec.audio||null, corpus:String(rec.corpus||'').slice(0,180000)
+  };
+}
+function v46LocalCurrentMedia(){ const box=state.v46Local||{}; return (box.mediaJobs||[]).find(x=>x.id===box.currentMediaId) || (box.mediaJobs||[])[0] || null; }
+function v46LocalCurrentChain(){ const box=state.v46Local||{}; return (box.chainScans||[]).find(x=>x.id===box.currentChainId) || (box.chainScans||[])[0] || null; }
+function v46StoreMedia(rec){
+  const box=state.v46Local||{mediaJobs:[], chainScans:[]};
+  const compact=v46CompactMedia(rec);
+  box.mediaJobs=[compact, ...(Array.isArray(box.mediaJobs)?box.mediaJobs:[]).filter(x=>x.id!==compact.id)].slice(0,12);
+  box.currentMediaId=compact.id;
+  state.v46Local=box; v46SaveLocal(box);
+  if(compact.corpus){
+    const existing=String(state.settings.researchCorpus||'');
+    const needle=String(compact.corpus||'').slice(0,160);
+    if(needle && !existing.includes(needle)){
+      state.settings.researchCorpus=[existing, compact.corpus].filter(Boolean).join('\n\n');
+      saveSettings(); try{ pushSettings(); }catch{}
+    }
+  }
+}
+function v46StoreChain(rec){
+  const box=state.v46Local||{mediaJobs:[], chainScans:[]};
+  box.chainScans=[rec, ...(Array.isArray(box.chainScans)?box.chainScans:[]).filter(x=>x.id!==rec.id)].slice(0,12);
+  box.currentChainId=rec.id;
+  state.v46Local=box; v46SaveLocal(box);
+}
+function v46MigrateLegacy(){
+  const box=state.v46Local||{mediaJobs:[], chainScans:[]};
+  let changed=false;
+  if(state.videoIntel && !(box.mediaJobs||[]).length){ v46StoreMedia(Object.assign({id:v46Uid('legacy-media')}, state.videoIntel)); changed=true; }
+  const aw=state.awacsIntel||{};
+  if(aw.media && !(box.mediaJobs||[]).some(x=>String(x.summary||'')===String(aw.media.summary?.title||'') || x.id===aw.media.jobId)){
+    const legacy={id:aw.media.jobId||v46Uid('legacy-awacs-media'), kind:'transcript', label:aw.media.summary?.title||'AWACS media', sourceUrl:aw.media.summary?.url||state.settings.awacsTargetUrl||'', sourceGrade:v46SourceGrade(aw.media.summary?.url||state.settings.awacsTargetUrl||''), summary:'Imported legacy AWACS media job into single-html local engine.', blockCount:Array.isArray(aw.media.transcriptBlocks)?aw.media.transcriptBlocks.length:Number(aw.media.summary?.transcriptBlocks||0), topTerms:Array.isArray(aw.media.summary?.topTerms)?aw.media.summary.topTerms:[], blocks:Array.isArray(aw.media.transcriptBlocks)?aw.media.transcriptBlocks.slice(0,120):[], corpus:v45MediaToCorpus(aw.media)};
+    v46StoreMedia(legacy); changed=true;
+  }
+  if(aw.chain && !(box.chainScans||[]).some(x=>x.id===aw.chain.scanId)){
+    const legacyChain={id:aw.chain.scanId||v46Uid('legacy-chain'), createdAt:Date.now(), summary:aw.chain.summary||{}, rows:[`Imported legacy AWACS chain scan ${aw.chain.scanId||''}.`], routeFamilies:[], replay:[], score:0.2};
+    v46StoreChain(legacyChain); changed=true;
+  }
+  if(changed) state.v46Local=v46LoadLocal();
+}
+v46MigrateLegacy();
+async function v46AnalyzeFile(file, sourceUrl=''){
+  const url=String(sourceUrl||'').trim();
+  const name=String(file?.name||'media');
+  const low=name.toLowerCase();
+  let rec;
+  if(/\.(srt|vtt|txt|md|json)$/i.test(low) || /^text\//i.test(String(file.type||'')) || /json/i.test(String(file.type||''))){
+    const raw=await file.text();
+    rec=v44TranscriptIntel(raw, name, {url});
+  }else if(/^audio\//i.test(String(file.type||'')) || /^video\//i.test(String(file.type||''))){
+    rec=await v44AnalyzeVideoBlob(file, {url});
+  }else{
+    throw new Error('Unsupported file type for integrated AWACS local engine.');
+  }
+  rec.id=v46Uid('media');
+  rec.sourceUrl=url;
+  rec.sourceGrade=v46SourceGrade(url);
+  rec.summary=`${rec.summary} Source grade: ${rec.sourceGrade}.`;
+  v46StoreMedia(rec);
+  return rec;
+}
+async function v46DigestPaste(url, raw){
+  const text=String(raw||'').trim(); if(!text) throw new Error('Paste transcript text first.');
+  const label=url ? `Pasted transcript • ${url}` : 'Pasted transcript';
+  const rec=v44TranscriptIntel(text, label, {url});
+  rec.id=v46Uid('paste'); rec.sourceUrl=String(url||'').trim(); rec.sourceGrade=v46SourceGrade(rec.sourceUrl); rec.summary=`${rec.summary} Source grade: ${rec.sourceGrade}.`;
+  v46StoreMedia(rec); return rec;
+}
+function v46PairKey(a,b){ return `${norm(a)}>${norm(b)}`; }
+function v46BuildRouteFamilies(transfers, windows){
+  const groups=new Map();
+  (Array.isArray(transfers)?transfers:[]).forEach(t=>{ if(!t?.tx) return; if(!groups.has(t.tx)) groups.set(t.tx, []); groups.get(t.tx).push(t); });
+  const fam=new Map();
+  const actorHot=new Set([norm(state.settings.focusWallet||''), norm(state.settings.focusSpender||''), norm(state.settings.focusCore||''), norm(state.settings.focusNexus||'')].filter(Boolean));
+  for(const [tx,rows] of groups.entries()){
+    if(rows.length<2) continue;
+    const edges=rows.slice(0,5).map(r=>v46PairKey(r.from,r.to));
+    const uniqEdges=[...new Set(edges)];
+    const signature=uniqEdges.slice(0,3).join(' || ');
+    if(!signature) continue;
+    const hit=rows.some(r=>actorHot.has(norm(r.from))||actorHot.has(norm(r.to)));
+    const windowHit=rows.some(r=>v44BlockInWindows(r.block, windows||[]));
+    const vol=rows.reduce((s,r)=>s+Math.abs(Number(r.amount||0)),0);
+    const cur=fam.get(signature)||{signature, txCount:0, volume:0, windowHits:0, hotHits:0, sampleTx:tx};
+    cur.txCount+=1; cur.volume+=vol; if(windowHit) cur.windowHits+=1; if(hit) cur.hotHits+=1; fam.set(signature, cur);
+  }
+  return [...fam.values()].sort((a,b)=>(b.hotHits*4+b.windowHits*2+b.txCount+b.volume/50000)-(a.hotHits*4+a.windowHits*2+a.txCount+a.volume/50000)).slice(0,12);
+}
+function v46BuildReplay(transfers, windows){
+  const out=[];
+  const txSeen=new Set();
+  (Array.isArray(windows)?windows:[]).forEach((w,idx)=>{
+    const rows=(Array.isArray(transfers)?transfers:[]).filter(t=>Number(t.block)>=Number(w.fromBlock||0) && Number(t.block)<=Number(w.toBlock||0));
+    const txs=[...new Set(rows.map(r=>r.tx).filter(Boolean))];
+    txs.forEach(x=>txSeen.add(x));
+    const hotRows=rows.filter(r=>[state.settings.focusWallet,state.settings.focusSpender,state.settings.focusCore,state.settings.focusNexus].map(norm).includes(norm(r.from)) || [state.settings.focusWallet,state.settings.focusSpender,state.settings.focusCore,state.settings.focusNexus].map(norm).includes(norm(r.to)));
+    out.push({id:w.id||`w:${idx}`, label:w.title||w.windowKind||`window ${idx+1}`, fromBlock:w.fromBlock, toBlock:w.toBlock, txCount:txs.length, hitCount:rows.length, hotHits:hotRows.length, volume:rows.reduce((s,r)=>s+Math.abs(Number(r.amount||0)),0)});
+  });
+  return out.sort((a,b)=>(b.hotHits*5+b.txCount*2+b.volume/50000)-(a.hotHits*5+a.txCount*2+a.volume/50000)).slice(0,10);
+}
+function v46BuildClusterIndex(transfers){
+  const byAddr=new Map();
+  (Array.isArray(transfers)?transfers:[]).forEach(t=>{
+    [t.from,t.to].forEach(addr=>{ const a=norm(addr); if(!a) return; const cur=byAddr.get(a)||{address:a,touches:0,partners:new Set(),volume:0}; cur.touches+=1; cur.volume+=Math.abs(Number(t.amount||0)||0); cur.partners.add(norm(t.from)===a?norm(t.to):norm(t.from)); byAddr.set(a,cur); });
+  });
+  return [...byAddr.values()].map(r=>({address:r.address,touches:r.touches,partners:r.partners.size,volume:r.volume,score:clamp(Math.min(r.touches/40,0.45)+Math.min(r.partners.size/18,0.35)+Math.min(r.volume/100000,0.2),0,1)})).sort((a,b)=>b.score-a.score).slice(0,12);
+}
+async function v46RunIntegratedStrike(model){
+  const m=model||state.lastGood||{};
+  const ci=m.signalBrain?.contractIntel||{};
+  const transfers=Array.isArray(ci.transfers)?ci.transfers:[];
+  const windows=Array.isArray(m.windows)?m.windows:[];
+  const grouped=new Map(); transfers.forEach(t=>{ if(!t?.tx) return; if(!grouped.has(t.tx)) grouped.set(t.tx, []); grouped.get(t.tx).push(t); });
+  const focusWallet=norm(state.settings.focusWallet||''); const focusSpender=norm(state.settings.focusSpender||''); const focusCore=norm(state.settings.focusCore||''); const focusNexus=norm(state.settings.focusNexus||'');
+  let directWalletToSpender=0, directWalletToCore=0, viaNexus=0, txTouches=0;
+  for(const [tx,rows] of grouped.entries()){
+    const touches=rows.some(r=>[focusWallet,focusSpender,focusCore,focusNexus].includes(norm(r.from)) || [focusWallet,focusSpender,focusCore,focusNexus].includes(norm(r.to)));
+    if(touches) txTouches++;
+    if(rows.some(r=>norm(r.from)===focusWallet && norm(r.to)===focusSpender)) directWalletToSpender++;
+    if(rows.some(r=>norm(r.from)===focusWallet && norm(r.to)===focusCore)) directWalletToCore++;
+    if(rows.some(r=>norm(r.from)===focusNexus && (norm(r.to)===focusSpender || norm(r.to)===focusCore))) viaNexus++;
+  }
+  const routeFamilies=v46BuildRouteFamilies(transfers, windows);
+  const replay=v46BuildReplay(transfers, windows);
+  const clusters=v46BuildClusterIndex(transfers);
+  const overdrive=m.v44?.overdrive || {selected:[], receiptRows:[], traceRows:[], focusRoute:0, windowAligned:0, directPath:0};
+  const summary={
+    fromBlock:ci.fromBlock||'—', toBlock:(m.chain?.latestBlock||m.latestBlock||'—'), txTouches, logHits:ci.logsCount||0, traceHits:(overdrive.traceRows||[]).length,
+    directWalletToSpender, directWalletToCore, viaNexus, routeFamilies:routeFamilies.length, replayWindows:replay.length
+  };
+  const rows=[
+    `Integrated strike scan touched ${txTouches} tx group(s) across blocks ${summary.fromBlock}-${summary.toBlock}.`,
+    `Direct wallet → spender hits: ${directWalletToSpender}. Direct wallet → core hits: ${directWalletToCore}. Nexus relay hits: ${viaNexus}.`,
+    `Route families indexed: ${routeFamilies.length}. Replay windows ranked: ${replay.length}. Cluster rows: ${clusters.length}.`,
+    `Trace carry-over from live overdrive: ${(overdrive.traceRows||[]).length} sampled tx with ${overdrive.focusRoute||0} focus-route closure(s).`
+  ];
+  const score=clamp(Math.min(txTouches/18,0.24)+Math.min(routeFamilies.length/8,0.18)+Math.min(replay.filter(x=>x.hotHits>0).length/5,0.16)+Math.min((overdrive.focusRoute||0)/5,0.14)+Math.min(directWalletToSpender/2,0.14)+Math.min(viaNexus/2,0.1)+((m.slotProbe?.allZero===false)?0.04:0),0,1);
+  const rec={id:v46Uid('chain'), createdAt:Date.now(), summary, rows, score, routeFamilies, replay, clusters};
+  v46StoreChain(rec); return rec;
+}
+function v46BuildIntegratedAwacs(model){
+  const media=v46LocalCurrentMedia(); const chain=v46LocalCurrentChain();
+  const rows=[];
+  rows.push({label:'Engine mode', value:'single-html integrated', hint:'Media extraction, persistence, replay, and strike indexing run inside this HTML without a separate backend.', cls:'good'});
+  rows.push({label:'Media job', value:media?media.label:'idle', hint:media?media.summary:'No integrated media job stored yet.', cls:media?'good':'warn'});
+  rows.push({label:'Source grade', value:media?media.sourceGrade:'—', hint:'Concrete sources can seed blueprint lanes; source-coverage URLs do not become timing windows by themselves.', cls:media && media.sourceGrade==='concrete' ? 'good' : 'warn'});
+  rows.push({label:'Transcript blocks', value:String(media?.blockCount||0), hint:'Timed blocks parsed locally from uploaded subtitle / transcript material.', cls:(media?.blockCount||0)?'info':'warn'});
+  rows.push({label:'Scene shifts', value:String(media?.sceneCount||0), hint:'Sampled from local video uploads.', cls:(media?.sceneCount||0)?'info':'warn'});
+  rows.push({label:'Integrated strike scan', value:chain?chain.id:'idle', hint:chain?`tx ${chain.summary.txTouches||0} • route families ${chain.summary.routeFamilies||0} • replay windows ${chain.summary.replayWindows||0}`:'Run integrated strike scan to index recent tx families locally.', cls:chain?'good':'warn'});
+  const score=clamp((media?0.22:0)+(Math.min((media?.blockCount||0)/40,0.18))+(Math.min((media?.sceneCount||0)/8,0.08))+(chain?0.22:0)+(Math.min((chain?.summary?.routeFamilies||0)/8,0.15))+(Math.min((chain?.summary?.replayWindows||0)/6,0.1))+(Math.min((chain?.summary?.directWalletToSpender||0)/2,0.05)),0,1);
+  const summary=media||chain ? 'V46 integrated AWACS local engine is active: persistent local media intelligence and chain indexing are running inside one HTML.' : 'V46 integrated AWACS local engine is idle.';
+  return {rows, score, summary, media, chain};
+}
+function v46BuildWarRoom(model){
+  const media=v46LocalCurrentMedia(); const chain=v46LocalCurrentChain();
+  const flash=model.v42_9?.gravity?.flashPct || model.v43?.audit?.flashPct || 0;
+  const routeFamilies=Array.isArray(chain?.routeFamilies)?chain.routeFamilies:[];
+  const replay=Array.isArray(chain?.replay)?chain.replay:[];
+  const clusters=Array.isArray(chain?.clusters)?chain.clusters:[];
+  const rows=[];
+  rows.push({label:'Flashpoint', value:flash?`${flash.toFixed(3)}% core`:'watching', hint:'Gravity remains structural pressure, not discharge proof.', cls:(flash>0 && flash<1)?'good':'warn'});
+  rows.push({label:'Null-null gate', value:model.slotProbe?.allZero===false?'awake':'still null-null', hint:model.slotProbe?.allZero===false?'Watched slots are no longer both zero.':'7b12 / 0968 still cap formal execution.', cls:model.slotProbe?.allZero===false?'good':'bad'});
+  rows.push({label:'Deterministic route families', value:String(routeFamilies.length), hint:routeFamilies[0]?`${routeFamilies[0].signature} • tx ${routeFamilies[0].txCount} • hot ${routeFamilies[0].hotHits}`:'No repeated multi-edge families indexed yet.', cls:routeFamilies.length?'good':'warn'});
+  rows.push({label:'Window replay board', value:String(replay.length), hint:replay[0]?`${replay[0].label} • hot ${replay[0].hotHits} • tx ${replay[0].txCount}`:'No replay board yet.', cls:replay.length?'info':'warn'});
+  rows.push({label:'Cluster pressure', value:String(clusters.length), hint:clusters[0]?`${clusters[0].address.slice(0,10)}… • score ${pct(clusters[0].score||0)} • partners ${clusters[0].partners}`:'No cluster index built yet.', cls:clusters.length?'info':'warn'});
+  rows.push({label:'Video / transcript fusion', value:media?`${media.kind} • ${media.sourceGrade}`:'idle', hint:media?.topTerms?.length?`Top terms: ${media.topTerms.slice(0,5).map(x=>x.label+'×'+x.count).join(', ')}`:'No extracted blueprint terms persisted yet.', cls:media?'info':'warn'});
+  const tasks=[];
+  if(!media) tasks.push('Upload local video/audio/subtitles or paste transcript text tied to a concrete source URL if you want media-derived blueprint terms.');
+  if(media && media.sourceGrade!=='concrete') tasks.push('Current media source grade is not concrete. Keep it in coverage / blueprint lanes instead of timing proof.');
+  if(!chain) tasks.push('Run integrated strike scan to build deterministic route families and a replay board inside this HTML.');
+  if(chain && !(chain.summary?.directWalletToSpender>0 || chain.summary?.viaNexus>0)) tasks.push('Strike index still has no direct wallet→spender or nexus relay closure; widen block span by refreshing again after more live history accumulates.');
+  if(!(routeFamilies.some(r=>r.windowHits>0))) tasks.push('Drive repeated route families into timing windows before upgrading choreography claims.');
+  if(model.slotProbe?.allZero!==false) tasks.push('Keep 7b12 / 0968 null-null hard gate dominant until real state mutation appears.');
+  if((model.signalBrain?.contractIntel?.approvalCount||0)<1) tasks.push('Approval pulse is quiet; wait for spender markers to re-appear before over-promoting route families.');
+  const summary=tasks.length?`V46 war-room generated ${tasks.length} high-priority proving task(s).`:'V46 war-room has no urgent blockers beyond the standing proof gate.';
+  return {rows, tasks:tasks.slice(0,10), summary};
+}
+async function applyV46Upgrade(baseModel){
+  const integrated=v46BuildIntegratedAwacs(baseModel);
+  const war=v46BuildWarRoom(baseModel);
+  baseModel.v46={integrated, war, summary:'V46 folds AWACS functions into a single-html local engine, adds route-family indexing, replay boards, and cluster pressure tracking.'};
+  baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V46 integrated AWACS', value: pct(integrated.score||0), hint:integrated.summary, cls:integrated.score>.42?'good':'info'}, {label:'V46 war-room', value: war.rows[2]?.value || 'watching', hint:war.summary, cls:(war.rows[2]?.value && war.rows[2].value!=='0')?'good':'warn'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V46 folds the AWACS lane into one HTML and adds deterministic route-family / replay indexing.`};
+  baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'Integrated AWACS local engine', kind:'soft', score:integrated.score||0, status:integrated.media||integrated.chain?'observed':'watching', why:integrated.summary}, {name:'War-room replay / route-family indexing', kind:'soft', score:clamp(((integrated.chain?.summary?.routeFamilies||0)/8)+((integrated.chain?.summary?.replayWindows||0)/10),0,1), status:(integrated.chain?.summary?.routeFamilies||0)?'observed':'watching', why:war.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V46 adds in-browser persistence, route-family replay, and cluster pressure without a separate backend.`};
+  baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[integrated.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(war.tasks||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V46 single-html ${pct(integrated.score||0)} • route families ${integrated.chain?.summary?.routeFamilies||0} • replay ${integrated.chain?.summary?.replayWindows||0}.`};
+  baseModel.version='V46.0 Single-HTML F-22 War-Room Auditor';
+  return baseModel;
+}
+const __buildModelV46 = buildModel;
+buildModel = async function(){ const model = await __buildModelV46(); return await applyV46Upgrade(model); };
+function v46RenderPanel(model){
+  v46EnsureUi();
+  const integrated=(model&&model.v46&&model.v46.integrated)?model.v46.integrated:v46BuildIntegratedAwacs(model||{});
+  const war=(model&&model.v46&&model.v46.war)?model.v46.war:v46BuildWarRoom(model||{});
+  const media=integrated.media, chain=integrated.chain;
+  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.0 Single-HTML F-22 War-Room Auditor';
+  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.0 upgrades your attached V45 line in place: AWACS is folded into one HTML with persistent local media intelligence, deterministic route-family indexing, replay boards, and a tighter war-room proving loop. Formal execution remains hard-gated by real slot / shell / reserve closure.';
+  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V45 code in place</div><div class="chip info">Folds AWACS into one HTML with local persistence</div><div class="chip warn">Adds route-family indexing + replay board + war-room tasks</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
+  const urlInput=document.getElementById('v46SourceUrl'); if(urlInput && !urlInput.value && media?.sourceUrl) urlInput.value=media.sourceUrl;
+  clearEl($('v46IntegratedList')); integrated.rows.forEach(r=>pushItem($('v46IntegratedList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
+  clearEl($('v46WarRows')); war.rows.forEach(r=>pushItem($('v46WarRows'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
+  clearEl($('v46TaskList')); (war.tasks||[]).forEach(t=>pushItem($('v46TaskList'), t, 'info'));
+  clearEl($('v46FamilyList')); (chain?.routeFamilies||[]).slice(0,8).forEach(r=>pushItem($('v46FamilyList'), `${r.signature} • tx ${r.txCount} • hot ${r.hotHits} • windows ${r.windowHits} • vol ${fmtShort(r.volume)}`, r.hotHits?'good':'info'));
+  clearEl($('v46ReplayList')); (chain?.replay||[]).slice(0,8).forEach(r=>pushItem($('v46ReplayList'), `${r.label}: blocks ${r.fromBlock}-${r.toBlock} • tx ${r.txCount} • hot ${r.hotHits} • vol ${fmtShort(r.volume)}`, r.hotHits?'good':'info'));
+  const v44=document.getElementById('v44IntelTri'); if(v44) v44.style.display='none';
+  const v45=document.getElementById('v45AwacsHost'); if(v45) v45.style.display='none';
+}
+const __renderV46 = render;
+render = function(model){ __renderV46(model); v46RenderPanel(model); };
+function v46EnsureUi(){
+  if(document.getElementById('v46SingleHost')) return;
+  const wrap=document.querySelector('.wrap'); if(!wrap) return;
+  const host=document.createElement('div'); host.className='tri'; host.id='v46SingleHost';
+  host.innerHTML=`<div class="panel"><div class="boxTitle">V46 integrated AWACS local engine</div><div class="small">One-file cockpit mode. Upload local video/audio/subtitles/transcripts, or paste transcript text with a concrete source URL. Media jobs and strike scans persist locally inside the browser.</div><div class="field" style="margin-top:10px"><label>Concrete source URL (optional)</label><input id="v46SourceUrl" placeholder="Paste a concrete YouTube / X / Telegram post URL if you have one" /></div><textarea id="v46TranscriptPaste" placeholder="Paste transcript / subtitle text here for local parsing and blueprint extraction." style="margin-top:10px;min-height:120px"></textarea><div class="btns" style="justify-content:flex-start;margin-top:12px"><button id="v46UploadBtn">Analyze local media</button><button id="v46PasteBtn" class="secondary">Digest pasted transcript</button><button id="v46StrikeBtn" class="secondary">Run integrated strike scan</button><button id="v46ClearBtn" class="secondary">Clear V46 local</button></div><input id="v46UploadFile" type="file" accept="video/*,audio/*,.srt,.vtt,.txt,.md,.json" style="display:none" /><div id="v46IntegratedList" style="margin-top:12px"></div></div><div class="panel"><div class="boxTitle">V46 war-room</div><div class="small">Deterministic route-family scoring, replay-board ranking across loaded windows, cluster pressure, and proving tasks generated from the current live model.</div><div id="v46WarRows" style="margin-top:12px"></div><div class="boxTitle" style="margin-top:14px">War-room tasks</div><div id="v46TaskList" style="margin-top:8px"></div></div><div class="panel"><div class="boxTitle">V46 route families + replay board</div><div class="small">Repeated multi-edge route signatures and top window replays extracted from the current contract-intel transfer set.</div><div class="boxTitle" style="margin-top:12px">Route families</div><div id="v46FamilyList" style="margin-top:8px"></div><div class="boxTitle" style="margin-top:14px">Replay board</div><div id="v46ReplayList" style="margin-top:8px"></div></div>`;
+  const anchor=document.getElementById('v45AwacsHost') || document.getElementById('v44IntelTri');
+  if(anchor && anchor.parentNode===wrap) wrap.insertBefore(host, anchor); else wrap.appendChild(host);
+  document.getElementById('v46UploadBtn').onclick=()=> document.getElementById('v46UploadFile').click();
+  document.getElementById('v46UploadFile').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ await v46AnalyzeFile(file, document.getElementById('v46SourceUrl').value||''); await sync(); }catch(err){ alert('Integrated media analysis failed: '+(err.message||String(err))); } e.target.value=''; });
+  document.getElementById('v46PasteBtn').onclick=async ()=>{ try{ await v46DigestPaste(document.getElementById('v46SourceUrl').value||'', document.getElementById('v46TranscriptPaste').value||''); await sync(); }catch(err){ alert('Transcript digest failed: '+(err.message||String(err))); } };
+  document.getElementById('v46StrikeBtn').onclick=async ()=>{ try{ await v46RunIntegratedStrike(state.lastGood||{}); await sync(); }catch(err){ alert('Integrated strike scan failed: '+(err.message||String(err))); } };
+  document.getElementById('v46ClearBtn').onclick=()=>{ state.v46Local={mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; v46SaveLocal(state.v46Local); sync(); };
+}
   const __start = () => {
     try { pushSettings(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Startup settings error: '+(err.message||String(err)); throw err; }
     if(state.timer) clearInterval(state.timer);
