@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V42.4 Predictive Maria Filter Auditor</title>
+<title>pDAI Peg Prover • V42.9 Predator Gatekeeper Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.4 Semantic Maria Closure Auditor</h1>
-      <div class="sub">V42.4 keeps your exact V38→V42.4 tool and layers Maria rehydration closure directly into it: cue-memory persistence, automatic social/window rebuilds, persistence-fault detection, recursive window density lift, nexus-lane auto-pinning, negative-evidence scoring, semantic motif recurrence, Stage 0.5 pre-shell trie gating, routed manifold ingress, and hard separation between hunt pressure and formal execution.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V42.9 Predator Gatekeeper Auditor</h1>
+      <div class="sub">V42.9 upgrades your exact attached V42.4/V42.8 tool in place: automatic social-scout conductance, 9E6F gatekeeper watch, shadow-liquidity intake modeling, primed-storage synthesis, economic gravity flashpoint math, and a stricter separation between blueprint pressure and formal execution.</div>
       <div class="chips">
-        <div class="chip good">Imports prior V31–V38 bundle JSON</div>
-        <div class="chip info">Adds integrated V42.1 Maria corpus cycles</div>
-        <div class="chip warn">Hardens Maria/social coverage + semantic mapping</div>
-        <div class="chip bad">Locks focus pack and keeps Maria cues proof-gated</div>
+        <div class="chip good">Upgrades the attached V42.4 code in place</div>
+        <div class="chip info">Adds auto social-scout + conductance scoring</div>
+        <div class="chip warn">Adds 9E6F gatekeeper + shadow-liquidity lanes</div>
+        <div class="chip bad">Keeps admin / blueprint theories proof-gated behind chain closure</div>
       </div>
     </div>
     <div>
@@ -150,6 +150,10 @@
       <div class="field"><label>Focus spender (optional)</label><input id="sFocusSpender" placeholder="0x6bf2... or blank for auto" /></div>
       <div class="field"><label>Focus wallet (optional)</label><input id="sFocusWallet" placeholder="0xae84... or blank for auto" /></div>
       <div class="field"><label>Focus core (optional)</label><input id="sFocusCore" placeholder="0x5ef7... or blank for auto" /></div>
+      <div class="field"><label>Focus nexus (optional)</label><input id="sFocusNexus" placeholder="0xefc4... or blank for auto" /></div>
+      <div class="field"><label>Governance / admin hints</label><textarea id="sGovernanceHints" placeholder="proposal 224, proposal 225, admin pending, 9E6F, VAT, refresh, unaccepted admin"></textarea></div>
+      <div class="field"><label>Governance targets / addresses</label><textarea id="sGovernanceTargets" placeholder="one per line: 0xA30190...9E6F or labels like VAT 0x9759...A28"></textarea></div>
+      <div class="field"><label>Shadow bridge ledger / pre-ingress notes</label><textarea id="sShadowBridgeLedger" placeholder="JSON rows or lines like: eDAI 1200000 pending eth-bridge"></textarea></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
@@ -493,6 +497,42 @@
     </div>
   </div>
 
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">V42.9 automated social scout</div>
+      <div class="small">Conductance scoring compresses Maria, Darkly, NineIron, and blueprint-narrator inputs into one lane so the prover can prioritize real social pressure without confusing it for closure.</div>
+      <div id="socialScoutList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Gatekeeper / 9E6F governance watch</div>
+      <div class="small">Tracks admin-pending language, proposal references, slot state, and the current manifold focus so governance theories stay modeled but capped until slots or DNA wake.</div>
+      <div id="gatekeeperList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Shadow-liquidity ingress</div>
+      <div class="small">Uses bridged-rail deltas now and accepts pasted bridge-side rows later, so pre-ingress liquidity can be modeled without pretending the Ethereum side is proven from Pulse-side data alone.</div>
+      <div id="shadowIngressList"></div>
+    </div>
+  </div>
+
+  <div class="tri">
+    <div class="panel">
+      <div class="boxTitle">Primed-storage synthesis</div>
+      <div class="small">Fuses zero-write hints, trie touches, gatewords, gas fingerprints, and cluster pressure into a stricter priming view than any single trace hint can provide on its own.</div>
+      <div id="primingLabList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">Economic gravity flashpoint</div>
+      <div class="small">Translates the square-law imbalance into the fraction of 5EF7 core needed to equal the visible native rail, so structural pressure is shown in actionable terms without claiming discharge has happened.</div>
+      <div id="gravityFlashpointList"></div>
+    </div>
+    <div class="panel">
+      <div class="boxTitle">High-priority alert board</div>
+      <div class="small">Keeps the next version centered on the few addresses, slots, and manifolds that would actually close the remaining proof gap.</div>
+      <div id="alertBoardList"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -592,7 +632,10 @@
     focusSpender:'',
     focusWallet:'',
     focusCore:'',
-    focusNexus:''
+    focusNexus:'',
+    governanceHints:'',
+    governanceTargets:'',
+    shadowBridgeLedger:''
   };
 
   const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[], persistIssue:''};
@@ -3312,7 +3355,183 @@ ${state.settings.researchCorpus||''}`);
     baseModel.version='V42.8 Social Conductor Graph Auditor';
     return baseModel;
   }
-  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); const v426=applyV42_6Upgrade(v425); return applyV42_8Upgrade(v426); }
+
+  function v42_9Corpus(baseModel){
+    const parts=[];
+    const s=state.settings||{};
+    ['manualSocial','researchCorpus','mariaCueDrop','mariaCueMemory','socialProxy','stableHints','relayerHints','governanceHints','governanceTargets','shadowBridgeLedger'].forEach(k=>{ if(s[k]) parts.push(String(s[k])); });
+    v39SafeArray(baseModel.social).forEach(x=>{ if(x?.title) parts.push(String(x.title)); if(x?.text) parts.push(String(x.text)); if(x?.url) parts.push(String(x.url)); if(x?.source) parts.push(String(x.source)); });
+    return parts.join('\n');
+  }
+  function v42_9NeedleCount(text, needles){
+    const t=String(text||'').toLowerCase();
+    let n=0;
+    needles.forEach(nd=>{ if(!nd) return; if(t.includes(String(nd).toLowerCase())) n++; });
+    return n;
+  }
+  function v42_9ExtractAddresses(text){
+    return uniq((String(text||'').match(/0x[a-fA-F0-9]{40}/g)||[]).map(x=>norm(x)), x=>x);
+  }
+  function v42_9ParseBridgeLedger(raw){
+    const txt=String(raw||'').trim();
+    if(!txt) return [];
+    const json=tryJson(txt, null);
+    const rows=Array.isArray(json) ? json : Array.isArray(json?.rows) ? json.rows : null;
+    if(rows) return rows.map((r,i)=>({token:String(r.token||r.symbol||`row-${i+1}`), amount:Number(r.amount||r.value||0)||0, status:String(r.status||r.state||'watching'), chain:String(r.chain||r.network||'external'), note:String(r.note||r.notes||'')}));
+    return txt.split(/\n+/).map(line=>line.trim()).filter(Boolean).map((line,i)=>{
+      const m=line.match(/^([A-Za-z0-9_\-]+)\s+([0-9][0-9,._]*)\s*(.*)$/);
+      if(!m) return {token:`note-${i+1}`, amount:0, status:'watching', chain:'external', note:line};
+      return {token:m[1], amount:Number(m[2].replace(/,/g,''))||0, status:(m[3]||'watching').trim()||'watching', chain:'external', note:line};
+    });
+  }
+  function v42_9BuildSocialScout(baseModel){
+    const corpus=v42_9Corpus(baseModel);
+    const windows=v39SafeArray(baseModel.windows).filter(w=>w.real).length;
+    const actors=[
+      {key:'maria', label:'Maria / timing oracle', needles:['maria','@靈脅用','36lgatfpmd8','xjszxq','x6ttm3lk8hk','4wjkstddqf0']},
+      {key:'darkly', label:'Darkly / amplifier', needles:['adesignerdarkly','message received','timeline adjustment','labyrinth','no power']},
+      {key:'nineiron', label:'NineIron / debt-structure guide', needles:['nineironcapital','p-daimaxi','proposal 224','proposal 225','admin pending','admin accepted','v2 proxy','v3']},
+      {key:'cryptoexclusive', label:'Crypto Exclusiv / blueprint narrator', needles:['crypto exclusiv','crypto exclusive','ruben alex','mystery #3','key to the system','9e6f','unaccepted admin','m0','m1']}
+    ].map(a=>{
+      const hits=v42_9NeedleCount(corpus, a.needles);
+      const score=clamp((hits?0.34:0)+Math.min(hits,6)/6*0.36+(windows?0.12:0)+(a.key==='maria'||a.key==='nineiron'?0.08:0),0,1);
+      return {...a, hits, seen:hits>0, score};
+    });
+    const active=actors.filter(a=>a.seen);
+    const termNeedles=['9e6f','proposal 224','proposal 225','admin pending','admin accepted','unaccepted admin','timeline adjustment','refresh','m0','m1'];
+    const termHits=termNeedles.filter(t=>String(corpus).toLowerCase().includes(t));
+    const summary=active.length ? `Auto social scout sees ${active.length} active conductor / narrator lane(s) with ${termHits.length} governance-blueprint trigger term(s).` : 'Auto social scout has not found enough conductor language yet.';
+    return {score:avg(active.map(a=>a.score))||0, activeCount:active.length, termHits, actors, summary};
+  }
+  function v42_9BuildGatekeeper(baseModel, scout){
+    const corpus=v42_9Corpus(baseModel).toLowerCase();
+    const slotProbe=baseModel.slotProbe||{};
+    const dna=baseModel.dnaProbe||{};
+    const manifoldRows=v39SafeArray(baseModel.manifoldTracker?.rows);
+    const approvalRows=v39SafeArray(baseModel.spenderLab);
+    const lead=manifoldRows[0]||approvalRows[0]||{};
+    const terms=['9e6f','proposal 224','proposal 225','admin pending','admin accepted','unaccepted admin','refresh','v2 proxy','v3','vat'];
+    const matched=terms.filter(t=>corpus.includes(t));
+    const termScore=Math.min(matched.length/terms.length,0.55);
+    const pressure=clamp(0.14 + termScore + Math.min((lead.score||0)*0.18,0.18) + Math.min((baseModel.signalBrain?.thinLP?.score||0)*0.14,0.14),0,1);
+    const slotGate=slotProbe.allZero ? 'null-null' : slotProbe.changed ? 'changed' : slotProbe.summary||'watching';
+    const preAcceptance=clamp(pressure - (slotProbe.allZero?0.22:0) + (slotProbe.changed?0.16:0) + (dna.changed?0.08:0),0,slotProbe.allZero?0.58:1);
+    const targets=[...(String(state.settings.governanceTargets||'').split(/\n|,/).map(s=>s.trim()).filter(Boolean)), state.settings.focusSpender||'', state.settings.focusNexus||'', lead.address||'', ...v42_9ExtractAddresses(v42_9Corpus(baseModel))].filter(Boolean);
+    const targetRows=uniq(targets.map(t=>t), x=>x).slice(0,8);
+    const rows=[
+      {label:'Governance pressure', value:pct(pressure), hint:matched.length?`Matched: ${matched.join(', ')}.`:'No admin-pending language is loaded strongly enough yet.'},
+      {label:'Pre-acceptance sim', value:pct(preAcceptance), hint:'Capped while watched slots remain null-null so governance theory cannot outrank chain closure.'},
+      {label:'Slot hard gate', value:slotGate, hint:slotProbe.summary||'Watched slots are still on watch.'},
+      {label:'DNA / admin slot', value:dna.changed?'changed':(dna.implAddress?addrShort(dna.implAddress):'empty / none seen'), hint:dna.changed?'Implementation / admin DNA changed.':'No implementation wake is visible yet.'},
+      {label:'Live manifold lead', value:lead.address?addrShort(lead.address):'none yet', hint:lead.address?`Current strongest spender/manifold watch with score ${pct(lead.score||0)}.`:'No manifold lead is currently pinned.'},
+      {label:'High-priority targets', value:targetRows.length?targetRows.map(t=>isAddr(t)?addrShort(t):t).join(' • '):'none', hint:'Imported targets, focus pack, and extracted governance addresses are merged here.'}
+    ];
+    const summary=slotProbe.allZero ? `Gatekeeper lane is sharpened around admin / 9E6F hypotheses, but watched slots are still ${slotGate}, so this remains a pressure model rather than closure.` : 'Gatekeeper lane strengthened because the slot gate is no longer fully null-null.';
+    return {score:pressure, preAcceptance, matched, rows, targets:targetRows, summary};
+  }
+  function v42_9BuildShadowIngress(baseModel){
+    const ledger=v42_9ParseBridgeLedger(state.settings.shadowBridgeLedger||'');
+    const hist=[...loadHistory(), ...(state.importedBundle?.history||[])];
+    const latest=v39SafeArray(baseModel.publicAnchors).find(a=>String(a.type||'').toLowerCase()==='bridged')||{};
+    const firstHist=[...hist].find(h=>v39SafeArray(h.publicAnchors).find(a=>String(a.type||'').toLowerCase()==='bridged'));
+    const first=(v39SafeArray(firstHist?.publicAnchors).find(a=>String(a.type||'').toLowerCase()==='bridged'))||{};
+    const latestReserve=Number(latest.reserve0||0);
+    const firstReserve=Number(first.reserve0||latestReserve||0);
+    const delta=latestReserve-firstReserve;
+    const corpus=v42_9Corpus(baseModel).toLowerCase();
+    const tokenHits=['edai','eusdc','eusdt','bridge','shadow liquidity','pre-ingress'].filter(t=>corpus.includes(t));
+    const importedTotal=ledger.reduce((a,b)=>a+(Number(b.amount)||0),0);
+    const score=clamp((ledger.length?0.26:0)+(delta>0?0.22:0)+Math.min((baseModel.intakeDelta?.score||0)*0.26,0.26)+(tokenHits.length?0.12:0),0,1);
+    const rows=[
+      {label:'Bridged rail now', value:fmtShort(latestReserve), hint:'Current Pulse-side bridged surface reserve.'},
+      {label:'Bridged reserve delta', value:(delta>=0?'+':'')+fmtShort(delta), hint:'Computed against the earliest bridged snapshot loaded into history.'},
+      {label:'Imported bridge rows', value:ledger.length?`${ledger.length} row(s)`:'none', hint:ledger.length?`Imported total ${fmtShort(importedTotal)} across ${ledger.map(r=>r.token).slice(0,5).join(', ')}.`:'Paste JSON or simple bridge-side notes to harden this lane.'},
+      {label:'Cross-chain terms', value:tokenHits.length?tokenHits.join(', '):'none', hint:'Corpus terms are only supportive until external bridge rows are supplied.'}
+    ];
+    ledger.slice(0,4).forEach(r=>rows.push({label:`${r.token}`, value:fmtShort(r.amount), hint:`${r.status}${r.chain?` • ${r.chain}`:''}${r.note?` • ${r.note}`:''}`}));
+    const summary=ledger.length ? `Shadow-liquidity lane is ingesting ${ledger.length} external bridge row(s) while bridged-rail delta sits at ${(delta>=0?'+':'')}${fmtShort(delta)}.` : 'Shadow-liquidity lane is still mostly inferred from Pulse-side bridged reserve deltas until external bridge rows are pasted.';
+    return {score, rows, summary, delta, ledger};
+  }
+  function v42_9BuildPrimingLab(baseModel){
+    const zero=baseModel.zeroingAnalysis||{};
+    const trie=baseModel.trieTouch||{};
+    const gate=baseModel.gateWatch||{};
+    const gas=baseModel.gasFingerprint||{};
+    const clusters=v39SafeArray(baseModel.signalBrain?.routeClusters);
+    const cocked=Number(trie.cocked||0);
+    const changed=Number(trie.changes||0);
+    const score=clamp(Math.min(Number(zero.score||0),0.34)+Math.min(cocked?0.22:(changed?0.12:0),0.22)+Math.min((v39SafeArray(gate.rows).length?0.12:0),0.12)+Math.min((Number(gas.score||0))*0.14,0.14)+Math.min((clusters[0]?.score||0)*0.18,0.18),0,1);
+    const rows=[
+      {label:'Zero-write trace hints', value:`${zero.zeroish||0} hit(s)`, hint:zero.summary||'No zero-write hints yet.'},
+      {label:'Trie cocked state', value:cocked?`${cocked} cocked`:changed?`${changed} change(s)`:'none', hint:trie.summary||'Trie-touch lane is idle.'},
+      {label:'Gateword pressure', value:v39SafeArray(gate.rows).length?`${gate.rows.length} word(s)`:'quiet', hint:gate.summary||'No gateword watch yet.'},
+      {label:'Deterministic gas', value:gas.exact?`${gas.exact} exact`:(gas.plateau?`${gas.plateau} plateau`:'quiet'), hint:gas.summary||'Gas fingerprint lane is idle.'},
+      {label:'Cluster carry', value:clusters[0]?`${clusters[0].memberCount} addr cluster`:'none', hint:clusters[0]?`Top same-code cluster score ${pct(clusters[0].score||0)}.`:'No same-code cluster lead is active.'}
+    ];
+    const summary=(zero.zeroish||0)||cocked ? `Primed-storage synthesis is elevated: ${zero.zeroish||0} zero-write hint(s) and ${cocked||changed||0} trie-touch signal(s) are on watch.` : 'Primed-storage synthesis is cautious: there are hints, but not enough to call a loaded slot path yet.';
+    return {score, rows, summary};
+  }
+  function v42_9BuildGravity(baseModel){
+    const anchors=v39SafeArray(baseModel.publicAnchors);
+    const native=v39Num(anchors.find(a=>String(a.type||'').toLowerCase()==='public-native')?.reserve0 || baseModel.signalBrain?.thinLP?.nativeNow || 0);
+    const core=v39Num(anchors.find(a=>String(a.type||'').toLowerCase()==='core')?.reserve0 || baseModel.nodeBalances?.['5EF7']?.pdai || 0);
+    const ratio=Number(baseModel.signalBrain?.thinLP?.coreRatio || (native?core/native:0) || 0);
+    const flashPct=ratio>0 ? 100/ratio : 0;
+    const quarterPct=ratio>0 ? 25/ratio : 0;
+    const halfPct=ratio>0 ? 50/ratio : 0;
+    const railEq=native;
+    const score=clamp(Math.min(ratio/400,0.55)+Math.min((baseModel.squareLaw?.score||0)*0.25,0.25)+Math.min((baseModel.signalBrain?.thinLP?.score||0)*0.2,0.2),0,1);
+    const rows=[
+      {label:'Core/native ratio', value:ratio?`${ratio.toFixed(2)}x`:'—', hint:'Structural pressure only; not a direct peg oracle.'},
+      {label:'Flashpoint fraction', value:flashPct?`${flashPct.toFixed(3)}% of core`:'—', hint:'Approximate share of 5EF7 core needed to equal the entire visible native optical rail.'},
+      {label:'Rail-equivalent amount', value:fmtShort(railEq), hint:'If discharge ever reaches this size, it matches the current public native pDAI rail one-for-one.'},
+      {label:'Quarter-rail fraction', value:quarterPct?`${quarterPct.toFixed(3)}%`:'—', hint:'Fraction of core equal to 25% of the visible native rail.'},
+      {label:'Half-rail fraction', value:halfPct?`${halfPct.toFixed(3)}%`:'—', hint:'Fraction of core equal to 50% of the visible native rail.'}
+    ];
+    const summary=ratio ? `Economic gravity flashpoint sits near ${flashPct.toFixed(3)}% of core: a discharge of about ${fmtShort(railEq)} pDAI would equal the visible native rail. Structural pressure is real, but discharge is not yet proven.` : 'Economic gravity flashpoint is waiting on anchor data.';
+    return {score, rows, summary, ratio, flashPct};
+  }
+  function applyV42_9Upgrade(baseModel){
+    const scout=v42_9BuildSocialScout(baseModel);
+    const gatekeeper=v42_9BuildGatekeeper(baseModel, scout);
+    const shadowIngress=v42_9BuildShadowIngress(baseModel);
+    const primingLab=v42_9BuildPrimingLab(baseModel);
+    const gravity=v42_9BuildGravity(baseModel);
+    const alertTargets=uniq([...(gatekeeper.targets||[]), baseModel.slotProbe?.values ? '0x7b12 / 0x0968 slot watch' : '', baseModel.v40?.focus?.spender || state.settings.focusSpender || '', baseModel.v42_3?.focusNexus || state.settings.focusNexus || ''].filter(Boolean), x=>x).slice(0,8);
+    baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)),
+      {name:'Automated social scout / conductance', kind:'soft', score:scout.score||0, status:scout.activeCount>=2?'observed':scout.activeCount?'watching':'missing', why:scout.summary},
+      {name:'Gatekeeper governance watch', kind:'soft', score:gatekeeper.score||0, status:/null-null/i.test(String((gatekeeper.rows.find(r=>r.label==='Slot hard gate')||{}).value||''))?'watching':'observed', why:gatekeeper.summary},
+      {name:'Shadow-liquidity ingress', kind:'soft', score:shadowIngress.score||0, status:shadowIngress.ledger?.length?'observed':'watching', why:shadowIngress.summary},
+      {name:'Primed-storage synthesis', kind:'soft', score:primingLab.score||0, status:(baseModel.zeroingAnalysis?.zeroish||0)||(baseModel.trieTouch?.cocked||0)?'observed':'watching', why:primingLab.summary},
+      {name:'Economic gravity flashpoint', kind:'soft', score:gravity.score||0, status:(gravity.ratio||0)>100?'observed':'watching', why:gravity.summary}
+    ], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V42.9 adds social conductance, gatekeeper watch, shadow ingress, priming synthesis, and gravity flashpoints.`};
+    baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)),
+      {label:'V42.9 social scout', value:scout.activeCount?`${scout.activeCount} lane(s)`:'idle', hint:scout.summary, cls:scout.activeCount>=2?'good':scout.activeCount?'warn':'info'},
+      {label:'V42.9 gatekeeper', value:pct(gatekeeper.preAcceptance||0), hint:gatekeeper.summary, cls:(gatekeeper.preAcceptance||0)>.5?'warn':'info'},
+      {label:'V42.9 shadow ingress', value:shadowIngress.ledger?.length?`${shadowIngress.ledger.length} row(s)`:'inferred', hint:shadowIngress.summary, cls:shadowIngress.ledger?.length?'good':'warn'},
+      {label:'V42.9 priming lab', value:pct(primingLab.score||0), hint:primingLab.summary, cls:(primingLab.score||0)>.45?'warn':'info'},
+      {label:'V42.9 gravity', value:gravity.flashPct?`${gravity.flashPct.toFixed(3)}%`:'watching', hint:gravity.summary, cls:(gravity.flashPct||0)<1&&gravity.flashPct>0?'good':'info'}
+    ], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V42.9 adds pressure lenses without letting governance or blueprint lanes outrank slot / shell closure.`};
+    baseModel.proveLoop={...baseModel.proveLoop, rows:[...(v39SafeArray(baseModel.proveLoop?.rows)),
+      {label:'V42.9 social scout', value:scout.activeCount?`${scout.activeCount} actor lane(s)`:'idle', hint:scout.summary},
+      {label:'V42.9 gatekeeper', value:/null-null/i.test(String((gatekeeper.rows.find(r=>r.label==='Slot hard gate')||{}).value||''))?'ajar / pending':'waking', hint:gatekeeper.summary},
+      {label:'V42.9 shadow ingress', value:shadowIngress.ledger?.length?'external rows loaded':'Pulse-side inference', hint:shadowIngress.summary},
+      {label:'V42.9 priming lab', value:(primingLab.score||0)>.45?'armed-watch':'watching', hint:primingLab.summary},
+      {label:'V42.9 gravity flashpoint', value:gravity.flashPct?`${gravity.flashPct.toFixed(3)}% core`:'watching', hint:gravity.summary}
+    ], summary:`${baseModel.proveLoop?.summary||''}${baseModel.proveLoop?.summary?' • ':''}V42.9 models the next closure lanes explicitly: conductors, gatekeeper, shadow ingress, priming, and flashpoint math.`};
+    baseModel.clarifier={...baseModel.clarifier,
+      clarity:clamp(Number(baseModel.clarifier?.clarity||0)+Math.min(scout.score||0,0.03)+Math.min(shadowIngress.score||0,0.02)+Math.min(gravity.score||0,0.03)-(baseModel.slotProbe?.allZero?0.015:0),0,1),
+      debt:clamp(Number(baseModel.clarifier?.debt||0)+(baseModel.slotProbe?.allZero?0.04:0)+Math.min((1-(gatekeeper.preAcceptance||0))*0.02,0.02),0,1),
+      supports:v40AppendUniqueText(baseModel.clarifier?.supports,[scout.activeCount?scout.summary:'', gravity.summary, shadowIngress.ledger?.length?shadowIngress.summary:''].filter(Boolean),26),
+      disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm,[baseModel.slotProbe?.allZero?'Gatekeeper lane is still capped because watched slots remain null-null.':'', !shadowIngress.ledger?.length?'Shadow-liquidity remains partly inferred until external bridge rows are pasted.':''].filter(Boolean),26),
+      proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,['Watch 7b12 / 0968 and admin-DNA lanes first; governance theory should only graduate when slots or implementation state move.', 'Paste bridge-side ledger rows to harden shadow-liquidity ingress instead of relying only on Pulse-side bridged reserves.', 'Catch the top manifold on a direct wallet/core pull-path before upgrading pressure math into formal execution.'],26),
+      hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V42.9 scout ${scout.activeCount} • gate ${pct(gatekeeper.preAcceptance||0)} • shadow ${shadowIngress.ledger?.length||0} • priming ${pct(primingLab.score||0)} • flash ${gravity.flashPct?gravity.flashPct.toFixed(3)+'%':'—'}.`
+    };
+    baseModel.v42_9={scout, gatekeeper, shadowIngress, primingLab, gravity, alertTargets, summary:`V42.9 adds ${scout.activeCount} scout lane(s), gatekeeper ${pct(gatekeeper.preAcceptance||0)}, shadow ingress ${shadowIngress.ledger?.length||0} row(s), priming ${pct(primingLab.score||0)}, and gravity flashpoint ${gravity.flashPct?gravity.flashPct.toFixed(3)+'% of core':'watching'}.`};
+    baseModel.version='V42.9 Predator Gatekeeper Auditor';
+    return baseModel;
+  }
+  async function buildModel(){ const base=await buildModelBase(); const v39=await applyV39IntegratedUpgrade(base); const v40=applyV40Upgrade(v39); const v41=applyV41Upgrade(v40); const v42=applyV42_3Upgrade(v41); const v425=applyV42_5Upgrade(v42); const v426=applyV42_6Upgrade(v425); const v428=applyV42_8Upgrade(v426); return applyV42_9Upgrade(v428); }
 
 
   function snapshot(m){ return JSON.parse(JSON.stringify(m)); }
@@ -3652,6 +3871,7 @@ ${state.settings.researchCorpus||''}`);
     if(intEl && Array.isArray(v41.integrationRows)) v41.integrationRows.forEach(t=>pushItem(intEl, t, 'info'));
     renderV42_6(model);
     renderV42_8(model);
+    renderV42_9(model);
   }
   function renderV42_6(model){
     const v426=model.v42_6||{};
@@ -3686,6 +3906,48 @@ ${state.settings.researchCorpus||''}`);
       if(!(((v428.mismatch||{}).rows)||[]).length && ((v428.mismatch||{}).checks||0)===0) pushItem(mismatch,'No active symbolic cue terms were loaded, so mismatch scoring is idle.','warn');
     }
   }
+  function renderV42_9(model){
+    const v429=model.v42_9||{};
+    const scout=$('socialScoutList');
+    if(scout){
+      clearEl(scout);
+      pushItem(scout, v429.summary||'No V42.9 social-scout summary yet.', 'info');
+      (((v429.scout||{}).actors)||[]).forEach(a=>pushItem(scout, `${a.label} • hits ${a.hits||0} • ${pct(a.score||0)}`, a.seen?'good':'info'));
+      if((((v429.scout||{}).termHits)||[]).length) pushItem(scout, `Trigger terms: ${v429.scout.termHits.join(', ')}`, 'warn');
+    }
+    const gate=$('gatekeeperList');
+    if(gate){
+      clearEl(gate);
+      pushItem(gate, ((v429.gatekeeper||{}).summary)||'No gatekeeper summary yet.', 'warn');
+      (((v429.gatekeeper||{}).rows)||[]).forEach(r=>pushItem(gate, `${r.label}: ${r.value} • ${r.hint||''}`, /null-null|ajar|pending/i.test(`${r.value} ${r.hint||''}`)?'warn':'info'));
+    }
+    const shadow=$('shadowIngressList');
+    if(shadow){
+      clearEl(shadow);
+      pushItem(shadow, ((v429.shadowIngress||{}).summary)||'No shadow-ingress summary yet.', (((v429.shadowIngress||{}).ledger)||[]).length?'good':'warn');
+      (((v429.shadowIngress||{}).rows)||[]).forEach(r=>pushItem(shadow, `${r.label}: ${r.value} • ${r.hint||''}`, /none|inferred/i.test(`${r.value} ${r.hint||''}`)?'warn':'info'));
+    }
+    const priming=$('primingLabList');
+    if(priming){
+      clearEl(priming);
+      pushItem(priming, ((v429.primingLab||{}).summary)||'No priming-lab summary yet.', (((v429.primingLab||{}).score)||0)>.45?'warn':'info');
+      (((v429.primingLab||{}).rows)||[]).forEach(r=>pushItem(priming, `${r.label}: ${r.value} • ${r.hint||''}`, /hit\(s\)|cocked|exact/i.test(`${r.value} ${r.hint||''}`)?'warn':'info'));
+    }
+    const gravity=$('gravityFlashpointList');
+    if(gravity){
+      clearEl(gravity);
+      pushItem(gravity, ((v429.gravity||{}).summary)||'No gravity-flashpoint summary yet.', (((v429.gravity||{}).flashPct)||0)>0 && (((v429.gravity||{}).flashPct)||0)<1?'good':'info');
+      (((v429.gravity||{}).rows)||[]).forEach(r=>pushItem(gravity, `${r.label}: ${r.value} • ${r.hint||''}`, /ratio|flashpoint/i.test(`${r.label} ${r.value}`)?'good':'info'));
+    }
+    const alert=$('alertBoardList');
+    if(alert){
+      clearEl(alert);
+      pushItem(alert, 'Alert board keeps the next proof-closing addresses and slots pinned.', 'info');
+      (v429.alertTargets||[]).forEach(t=>pushItem(alert, isAddr(t)?addrShort(t):String(t), /slot watch/i.test(String(t))?'warn':'good'));
+      if(!(v429.alertTargets||[]).length) pushItem(alert,'No high-priority targets pinned yet.','warn');
+    }
+  }
+
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 
@@ -3756,6 +4018,10 @@ ${state.settings.researchCorpus||''}`);
     $('sFocusSpender').value=state.settings.focusSpender||'';
     $('sFocusWallet').value=state.settings.focusWallet||'';
     $('sFocusCore').value=state.settings.focusCore||'';
+    $('sFocusNexus').value=state.settings.focusNexus||'';
+    $('sGovernanceHints').value=state.settings.governanceHints||'';
+    $('sGovernanceTargets').value=state.settings.governanceTargets||'';
+    $('sShadowBridgeLedger').value=state.settings.shadowBridgeLedger||'';
   }
   function pullSettings(){
     state.settings.privateRpc=$('sPrivateRpc').value.trim();
@@ -3793,6 +4059,10 @@ ${state.settings.researchCorpus||''}`);
     state.settings.focusSpender=$('sFocusSpender').value.trim();
     state.settings.focusWallet=$('sFocusWallet').value.trim();
     state.settings.focusCore=$('sFocusCore').value.trim();
+    state.settings.focusNexus=$('sFocusNexus').value.trim();
+    state.settings.governanceHints=$('sGovernanceHints').value;
+    state.settings.governanceTargets=$('sGovernanceTargets').value;
+    state.settings.shadowBridgeLedger=$('sShadowBridgeLedger').value;
     saveSettings();
     if(state.timer) clearInterval(state.timer);
     state.timer=setInterval(sync, Math.max(12000, state.settings.autoRefresh||30000));
@@ -3810,7 +4080,7 @@ ${state.settings.researchCorpus||''}`);
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_5-history.json', state.history);
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v42_9-history.json', state.history);
   $('exportBtn').onclick=()=> {
     state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
     if(state.lastGood && typeof state.lastGood==='object'){
@@ -3819,7 +4089,7 @@ ${state.settings.researchCorpus||''}`);
     }
     if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
     if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
-    downloadJson('pdai-v42_5-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+    downloadJson('pdai-v42_9-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   };
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
