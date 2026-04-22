@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V46.9 Safe-Slice Deep-Prove War-Room Auditor</title>
+<title>pDAI Peg Prover • V47.0 No-AWACS Core Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -85,7 +85,7 @@
   <div class="panel grid2">
     <div>
       <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor</h1>
-      <div class="sub">V46.9 keeps the crash-safe lite quick-lock path, but deep proving now runs as a smaller safe-slice pass instead of a heavier manual burst. The goal is to preserve proving without blowing up the browser renderer.</div>
+      <div class="sub">V47.0 removes the integrated AWACS, video-lab, and replay stack from deep proving and reverts the manual deep pass to the lighter pre-AWACS core engine.</div>
       <div class="chips">
         <div class="chip good">Upgrades the attached V46.x code in place</div>
         <div class="chip info">Adds forEach guard + instant imported render</div>
@@ -5258,7 +5258,7 @@ function v46RenderPanel(model){
   document.title='pDAI Peg Prover • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
   const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
   const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.9 keeps the crash-safe lite quick-lock path, but deep proving now runs as a smaller safe-slice pass instead of a heavier manual burst. Formal execution remains hard-gated by slot / shell / reserve closure.';
-  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Keeps crash-safe lite quick-lock</div><div class="chip warn">Deep proving is safe-slice manual, not automatic</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
+  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Keeps crash-safe lite quick-lock</div><div class="chip warn">Core deep proving is manual, not automatic</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
   const urlInput=document.getElementById('v46SourceUrl'); if(urlInput && !urlInput.value && media?.sourceUrl) urlInput.value=media.sourceUrl;
   clearEl($('v46IntegratedList')); integrated.rows.forEach(r=>pushItem($('v46IntegratedList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
   clearEl($('v46WarRows')); war.rows.forEach(r=>pushItem($('v46WarRows'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
@@ -5289,9 +5289,9 @@ function v46EnsureUi(){
   state.manualDeepOnce = false;
   const __originalSync = sync;
   function __v468Header(){
-    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.9 Safe-Slice Deep-Prove War-Room Auditor';
-    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.9 keeps the crash-safe lite quick-lock path, but deep proving now runs as a smaller safe-slice pass instead of a heavier manual burst. The goal is to preserve proving without blowing up the browser renderer.';
-    const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Starts in crash-safe lite quick-lock</div><div class="chip warn">Deep proving is safe-slice manual, not automatic</div><div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>';
+    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V47.0 No-AWACS Core Auditor';
+    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V47.0 removes the integrated AWACS, video-lab, and replay stack from deep proving and reverts the manual deep pass to the lighter pre-AWACS core engine.';
+    const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Starts in crash-safe lite quick-lock</div><div class="chip warn">Core deep proving is manual, not automatic</div><div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>';
     const boxTitle=document.querySelector('#settingsBox .boxTitle'); if(boxTitle) boxTitle.textContent='V46.9 safe-slice integrated settings';
   }
   function __v468InjectBtn(){
@@ -5395,5 +5395,40 @@ function v46EnsureUi(){
 
 
 </script>
+
+<script>
+(function(){
+  try{
+    if (typeof __buildModelV44 === 'function') {
+      buildModel = async function(){ return await __buildModelV44(); };
+    }
+    if (typeof __renderV44 === 'function') {
+      render = function(model){ __renderV44(model); };
+    }
+    function stripAwacsUi(){
+      ['v44IntelTri','v45AwacsHost','v46Host','v45AwacsPanel','v44VideoPanel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
+      ['v44QuickMediaBtn','deepProveBtn'].forEach(id=>{ const el=document.getElementById(id); if(el && id==='v44QuickMediaBtn') el.remove(); });
+      const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V47.0 No-AWACS Core Auditor';
+      const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V47.0 removes the integrated AWACS, video-lab, and replay panels from the one-file build so deep proving falls back to the lighter pre-AWACS core engine. Live quick-lock remains, and formal execution stays hard-gated by slot / shell / reserve closure.';
+      const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">AWACS / video-lab / replay panels removed</div><div class="chip warn">Deep proving uses the lighter pre-AWACS core engine</div><div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>';
+      const boxTitle=document.querySelector('#settingsBox .boxTitle'); if(boxTitle) boxTitle.textContent='V47.0 no-AWACS core settings';
+      const sync=document.getElementById('syncStatus');
+      if(sync && String(sync.textContent||'').toLowerCase().includes('deep proving')){ sync.textContent='core proving'; sync.className='status info'; }
+      const btns=document.querySelector('.panel.grid2 .btns');
+      if(btns && !document.getElementById('coreDeepBtn')){
+        const b=document.createElement('button');
+        b.id='coreDeepBtn'; b.className='secondary'; b.textContent='Core deep prove';
+        b.onclick=async ()=>{ state.manualDeepOnce=true; try{ await sync(); }catch(err){ console.error(err); } };
+        btns.insertBefore(b, btns.firstChild);
+      }
+      const quick=document.getElementById('deepProveBtn'); if(quick) quick.textContent='Core deep prove';
+    }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', stripAwacsUi, {once:false}); else stripAwacsUi();
+    const _sync = sync;
+    sync = async function(){ await _sync(); try{ stripAwacsUi(); }catch{} };
+  }catch(err){ console.error('V47 patch error', err); }
+})();
+</script>
+
 </body>
 </html>
