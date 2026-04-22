@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor</title>
+<title>pDAI Peg Prover • V46.8 Crash-Safe Lite-Sync War-Room Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -85,7 +85,7 @@
   <div class="panel grid2">
     <div>
       <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor</h1>
-      <div class="sub">V46.7 bypasses full-model timeout by preferring a live quick-lock pass whenever overdrive settings or cold-start conditions would otherwise stall the one-file cockpit. It also fixes stale version copy and keeps imported-bundle rendering instant.</div>
+      <div class="sub">V46.8 prioritizes stability over cold-boot aggression. It stays in lite quick-lock by default, renders imported/live essentials first, and only runs a deep proving pass when you explicitly ask for it.</div>
       <div class="chips">
         <div class="chip good">Upgrades the attached V46.x code in place</div>
         <div class="chip info">Adds forEach guard + instant imported render</div>
@@ -5283,6 +5283,100 @@ function v46EnsureUi(){
   document.getElementById('v46StrikeBtn').onclick=async ()=>{ try{ await v46RunIntegratedStrike(state.lastGood||{}); await sync(); }catch(err){ alert('Integrated strike scan failed: '+(err.message||String(err))); } };
   document.getElementById('v46ClearBtn').onclick=()=>{ state.v46Local={mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; v46SaveLocal(state.v46Local); sync(); };
 }
+
+  // ===== V46.8 crash-safe lite-sync patch =====
+  state.deepUnlocked = false;
+  state.manualDeepOnce = false;
+  const __originalSync = sync;
+  function __v468Header(){
+    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.8 Crash-Safe Lite-Sync War-Room Auditor';
+    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.8 prioritizes stability over cold-boot aggression. It stays in lite quick-lock by default, renders imported/live essentials first, and only runs a deep proving pass when you explicitly ask for it.';
+    const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Starts in crash-safe lite quick-lock</div><div class="chip warn">Deep proving is manual, not automatic</div><div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>';
+    const boxTitle=document.querySelector('#settingsBox .boxTitle'); if(boxTitle) boxTitle.textContent='V46.8 crash-safe integrated settings';
+  }
+  function __v468InjectBtn(){
+    const btns=document.querySelector('.panel.grid2 .btns');
+    if(btns && !document.getElementById('deepProveBtn')){
+      const b=document.createElement('button');
+      b.id='deepProveBtn'; b.className='secondary'; b.textContent='Deep prove once';
+      b.onclick=async ()=>{ state.manualDeepOnce=true; try{ await sync(); }catch(err){ console.error(err); } };
+      btns.insertBefore(b, btns.firstChild);
+    }
+  }
+  sync = async function(){
+    if(state.syncing) return;
+    state.syncing=true;
+    state.cycle=(state.cycle||0)+1;
+    try{
+      state.settings=loadSettings();
+      // Crash-safe startup: always clamp the live cycle unless the user explicitly requests deep proving.
+      const manualDeep = !!state.manualDeepOnce;
+      state.manualDeepOnce = false;
+      state.bootstrapMode = true;
+      state.deepMode = manualDeep;
+      state.overdriveLike = false;
+      state.preSyncSettings = JSON.parse(JSON.stringify(state.settings||{}));
+      state.settings = Object.assign({}, state.settings, {
+        scanBlocks: manualDeep ? Math.min(220, Number(state.settings.scanBlocks||220)) : Math.min(28, Number(state.settings.scanBlocks||28)),
+        burstScanBlocks: manualDeep ? Math.min(800, Number(state.settings.burstScanBlocks||800)) : Math.min(80, Number(state.settings.burstScanBlocks||80)),
+        maxLeadExpansionsPerCycle: manualDeep ? Math.min(4, Number(state.settings.maxLeadExpansionsPerCycle||4)) : 1,
+        neighborBlockBurst: manualDeep ? Math.min(14, Number(state.settings.neighborBlockBurst||14)) : 4,
+        routeDepthBurst: manualDeep ? Math.min(2, Number(state.settings.routeDepthBurst||2)) : 1,
+        deepSweepEvery: 999999,
+        aggressiveFollowups: manualDeep ? Math.min(1, Number(state.settings.aggressiveFollowups||1)) : 0,
+        awacsAutoUse: false,
+        autoRefresh: Math.max(60000, Number(state.settings.autoRefresh||60000))
+      });
+      $('syncStatus').textContent=manualDeep?'deep proving':'lite quick-lock';
+      $('syncStatus').className='status info';
+      try{ $('rpcMeta').textContent='RPC: '+String((state.settings.privateRpc||'').trim() || (Array.isArray(state.settings.rpcs)&&state.settings.rpcs[0]) || '—'); }catch{}
+      let model;
+      if(manualDeep){
+        try{
+          model = await Promise.race([
+            buildModel(),
+            new Promise((_, reject)=>setTimeout(()=>reject(new Error('Deep proving timeout after 15s')), 15000))
+          ]);
+        }catch(err){
+          model = await buildStableLockModel().catch(()=>null);
+          if(!model) throw err;
+          state.quickLockFallback = err.message || String(err);
+        }
+      }else{
+        model = await buildStableLockModel();
+      }
+      render(model);
+      state.lastLiveLock = true;
+      const persistedLast=saveLastGood(snapshot(model));
+      const hist=loadHistory(); hist.push(snapshot(model));
+      const persistedHistory=saveHistory(hist.slice(-24));
+      const persistWarn=[persistedLast, persistedHistory].filter(x=>x && x.ok && x.via && x.via!=='local').map(x=>x.via);
+      $('syncStatus').textContent=manualDeep?(state.quickLockFallback?'deep→quick-lock':'deep ok'):'live';
+      $('syncStatus').className='status ok';
+      let msg = `Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${manualDeep ? 'manual deep pass' : 'crash-safe lite quick-lock'}`;
+      if(state.quickLockFallback) msg += ` • fallback (${state.quickLockFallback})`;
+      if(persistWarn.length) msg += ` • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode`;
+      $('lastSync').textContent=msg;
+    }catch(err){
+      console.error(err);
+      const detail = `Last error: ${err.message||String(err)}${state.rpcUsed?` • RPC ${state.rpcUsed}`:''} • crash-safe mode`;
+      const fallback = state.importedBundle ? safeImportedRender(state.importedBundle) : state.lastGood;
+      if(fallback){
+        render(fallback);
+        $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn';
+        $('lastSync').textContent=detail+' • showing imported / cached snapshot';
+      }else{
+        $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad';
+        $('lastSync').textContent=detail;
+      }
+    }finally{
+      if(state.preSyncSettings){ state.settings = state.preSyncSettings; state.preSyncSettings = null; }
+      state.bootstrapMode=false;
+      state.quickLockFallback='';
+      state.syncing=false;
+      try{ __v468Header(); __v468InjectBtn(); }catch{}
+    }
+  };
   const __start = () => {
     try { pushSettings(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Startup settings error: '+(err.message||String(err)); throw err; }
     if(state.timer) clearInterval(state.timer);
