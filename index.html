@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V46.6 forEach-Guard Stable-Lock War-Room Auditor</title>
+<title>pDAI Peg Prover • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,8 +84,8 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.6 forEach-Guard Stable-Lock War-Room Auditor</h1>
-      <div class="sub">V46.6 hotfixes bootstrap sync crashes from object-shaped imported lanes by guarding non-array forEach calls, while keeping stable-lock startup and instant imported-bundle rendering.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor</h1>
+      <div class="sub">V46.7 bypasses full-model timeout by preferring a live quick-lock pass whenever overdrive settings or cold-start conditions would otherwise stall the one-file cockpit. It also fixes stale version copy and keeps imported-bundle rendering instant.</div>
       <div class="chips">
         <div class="chip good">Upgrades the attached V46.x code in place</div>
         <div class="chip info">Adds forEach guard + instant imported render</div>
@@ -4221,7 +4221,7 @@ ${state.settings.researchCorpus||''}`);
       quick.clarifier.verdict = 'Quick-lock bootstrap snapshot loaded while deep proving warms up.';
       quick.clarifier.supports = v40AppendUniqueText(quick.clarifier.supports, last.thoughts, 10);
       quick.clarifier.proveNext = v40AppendUniqueText(quick.clarifier.proveNext, ['Finish the full deep proving pass for contract logs, route families, and archaeology.', 'Keep 7b12 / 0968 dominant until live state changes.'], 10);
-      quick.version = 'V46.6 forEach-Guard Stable-Lock War-Room Auditor';
+      quick.version = 'V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
       quick.quickLock = {ratio, flashPct};
     }
     return quick;
@@ -4255,12 +4255,14 @@ ${state.settings.researchCorpus||''}`);
       state.deepMode = ((state.cycle % every)===0) && !state.bootstrapMode;
       $('syncStatus').textContent=state.bootstrapMode?'stable-lock bootstrap':(state.deepMode?'deep proving':'syncing'); $('syncStatus').className='status info';
       try{ $('rpcMeta').textContent='RPC: '+String((state.settings.privateRpc||'').trim() || (Array.isArray(state.settings.rpcs)&&state.settings.rpcs[0]) || '—'); }catch{}
-      const buildTimeoutMs = state.bootstrapMode ? 12000 : 25000;
+      const buildTimeoutMs = state.bootstrapMode ? 12000 : 18000;
+      const quickLockPreferred = state.bootstrapMode || (!state.lastLiveLock && state.overdriveLike) || state.forceQuickLockNext;
       let model;
       try{
-        if(state.bootstrapMode){
+        if(quickLockPreferred){
           model = await buildStableLockModel();
-          state.quickLockFallback = 'cold-boot stable-lock';
+          state.quickLockFallback = state.bootstrapMode ? 'cold-boot stable-lock' : (state.overdriveLike ? 'overdrive quick-lock' : 'forced quick-lock');
+          state.forceQuickLockNext = false;
         }else{
           model = await Promise.race([
             buildModel(),
@@ -4268,15 +4270,19 @@ ${state.settings.researchCorpus||''}`);
           ]);
         }
       }catch(buildErr){
-        if(state.bootstrapMode){
+        const timeoutLike = /timeout/i.test(String(buildErr&&buildErr.message||buildErr));
+        const retryQuick = timeoutLike || state.bootstrapMode || state.overdriveLike;
+        if(retryQuick){
           model = await buildStableLockModel().catch(()=>null);
           if(!model) throw buildErr;
           state.quickLockFallback = buildErr.message||String(buildErr);
+          state.forceQuickLockNext = false;
         }else{
           throw buildErr;
         }
       }
       render(model);
+      state.lastLiveLock = true;
       const persistedLast=saveLastGood(snapshot(model));
       const hist=loadHistory(); hist.push(snapshot(model));
       const persistedHistory=saveHistory(hist.slice(-120));
@@ -5239,7 +5245,7 @@ async function applyV46Upgrade(baseModel){
   baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V46 integrated AWACS', value: pct(integrated.score||0), hint:integrated.summary, cls:integrated.score>.42?'good':'info'}, {label:'V46 war-room', value: war.rows[2]?.value || 'watching', hint:war.summary, cls:(war.rows[2]?.value && war.rows[2].value!=='0')?'good':'warn'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V46 folds the AWACS lane into one HTML and adds deterministic route-family / replay indexing.`};
   baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'Integrated AWACS local engine', kind:'soft', score:integrated.score||0, status:integrated.media||integrated.chain?'observed':'watching', why:integrated.summary}, {name:'War-room replay / route-family indexing', kind:'soft', score:clamp(((integrated.chain?.summary?.routeFamilies||0)/8)+((integrated.chain?.summary?.replayWindows||0)/10),0,1), status:(integrated.chain?.summary?.routeFamilies||0)?'observed':'watching', why:war.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V46 adds in-browser persistence, route-family replay, and cluster pressure without a separate backend.`};
   baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[integrated.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(war.tasks||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V46 single-html ${pct(integrated.score||0)} • route families ${integrated.chain?.summary?.routeFamilies||0} • replay ${integrated.chain?.summary?.replayWindows||0}.`};
-  baseModel.version='V46.6 forEach-Guard Stable-Lock War-Room Auditor';
+  baseModel.version='V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
   return baseModel;
 }
 const __buildModelV46 = buildModel;
@@ -5249,9 +5255,9 @@ function v46RenderPanel(model){
   const integrated=(model&&model.v46&&model.v46.integrated)?model.v46.integrated:v46BuildIntegratedAwacs(model||{});
   const war=(model&&model.v46&&model.v46.war)?model.v46.war:v46BuildWarRoom(model||{});
   const media=integrated.media, chain=integrated.chain;
-  document.title='pDAI Peg Prover • V46.6 forEach-Guard Stable-Lock War-Room Auditor';
-  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.6 forEach-Guard Stable-Lock War-Room Auditor';
-  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.3 adds a true quick-lock live chain fallback, tighter bootstrap limits, static title fixes, and clearer diagnostics so the one-file war-room can render a real live snapshot before deeper proving completes. Formal execution remains hard-gated by real slot / shell / reserve closure.';
+  document.title='pDAI Peg Prover • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
+  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
+  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.7 prefers live quick-lock over model timeout, keeps instant imported rendering, fixes stale version copy, and only escalates into heavier proving after a successful live chain lock. Formal execution remains hard-gated by slot / shell / reserve closure.';
   const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.2 code in place</div><div class="chip info">Adds quick-lock fallback + RPC timeout diagnostics</div><div class="chip warn">Folds AWACS into one HTML with route-family replay</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
   const urlInput=document.getElementById('v46SourceUrl'); if(urlInput && !urlInput.value && media?.sourceUrl) urlInput.value=media.sourceUrl;
   clearEl($('v46IntegratedList')); integrated.rows.forEach(r=>pushItem($('v46IntegratedList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
