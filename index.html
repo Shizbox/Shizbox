@@ -4214,28 +4214,36 @@ ${state.settings.researchCorpus||''}`);
       if(state.bootstrapMode){
         state.preSyncSettings = JSON.parse(JSON.stringify(state.settings));
         state.settings = Object.assign({}, state.settings, {
-          scanBlocks: Math.min(60, Number(state.settings.scanBlocks||60)),
-          burstScanBlocks: Math.min(240, Number(state.settings.burstScanBlocks||240)),
-          maxLeadExpansionsPerCycle: Math.min(3, Number(state.settings.maxLeadExpansionsPerCycle||3)),
-          neighborBlockBurst: Math.min(11, Number(state.settings.neighborBlockBurst||11)),
-          routeDepthBurst: Math.min(2, Number(state.settings.routeDepthBurst||2)),
-          deepSweepEvery: Math.max(4, Number(state.settings.deepSweepEvery||4)),
-          aggressiveFollowups: Math.min(1, Number(state.settings.aggressiveFollowups||1))
+          scanBlocks: Math.min(40, Number(state.settings.scanBlocks||40)),
+          burstScanBlocks: Math.min(120, Number(state.settings.burstScanBlocks||120)),
+          maxLeadExpansionsPerCycle: Math.min(2, Number(state.settings.maxLeadExpansionsPerCycle||2)),
+          neighborBlockBurst: Math.min(7, Number(state.settings.neighborBlockBurst||7)),
+          routeDepthBurst: Math.min(1, Number(state.settings.routeDepthBurst||1)),
+          deepSweepEvery: Math.max(5, Number(state.settings.deepSweepEvery||5)),
+          aggressiveFollowups: Math.min(0, Number(state.settings.aggressiveFollowups||0)),
+          awacsAutoUse: false,
+          autoRefresh: Math.max(45000, Number(state.settings.autoRefresh||45000))
         });
       }
       const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
       state.deepMode = ((state.cycle % every)===0) && !state.bootstrapMode;
-      $('syncStatus').textContent=state.bootstrapMode?'bootstrap sync':(state.deepMode?'deep proving':'syncing'); $('syncStatus').className='status info';
+      $('syncStatus').textContent=state.bootstrapMode?'quick-lock bootstrap':(state.deepMode?'deep proving':'syncing'); $('syncStatus').className='status info';
+      try{ $('rpcMeta').textContent='RPC: '+String((state.settings.privateRpc||'').trim() || (Array.isArray(state.settings.rpcs)&&state.settings.rpcs[0]) || '—'); }catch{}
       const buildTimeoutMs = state.bootstrapMode ? 12000 : 25000;
       let model;
       try{
-        model = await Promise.race([
-          buildModel(),
-          new Promise((_, reject)=>setTimeout(()=>reject(new Error(`Model build timeout after ${Math.round(buildTimeoutMs/1000)}s`)), buildTimeoutMs))
-        ]);
-      }catch(buildErr){
         if(state.bootstrapMode){
           model = await buildQuickLockModel();
+          state.quickLockFallback = 'cold-boot quick-lock';
+        }else{
+          model = await Promise.race([
+            buildModel(),
+            new Promise((_, reject)=>setTimeout(()=>reject(new Error(`Model build timeout after ${Math.round(buildTimeoutMs/1000)}s`)), buildTimeoutMs))
+          ]);
+        }
+      }catch(buildErr){
+        if(state.bootstrapMode){
+          model = await buildQuickLockModel().catch(()=>null);
           if(!model) throw buildErr;
           state.quickLockFallback = buildErr.message||String(buildErr);
         }else{
@@ -4871,7 +4879,7 @@ function v45ApplyDefaults(settings){
     ...settings,
     awacsBaseUrl: String(settings.awacsBaseUrl||'http://localhost:8787').trim(),
     awacsTargetUrl: String(settings.awacsTargetUrl||'').trim(),
-    awacsAutoUse: settings.awacsAutoUse!==false,
+    awacsAutoUse: settings.awacsAutoUse===true,
     rpcTimeoutMs: Number(settings.rpcTimeoutMs||15000)
   };
 }
