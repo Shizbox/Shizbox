@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V46.1 Single-HTML F-22 War-Room Auditor</title>
+<title>pDAI Peg Prover • V46.2 Staged-Sync F-22 War-Room Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,7 +84,7 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.1 Single-HTML F-22 War-Room Auditor</h1>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.2 Staged-Sync F-22 War-Room Auditor</h1>
       <div class="sub">V46.1 hotfixes the single-HTML war-room build: correct static title/version text, restores the missing transaction-receipt helper, and keeps the one-file AWACS, video, replay, route-indexing, and proving lanes working together.</div>
       <div class="chips">
         <div class="chip good">Upgrades the attached V42.9 code in place</div>
@@ -920,7 +920,21 @@
     return rehydrateMariaSettings(Object.assign({}, DEFAULTS, storedSettings), {history:hist,lastGood:lg,socialCache:sc,social:lg?.social||[],windows:lg?.windows||[]});
   }
 
-  async function postJson(url, payload){ const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); }
+  async function postJson(url, payload){
+    const controller = typeof AbortController!=='undefined' ? new AbortController() : null;
+    const timeoutMs = Math.max(8000, Number(state?.settings?.rpcTimeoutMs||15000));
+    const timer = controller ? setTimeout(()=>{ try{ controller.abort(); }catch{} }, timeoutMs) : null;
+    try{
+      const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),signal:controller?.signal});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }catch(err){
+      if(err && (err.name==='AbortError' || /aborted/i.test(String(err.message||'')))) throw new Error(`RPC timeout after ${Math.round(timeoutMs/1000)}s`);
+      throw err;
+    }finally{
+      if(timer) clearTimeout(timer);
+    }
+  }
 
   async function rpc(method, params=[]){
     const list=[];
@@ -4118,31 +4132,52 @@ ${state.settings.researchCorpus||''}`);
     if(state.syncing) return;
     state.syncing=true;
     state.cycle=(state.cycle||0)+1;
-    const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
-    state.deepMode = ((state.cycle % every)===0);
-    $('syncStatus').textContent=state.deepMode?'deep proving':'syncing'; $('syncStatus').className='status info';
     try{
       state.settings=loadSettings();
+      const bootstrapMode = !state.lastGood && !(state.history||[]).length;
+      const overdriveLike = Number(state.settings.scanBlocks||0) > 500 || Number(state.settings.burstScanBlocks||0) > 3000 || String(state.settings.huntMode||'').includes('f22');
+      state.bootstrapMode = !!(bootstrapMode && overdriveLike);
+      if(state.bootstrapMode){
+        state.preSyncSettings = JSON.parse(JSON.stringify(state.settings));
+        state.settings = Object.assign({}, state.settings, {
+          scanBlocks: Math.min(300, Number(state.settings.scanBlocks||300)),
+          burstScanBlocks: Math.min(1600, Number(state.settings.burstScanBlocks||1600)),
+          maxLeadExpansionsPerCycle: Math.min(8, Number(state.settings.maxLeadExpansionsPerCycle||8)),
+          neighborBlockBurst: Math.min(33, Number(state.settings.neighborBlockBurst||33)),
+          routeDepthBurst: Math.min(4, Number(state.settings.routeDepthBurst||4)),
+          deepSweepEvery: Math.max(3, Number(state.settings.deepSweepEvery||4)),
+          aggressiveFollowups: Math.min(3, Number(state.settings.aggressiveFollowups||3))
+        });
+      }
+      const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
+      state.deepMode = ((state.cycle % every)===0) && !state.bootstrapMode;
+      $('syncStatus').textContent=state.bootstrapMode?'bootstrap sync':(state.deepMode?'deep proving':'syncing'); $('syncStatus').className='status info';
       const model=await buildModel();
       render(model);
       const persistedLast=saveLastGood(snapshot(model));
       const hist=loadHistory(); hist.push(snapshot(model));
       const persistedHistory=saveHistory(hist.slice(-120));
       const persistWarn=[persistedLast, persistedHistory].filter(x=>x && x.ok && x.via && x.via!=='local').map(x=>x.via);
-      if(persistWarn.length){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode`; }
-      else if(state.persistIssue){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${state.persistIssue}`; }
+      if(persistWarn.length){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode${state.bootstrapMode?' • staged bootstrap pass':''}`; }
+      else if(state.persistIssue){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${state.persistIssue}${state.bootstrapMode?' • staged bootstrap pass':''}`; }
+      else if(state.bootstrapMode){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • staged bootstrap pass completed`; }
     }catch(err){
       console.error(err);
+      const detail = `Last error: ${err.message||String(err)}${state.rpcUsed?` • RPC ${state.rpcUsed}`:''}${state.bootstrapMode?' • bootstrap mode':''}`;
       const fallback = state.importedBundle ? safeImportedRender(state.importedBundle) : state.lastGood;
       if(fallback){
         render(fallback);
         $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn';
-        $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing imported / cached snapshot';
+        $('lastSync').textContent=detail+' • showing imported / cached snapshot';
       }else{
         $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad';
-        $('lastSync').textContent='Last error: '+(err.message||String(err));
+        $('lastSync').textContent=detail;
       }
-    }finally{ state.syncing=false; }
+    }finally{
+      if(state.preSyncSettings){ state.settings = state.preSyncSettings; state.preSyncSettings = null; }
+      state.bootstrapMode=false;
+      state.syncing=false;
+    }
   }
 
   function pushSettings(){
@@ -4746,7 +4781,8 @@ function v45ApplyDefaults(settings){
     ...settings,
     awacsBaseUrl: String(settings.awacsBaseUrl||'http://localhost:8787').trim(),
     awacsTargetUrl: String(settings.awacsTargetUrl||'').trim(),
-    awacsAutoUse: settings.awacsAutoUse!==false
+    awacsAutoUse: settings.awacsAutoUse!==false,
+    rpcTimeoutMs: Number(settings.rpcTimeoutMs||15000)
   };
 }
 const __loadSettingsV45 = loadSettings;
@@ -5079,7 +5115,7 @@ async function applyV46Upgrade(baseModel){
   baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V46 integrated AWACS', value: pct(integrated.score||0), hint:integrated.summary, cls:integrated.score>.42?'good':'info'}, {label:'V46 war-room', value: war.rows[2]?.value || 'watching', hint:war.summary, cls:(war.rows[2]?.value && war.rows[2].value!=='0')?'good':'warn'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V46 folds the AWACS lane into one HTML and adds deterministic route-family / replay indexing.`};
   baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'Integrated AWACS local engine', kind:'soft', score:integrated.score||0, status:integrated.media||integrated.chain?'observed':'watching', why:integrated.summary}, {name:'War-room replay / route-family indexing', kind:'soft', score:clamp(((integrated.chain?.summary?.routeFamilies||0)/8)+((integrated.chain?.summary?.replayWindows||0)/10),0,1), status:(integrated.chain?.summary?.routeFamilies||0)?'observed':'watching', why:war.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V46 adds in-browser persistence, route-family replay, and cluster pressure without a separate backend.`};
   baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[integrated.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(war.tasks||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V46 single-html ${pct(integrated.score||0)} • route families ${integrated.chain?.summary?.routeFamilies||0} • replay ${integrated.chain?.summary?.replayWindows||0}.`};
-  baseModel.version='V46.1 Single-HTML F-22 War-Room Auditor';
+  baseModel.version='V46.2 Staged-Sync F-22 War-Room Auditor';
   return baseModel;
 }
 const __buildModelV46 = buildModel;
@@ -5089,10 +5125,10 @@ function v46RenderPanel(model){
   const integrated=(model&&model.v46&&model.v46.integrated)?model.v46.integrated:v46BuildIntegratedAwacs(model||{});
   const war=(model&&model.v46&&model.v46.war)?model.v46.war:v46BuildWarRoom(model||{});
   const media=integrated.media, chain=integrated.chain;
-  document.title='pDAI Peg Prover • V46.1 Single-HTML F-22 War-Room Auditor';
-  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.1 Single-HTML F-22 War-Room Auditor';
-  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.1 hotfixes the single-HTML war-room build: correct static title/version text, restores the missing transaction-receipt helper, and keeps the one-file AWACS, video, replay, route-indexing, and proving lanes working together. Formal execution remains hard-gated by real slot / shell / reserve closure.';
-  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V45 code in place</div><div class="chip info">Folds AWACS into one HTML with local persistence</div><div class="chip warn">Adds route-family indexing + replay board + war-room tasks</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
+  document.title='pDAI Peg Prover • V46.2 Staged-Sync F-22 War-Room Auditor';
+  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.2 Staged-Sync F-22 War-Room Auditor';
+  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.2 adds staged sync, RPC timeouts, lighter bootstrap passes, and clearer diagnostics so the one-file war-room can get a clean first lock before ramping into F-22 overdrive. Formal execution remains hard-gated by real slot / shell / reserve closure.';
+  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V45 code in place</div><div class="chip info">Adds staged sync + RPC timeout diagnostics</div><div class="chip warn">Folds AWACS into one HTML with route-family replay</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
   const urlInput=document.getElementById('v46SourceUrl'); if(urlInput && !urlInput.value && media?.sourceUrl) urlInput.value=media.sourceUrl;
   clearEl($('v46IntegratedList')); integrated.rows.forEach(r=>pushItem($('v46IntegratedList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
   clearEl($('v46WarRows')); war.rows.forEach(r=>pushItem($('v46WarRows'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
