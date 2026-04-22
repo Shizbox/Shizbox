@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V43.2 Source-Hardened Predator Gatekeeper Auditor</title>
+<title>pDAI Peg Prover • V46.1 Single-HTML F-22 War-Room Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,8 +84,8 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V43.2 Source-Hardened Predator Gatekeeper Auditor</h1>
-      <div class="sub">V43.2 upgrades your attached V42.9/V43.0 tool in place: deterministic bundle import, self-audit and consistency checks, stronger Maria rehydration, source-family cue hardening, clearer lead-vs-focus logic, and an interactive flashpoint simulator layered on top of the existing social-scout, gatekeeper, priming, and gravity lanes.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.1 Single-HTML F-22 War-Room Auditor</h1>
+      <div class="sub">V46.1 hotfixes the single-HTML war-room build: correct static title/version text, restores the missing transaction-receipt helper, and keeps the one-file AWACS, video, replay, route-indexing, and proving lanes working together.</div>
       <div class="chips">
         <div class="chip good">Upgrades the attached V42.9 code in place</div>
         <div class="chip info">Adds deterministic import + self-audit</div>
@@ -946,6 +946,7 @@
   async function getBlock(numberOrTag='latest'){ return rpc('eth_getBlockByNumber',[typeof numberOrTag==='string' ? numberOrTag : hex(numberOrTag), false]); }
   async function getTx(hash){ return rpc('eth_getTransactionByHash',[hash]); }
   async function getReceipt(hash){ return rpc('eth_getTransactionReceipt',[hash]); }
+  async function getTxReceipt(hash){ return getReceipt(hash); }
   async function getProof(address, slots=[], block='latest'){ return rpc('eth_getProof',[address, slots, block]); }
   async function traceTx(hash){
     try{ return await rpc('debug_traceTransaction',[hash,{}]); }
@@ -5078,7 +5079,7 @@ async function applyV46Upgrade(baseModel){
   baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V46 integrated AWACS', value: pct(integrated.score||0), hint:integrated.summary, cls:integrated.score>.42?'good':'info'}, {label:'V46 war-room', value: war.rows[2]?.value || 'watching', hint:war.summary, cls:(war.rows[2]?.value && war.rows[2].value!=='0')?'good':'warn'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V46 folds the AWACS lane into one HTML and adds deterministic route-family / replay indexing.`};
   baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'Integrated AWACS local engine', kind:'soft', score:integrated.score||0, status:integrated.media||integrated.chain?'observed':'watching', why:integrated.summary}, {name:'War-room replay / route-family indexing', kind:'soft', score:clamp(((integrated.chain?.summary?.routeFamilies||0)/8)+((integrated.chain?.summary?.replayWindows||0)/10),0,1), status:(integrated.chain?.summary?.routeFamilies||0)?'observed':'watching', why:war.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V46 adds in-browser persistence, route-family replay, and cluster pressure without a separate backend.`};
   baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[integrated.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(war.tasks||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V46 single-html ${pct(integrated.score||0)} • route families ${integrated.chain?.summary?.routeFamilies||0} • replay ${integrated.chain?.summary?.replayWindows||0}.`};
-  baseModel.version='V46.0 Single-HTML F-22 War-Room Auditor';
+  baseModel.version='V46.1 Single-HTML F-22 War-Room Auditor';
   return baseModel;
 }
 const __buildModelV46 = buildModel;
@@ -5088,8 +5089,9 @@ function v46RenderPanel(model){
   const integrated=(model&&model.v46&&model.v46.integrated)?model.v46.integrated:v46BuildIntegratedAwacs(model||{});
   const war=(model&&model.v46&&model.v46.war)?model.v46.war:v46BuildWarRoom(model||{});
   const media=integrated.media, chain=integrated.chain;
-  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.0 Single-HTML F-22 War-Room Auditor';
-  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.0 upgrades your attached V45 line in place: AWACS is folded into one HTML with persistent local media intelligence, deterministic route-family indexing, replay boards, and a tighter war-room proving loop. Formal execution remains hard-gated by real slot / shell / reserve closure.';
+  document.title='pDAI Peg Prover • V46.1 Single-HTML F-22 War-Room Auditor';
+  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.1 Single-HTML F-22 War-Room Auditor';
+  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.1 hotfixes the single-HTML war-room build: correct static title/version text, restores the missing transaction-receipt helper, and keeps the one-file AWACS, video, replay, route-indexing, and proving lanes working together. Formal execution remains hard-gated by real slot / shell / reserve closure.';
   const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V45 code in place</div><div class="chip info">Folds AWACS into one HTML with local persistence</div><div class="chip warn">Adds route-family indexing + replay board + war-room tasks</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
   const urlInput=document.getElementById('v46SourceUrl'); if(urlInput && !urlInput.value && media?.sourceUrl) urlInput.value=media.sourceUrl;
   clearEl($('v46IntegratedList')); integrated.rows.forEach(r=>pushItem($('v46IntegratedList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
