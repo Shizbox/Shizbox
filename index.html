@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V47.0 No-AWACS Core Auditor</title>
+<title>pDAI Peg Prover • V43.2 Source-Hardened Predator Gatekeeper Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor</h1>
-      <div class="sub">V47.0 removes the integrated AWACS, video-lab, and replay stack from deep proving and reverts the manual deep pass to the lighter pre-AWACS core engine.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V43.2 Source-Hardened Predator Gatekeeper Auditor</h1>
+      <div class="sub">V43.2 upgrades your attached V42.9/V43.0 tool in place: deterministic bundle import, self-audit and consistency checks, stronger Maria rehydration, source-family cue hardening, clearer lead-vs-focus logic, and an interactive flashpoint simulator layered on top of the existing social-scout, gatekeeper, priming, and gravity lanes.</div>
       <div class="chips">
-        <div class="chip good">Upgrades the attached V46.x code in place</div>
-        <div class="chip info">Adds forEach guard + instant imported render</div>
-        <div class="chip warn">Keeps one-file war-room / replay / route indexing</div>
-        <div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>
+        <div class="chip good">Upgrades the attached V42.9 code in place</div>
+        <div class="chip info">Adds deterministic import + self-audit</div>
+        <div class="chip warn">Adds source-seed filtering + flashpoint simulator</div>
+        <div class="chip bad">Keeps governance / blueprint theories proof-gated behind chain closure</div>
       </div>
     </div>
     <div>
@@ -113,7 +113,7 @@
   </div>
 
   <div class="settings panel" id="settingsBox">
-    <div class="boxTitle">V46.5 integrated settings</div>
+    <div class="boxTitle">V41 integrated settings</div>
     <div class="form">
       <div class="field"><label>Private RPC</label><input id="sPrivateRpc" placeholder="optional private RPC" /></div>
       <div class="field"><label>Fallback RPCs</label><textarea id="sRpcs" placeholder="one per line"></textarea></div>
@@ -562,15 +562,6 @@
 </div>
 
 <script>
-  if (typeof Object.prototype.forEach !== "function") {
-    Object.defineProperty(Object.prototype, "forEach", {
-      value: function(cb, thisArg){
-        const vals = (this && typeof this === "object") ? Object.values(this) : [];
-        return Array.prototype.forEach.call(vals, cb, thisArg);
-      },
-      enumerable: false, configurable: true, writable: true
-    });
-  }
 (() => {
   const __bootStatus = (msg, cls='bad') => { try { const el=document.getElementById('syncStatus'); if(el){ el.textContent=msg; el.className='status '+cls; } const ls=document.getElementById('lastSync'); if(ls && msg!==el?.textContent){ ls.textContent=msg; } } catch{} };
   window.addEventListener('error', (ev) => { try { const msg='Startup error: ' + ((ev.error&&ev.error.message)||ev.message||'unknown'); __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent=msg; } catch{} });
@@ -675,11 +666,6 @@
 
   const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[], persistIssue:''};
   state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
-
-  state.settings.awacsAutoUse=false;
-  state.settings.f44Overdrive=false;
-  if(!state.settings.rpcTimeoutMs) state.settings.rpcTimeoutMs=12000;
-
 
   function $(id){ return document.getElementById(id); }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
@@ -934,21 +920,7 @@
     return rehydrateMariaSettings(Object.assign({}, DEFAULTS, storedSettings), {history:hist,lastGood:lg,socialCache:sc,social:lg?.social||[],windows:lg?.windows||[]});
   }
 
-  async function postJson(url, payload){
-    const controller = typeof AbortController!=='undefined' ? new AbortController() : null;
-    const timeoutMs = Math.max(8000, Number(state?.settings?.rpcTimeoutMs||15000));
-    const timer = controller ? setTimeout(()=>{ try{ controller.abort(); }catch{} }, timeoutMs) : null;
-    try{
-      const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),signal:controller?.signal});
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    }catch(err){
-      if(err && (err.name==='AbortError' || /aborted/i.test(String(err.message||'')))) throw new Error(`RPC timeout after ${Math.round(timeoutMs/1000)}s`);
-      throw err;
-    }finally{
-      if(timer) clearTimeout(timer);
-    }
-  }
+  async function postJson(url, payload){ const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); }
 
   async function rpc(method, params=[]){
     const list=[];
@@ -974,7 +946,6 @@
   async function getBlock(numberOrTag='latest'){ return rpc('eth_getBlockByNumber',[typeof numberOrTag==='string' ? numberOrTag : hex(numberOrTag), false]); }
   async function getTx(hash){ return rpc('eth_getTransactionByHash',[hash]); }
   async function getReceipt(hash){ return rpc('eth_getTransactionReceipt',[hash]); }
-  async function getTxReceipt(hash){ return getReceipt(hash); }
   async function getProof(address, slots=[], block='latest'){ return rpc('eth_getProof',[address, slots, block]); }
   async function traceTx(hash){
     try{ return await rpc('debug_traceTransaction',[hash,{}]); }
@@ -4142,172 +4113,35 @@ ${state.settings.researchCorpus||''}`);
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 
-
-
-  async function buildStableLockModel(){
-    const imported = state.importedBundle || null;
-    const chain = await buildChainState(imported);
-    const base = await buildQuickLockModel();
-    base.clarifier = base.clarifier || {};
-    base.clarifier.hint = `Stable-lock live snapshot • core/native ${(base.signalBrain?.thinLP?.coreRatio||0).toFixed ? (base.signalBrain?.thinLP?.coreRatio||0).toFixed(2) : '—'}x.`;
-    base.v46Mode = 'stable-lock';
-    return base;
-  }
-
-  async function buildQuickLockModel(){
-    const imported = state.importedBundle || null;
-    const chain = await buildChainState(imported);
-    const nativeAnchor = (chain.publicAnchors||[]).find(a=>String(a.type||'').toLowerCase()==='public-native') || (chain.publicAnchors||[])[0] || {};
-    const coreAnchor = (chain.publicAnchors||[]).find(a=>String(a.type||'').toLowerCase()==='core') || {};
-    const nativePdai = norm(nativeAnchor.token0)===norm(state.settings.target) ? Number(nativeAnchor.reserve0||0) : norm(nativeAnchor.token1)===norm(state.settings.target) ? Number(nativeAnchor.reserve1||0) : Number(nativeAnchor.reserve0||0);
-    const corePdai = norm(coreAnchor.token0)===norm(state.settings.target) ? Number(coreAnchor.reserve0||0) : norm(coreAnchor.token1)===norm(state.settings.target) ? Number(coreAnchor.reserve1||0) : Number(coreAnchor.reserve0||0);
-    const ratio = nativePdai>0 ? corePdai/Math.max(nativePdai,1e-9) : 0;
-    const flashPct = corePdai>0 && nativePdai>0 ? (nativePdai/corePdai)*100 : 0;
-    const last = {
-      createdAt: Date.now(),
-      latestBlock: chain.latestBlock,
-      latestTsMs: chain.latestTsMs,
-      total: chain.total,
-      burned: chain.burned,
-      publicAnchors: chain.publicAnchors||[],
-      nodeBalances: chain.nodeBalances||{},
-      watchTiers: chain.watchTiers||{},
-      hotWatcher: chain.hotWatcher||'5EF7',
-      slotProbe: chain.slotProbe||{values:{}, allZero:true, summary:'null-null equality'},
-      dnaProbe: chain.dnaProbe||{raw:NULL32, implAddress:''},
-      score: chain.slotProbe?.allZero===false ? 54 : 36,
-      pegProgress: clamp((ratio>300?0.62:ratio>100?0.48:0.24),0,1),
-      contradictionLoad: chain.slotProbe?.allZero===false ? 0.38 : 0.72,
-      thoughts: [
-        `Quick-lock live chain snapshot loaded from ${state.rpcUsed||'RPC'}.`,
-        `Core/native ratio ${ratio?ratio.toFixed(2):'0.00'}x on the visible rails.`,
-        chain.slotProbe?.allZero===false ? 'Watched slots are not both zero in quick-lock mode.' : 'Watched slots remain null-null in quick-lock mode.',
-        flashPct ? `Flashpoint sits near ${flashPct.toFixed(3)}% of core if native rail equals visible core discharge.` : 'Flashpoint could not be computed from current visible reserves.'
-      ],
-      signalBrain: {
-        rivalModels: {
-          winner: {name:'Bootstrap live / quick-lock', score:0.51},
-          summary:'Quick-lock bootstrap snapshot built from live chain essentials while deeper proving warms up.',
-          models:[
-            {name:'Bootstrap live / quick-lock', score:0.51, because:'Deep scan timed out or is still warming up; rendering a live essentials snapshot first.'},
-            {name:'Full deep proving pending', score:0.49, because:'The full route / manifold / archaeology stack has not completed yet.'}
-          ]
-        },
-        moveBuilder: {
-          stateText:'bootstrap-live',
-          stages:[{score:0},{score:0},{score:0},{score:0},{score:0},{score: chain.slotProbe?.allZero===false ? 0.35 : 0.125}]
-        },
-        contractInnerEye: {stance: chain.slotProbe?.allZero===false ? 'state-awake' : 'window-reactive-shell', score: chain.slotProbe?.allZero===false ? 0.44 : 0.16, verdicts:[chain.slotProbe?.allZero===false ? 'Quick-lock saw non-zero watched slot state.' : 'Quick-lock confirms watched slots are still null-null.']},
-        probePlanner: {tasks:[
-          {title:'Complete full deep proving pass', why:'Quick-lock only loaded chain essentials.'},
-          {title:'Keep slot-awakening watch live', why:'The watched slot state still dominates proof gating.'},
-          {title:'Refresh for contract-local logs / approvals', why:'Quick-lock does not yet include full archaeology.'}
-        ]},
-        contractIntel: {logsCount:0, transferCount:0, approvalCount:0, mints:{count:0}, burns:{count:0}, standoutScore:0, nativeDrift:0, topContractPairs:[]},
-        thinLP: {nativeNow:nativePdai, coreRatio:ratio},
-        squareLaw: {score: ratio>300?0.78:ratio>100?0.52:0.2},
-        executionHunt: {support:[], tripwires:[], summary:'Quick-lock mode: execution hunt not yet expanded.'},
-        routeClusters: []
-      },
-      v42_9: {gravity:{flashPct}}
-    };
-    const quick = safeImportedRender({history:[last], lastGood:last, settings: state.settings});
-    if(quick){
-      quick.signalBrain = quick.signalBrain || {};
-      quick.signalBrain.thinLP = {nativeNow:nativePdai, coreRatio:ratio};
-      quick.squareLaw = {score: ratio>300?0.78:ratio>100?0.52:0.2, summary:`Quick-lock square-law view: core/native ${ratio?ratio.toFixed(2):'0.00'}x.`, rows:[{label:'Core/native ratio', value:`${ratio?ratio.toFixed(2):'0.00'}x`, hint:'Quick-lock visible reserve ratio.'},{label:'Flashpoint', value: flashPct?`${flashPct.toFixed(3)}% core`:'—', hint:'Approximate visible-rail equalization threshold from quick-lock reserves.'}]};
-      quick.clarifier = quick.clarifier || {};
-      quick.clarifier.hint = `Quick-lock live snapshot • core/native ${ratio?ratio.toFixed(2):'0.00'}x • flash ${flashPct?flashPct.toFixed(3):'0.000'}% • slots ${chain.slotProbe?.allZero===false?'awake':'null-null'}.`;
-      quick.clarifier.verdict = 'Quick-lock bootstrap snapshot loaded while deep proving warms up.';
-      quick.clarifier.supports = v40AppendUniqueText(quick.clarifier.supports, last.thoughts, 10);
-      quick.clarifier.proveNext = v40AppendUniqueText(quick.clarifier.proveNext, ['Finish the full deep proving pass for contract logs, route families, and archaeology.', 'Keep 7b12 / 0968 dominant until live state changes.'], 10);
-      quick.version = 'V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
-      quick.quickLock = {ratio, flashPct};
-    }
-    return quick;
-  }
-
   async function sync(){
     if(state.syncing) return;
     state.syncing=true;
     state.cycle=(state.cycle||0)+1;
+    const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
+    state.deepMode = ((state.cycle % every)===0);
+    $('syncStatus').textContent=state.deepMode?'deep proving':'syncing'; $('syncStatus').className='status info';
     try{
       state.settings=loadSettings();
-      const bootstrapMode = !state.lastGood && !(state.history||[]).length;
-      const overdriveLike = Number(state.settings.scanBlocks||0) > 500 || Number(state.settings.burstScanBlocks||0) > 3000 || String(state.settings.huntMode||'').includes('f22');
-      state.bootstrapMode = !!bootstrapMode;
-      state.overdriveLike = !!overdriveLike;
-      if(state.bootstrapMode){
-        state.preSyncSettings = JSON.parse(JSON.stringify(state.settings));
-        state.settings = Object.assign({}, state.settings, {
-          scanBlocks: Math.min(40, Number(state.settings.scanBlocks||40)),
-          burstScanBlocks: Math.min(120, Number(state.settings.burstScanBlocks||120)),
-          maxLeadExpansionsPerCycle: Math.min(2, Number(state.settings.maxLeadExpansionsPerCycle||2)),
-          neighborBlockBurst: Math.min(7, Number(state.settings.neighborBlockBurst||7)),
-          routeDepthBurst: Math.min(1, Number(state.settings.routeDepthBurst||1)),
-          deepSweepEvery: Math.max(5, Number(state.settings.deepSweepEvery||5)),
-          aggressiveFollowups: Math.min(0, Number(state.settings.aggressiveFollowups||0)),
-          awacsAutoUse: false,
-          autoRefresh: Math.max(45000, Number(state.settings.autoRefresh||45000))
-        });
-      }
-      const every=Math.max(1, Number(state.settings.deepSweepEvery||4));
-      state.deepMode = ((state.cycle % every)===0) && !state.bootstrapMode;
-      $('syncStatus').textContent=state.bootstrapMode?'stable-lock bootstrap':(state.deepMode?'deep proving':'syncing'); $('syncStatus').className='status info';
-      try{ $('rpcMeta').textContent='RPC: '+String((state.settings.privateRpc||'').trim() || (Array.isArray(state.settings.rpcs)&&state.settings.rpcs[0]) || '—'); }catch{}
-      const buildTimeoutMs = state.bootstrapMode ? 12000 : 18000;
-      const quickLockPreferred = state.bootstrapMode || (!state.lastLiveLock && state.overdriveLike) || state.forceQuickLockNext;
-      let model;
-      try{
-        if(quickLockPreferred){
-          model = await buildStableLockModel();
-          state.quickLockFallback = state.bootstrapMode ? 'cold-boot stable-lock' : (state.overdriveLike ? 'overdrive quick-lock' : 'forced quick-lock');
-          state.forceQuickLockNext = false;
-        }else{
-          model = await Promise.race([
-            buildModel(),
-            new Promise((_, reject)=>setTimeout(()=>reject(new Error(`Model build timeout after ${Math.round(buildTimeoutMs/1000)}s`)), buildTimeoutMs))
-          ]);
-        }
-      }catch(buildErr){
-        const timeoutLike = /timeout/i.test(String(buildErr&&buildErr.message||buildErr));
-        const retryQuick = timeoutLike || state.bootstrapMode || state.overdriveLike;
-        if(retryQuick){
-          model = await buildStableLockModel().catch(()=>null);
-          if(!model) throw buildErr;
-          state.quickLockFallback = buildErr.message||String(buildErr);
-          state.forceQuickLockNext = false;
-        }else{
-          throw buildErr;
-        }
-      }
+      const model=await buildModel();
       render(model);
-      state.lastLiveLock = true;
       const persistedLast=saveLastGood(snapshot(model));
       const hist=loadHistory(); hist.push(snapshot(model));
       const persistedHistory=saveHistory(hist.slice(-120));
       const persistWarn=[persistedLast, persistedHistory].filter(x=>x && x.ok && x.via && x.via!=='local').map(x=>x.via);
-      if(persistWarn.length){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode${state.bootstrapMode?' • staged bootstrap pass':''}`; }
-      else if(state.persistIssue){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${state.persistIssue}${state.bootstrapMode?' • staged bootstrap pass':''}`; }
-      else if(state.bootstrapMode){ $('syncStatus').textContent=state.quickLockFallback?'quick-lock':'live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${state.quickLockFallback?`quick-lock fallback (${state.quickLockFallback})`:'staged bootstrap pass completed'}`; }
+      if(persistWarn.length){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode`; }
+      else if(state.persistIssue){ $('syncStatus').textContent='live'; $('syncStatus').className='status ok'; $('lastSync').textContent=`Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${state.persistIssue}`; }
     }catch(err){
       console.error(err);
-      const detail = `Last error: ${err.message||String(err)}${state.rpcUsed?` • RPC ${state.rpcUsed}`:''}${state.bootstrapMode?' • bootstrap mode':''}`;
       const fallback = state.importedBundle ? safeImportedRender(state.importedBundle) : state.lastGood;
       if(fallback){
         render(fallback);
         $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn';
-        $('lastSync').textContent=detail+' • showing imported / cached snapshot';
+        $('lastSync').textContent='Last error: '+(err.message||String(err))+' • showing imported / cached snapshot';
       }else{
         $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad';
-        $('lastSync').textContent=detail;
+        $('lastSync').textContent='Last error: '+(err.message||String(err));
       }
-    }finally{
-      if(state.preSyncSettings){ state.settings = state.preSyncSettings; state.preSyncSettings = null; }
-      state.bootstrapMode=false;
-      state.quickLockFallback='';
-      state.syncing=false;
-    }
+    }finally{ state.syncing=false; }
   }
 
   function pushSettings(){
@@ -4442,993 +4276,121 @@ ${state.settings.researchCorpus||''}`);
     e.target.value='';
   });
 
-
-
-// ===== V44 internal F-22 overdrive + video lab patch =====
-const V44_VIDEO_INTEL_KEY='pdai-v44-video-intel';
-function v44LoadVideoIntel(){
-  try{ return tryJson(localStorage.getItem(V44_VIDEO_INTEL_KEY), null); }catch{ return null; }
-}
-function v44SaveVideoIntel(obj){ try{ safeStorageSet(V44_VIDEO_INTEL_KEY, obj, x=>x); }catch{} }
-state.videoIntel=v44LoadVideoIntel();
-
-function v44ApplyOverdriveDefaults(s){
-  const out=Object.assign({}, s||{});
-  if(out.f44Overdrive===undefined) out.f44Overdrive=true;
-  if(!out.f44Overdrive) return out;
-  out.huntMode='f22-overdrive';
-  out.scanBlocks=Math.max(900, Number(out.scanBlocks)||0);
-  out.deepSweepEvery=1;
-  out.burstScanBlocks=Math.max(6600, Number(out.burstScanBlocks)||0);
-  out.maxLeadExpansionsPerCycle=Math.max(18, Number(out.maxLeadExpansionsPerCycle)||0);
-  out.neighborBlockBurst=Math.max(88, Number(out.neighborBlockBurst)||0);
-  out.routeDepthBurst=Math.max(7, Number(out.routeDepthBurst)||0);
-  out.allowanceDiffEvery=1;
-  out.slotClassificationEvery=1;
-  out.sourceCoverageCheckEvery=1;
-  out.revisitStalledLeadsEvery=1;
-  out.socialWindowBurst=true;
-  out.aggressiveFollowups=Math.max(7, Number(out.aggressiveFollowups)||0);
-  return out;
-}
-const __loadSettingsV44 = loadSettings;
-loadSettings = function(){ return v44ApplyOverdriveDefaults(__loadSettingsV44()); };
-state.settings=v44ApplyOverdriveDefaults(state.settings);
-
-function v44SeedUrlInfo(url){
-  const u=String(url||'').trim();
-  const low=u.toLowerCase();
-  if(!u) return {seed:false, platform:'', reason:''};
-  const ytConcrete = /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/|clip\/)|youtu\.be\/)/i.test(low);
-  const ytSeed = /youtube\.com\/@[^\s?#]+(?:\/(?:streams|videos|shorts))?\/?(?:[?#].*)?$/i.test(low) && !ytConcrete;
-  if(ytSeed) return {seed:true, platform:'youtube', reason:'channel-page'};
-  const xSeed = /(?:x\.com|twitter\.com)\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/(?:status|i\/status)\//i.test(low);
-  if(xSeed) return {seed:true, platform:'x', reason:'profile-page'};
-  const tgSeed = /t\.me\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/t\.me\/[^\/\s?#]+\/\d+/i.test(low);
-  if(tgSeed) return {seed:true, platform:'telegram', reason:'channel-root'};
-  return {seed:false, platform:inferPlatform(u,''), reason:''};
-}
-function v44IsSeedOnlyCue(item){
-  if(!item) return false;
-  if(item.seedOnly) return true;
-  const info=v44SeedUrlInfo(item.url||'');
-  return !!info.seed;
-}
-const __parseMariaCueTextV44 = parseMariaCueText;
-parseMariaCueText = function(raw){
-  const rows = __parseMariaCueTextV44(raw).map((item)=>{
-    const info=v44SeedUrlInfo(item?.url||'');
-    if(info.seed){
-      const tags=Array.isArray(item.tags)?item.tags.slice():[];
-      if(!tags.includes('source-seed')) tags.push('source-seed');
-      return Object.assign({}, item, {
-        seedOnly:true,
-        realCue:false,
-        kind:item.kind || 'maria-cue',
-        tags,
-        phase:item.phase==='social' ? 'source-seed' : item.phase,
-        code:item.code || info.reason || 'seed'
-      });
-    }
-    return item;
-  });
-  return rows;
-};
-const __collectSocialV44 = collectSocial;
-collectSocial = async function(imported){
-  const rows = await __collectSocialV44(imported);
-  return (Array.isArray(rows)?rows:[]).filter(x=>!v44IsSeedOnlyCue(x));
-};
-const __buildWindowsV44 = buildWindows;
-buildWindows = function(latestBlock, latestTsMs, items, liveBlockSec){
-  return __buildWindowsV44(latestBlock, latestTsMs, (Array.isArray(items)?items:[]).filter(x=>!v44IsSeedOnlyCue(x) && !(Array.isArray(x.tags) && x.tags.includes('video-lab-blueprint'))), liveBlockSec);
-};
-const __v43GatherImportedSocialV44 = v43GatherImportedSocial;
-v43GatherImportedSocial = function(imported){
-  const out = __v43GatherImportedSocialV44(imported);
-  const all = Array.isArray(out?.social)?out.social:[];
-  const seedOnly = all.filter(v44IsSeedOnlyCue);
-  const concrete = all.filter(x=>!v44IsSeedOnlyCue(x));
-  return Object.assign({}, out, {social:concrete, seedOnlyCount:seedOnly.length, concreteCount:concrete.length});
-};
-const __v43ResolveImportedWindowsV44 = v43ResolveImportedWindows;
-v43ResolveImportedWindows = function(imported, social, last){
-  const concrete=(Array.isArray(social)?social:[]).filter(x=>!v44IsSeedOnlyCue(x));
-  if(!concrete.length) return {windows:[], rebuilt:false, sanitized:true};
-  const out=__v43ResolveImportedWindowsV44(imported, concrete, last);
-  const filtered=(Array.isArray(out?.windows)?out.windows:[]).filter(w=>!v44IsSeedOnlyCue(w));
-  return Object.assign({}, out, {windows:filtered, sanitized:filtered.length !== (Array.isArray(out?.windows)?out.windows.length:0)});
-};
-const __v43BuildSelfAuditV44 = v43BuildSelfAudit;
-v43BuildSelfAudit = function(baseModel){
-  const audit = __v43BuildSelfAuditV44(baseModel);
-  const rawCueText = state.settings.mariaCueDrop || state.settings.mariaCueMemory || state.importedBundle?.settings?.mariaCueDrop || state.importedBundle?.settings?.mariaCueMemory || '';
-  const cueLines = mergeCueLines(rawCueText).split(/\n+/).map(x=>x.trim()).filter(Boolean);
-  const seedLines = cueLines.filter(line=>v44SeedUrlInfo((String(line).match(/https?:\/\/\S+/i)||[])[0]||'').seed).length;
-  const concreteLines = Math.max(0, cueLines.length - seedLines);
-  audit.rows.splice(Math.min(3, audit.rows.length), 0, {
-    label:'Cue specificity',
-    value:`${concreteLines} concrete / ${seedLines} source-seed`,
-    hint: seedLines ? 'Generic channel/profile URLs are treated as source coverage, not as timing windows.' : 'Cue lines appear specific enough for timing-window use.',
-    cls: seedLines ? 'warn' : 'good'
-  });
-  if(state.videoIntel){
-    audit.rows.push({
-      label:'Video-lab ingest',
-      value: state.videoIntel.kind==='transcript' ? `${state.videoIntel.blockCount||0} timed block(s)` : `${state.videoIntel.sceneCount||0} scene shift(s)`,
-      hint:'Local video-lab ingest is active. Uploaded media contributes blueprint corpus and strike cues, but it stays proof-gated unless concrete timing is supplied.',
-      cls:'info'
-    });
-  }
-  audit.summary = `${audit.summary} V44 filters source-family URLs out of social timing windows and audits local video-lab intake separately.`;
-  return audit;
-};
-
-function v44TimeToSec(raw){
-  const s=String(raw||'').trim().replace(',', '.').replace(/^[\[]|\]$/g,'');
-  if(!s) return null;
-  const parts=s.split(':').map(x=>x.trim()).filter(Boolean);
-  if(!parts.length || parts.some(p=>Number.isNaN(Number(p)))) return null;
-  if(parts.length===3) return Number(parts[0])*3600 + Number(parts[1])*60 + Number(parts[2]);
-  if(parts.length===2) return Number(parts[0])*60 + Number(parts[1]);
-  if(parts.length===1) return Number(parts[0]);
-  return null;
-}
-function v44FormatTime(sec){
-  const s=Math.max(0, Number(sec)||0);
-  const h=Math.floor(s/3600);
-  const m=Math.floor((s%3600)/60);
-  const r=(s%60).toFixed(1).replace(/\.0$/,'');
-  return h>0 ? `${h}:${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}` : `${m}:${String(r).padStart(2,'0')}`;
-}
-function v44TopTermRows(text){
-  const corpus=String(text||'').toLowerCase();
-  const terms=[
-    ['maria',/靈脅用|\bmaria\b/gi], ['9e6f',/\b9e6f\b/gi], ['proposal-224',/proposal\s*224/gi], ['proposal-225',/proposal\s*225/gi],
-    ['admin-pending',/admin\s+pending|unaccepted\s+admin/gi], ['refresh',/\brefresh\b|sync\(\)|skim\(\)/gi], ['v2-proxy',/v2\s+proxy|old\s+rail/gi],
-    ['v3',/\bv3\b|new\s+bank/gi], ['m0',/\bm0\b|base\s+money/gi], ['m1',/\bm1\b|credit\s+layer/gi], ['alligator',/alligator/gi],
-    ['pulse',/\bpulse\b|11-block|symmetry/gi], ['111-spider',/111\s*spider|\bspider\b/gi], ['acoustic-void',/acoustic\s+void|silent\s+stream/gi]
-  ];
-  return terms.map(([label,re])=>({label,count:(corpus.match(re)||[]).length})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count).slice(0,10);
-}
-function v44ParseTranscriptBlocks(raw){
-  const txt=String(raw||'').replace(/\r/g,'').trim();
-  if(!txt) return [];
-  const parsed=[];
-  const json=tryJson(txt,null);
-  if(Array.isArray(json)){
-    json.forEach((row,idx)=>{
-      if(!row) return;
-      const start=v44TimeToSec(row.start||row.offset||row.startTime||row.begin||'');
-      const end=v44TimeToSec(row.end||row.endTime||'');
-      const text=String(row.text||row.caption||row.content||row.title||'').trim();
-      if(text) parsed.push({id:`json:${idx}`, startSec:start!=null?start:null, endSec:end!=null?end:(start!=null?start+Math.max(3, text.split(/\s+/).length/2):null), text});
-    });
-    if(parsed.length) return parsed;
-  }
-  const blocks=txt.split(/\n\s*\n+/).map(x=>x.trim()).filter(Boolean);
-  const arrow=/((?:\d+:)?\d{1,2}:\d{2}(?:[\.,]\d{1,3})?)\s*-->\s*((?:\d+:)?\d{1,2}:\d{2}(?:[\.,]\d{1,3})?)/;
-  let hitArrow=false;
-  blocks.forEach((block,idx)=>{
-    const lines=block.split(/\n+/).map(x=>x.trim()).filter(Boolean);
-    const hit=block.match(arrow);
-    if(hit){
-      hitArrow=true;
-      const text=lines.filter(line=>!arrow.test(line) && !/^\d+$/.test(line)).join(' ').trim();
-      if(text) parsed.push({id:`srt:${idx}`, startSec:v44TimeToSec(hit[1]), endSec:v44TimeToSec(hit[2]), text});
-    }
-  });
-  if(hitArrow && parsed.length) return parsed;
-  txt.split(/\n+/).map(x=>x.trim()).filter(Boolean).forEach((line,idx)=>{
-    const bracket=line.match(/^\[?((?:\d+:)?\d{1,2}:\d{2}(?:[\.,]\d{1,3})?)\]?\s*(.+)$/);
-    if(bracket) parsed.push({id:`line:${idx}`, startSec:v44TimeToSec(bracket[1]), endSec:null, text:bracket[2].trim()});
-  });
-  for(let i=0;i<parsed.length;i++) if(parsed[i].endSec==null) parsed[i].endSec=i<parsed.length-1 && parsed[i+1].startSec!=null ? parsed[i+1].startSec : (parsed[i].startSec!=null ? parsed[i].startSec+6 : null);
-  return parsed.filter(x=>String(x.text||'').trim()).slice(0,240);
-}
-function v44TranscriptIntel(raw, label, meta={}){
-  const blocks=v44ParseTranscriptBlocks(raw);
-  const fullText=blocks.map(b=>b.text).join(' \n ');
-  const topTerms=v44TopTermRows(fullText);
-  const cues=blocks.slice(0,40).map((b,idx)=>({
-    id:`video-tx:${idx}:${label}`,
-    title:`${label} @ ${b.startSec!=null ? v44FormatTime(b.startSec) : 'block'}`,
-    text:b.text,
-    platform:'video-lab', source:'video-lab', kind:'video-transcript', phase:'video-blueprint', realCue:false,
-    durationSec:(b.startSec!=null && b.endSec!=null) ? Math.max(1, b.endSec-b.startSec) : 0,
-    tags:['video-lab-blueprint', ...topTerms.slice(0,4).map(x=>x.label)]
-  }));
-  const corpusLines=[`[VIDEO-LAB TRANSCRIPT] ${label}`, `Timed blocks: ${blocks.length}.`, topTerms.length ? `Top terms: ${topTerms.map(x=>`${x.label}×${x.count}`).join(', ')}.` : 'Top terms: none.', 'Excerpt:', ...blocks.slice(0,24).map(b=>`${b.startSec!=null ? '['+v44FormatTime(b.startSec)+'] ' : ''}${b.text}`)];
-  return {kind:'transcript', label, createdAt:Date.now(), blockCount:blocks.length, blocks:blocks.slice(0,80), topTerms, cues, corpus:corpusLines.join('\n'), sourceUrl:meta.url||'', publishedAt:meta.publishedAt||'', summary: blocks.length ? `Video-lab parsed ${blocks.length} timed transcript block(s) from ${label}.` : `No timed transcript blocks were parsed from ${label}.`};
-}
-async function v44DecodeAudioWindows(file){
-  const Ctx = window.AudioContext || window.webkitAudioContext;
-  if(!Ctx) return {supported:false, windows:[], silenceWindows:[], summary:'Browser audio decoding is unavailable.'};
-  try{
-    const arr=await file.arrayBuffer();
-    const ctx=new Ctx();
-    const buf=await ctx.decodeAudioData(arr.slice(0));
-    try{ await ctx.close(); }catch{}
-    const ch=buf.getChannelData(0);
-    const secPerWin=1.5;
-    const stride=Math.max(1, Math.floor(buf.sampleRate*secPerWin));
-    const rows=[];
-    for(let i=0;i<ch.length;i+=stride){
-      let sum=0, count=0;
-      for(let j=i;j<Math.min(ch.length, i+stride);j++){ const v=ch[j]; sum+=v*v; count++; }
-      const rms=Math.sqrt(sum/Math.max(1,count));
-      rows.push({startSec:i/buf.sampleRate, endSec:Math.min(ch.length, i+stride)/buf.sampleRate, rms});
-    }
-    const silenceWindows=[]; let open=null;
-    rows.forEach(r=>{
-      if(r.rms<0.012){ if(!open) open={startSec:r.startSec, endSec:r.endSec}; else open.endSec=r.endSec; }
-      else if(open){ if((open.endSec-open.startSec)>=2.5) silenceWindows.push(open); open=null; }
-    });
-    if(open && (open.endSec-open.startSec)>=2.5) silenceWindows.push(open);
-    return {supported:true, windows:rows.slice(0,120), silenceWindows:silenceWindows.slice(0,12), summary:`Audio windows ${rows.length}, silence windows ${silenceWindows.length}.`};
-  }catch(err){
-    return {supported:false, windows:[], silenceWindows:[], summary:'Audio decoding failed: '+(err.message||String(err))};
-  }
-}
-function v44SeekVideo(video, t){
-  return new Promise((resolve,reject)=>{
-    const target=Math.max(0, Math.min(Math.max(0, Number(video.duration||0)-0.05), Number(t)||0));
-    const done=()=>{ cleanup(); resolve(target); };
-    const fail=(e)=>{ cleanup(); reject(e instanceof Error ? e : new Error('seek failed')); };
-    const cleanup=()=>{ video.removeEventListener('seeked', done); video.removeEventListener('error', fail); };
-    video.addEventListener('seeked', done, {once:true});
-    video.addEventListener('error', fail, {once:true});
-    try{ video.currentTime=target; }catch(err){ cleanup(); reject(err); }
-  });
-}
-function v44FrameSignature(ctx, w, h){
-  const data=ctx.getImageData(0,0,w,h).data;
-  const cols=6, rows=4, sig=[];
-  for(let gy=0;gy<rows;gy++) for(let gx=0;gx<cols;gx++){
-    let sum=0, count=0;
-    const x0=Math.floor(gx*w/cols), x1=Math.floor((gx+1)*w/cols), y0=Math.floor(gy*h/rows), y1=Math.floor((gy+1)*h/rows);
-    for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){
-      const idx=(y*w+x)*4;
-      const lum=(data[idx]*0.2126 + data[idx+1]*0.7152 + data[idx+2]*0.0722)/255;
-      sum+=lum; count++;
-    }
-    sig.push(count?sum/count:0);
-  }
-  return sig;
-}
-function v44SigDiff(a,b){
-  if(!a || !b || !a.length || !b.length) return 0;
-  let sum=0; for(let i=0;i<Math.min(a.length,b.length);i++) sum+=Math.abs(a[i]-b[i]);
-  return sum/Math.min(a.length,b.length);
-}
-async function v44AnalyzeVideoBlob(file, meta={}){
-  const url=URL.createObjectURL(file);
-  const video=document.createElement('video');
-  video.preload='metadata'; video.muted=true; video.playsInline=true; video.src=url;
-  await new Promise((resolve,reject)=>{
-    const ok=()=>{ cleanup(); resolve(); };
-    const fail=(e)=>{ cleanup(); reject(e instanceof Error ? e : new Error('video metadata failed')); };
-    const cleanup=()=>{ video.removeEventListener('loadedmetadata', ok); video.removeEventListener('error', fail); };
-    video.addEventListener('loadedmetadata', ok, {once:true});
-    video.addEventListener('error', fail, {once:true});
-  });
-  const durationSec=Math.max(0, Number(video.duration)||0), width=Number(video.videoWidth)||0, height=Number(video.videoHeight)||0;
-  const canvas=document.createElement('canvas'); canvas.width=96; canvas.height=54;
-  const ctx=canvas.getContext('2d', {willReadFrequently:true});
-  const sampleCount=Math.max(6, Math.min(20, Math.round(durationSec ? durationSec/18 : 10)));
-  const sceneRows=[]; let prevSig=null;
-  for(let i=0;i<sampleCount;i++){
-    const t=durationSec ? ((i+1)/(sampleCount+1))*durationSec : i;
-    try{ await v44SeekVideo(video, t); }catch{ continue; }
-    ctx.drawImage(video,0,0,96,54);
-    const sig=v44FrameSignature(ctx, 96, 54);
-    const diff=prevSig ? v44SigDiff(prevSig, sig) : 0;
-    sceneRows.push({timeSec:t, diff});
-    prevSig=sig;
-  }
-  URL.revokeObjectURL(url);
-  const topScenes=sceneRows.filter(x=>x.diff>0.035).sort((a,b)=>b.diff-a.diff).slice(0,8);
-  const audio=await v44DecodeAudioWindows(file);
-  const corpus=[`[VIDEO-LAB MEDIA] ${file.name}`, `Duration ${durationSec.toFixed(1)}s • frame ${width}×${height} • sampled ${sceneRows.length} frame(s).`, topScenes.length ? `Scene shifts: ${topScenes.map(x=>v44FormatTime(x.timeSec)+' Δ'+x.diff.toFixed(3)).join(', ')}.` : 'Scene shifts: none above threshold.', audio.silenceWindows.length ? `Silence windows: ${audio.silenceWindows.map(x=>v44FormatTime(x.startSec)+'→'+v44FormatTime(x.endSec)).join(', ')}.` : 'Silence windows: none above threshold.'].join('\n');
-  return {kind:'media', label:file.name, createdAt:Date.now(), durationSec, width, height, sampleCount:sceneRows.length, sceneCount:topScenes.length, sceneRows:sceneRows.slice(0,24), topScenes, audio, corpus, sourceUrl:meta.url||'', publishedAt:meta.publishedAt||'', summary:`Video-lab sampled ${sceneRows.length} frame(s), found ${topScenes.length} scene-shift candidate(s), and ${audio.silenceWindows.length} silence window(s) in ${file.name}.`};
-}
-function v44BuildVideoLab(model){
-  const intel=state.videoIntel || null;
-  const rows=[];
-  if(!intel){
-    rows.push({label:'Video-lab state', value:'idle', hint:'Upload a local video/audio/transcript file or paste transcript text. A static single-file HTML cannot reliably auto-watch remote YouTube videos by itself.', cls:'info'});
-    return {score:0, rows, summary:'Video-lab is idle. Upload local media or transcript text to extract scene, silence, and transcript intel without pretending remote auto-ingest exists.'};
-  }
-  rows.push({label:'Video-lab state', value:intel.kind==='transcript'?'transcript parsed':'media analyzed', hint:intel.summary||'Video-lab data loaded.', cls:'good'});
-  if(intel.kind==='transcript'){
-    rows.push({label:'Timed transcript blocks', value:String(intel.blockCount||0), hint:'Parsed timed blocks stay in blueprint/intel lanes unless you later attach concrete publish timing.', cls:'info'});
-    rows.push({label:'Top extracted terms', value:intel.topTerms?.length ? intel.topTerms.map(x=>`${x.label}×${x.count}`).slice(0,5).join(', ') : 'none', hint:'Transcript terms are folded into the research corpus for blueprint cross-reference, not auto-promoted to timing windows.', cls:intel.topTerms?.length?'good':'warn'});
-  }else{
-    rows.push({label:'Duration / frame', value:`${(intel.durationSec||0).toFixed ? (intel.durationSec||0).toFixed(1) : fmtNum(intel.durationSec)}s • ${intel.width||0}×${intel.height||0}`, hint:'Local video metadata and keyframe sampling are extracted client-side.', cls:'info'});
-    rows.push({label:'Scene shifts', value:String(intel.sceneCount||0), hint:intel.topScenes?.length ? intel.topScenes.map(x=>v44FormatTime(x.timeSec)).join(', ') : 'No strong scene-shift sample crossed threshold.', cls:(intel.sceneCount||0)?'good':'warn'});
-    rows.push({label:'Silence windows', value:String(intel.audio?.silenceWindows?.length||0), hint:intel.audio?.silenceWindows?.length ? intel.audio.silenceWindows.map(x=>`${v44FormatTime(x.startSec)}→${v44FormatTime(x.endSec)}`).join(', ') : (intel.audio?.summary||'Audio analysis unavailable.'), cls:intel.audio?.supported?'info':'warn'});
-  }
-  rows.push({label:'Remote auto-watch', value:'not trusted in static HTML', hint:'For full text extraction from YouTube, supply a transcript/subtitle file or an external transcript feed. The single-file tool avoids pretending it can reliably bypass CORS / platform restrictions.', cls:'warn'});
-  const score=clamp((intel.kind==='transcript' ? Math.min((intel.blockCount||0)/40,0.5) + Math.min((intel.topTerms?.length||0)/10,0.2) : Math.min((intel.sceneCount||0)/8,0.35) + Math.min((intel.audio?.silenceWindows?.length||0)/6,0.2)) + 0.18,0,1);
-  return {score, rows, summary:intel.summary||'Video-lab data loaded.'};
-}
-function v44ReceiptTransferEdges(receipt){
-  const logs=Array.isArray(receipt?.logs)?receipt.logs:[];
-  const out=[];
-  logs.forEach(log=>{
-    if(norm(log.address)!==norm(state.settings.target)) return;
-    const topics=Array.isArray(log.topics)?log.topics:[];
-    if(!topics[0] || !String(topics[0]).toLowerCase().startsWith(TOPIC_TRANSFER.toLowerCase())) return;
-    const from='0x'+String(topics[1]||'').slice(-40).toLowerCase();
-    const to='0x'+String(topics[2]||'').slice(-40).toLowerCase();
-    const amount=Number(parseBig(log.data||'0x0'))/1e18;
-    out.push({from,to,amount});
-  });
-  return out;
-}
-function v44TraceStats(trace){
-  const stats={sstore:0, delegatecall:0, calls:0, slotNeedles:0};
-  const needles=['0000000000000000000000000000000000000000000000000000000000007b12','0000000000000000000000000000000000000000000000000000000000000968'];
-  if(Array.isArray(trace?.structLogs)){
-    trace.structLogs.forEach(row=>{
-      const op=String(row?.op||'').toUpperCase();
-      if(op==='SSTORE') stats.sstore++;
-      if(op==='DELEGATECALL') stats.delegatecall++;
-      if(op==='CALL') stats.calls++;
-      const stack=Array.isArray(row?.stack)?row.stack:[];
-      if(stack.some(v=>needles.some(n=>String(v||'').toLowerCase().endsWith(n.slice(-12)) || String(v||'').toLowerCase()===n))) stats.slotNeedles++;
-    });
-    return stats;
-  }
-  const walk=(node)=>{
-    if(!node || typeof node!=='object') return;
-    const t=String(node.type||node.callType||'').toUpperCase();
-    if(t==='DELEGATECALL') stats.delegatecall++;
-    if(t==='CALL' || t==='STATICCALL') stats.calls++;
-    const raw=JSON.stringify(node).toLowerCase();
-    if(raw.includes('sstore')) stats.sstore++;
-    if(needles.some(n=>raw.includes(n.slice(-12)))) stats.slotNeedles++;
-    (node.calls||[]).forEach(walk);
-  };
-  walk(trace);
-  return stats;
-}
-function v44BlockInWindows(block, windows){ return (Array.isArray(windows)?windows:[]).some(w=>Number(block)>=Number(w.fromBlock||0) && Number(block)<=Number(w.toBlock||0)); }
-async function v44BuildOverdrive(model){
-  const ci=model.signalBrain?.contractIntel||{};
-  const transfers=Array.isArray(ci.transfers)?ci.transfers:[];
-  const actors=uniq([state.settings.focusWallet||'', state.settings.focusSpender||'', state.settings.focusCore||'', state.settings.focusNexus||'', ...((model.spenderLab||[]).slice(0,8).map(x=>x.address)), ...((model.candidates||[]).slice(0,8).map(x=>x.address)), ...((state.settings.anchors||[]).map(x=>x.address))].filter(Boolean), x=>norm(x));
-  const actorSet=new Set(actors.map(norm));
-  const selected=uniq(transfers.filter(t=>actorSet.has(norm(t.from)) || actorSet.has(norm(t.to)) || Number(t.amount||0)>=5000), x=>x.tx).slice(0, state.deepMode ? 14 : 9);
-  const grouped=new Map(); transfers.forEach(t=>{ if(!t?.tx) return; if(!grouped.has(t.tx)) grouped.set(t.tx, []); grouped.get(t.tx).push(t); });
-  let multiEdge=0, focusRoute=0, windowAligned=0, directPath=0;
-  const receiptRows=[], traceRows=[];
-  for(const sel of selected){
-    const group=grouped.get(sel.tx)||[];
-    if(group.length>=2) multiEdge++;
-    const groupActors=new Set(group.flatMap(g=>[norm(g.from), norm(g.to)]).filter(a=>actorSet.has(a)));
-    if(groupActors.size>=2) focusRoute++;
-    if(v44BlockInWindows(sel.block, model.windows||[])) windowAligned++;
-    if(group.some(g=>norm(g.from)===norm(state.settings.focusWallet||'') && (norm(g.to)===norm(state.settings.focusSpender||'') || norm(g.to)===norm(state.settings.focusCore||'')))) directPath++;
-    const receipt=await getTxReceipt(sel.tx).catch(()=>null);
-    if(receipt){ const edges=v44ReceiptTransferEdges(receipt); const edgeActors=uniq(edges.flatMap(e=>[e.from,e.to]).filter(a=>actorSet.has(norm(a))), x=>norm(x)); receiptRows.push({hash:sel.tx, block:sel.block, edgeCount:edges.length, actorCount:edgeActors.length, window:v44BlockInWindows(sel.block, model.windows||[])}); }
-  }
-  const traceTargets=selected.slice(0, state.deepMode ? 6 : 3);
-  let sstore=0, delegatecall=0, slotNeedles=0, traceSuccess=0;
-  for(const sel of traceTargets){
-    const tr=await traceTx(sel.tx).catch(()=>null); if(!tr) continue; traceSuccess++; const stats=v44TraceStats(tr); sstore+=stats.sstore; delegatecall+=stats.delegatecall; slotNeedles+=stats.slotNeedles; traceRows.push({hash:sel.tx, block:sel.block, sstore:stats.sstore, delegatecall:stats.delegatecall, slotNeedles:stats.slotNeedles});
-  }
-  const rows=[
-    {label:'F-22 mode', value:state.settings.f44Overdrive===false?'limited':'engaged', hint:'Deep sweeps run every cycle, scan depth is widened, and strike analysis samples receipts/traces around focus actors.', cls:state.settings.f44Overdrive===false?'warn':'good'},
-    {label:'Selected strike tx', value:String(selected.length), hint:selected.length?'Highest-value transfer groups touching focus actors / large manifold flows.':'No qualifying tx groups were selected this cycle.', cls:selected.length?'info':'warn'},
-    {label:'Multi-edge tx groups', value:String(multiEdge), hint:'Counts pDAI tx hashes with at least two transfer edges in the sampled live set.', cls:multiEdge?'good':'warn'},
-    {label:'Focus-route closures', value:String(focusRoute), hint:'Sampled tx groups touching two or more focus actors / promoted candidates.', cls:focusRoute?'good':'warn'},
-    {label:'Window-aligned strike tx', value:String(windowAligned), hint:'How many selected strike tx groups landed inside loaded timing windows.', cls:windowAligned?'good':'info'},
-    {label:'Direct wallet/core path hits', value:String(directPath), hint:'Strict hits where the focus wallet directly fed the focus spender or core in the sampled live set.', cls:directPath?'good':'warn'},
-    {label:'Receipt triangulation', value:String(receiptRows.length), hint:receiptRows.length?'Receipts were sampled to verify multi-edge route closure at tx level.':'No receipt triangulation completed on this cycle.', cls:receiptRows.length?'info':'warn'},
-    {label:'Trace deep dives', value:`${traceSuccess} tx • SSTORE ${sstore} • DELEGATECALL ${delegatecall}`, hint:slotNeedles?`Slot needles detected ${slotNeedles} time(s) in sampled traces.`:'Trace scans did not expose 7b12/0968 needles in sampled paths.', cls:traceSuccess?'info':'warn'}
-  ];
-  const score=clamp(Math.min(multiEdge/6,0.18)+Math.min(focusRoute/5,0.2)+Math.min(windowAligned/4,0.14)+Math.min(directPath/2,0.14)+Math.min(receiptRows.length/6,0.12)+Math.min(traceSuccess/4,0.08)+Math.min(sstore/20,0.08)+Math.min(delegatecall/10,0.04)+(slotNeedles?0.04:0),0,1);
-  const summary=selected.length ? `F-22 overdrive sampled ${selected.length} strike tx group(s), ${receiptRows.length} receipt(s), and ${traceSuccess} trace(s). Focus-route closure is ${focusRoute}, window-aligned strike tx ${windowAligned}, direct wallet/core path hits ${directPath}.` : 'F-22 overdrive did not find enough high-value strike tx groups in the current sampled set.';
-  return {score, rows, selected, receiptRows, traceRows, summary, focusRoute, windowAligned, directPath};
-}
-function v44BuildStrikePackage(model, overdrive, videoLab){
-  const tasks=[];
-  if(state.settings.f44Overdrive!==false) tasks.push('Keep F-22 mode hot and force deep sweeps every cycle.');
-  if(model.slotProbe?.allZero!==false) tasks.push('Stay hard-gated on 7b12 / 0968 until a real slot wake appears.');
-  if((overdrive.directPath||0)===0) tasks.push('Prioritize tx groups that could close a direct focus wallet → spender/core pull-path.');
-  if((overdrive.windowAligned||0)===0 && (model.windows||[]).length) tasks.push('Drive receipts/traces through loaded timing windows until at least one strike tx aligns cleanly.');
-  if((videoLab.score||0)>0.2) tasks.push('Cross-reference extracted video/transcript terms against governance, absorber, and shell-ignition lanes without auto-promoting them to closure.');
-  if(!((model.reserveArchaeology||[]).some(x=>x.status==='reactive'))) tasks.push('Widen anchor shock hunting until reserve motion overlaps a priority window.');
-  return {rows:tasks.slice(0,8), summary:tasks.length?`Strike package built ${tasks.length} next-step task(s).`:'Strike package is waiting for stronger live inputs.'};
-}
-async function applyV44Upgrade(baseModel){
-  const overdrive=await v44BuildOverdrive(baseModel);
-  const videoLab=v44BuildVideoLab(baseModel);
-  const strike=v44BuildStrikePackage(baseModel, overdrive, videoLab);
-  baseModel.v44={overdrive, videoLab, strike, summary:'V44 adds local video-lab extraction and F-22 overdrive strike analysis on top of proof-gated V43 logic.'};
-  baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V44 video-lab', value:videoLab.rows[0]?.value || 'idle', hint:videoLab.summary, cls:videoLab.score>.22?'info':'warn'}, {label:'V44 F-22 overdrive', value:pct(overdrive.score||0), hint:overdrive.summary, cls:state.settings.f44Overdrive===false?'warn':(overdrive.score>.45?'good':'info')}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V44 adds client-side media extraction, source-grade cue hygiene, and receipt/trace strike analysis.`};
-  baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'Video-lab extraction', kind:'soft', score:videoLab.score||0, status:videoLab.score>.22?'observed':'watching', why:videoLab.summary}, {name:'F-22 strike analysis', kind:'soft', score:overdrive.score||0, status:overdrive.focusRoute>0?'observed':'watching', why:overdrive.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V44 adds local video/transcript extraction and strike-level tx cross-reference without lowering the proof gate.`};
-  baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[videoLab.summary, overdrive.focusRoute?`F-22 strike analysis found ${overdrive.focusRoute} sampled focus-route closure(s).`:'' ].filter(Boolean),28), disconfirm:v40AppendUniqueText(baseModel.clarifier?.disconfirm,[videoLab.rows.find(r=>String(r.label).toLowerCase().includes('remote auto-watch'))?.hint||'', (baseModel.slotProbe?.allZero?'Watched slots remain null-null, so even F-22 overdrive cannot upgrade pressure into formal execution yet.':'')].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...strike.rows],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V44 video ${videoLab.score?pct(videoLab.score):'idle'} • F-22 ${pct(overdrive.score||0)} • route ${overdrive.focusRoute||0} • direct ${overdrive.directPath||0}.`};
-  baseModel.version='V44.0 F-22 Video Overdrive Auditor';
-  return baseModel;
-}
-const __buildModelV44 = buildModel;
-buildModel = async function(){ const model = await __buildModelV44(); return await applyV44Upgrade(model); };
-function v44RenderPanel(model){
-  v44EnsureUi();
-  const video=(model&&model.v44&&model.v44.videoLab) ? model.v44.videoLab : v44BuildVideoLab(model||{});
-  const overdrive=(model&&model.v44&&model.v44.overdrive) ? model.v44.overdrive : {rows:[{label:'F-22 mode', value:state.settings.f44Overdrive===false?'limited':'engaged', hint:'Waiting for a live sync to populate strike analysis.', cls:'info'}], summary:'Waiting for live sync.'};
-  const strike=(model&&model.v44&&model.v44.strike) ? model.v44.strike : {rows:['Run a live sync to populate the strike package.'], summary:'Waiting for live sync.'};
-  const btn=document.getElementById('v44ModeBtn'); if(btn) btn.textContent=state.settings.f44Overdrive===false?'Enable F-22 overdrive':'F-22 overdrive on';
-  clearEl($('v44VideoList')); video.rows.forEach(r=>pushItem($('v44VideoList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
-  clearEl($('v44OverdriveList')); overdrive.rows.forEach(r=>pushItem($('v44OverdriveList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
-  clearEl($('v44StrikeList')); (strike.rows||[]).forEach(t=>pushItem($('v44StrikeList'), t, 'info'));
-  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V44.0 F-22 Video Overdrive Auditor';
-  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V44.0 upgrades your attached V43.x tool in place: stricter cue hygiene, local video/transcript extraction, client-side scene/silence analysis, and far more aggressive on-chain strike correlation with receipt/trace sampling. Formal execution remains hard-gated by real chain closure.';
-  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V43.x code in place</div><div class="chip info">Adds local video / transcript extraction</div><div class="chip warn">Adds F-22 overdrive receipts + traces</div><div class="chip bad">Keeps governance / blueprint theories proof-gated behind chain closure</div>';
-}
-const __renderV44 = render;
-render = function(model){ __renderV44(model); v44RenderPanel(model); };
-async function v44AnalyzeSelectedFile(file){
-  if(!file) return;
-  const lower=String(file.name||'').toLowerCase(); let intel=null;
-  if(/\.(srt|vtt|txt|md|json)$/i.test(lower) || String(file.type||'').startsWith('text/')) intel=v44TranscriptIntel(await file.text(), file.name);
-  else if(String(file.type||'').startsWith('video/') || String(file.type||'').startsWith('audio/') || /\.(mp4|mov|webm|mkv|mp3|wav|m4a|aac)$/i.test(lower)) intel=await v44AnalyzeVideoBlob(file);
-  else throw new Error('Unsupported media/transcript type for video-lab');
-  state.videoIntel=intel; v44SaveVideoIntel(intel);
-  if(intel.corpus){ const existing=String(state.settings.researchCorpus||''); if(!existing.includes(intel.corpus.slice(0,96))){ state.settings.researchCorpus=[existing, intel.corpus].filter(Boolean).join('\n\n'); saveSettings(); try{ pushSettings(); }catch{} } }
-  await sync();
-}
-async function v44DigestTranscriptPaste(){
-  const area=document.getElementById('v44TranscriptPaste'); const txt=String(area?.value||'').trim(); if(!txt) return;
-  state.videoIntel=v44TranscriptIntel(txt, 'pasted transcript'); v44SaveVideoIntel(state.videoIntel);
-  if(state.videoIntel.corpus){ const existing=String(state.settings.researchCorpus||''); if(!existing.includes(state.videoIntel.corpus.slice(0,96))){ state.settings.researchCorpus=[existing, state.videoIntel.corpus].filter(Boolean).join('\n\n'); saveSettings(); try{ pushSettings(); }catch{} } }
-  await sync();
-}
-function v44EnsureUi(){
-  if(document.getElementById('v44VideoPanel')) return;
-  const wrap=document.querySelector('.wrap'); if(!wrap) return;
-  const host=document.createElement('div'); host.className='tri'; host.id='v44IntelTri';
-  host.innerHTML=`<div class="panel" id="v44VideoPanel"><div class="boxTitle">V44 video-lab / media intake</div><div class="small">Upload a local video, audio file, subtitle file, transcript JSON, or paste transcript text. The tool extracts scene shifts, silence windows, transcript blocks, and blueprint terms client-side. It does not pretend to auto-bypass remote platform restrictions.</div><div class="btns" style="justify-content:flex-start;margin-top:12px"><button id="v44MediaBtn">Analyze local media</button><button id="v44PasteBtn" class="secondary">Digest pasted transcript</button><button id="v44ClearMediaBtn" class="secondary">Clear video-lab</button></div><input id="v44MediaFile" type="file" accept="video/*,audio/*,.srt,.vtt,.txt,.md,.json" style="display:none" /><textarea id="v44TranscriptPaste" placeholder="Paste transcript / subtitle text here if you want blueprint extraction without uploading a file." style="margin-top:10px;min-height:120px"></textarea><div id="v44VideoList" style="margin-top:12px"></div></div><div class="panel"><div class="boxTitle">V44 F-22 overdrive</div><div class="small">Wider scans, deep sweeps every cycle, more aggressive actor expansion, and strike-level receipt / trace triangulation around focus actors and candidate manifolds.</div><div class="btns" style="justify-content:flex-start;margin-top:12px"><button id="v44ModeBtn">F-22 overdrive on</button></div><div id="v44OverdriveList" style="margin-top:12px"></div></div><div class="panel"><div class="boxTitle">V44 strike package</div><div class="small">The engine’s highest-priority next attacks after combining overdrive scans, current chain closure gaps, and any extracted video / transcript blueprint intel.</div><div id="v44StrikeList" style="margin-top:12px"></div></div>`;
-  const firstTri=document.querySelector('.tri'); if(firstTri && firstTri.parentNode===wrap) wrap.insertBefore(host, firstTri); else wrap.appendChild(host);
-  const btns=document.querySelector('.btns'); if(btns && !document.getElementById('v44QuickMediaBtn')){ const quick=document.createElement('button'); quick.id='v44QuickMediaBtn'; quick.className='secondary'; quick.textContent='Video-lab'; btns.insertBefore(quick, btns.firstChild); quick.onclick=()=> document.getElementById('v44MediaFile')?.click(); }
-  document.getElementById('v44MediaBtn').onclick=()=> document.getElementById('v44MediaFile').click();
-  document.getElementById('v44MediaFile').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ const status=document.getElementById('syncStatus'); if(status){ status.textContent='video-lab'; status.className='status info'; } await v44AnalyzeSelectedFile(file); }catch(err){ alert('Video-lab failed: '+(err.message||String(err))); } e.target.value=''; });
-  document.getElementById('v44PasteBtn').onclick=()=> v44DigestTranscriptPaste().catch(err=>alert('Transcript digest failed: '+(err.message||String(err))));
-  document.getElementById('v44ClearMediaBtn').onclick=()=>{ state.videoIntel=null; v44SaveVideoIntel(null); try{ localStorage.removeItem(V44_VIDEO_INTEL_KEY); }catch{}; sync(); };
-  document.getElementById('v44ModeBtn').onclick=()=>{ state.settings.f44Overdrive = state.settings.f44Overdrive===false; state.settings=v44ApplyOverdriveDefaults(state.settings); saveSettings(); try{ pushSettings(); }catch{} sync(); };
-}
-
-
-// ===== V45 AWACS + satellite backend patch =====
-const V45_AWACS_KEY='pdai-v45-awacs-intel';
-function v45LoadAwacsIntel(){ try{ return tryJson(localStorage.getItem(V45_AWACS_KEY), null); }catch{ return null; } }
-function v45SaveAwacsIntel(obj){ try{ if(!obj) localStorage.removeItem(V45_AWACS_KEY); else safeStorageSet(V45_AWACS_KEY, obj, x=>x); }catch{} }
-state.awacsIntel=v45LoadAwacsIntel();
-function v45ApplyDefaults(settings){
-  return {
-    ...settings,
-    awacsBaseUrl: String(settings.awacsBaseUrl||'http://localhost:8787').trim(),
-    awacsTargetUrl: String(settings.awacsTargetUrl||'').trim(),
-    awacsAutoUse: settings.awacsAutoUse===true,
-    rpcTimeoutMs: Number(settings.rpcTimeoutMs||15000)
-  };
-}
-const __loadSettingsV45 = loadSettings;
-loadSettings = function(){ return v45ApplyDefaults(__loadSettingsV45()); };
-state.settings=v45ApplyDefaults(state.settings||{});
-async function v45CallAwacs(path, payload){
-  const base=String(state.settings.awacsBaseUrl||'').trim().replace(/\/$/, '');
-  if(!base) throw new Error('AWACS backend URL is empty');
-  return await postJson(`${base}${path}`, payload||{});
-}
-async function v45UploadAwacs(path, file){
-  const base=String(state.settings.awacsBaseUrl||'').trim().replace(/\/$/, '');
-  if(!base) throw new Error('AWACS backend URL is empty');
-  const fd=new FormData();
-  fd.append('media', file);
-  const res=await fetch(`${base}${path}`, { method:'POST', body:fd });
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-function v45BuildCorpusFromAwacs(intel){
-  const media=intel?.media||{}; const blocks=Array.isArray(media.transcriptBlocks)?media.transcriptBlocks:[]; const terms=((media.summary&&media.summary.topTerms)||[]).slice(0,20).map(x=>x.term||x.label).filter(Boolean);
-  const chunk=blocks.slice(0,40).map(b=>`[${Number(b.startSec||0).toFixed(1)}-${Number(b.endSec||0).toFixed(1)}] ${b.speaker?`(${b.speaker}) `:''}${b.text||''}`).join('\n');
-  return [`AWACS MEDIA INTEL`, media.summary?.title?`Title: ${media.summary.title}`:'', terms.length?`Terms: ${terms.join(', ')}`:'', chunk].filter(Boolean).join('\n');
-}
-function v45MergeAwacsCorpus(intel){
-  const corpus=v45BuildCorpusFromAwacs(intel).trim();
-  if(!corpus) return;
-  const existing=String(state.settings.researchCorpus||'');
-  if(existing.includes(corpus.slice(0,120))) return;
-  state.settings.researchCorpus=[existing, corpus].filter(Boolean).join('\n\n');
-  saveSettings();
-  try{ pushSettings(); }catch{}
-}
-function v45BuildAwacs(model){
-  const intel=state.awacsIntel||{}; const media=intel.media||null; const chain=intel.chain||null;
-  const rows=[];
-  rows.push({label:'Backend', value:String(state.settings.awacsBaseUrl||'unset'), hint:'AWACS backend is used for real transcript intake, OCR, speaker segmentation, and persistent strike indexing.', cls:'info'});
-  rows.push({label:'Media job', value:media?.jobId||'idle', hint:media?.summary?.title || 'No backend media intake has been stored yet.', cls:media?'good':'warn'});
-  rows.push({label:'Transcript blocks', value:`${Array.isArray(media?.transcriptBlocks)?media.transcriptBlocks.length:(media?.summary?.transcriptBlocks||0)}`, hint:'Timed subtitle / transcript blocks indexed by the backend.', cls:media?'good':'warn'});
-  rows.push({label:'OCR frames', value:`${Array.isArray(media?.ocrFrames)?media.ocrFrames.length:(media?.summary?.ocrFrames||0)}`, hint:'Frame OCR samples persisted by AWACS.', cls:(media?.summary?.ocrFrames||0)?'info':'warn'});
-  rows.push({label:'Speaker segments', value:`${Array.isArray(media?.speakerSegments)?media.speakerSegments.length:(media?.summary?.speakerSegments||0)}`, hint:'Speaker segmentation is backend-assisted and persistent.', cls:(media?.summary?.speakerSegments||0)?'info':'warn'});
-  rows.push({label:'Deep strike scan', value:chain?.scanId||'idle', hint:chain?`Blocks ${chain.summary?.fromBlock||'—'}-${chain.summary?.toBlock||'—'} • tx ${chain.summary?.txTouches||0} • logs ${chain.summary?.logHits||0} • traces ${chain.summary?.traceHits||0}`:'No backend strike scan stored yet.', cls:chain?'good':'warn'});
-  const summary = media || chain ? 'V45 AWACS is active: backend media intelligence and persistent chain indexing are available.' : 'V45 AWACS is waiting for backend media or strike results.';
-  const score = ((media?.summary?.transcriptBlocks||0)>0 ? 0.4 : 0) + ((media?.summary?.ocrFrames||0)>0 ? 0.15 : 0) + ((chain?.summary?.txTouches||0)>0 ? 0.25 : 0) + ((chain?.summary?.traceHits||0)>0 ? 0.2 : 0);
-  return {rows, summary, score:clamp(score,0,1)};
-}
-async function v45BuildStrikeFusion(model){
-  const chain=state.awacsIntel?.chain||null; const media=state.awacsIntel?.media||null;
-  const tasks=[];
-  if(!media) tasks.push('Run AWACS YouTube intake or upload a local video so transcript/OCR terms can be fused into blueprint search.');
-  if(media && !(media.summary?.transcriptBlocks>0)) tasks.push('Backend media job did not yield timed transcript blocks; fall back to subtitles, SRT, or a clearer source.');
-  if(!chain) tasks.push('Run a backend deep strike scan to persist tx/log/trace hits around focus actors.');
-  if(chain && (chain.summary?.directWalletToSpender||0)===0) tasks.push('Backend strike scan still has no direct focus wallet → spender touch; widen block span or add extra addresses.');
-  if(chain && (chain.summary?.traceHits||0)===0) tasks.push('Try a tracing-capable RPC so AWACS can capture call-path evidence, not only receipts and logs.');
-  if(model.slotProbe?.allZero!==false) tasks.push('Keep null-null hard gate dominant until 7b12 or 0968 actually wakes.');
-  return {rows:tasks.slice(0,8), summary:tasks.length?`V45 fusion produced ${tasks.length} next-step backend task(s).`:'V45 fusion is satisfied with current backend coverage.'};
-}
-async function applyV45Upgrade(baseModel){
-  const awacs=v45BuildAwacs(baseModel); const fusion=await v45BuildStrikeFusion(baseModel);
-  baseModel.v45={awacs, fusion, summary:'V45 adds a real backend lane for transcript fetching, OCR, speaker segmentation, and persistent chain indexing.'};
-  baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V45 AWACS backend', value: awacs.rows[1]?.value || 'idle', hint:awacs.summary, cls:awacs.score>.45?'good':'info'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V45 adds backend transcript/OCR/speaker/strike indexing.`};
-  baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'AWACS backend', kind:'soft', score:awacs.score||0, status:awacs.score>.45?'observed':'watching', why:awacs.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V45 adds backend media intelligence and persistent strike indexing.`};
-  baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[awacs.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(fusion.rows||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V45 AWACS ${pct(awacs.score||0)}.`};
-  baseModel.version='V45.0 AWACS + Satellite Backend Auditor';
-  return baseModel;
-}
-const __buildModelV45 = buildModel;
-buildModel = async function(){ const model = await __buildModelV45(); return await applyV45Upgrade(model); };
-function v45RenderPanel(model){
-  v45EnsureUi();
-  const awacs=(model&&model.v45&&model.v45.awacs)?model.v45.awacs:v45BuildAwacs(model||{});
-  const fusion=(model&&model.v45&&model.v45.fusion)?model.v45.fusion:{rows:['Run a sync to populate V45 backend fusion tasks.'], summary:'Waiting for sync.'};
-  const baseInput=document.getElementById('v45AwacsBase'); if(baseInput && baseInput.value!==String(state.settings.awacsBaseUrl||'')) baseInput.value=String(state.settings.awacsBaseUrl||'');
-  const urlInput=document.getElementById('v45AwacsUrl'); if(urlInput && !urlInput.value && state.settings.awacsTargetUrl) urlInput.value=state.settings.awacsTargetUrl;
-  clearEl($('v45AwacsList')); awacs.rows.forEach(r=>pushItem($('v45AwacsList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
-  clearEl($('v45FusionList')); (fusion.rows||[]).forEach(t=>pushItem($('v45FusionList'), t, 'info'));
-  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V45.0 AWACS + Satellite Backend Auditor';
-  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V45.0 upgrades your attached V44 tool in place: real backend transcript intake, OCR on sampled frames, speaker segmentation, persistent SQLite indexing, and deeper recent-block strike scans. Formal execution remains hard-gated by real slot / shell / reserve closure.';
-  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V44 code in place</div><div class="chip info">Adds AWACS backend transcript + OCR + speaker ingest</div><div class="chip warn">Adds persistent strike indexing and recall</div><div class="chip bad">Keeps backend blueprint intelligence proof-gated behind chain closure</div>';
-}
-const __renderV45 = render;
-render = function(model){ __renderV45(model); v45RenderPanel(model); };
-async function v45RunYoutubeIntake(){
-  const input=document.getElementById('v45AwacsUrl'); const url=String(input?.value||'').trim(); if(!url) throw new Error('Paste a YouTube URL first');
-  state.settings.awacsTargetUrl=url; saveSettings();
-  const out=await v45CallAwacs('/api/media/youtube-intake', { url });
-  state.awacsIntel={...(state.awacsIntel||{}), media:out}; v45SaveAwacsIntel(state.awacsIntel); v45MergeAwacsCorpus(state.awacsIntel);
-  await sync();
-}
-async function v45RunMediaUpload(file){
-  if(!file) throw new Error('Choose a local media file');
-  const out=await v45UploadAwacs('/api/media/upload', file);
-  state.awacsIntel={...(state.awacsIntel||{}), media:out}; v45SaveAwacsIntel(state.awacsIntel); v45MergeAwacsCorpus(state.awacsIntel);
-  await sync();
-}
-async function v45RunStrikeScan(){
-  const model=state.lastGood||{};
-  const out=await v45CallAwacs('/api/chain/strike', {
-    rpc: state.settings.privateRpc || (Array.isArray(state.settings.rpcs)?state.settings.rpcs[0]:'') || '',
-    target: state.settings.target || '',
-    focusSpender: state.settings.focusSpender || model?.v40?.focus?.spender || '',
-    focusWallet: state.settings.focusWallet || model?.v40?.focus?.wallet || '',
-    focusCore: state.settings.focusCore || model?.v40?.focus?.core || '',
-    focusNexus: state.settings.focusNexus || model?.v42_3?.focusNexus || '',
-    extraAddresses: [model?.v42_3?.focusNexus || '', model?.v40?.focus?.spender || '', model?.v40?.focus?.wallet || ''].filter(Boolean),
-    blockSpan: Math.max(400, Number(state.settings.burstScanBlocks||2200)),
-    maxTx: 180
-  });
-  state.awacsIntel={...(state.awacsIntel||{}), chain:out}; v45SaveAwacsIntel(state.awacsIntel);
-  await sync();
-}
-async function v45CheckHealth(){
-  const base=String(state.settings.awacsBaseUrl||'').trim().replace(/\/$/, ''); if(!base) throw new Error('AWACS backend URL is empty');
-  const res=await fetch(`${base}/api/health`); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json();
-}
-function v45EnsureUi(){
-  if(document.getElementById('v45AwacsPanel')) return;
-  const wrap=document.querySelector('.wrap'); if(!wrap) return;
-  const host=document.createElement('div'); host.className='twocol'; host.id='v45AwacsHost';
-  host.innerHTML=`<div class="panel" id="v45AwacsPanel"><div class="boxTitle">V45 AWACS backend</div><div class="small">Real backend lane for YouTube/subtitle intake, frame OCR, speaker segmentation, persistent SQLite indexing, and deep strike scans.</div><div class="field" style="margin-top:10px"><label>AWACS backend URL</label><input id="v45AwacsBase" placeholder="http://localhost:8787" /></div><div class="field" style="margin-top:10px"><label>YouTube URL</label><input id="v45AwacsUrl" placeholder="Paste a concrete YouTube URL for transcript intake" /></div><div class="btns" style="justify-content:flex-start;margin-top:12px"><button id="v45HealthBtn" class="secondary">Check backend</button><button id="v45YoutubeBtn">YouTube intake</button><button id="v45UploadBtn" class="secondary">Upload to AWACS</button><button id="v45StrikeBtn" class="secondary">Deep strike scan</button><button id="v45ClearBtn" class="secondary">Clear AWACS</button></div><input id="v45UploadFile" type="file" accept="video/*,audio/*,.srt,.vtt,.txt,.md,.json" style="display:none" /><div id="v45AwacsList" style="margin-top:12px"></div></div><div class="panel"><div class="boxTitle">V45 backend fusion tasks</div><div class="small">What the backend should hunt next after transcript, OCR, speaker, and chain indexing are combined with the existing cockpit logic.</div><div id="v45FusionList" style="margin-top:12px"></div></div>`;
-  const existing=document.getElementById('v44IntelTri'); if(existing && existing.parentNode===wrap) wrap.insertBefore(host, existing.nextSibling); else wrap.appendChild(host);
-  const baseInput=document.getElementById('v45AwacsBase');
-  baseInput.value=String(state.settings.awacsBaseUrl||'');
-  baseInput.addEventListener('change', ()=>{ state.settings.awacsBaseUrl=String(baseInput.value||'').trim(); saveSettings(); try{ pushSettings(); }catch{} sync(); });
-  document.getElementById('v45HealthBtn').onclick=async ()=>{ try{ const health=await v45CheckHealth(); alert(`AWACS ok\nTools: yt-dlp=${health.tools?.ytDlp?'yes':'no'}, ffmpeg=${health.tools?.ffmpeg?'yes':'no'}, tesseract=${health.tools?.tesseract?'yes':'no'}, python3=${health.tools?.python3?'yes':'no'}`); }catch(err){ alert('AWACS health failed: '+(err.message||String(err))); } };
-  document.getElementById('v45YoutubeBtn').onclick=()=> v45RunYoutubeIntake().catch(err=>alert('YouTube intake failed: '+(err.message||String(err))));
-  document.getElementById('v45UploadBtn').onclick=()=> document.getElementById('v45UploadFile').click();
-  document.getElementById('v45UploadFile').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ await v45RunMediaUpload(file); }catch(err){ alert('Upload to AWACS failed: '+(err.message||String(err))); } e.target.value=''; });
-  document.getElementById('v45StrikeBtn').onclick=()=> v45RunStrikeScan().catch(err=>alert('Deep strike scan failed: '+(err.message||String(err))));
-  document.getElementById('v45ClearBtn').onclick=()=>{ state.awacsIntel=null; v45SaveAwacsIntel(null); sync(); };
-}
-
-// ===== V46 single-html integrated AWACS / war-room patch =====
-const V46_LOCAL_KEY='pdai-v46-single-awacs';
-function v46LoadLocal(){ try{ return tryJson(localStorage.getItem(V46_LOCAL_KEY), null) || {mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; }catch{ return {mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; } }
-function v46SaveLocal(obj){ try{ safeStorageSet(V46_LOCAL_KEY, obj||{mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}, x=>x); }catch{} }
-state.v46Local=v46LoadLocal();
-function v46Uid(prefix='v46'){ return `${prefix}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2,8)}`; }
-function v46ConcreteUrl(url){ return /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/|clip\/)|youtu\.be\/|x\.com\/[^\/\s?#]+\/status\/|twitter\.com\/[^\/\s?#]+\/status\/|t\.me\/[^\/\s?#]+\/\d+)/i.test(String(url||'')); }
-function v46SourceGrade(url){ const info=v44SeedUrlInfo(url||''); if(v46ConcreteUrl(url)) return 'concrete'; if(info.seed) return 'source-coverage'; return url ? 'external-ref' : 'local'; }
-function v46CompactMedia(rec){
-  if(!rec) return null;
-  return { id:rec.id||v46Uid('media'), createdAt:rec.createdAt||Date.now(), label:rec.label||'media', kind:rec.kind||'media',
-    sourceUrl:rec.sourceUrl||'', sourceGrade:rec.sourceGrade||v46SourceGrade(rec.sourceUrl||''), summary:rec.summary||'',
-    blockCount:Number(rec.blockCount||0), sceneCount:Number(rec.sceneCount||0), durationSec:Number(rec.durationSec||0),
-    topTerms:Array.isArray(rec.topTerms)?rec.topTerms.slice(0,18):[], blocks:Array.isArray(rec.blocks)?rec.blocks.slice(0,120):[],
-    cues:Array.isArray(rec.cues)?rec.cues.slice(0,120):[], topScenes:Array.isArray(rec.topScenes)?rec.topScenes.slice(0,24):[],
-    audio:rec.audio||null, corpus:String(rec.corpus||'').slice(0,180000)
-  };
-}
-function v46LocalCurrentMedia(){ const box=state.v46Local||{}; return (box.mediaJobs||[]).find(x=>x.id===box.currentMediaId) || (box.mediaJobs||[])[0] || null; }
-function v46LocalCurrentChain(){ const box=state.v46Local||{}; return (box.chainScans||[]).find(x=>x.id===box.currentChainId) || (box.chainScans||[])[0] || null; }
-function v46StoreMedia(rec){
-  const box=state.v46Local||{mediaJobs:[], chainScans:[]};
-  const compact=v46CompactMedia(rec);
-  box.mediaJobs=[compact, ...(Array.isArray(box.mediaJobs)?box.mediaJobs:[]).filter(x=>x.id!==compact.id)].slice(0,12);
-  box.currentMediaId=compact.id;
-  state.v46Local=box; v46SaveLocal(box);
-  if(compact.corpus){
-    const existing=String(state.settings.researchCorpus||'');
-    const needle=String(compact.corpus||'').slice(0,160);
-    if(needle && !existing.includes(needle)){
-      state.settings.researchCorpus=[existing, compact.corpus].filter(Boolean).join('\n\n');
-      saveSettings(); try{ pushSettings(); }catch{}
-    }
-  }
-}
-function v46StoreChain(rec){
-  const box=state.v46Local||{mediaJobs:[], chainScans:[]};
-  box.chainScans=[rec, ...(Array.isArray(box.chainScans)?box.chainScans:[]).filter(x=>x.id!==rec.id)].slice(0,12);
-  box.currentChainId=rec.id;
-  state.v46Local=box; v46SaveLocal(box);
-}
-function v46MigrateLegacy(){
-  const box=state.v46Local||{mediaJobs:[], chainScans:[]};
-  let changed=false;
-  if(state.videoIntel && !(box.mediaJobs||[]).length){ v46StoreMedia(Object.assign({id:v46Uid('legacy-media')}, state.videoIntel)); changed=true; }
-  const aw=state.awacsIntel||{};
-  if(aw.media && !(box.mediaJobs||[]).some(x=>String(x.summary||'')===String(aw.media.summary?.title||'') || x.id===aw.media.jobId)){
-    const legacy={id:aw.media.jobId||v46Uid('legacy-awacs-media'), kind:'transcript', label:aw.media.summary?.title||'AWACS media', sourceUrl:aw.media.summary?.url||state.settings.awacsTargetUrl||'', sourceGrade:v46SourceGrade(aw.media.summary?.url||state.settings.awacsTargetUrl||''), summary:'Imported legacy AWACS media job into single-html local engine.', blockCount:Array.isArray(aw.media.transcriptBlocks)?aw.media.transcriptBlocks.length:Number(aw.media.summary?.transcriptBlocks||0), topTerms:Array.isArray(aw.media.summary?.topTerms)?aw.media.summary.topTerms:[], blocks:Array.isArray(aw.media.transcriptBlocks)?aw.media.transcriptBlocks.slice(0,120):[], corpus:v45MediaToCorpus(aw.media)};
-    v46StoreMedia(legacy); changed=true;
-  }
-  if(aw.chain && !(box.chainScans||[]).some(x=>x.id===aw.chain.scanId)){
-    const legacyChain={id:aw.chain.scanId||v46Uid('legacy-chain'), createdAt:Date.now(), summary:aw.chain.summary||{}, rows:[`Imported legacy AWACS chain scan ${aw.chain.scanId||''}.`], routeFamilies:[], replay:[], score:0.2};
-    v46StoreChain(legacyChain); changed=true;
-  }
-  if(changed) state.v46Local=v46LoadLocal();
-}
-v46MigrateLegacy();
-async function v46AnalyzeFile(file, sourceUrl=''){
-  const url=String(sourceUrl||'').trim();
-  const name=String(file?.name||'media');
-  const low=name.toLowerCase();
-  let rec;
-  if(/\.(srt|vtt|txt|md|json)$/i.test(low) || /^text\//i.test(String(file.type||'')) || /json/i.test(String(file.type||''))){
-    const raw=await file.text();
-    rec=v44TranscriptIntel(raw, name, {url});
-  }else if(/^audio\//i.test(String(file.type||'')) || /^video\//i.test(String(file.type||''))){
-    rec=await v44AnalyzeVideoBlob(file, {url});
-  }else{
-    throw new Error('Unsupported file type for integrated AWACS local engine.');
-  }
-  rec.id=v46Uid('media');
-  rec.sourceUrl=url;
-  rec.sourceGrade=v46SourceGrade(url);
-  rec.summary=`${rec.summary} Source grade: ${rec.sourceGrade}.`;
-  v46StoreMedia(rec);
-  return rec;
-}
-async function v46DigestPaste(url, raw){
-  const text=String(raw||'').trim(); if(!text) throw new Error('Paste transcript text first.');
-  const label=url ? `Pasted transcript • ${url}` : 'Pasted transcript';
-  const rec=v44TranscriptIntel(text, label, {url});
-  rec.id=v46Uid('paste'); rec.sourceUrl=String(url||'').trim(); rec.sourceGrade=v46SourceGrade(rec.sourceUrl); rec.summary=`${rec.summary} Source grade: ${rec.sourceGrade}.`;
-  v46StoreMedia(rec); return rec;
-}
-function v46PairKey(a,b){ return `${norm(a)}>${norm(b)}`; }
-function v46BuildRouteFamilies(transfers, windows){
-  const groups=new Map();
-  (Array.isArray(transfers)?transfers:[]).forEach(t=>{ if(!t?.tx) return; if(!groups.has(t.tx)) groups.set(t.tx, []); groups.get(t.tx).push(t); });
-  const fam=new Map();
-  const actorHot=new Set([norm(state.settings.focusWallet||''), norm(state.settings.focusSpender||''), norm(state.settings.focusCore||''), norm(state.settings.focusNexus||'')].filter(Boolean));
-  for(const [tx,rows] of groups.entries()){
-    if(rows.length<2) continue;
-    const edges=rows.slice(0,5).map(r=>v46PairKey(r.from,r.to));
-    const uniqEdges=[...new Set(edges)];
-    const signature=uniqEdges.slice(0,3).join(' || ');
-    if(!signature) continue;
-    const hit=rows.some(r=>actorHot.has(norm(r.from))||actorHot.has(norm(r.to)));
-    const windowHit=rows.some(r=>v44BlockInWindows(r.block, windows||[]));
-    const vol=rows.reduce((s,r)=>s+Math.abs(Number(r.amount||0)),0);
-    const cur=fam.get(signature)||{signature, txCount:0, volume:0, windowHits:0, hotHits:0, sampleTx:tx};
-    cur.txCount+=1; cur.volume+=vol; if(windowHit) cur.windowHits+=1; if(hit) cur.hotHits+=1; fam.set(signature, cur);
-  }
-  return [...fam.values()].sort((a,b)=>(b.hotHits*4+b.windowHits*2+b.txCount+b.volume/50000)-(a.hotHits*4+a.windowHits*2+a.txCount+a.volume/50000)).slice(0,12);
-}
-function v46BuildReplay(transfers, windows){
-  const out=[];
-  const txSeen=new Set();
-  (Array.isArray(windows)?windows:[]).forEach((w,idx)=>{
-    const rows=(Array.isArray(transfers)?transfers:[]).filter(t=>Number(t.block)>=Number(w.fromBlock||0) && Number(t.block)<=Number(w.toBlock||0));
-    const txs=[...new Set(rows.map(r=>r.tx).filter(Boolean))];
-    txs.forEach(x=>txSeen.add(x));
-    const hotRows=rows.filter(r=>[state.settings.focusWallet,state.settings.focusSpender,state.settings.focusCore,state.settings.focusNexus].map(norm).includes(norm(r.from)) || [state.settings.focusWallet,state.settings.focusSpender,state.settings.focusCore,state.settings.focusNexus].map(norm).includes(norm(r.to)));
-    out.push({id:w.id||`w:${idx}`, label:w.title||w.windowKind||`window ${idx+1}`, fromBlock:w.fromBlock, toBlock:w.toBlock, txCount:txs.length, hitCount:rows.length, hotHits:hotRows.length, volume:rows.reduce((s,r)=>s+Math.abs(Number(r.amount||0)),0)});
-  });
-  return out.sort((a,b)=>(b.hotHits*5+b.txCount*2+b.volume/50000)-(a.hotHits*5+a.txCount*2+a.volume/50000)).slice(0,10);
-}
-function v46BuildClusterIndex(transfers){
-  const byAddr=new Map();
-  (Array.isArray(transfers)?transfers:[]).forEach(t=>{
-    [t.from,t.to].forEach(addr=>{ const a=norm(addr); if(!a) return; const cur=byAddr.get(a)||{address:a,touches:0,partners:new Set(),volume:0}; cur.touches+=1; cur.volume+=Math.abs(Number(t.amount||0)||0); cur.partners.add(norm(t.from)===a?norm(t.to):norm(t.from)); byAddr.set(a,cur); });
-  });
-  return [...byAddr.values()].map(r=>({address:r.address,touches:r.touches,partners:r.partners.size,volume:r.volume,score:clamp(Math.min(r.touches/40,0.45)+Math.min(r.partners.size/18,0.35)+Math.min(r.volume/100000,0.2),0,1)})).sort((a,b)=>b.score-a.score).slice(0,12);
-}
-async function v46RunIntegratedStrike(model){
-  const m=model||state.lastGood||{};
-  const ci=m.signalBrain?.contractIntel||{};
-  const transfers=Array.isArray(ci.transfers)?ci.transfers:[];
-  const windows=Array.isArray(m.windows)?m.windows:[];
-  const grouped=new Map(); transfers.forEach(t=>{ if(!t?.tx) return; if(!grouped.has(t.tx)) grouped.set(t.tx, []); grouped.get(t.tx).push(t); });
-  const focusWallet=norm(state.settings.focusWallet||''); const focusSpender=norm(state.settings.focusSpender||''); const focusCore=norm(state.settings.focusCore||''); const focusNexus=norm(state.settings.focusNexus||'');
-  let directWalletToSpender=0, directWalletToCore=0, viaNexus=0, txTouches=0;
-  for(const [tx,rows] of grouped.entries()){
-    const touches=rows.some(r=>[focusWallet,focusSpender,focusCore,focusNexus].includes(norm(r.from)) || [focusWallet,focusSpender,focusCore,focusNexus].includes(norm(r.to)));
-    if(touches) txTouches++;
-    if(rows.some(r=>norm(r.from)===focusWallet && norm(r.to)===focusSpender)) directWalletToSpender++;
-    if(rows.some(r=>norm(r.from)===focusWallet && norm(r.to)===focusCore)) directWalletToCore++;
-    if(rows.some(r=>norm(r.from)===focusNexus && (norm(r.to)===focusSpender || norm(r.to)===focusCore))) viaNexus++;
-  }
-  const routeFamilies=v46BuildRouteFamilies(transfers, windows);
-  const replay=v46BuildReplay(transfers, windows);
-  const clusters=v46BuildClusterIndex(transfers);
-  const overdrive=m.v44?.overdrive || {selected:[], receiptRows:[], traceRows:[], focusRoute:0, windowAligned:0, directPath:0};
-  const summary={
-    fromBlock:ci.fromBlock||'—', toBlock:(m.chain?.latestBlock||m.latestBlock||'—'), txTouches, logHits:ci.logsCount||0, traceHits:(overdrive.traceRows||[]).length,
-    directWalletToSpender, directWalletToCore, viaNexus, routeFamilies:routeFamilies.length, replayWindows:replay.length
-  };
-  const rows=[
-    `Integrated strike scan touched ${txTouches} tx group(s) across blocks ${summary.fromBlock}-${summary.toBlock}.`,
-    `Direct wallet → spender hits: ${directWalletToSpender}. Direct wallet → core hits: ${directWalletToCore}. Nexus relay hits: ${viaNexus}.`,
-    `Route families indexed: ${routeFamilies.length}. Replay windows ranked: ${replay.length}. Cluster rows: ${clusters.length}.`,
-    `Trace carry-over from live overdrive: ${(overdrive.traceRows||[]).length} sampled tx with ${overdrive.focusRoute||0} focus-route closure(s).`
-  ];
-  const score=clamp(Math.min(txTouches/18,0.24)+Math.min(routeFamilies.length/8,0.18)+Math.min(replay.filter(x=>x.hotHits>0).length/5,0.16)+Math.min((overdrive.focusRoute||0)/5,0.14)+Math.min(directWalletToSpender/2,0.14)+Math.min(viaNexus/2,0.1)+((m.slotProbe?.allZero===false)?0.04:0),0,1);
-  const rec={id:v46Uid('chain'), createdAt:Date.now(), summary, rows, score, routeFamilies, replay, clusters};
-  v46StoreChain(rec); return rec;
-}
-function v46BuildIntegratedAwacs(model){
-  const media=v46LocalCurrentMedia(); const chain=v46LocalCurrentChain();
-  const rows=[];
-  rows.push({label:'Engine mode', value:'single-html integrated', hint:'Media extraction, persistence, replay, and strike indexing run inside this HTML without a separate backend.', cls:'good'});
-  rows.push({label:'Media job', value:media?media.label:'idle', hint:media?media.summary:'No integrated media job stored yet.', cls:media?'good':'warn'});
-  rows.push({label:'Source grade', value:media?media.sourceGrade:'—', hint:'Concrete sources can seed blueprint lanes; source-coverage URLs do not become timing windows by themselves.', cls:media && media.sourceGrade==='concrete' ? 'good' : 'warn'});
-  rows.push({label:'Transcript blocks', value:String(media?.blockCount||0), hint:'Timed blocks parsed locally from uploaded subtitle / transcript material.', cls:(media?.blockCount||0)?'info':'warn'});
-  rows.push({label:'Scene shifts', value:String(media?.sceneCount||0), hint:'Sampled from local video uploads.', cls:(media?.sceneCount||0)?'info':'warn'});
-  rows.push({label:'Integrated strike scan', value:chain?chain.id:'idle', hint:chain?`tx ${chain.summary.txTouches||0} • route families ${chain.summary.routeFamilies||0} • replay windows ${chain.summary.replayWindows||0}`:'Run integrated strike scan to index recent tx families locally.', cls:chain?'good':'warn'});
-  const score=clamp((media?0.22:0)+(Math.min((media?.blockCount||0)/40,0.18))+(Math.min((media?.sceneCount||0)/8,0.08))+(chain?0.22:0)+(Math.min((chain?.summary?.routeFamilies||0)/8,0.15))+(Math.min((chain?.summary?.replayWindows||0)/6,0.1))+(Math.min((chain?.summary?.directWalletToSpender||0)/2,0.05)),0,1);
-  const summary=media||chain ? 'V46 integrated AWACS local engine is active: persistent local media intelligence and chain indexing are running inside one HTML.' : 'V46 integrated AWACS local engine is idle.';
-  return {rows, score, summary, media, chain};
-}
-function v46BuildWarRoom(model){
-  const media=v46LocalCurrentMedia(); const chain=v46LocalCurrentChain();
-  const flash=model.v42_9?.gravity?.flashPct || model.v43?.audit?.flashPct || 0;
-  const routeFamilies=Array.isArray(chain?.routeFamilies)?chain.routeFamilies:[];
-  const replay=Array.isArray(chain?.replay)?chain.replay:[];
-  const clusters=Array.isArray(chain?.clusters)?chain.clusters:[];
-  const rows=[];
-  rows.push({label:'Flashpoint', value:flash?`${flash.toFixed(3)}% core`:'watching', hint:'Gravity remains structural pressure, not discharge proof.', cls:(flash>0 && flash<1)?'good':'warn'});
-  rows.push({label:'Null-null gate', value:model.slotProbe?.allZero===false?'awake':'still null-null', hint:model.slotProbe?.allZero===false?'Watched slots are no longer both zero.':'7b12 / 0968 still cap formal execution.', cls:model.slotProbe?.allZero===false?'good':'bad'});
-  rows.push({label:'Deterministic route families', value:String(routeFamilies.length), hint:routeFamilies[0]?`${routeFamilies[0].signature} • tx ${routeFamilies[0].txCount} • hot ${routeFamilies[0].hotHits}`:'No repeated multi-edge families indexed yet.', cls:routeFamilies.length?'good':'warn'});
-  rows.push({label:'Window replay board', value:String(replay.length), hint:replay[0]?`${replay[0].label} • hot ${replay[0].hotHits} • tx ${replay[0].txCount}`:'No replay board yet.', cls:replay.length?'info':'warn'});
-  rows.push({label:'Cluster pressure', value:String(clusters.length), hint:clusters[0]?`${clusters[0].address.slice(0,10)}… • score ${pct(clusters[0].score||0)} • partners ${clusters[0].partners}`:'No cluster index built yet.', cls:clusters.length?'info':'warn'});
-  rows.push({label:'Video / transcript fusion', value:media?`${media.kind} • ${media.sourceGrade}`:'idle', hint:media?.topTerms?.length?`Top terms: ${media.topTerms.slice(0,5).map(x=>x.label+'×'+x.count).join(', ')}`:'No extracted blueprint terms persisted yet.', cls:media?'info':'warn'});
-  const tasks=[];
-  if(!media) tasks.push('Upload local video/audio/subtitles or paste transcript text tied to a concrete source URL if you want media-derived blueprint terms.');
-  if(media && media.sourceGrade!=='concrete') tasks.push('Current media source grade is not concrete. Keep it in coverage / blueprint lanes instead of timing proof.');
-  if(!chain) tasks.push('Run integrated strike scan to build deterministic route families and a replay board inside this HTML.');
-  if(chain && !(chain.summary?.directWalletToSpender>0 || chain.summary?.viaNexus>0)) tasks.push('Strike index still has no direct wallet→spender or nexus relay closure; widen block span by refreshing again after more live history accumulates.');
-  if(!(routeFamilies.some(r=>r.windowHits>0))) tasks.push('Drive repeated route families into timing windows before upgrading choreography claims.');
-  if(model.slotProbe?.allZero!==false) tasks.push('Keep 7b12 / 0968 null-null hard gate dominant until real state mutation appears.');
-  if((model.signalBrain?.contractIntel?.approvalCount||0)<1) tasks.push('Approval pulse is quiet; wait for spender markers to re-appear before over-promoting route families.');
-  const summary=tasks.length?`V46 war-room generated ${tasks.length} high-priority proving task(s).`:'V46 war-room has no urgent blockers beyond the standing proof gate.';
-  return {rows, tasks:tasks.slice(0,10), summary};
-}
-async function applyV46Upgrade(baseModel){
-  const integrated=v46BuildIntegratedAwacs(baseModel);
-  const war=v46BuildWarRoom(baseModel);
-  baseModel.v46={integrated, war, summary:'V46 folds AWACS functions into a single-html local engine, adds route-family indexing, replay boards, and cluster pressure tracking.'};
-  baseModel.systemAudit={...baseModel.systemAudit, rows:[...(v39SafeArray(baseModel.systemAudit?.rows)), {label:'V46 integrated AWACS', value: pct(integrated.score||0), hint:integrated.summary, cls:integrated.score>.42?'good':'info'}, {label:'V46 war-room', value: war.rows[2]?.value || 'watching', hint:war.summary, cls:(war.rows[2]?.value && war.rows[2].value!=='0')?'good':'warn'}], summary:`${baseModel.systemAudit?.summary||''}${baseModel.systemAudit?.summary?' • ':''}V46 folds the AWACS lane into one HTML and adds deterministic route-family / replay indexing.`};
-  baseModel.evidenceLedger={...baseModel.evidenceLedger, rows:[...(v39SafeArray(baseModel.evidenceLedger?.rows)), {name:'Integrated AWACS local engine', kind:'soft', score:integrated.score||0, status:integrated.media||integrated.chain?'observed':'watching', why:integrated.summary}, {name:'War-room replay / route-family indexing', kind:'soft', score:clamp(((integrated.chain?.summary?.routeFamilies||0)/8)+((integrated.chain?.summary?.replayWindows||0)/10),0,1), status:(integrated.chain?.summary?.routeFamilies||0)?'observed':'watching', why:war.summary}], summary:`${baseModel.evidenceLedger?.summary||''}${baseModel.evidenceLedger?.summary?' • ':''}V46 adds in-browser persistence, route-family replay, and cluster pressure without a separate backend.`};
-  baseModel.clarifier={...baseModel.clarifier, supports:v40AppendUniqueText(baseModel.clarifier?.supports,[integrated.summary].filter(Boolean),28), proveNext:v40AppendUniqueText(baseModel.clarifier?.proveNext,[...(war.tasks||[])],28), hint:`${baseModel.clarifier?.hint||''}${baseModel.clarifier?.hint?' • ':''}V46 single-html ${pct(integrated.score||0)} • route families ${integrated.chain?.summary?.routeFamilies||0} • replay ${integrated.chain?.summary?.replayWindows||0}.`};
-  baseModel.version='V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
-  return baseModel;
-}
-const __buildModelV46 = buildModel;
-buildModel = async function(){ const model = await __buildModelV46(); return await applyV46Upgrade(model); };
-function v46RenderPanel(model){
-  v46EnsureUi();
-  const integrated=(model&&model.v46&&model.v46.integrated)?model.v46.integrated:v46BuildIntegratedAwacs(model||{});
-  const war=(model&&model.v46&&model.v46.war)?model.v46.war:v46BuildWarRoom(model||{});
-  const media=integrated.media, chain=integrated.chain;
-  document.title='pDAI Peg Prover • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
-  const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V46.7 Quick-Lock Timeout-Bypass War-Room Auditor';
-  const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V46.9 keeps the crash-safe lite quick-lock path, but deep proving now runs as a smaller safe-slice pass instead of a heavier manual burst. Formal execution remains hard-gated by slot / shell / reserve closure.';
-  const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Keeps crash-safe lite quick-lock</div><div class="chip warn">Core deep proving is manual, not automatic</div><div class="chip bad">Still proof-gates governance / media / blueprint pressure behind chain closure</div>';
-  const urlInput=document.getElementById('v46SourceUrl'); if(urlInput && !urlInput.value && media?.sourceUrl) urlInput.value=media.sourceUrl;
-  clearEl($('v46IntegratedList')); integrated.rows.forEach(r=>pushItem($('v46IntegratedList'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
-  clearEl($('v46WarRows')); war.rows.forEach(r=>pushItem($('v46WarRows'), `${r.label}: ${r.value} • ${r.hint}`, r.cls||'info'));
-  clearEl($('v46TaskList')); (war.tasks||[]).forEach(t=>pushItem($('v46TaskList'), t, 'info'));
-  clearEl($('v46FamilyList')); (chain?.routeFamilies||[]).slice(0,8).forEach(r=>pushItem($('v46FamilyList'), `${r.signature} • tx ${r.txCount} • hot ${r.hotHits} • windows ${r.windowHits} • vol ${fmtShort(r.volume)}`, r.hotHits?'good':'info'));
-  clearEl($('v46ReplayList')); (chain?.replay||[]).slice(0,8).forEach(r=>pushItem($('v46ReplayList'), `${r.label}: blocks ${r.fromBlock}-${r.toBlock} • tx ${r.txCount} • hot ${r.hotHits} • vol ${fmtShort(r.volume)}`, r.hotHits?'good':'info'));
-  const v44=document.getElementById('v44IntelTri'); if(v44) v44.style.display='none';
-  const v45=document.getElementById('v45AwacsHost'); if(v45) v45.style.display='none';
-}
-const __renderV46 = render;
-render = function(model){ __renderV46(model); v46RenderPanel(model); };
-function v46EnsureUi(){
-  if(document.getElementById('v46SingleHost')) return;
-  const wrap=document.querySelector('.wrap'); if(!wrap) return;
-  const host=document.createElement('div'); host.className='tri'; host.id='v46SingleHost';
-  host.innerHTML=`<div class="panel"><div class="boxTitle">V46 integrated AWACS local engine</div><div class="small">One-file cockpit mode. Upload local video/audio/subtitles/transcripts, or paste transcript text with a concrete source URL. Media jobs and strike scans persist locally inside the browser.</div><div class="field" style="margin-top:10px"><label>Concrete source URL (optional)</label><input id="v46SourceUrl" placeholder="Paste a concrete YouTube / X / Telegram post URL if you have one" /></div><textarea id="v46TranscriptPaste" placeholder="Paste transcript / subtitle text here for local parsing and blueprint extraction." style="margin-top:10px;min-height:120px"></textarea><div class="btns" style="justify-content:flex-start;margin-top:12px"><button id="v46UploadBtn">Analyze local media</button><button id="v46PasteBtn" class="secondary">Digest pasted transcript</button><button id="v46StrikeBtn" class="secondary">Run integrated strike scan</button><button id="v46ClearBtn" class="secondary">Clear V46 local</button></div><input id="v46UploadFile" type="file" accept="video/*,audio/*,.srt,.vtt,.txt,.md,.json" style="display:none" /><div id="v46IntegratedList" style="margin-top:12px"></div></div><div class="panel"><div class="boxTitle">V46 war-room</div><div class="small">Deterministic route-family scoring, replay-board ranking across loaded windows, cluster pressure, and proving tasks generated from the current live model.</div><div id="v46WarRows" style="margin-top:12px"></div><div class="boxTitle" style="margin-top:14px">War-room tasks</div><div id="v46TaskList" style="margin-top:8px"></div></div><div class="panel"><div class="boxTitle">V46 route families + replay board</div><div class="small">Repeated multi-edge route signatures and top window replays extracted from the current contract-intel transfer set.</div><div class="boxTitle" style="margin-top:12px">Route families</div><div id="v46FamilyList" style="margin-top:8px"></div><div class="boxTitle" style="margin-top:14px">Replay board</div><div id="v46ReplayList" style="margin-top:8px"></div></div>`;
-  const anchor=document.getElementById('v45AwacsHost') || document.getElementById('v44IntelTri');
-  if(anchor && anchor.parentNode===wrap) wrap.insertBefore(host, anchor); else wrap.appendChild(host);
-  document.getElementById('v46UploadBtn').onclick=()=> document.getElementById('v46UploadFile').click();
-  document.getElementById('v46UploadFile').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; try{ await v46AnalyzeFile(file, document.getElementById('v46SourceUrl').value||''); await sync(); }catch(err){ alert('Integrated media analysis failed: '+(err.message||String(err))); } e.target.value=''; });
-  document.getElementById('v46PasteBtn').onclick=async ()=>{ try{ await v46DigestPaste(document.getElementById('v46SourceUrl').value||'', document.getElementById('v46TranscriptPaste').value||''); await sync(); }catch(err){ alert('Transcript digest failed: '+(err.message||String(err))); } };
-  document.getElementById('v46StrikeBtn').onclick=async ()=>{ try{ await v46RunIntegratedStrike(state.lastGood||{}); await sync(); }catch(err){ alert('Integrated strike scan failed: '+(err.message||String(err))); } };
-  document.getElementById('v46ClearBtn').onclick=()=>{ state.v46Local={mediaJobs:[], chainScans:[], currentMediaId:'', currentChainId:''}; v46SaveLocal(state.v46Local); sync(); };
-}
-
-  // ===== V46.8 crash-safe lite-sync patch =====
-  state.deepUnlocked = false;
-  state.manualDeepOnce = false;
-  const __originalSync = sync;
-  function __v468Header(){
-    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V47.0 No-AWACS Core Auditor';
-    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V47.0 removes the integrated AWACS, video-lab, and replay stack from deep proving and reverts the manual deep pass to the lighter pre-AWACS core engine.';
-    const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">Starts in crash-safe lite quick-lock</div><div class="chip warn">Core deep proving is manual, not automatic</div><div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>';
-    const boxTitle=document.querySelector('#settingsBox .boxTitle'); if(boxTitle) boxTitle.textContent='V46.9 safe-slice integrated settings';
-  }
-  function __v468InjectBtn(){
-    const btns=document.querySelector('.panel.grid2 .btns');
-    if(btns && !document.getElementById('deepProveBtn')){
-      const b=document.createElement('button');
-      b.id='deepProveBtn'; b.className='secondary'; b.textContent='Deep prove safe';
-      b.onclick=async ()=>{ state.manualDeepOnce=true; try{ await sync(); }catch(err){ console.error(err); } };
-      btns.insertBefore(b, btns.firstChild);
-    }
-  }
-  sync = async function(){
-    if(state.syncing) return;
-    state.syncing=true;
-    state.cycle=(state.cycle||0)+1;
-    try{
-      state.settings=loadSettings();
-      // Crash-safe startup: always clamp the live cycle unless the user explicitly requests deep proving.
-      const manualDeep = !!state.manualDeepOnce;
-      state.manualDeepOnce = false;
-      state.bootstrapMode = true;
-      state.deepMode = manualDeep;
-      state.overdriveLike = false;
-      state.preSyncSettings = JSON.parse(JSON.stringify(state.settings||{}));
-      state.settings = Object.assign({}, state.settings, {
-        scanBlocks: manualDeep ? Math.min(90, Number(state.settings.scanBlocks||90)) : Math.min(28, Number(state.settings.scanBlocks||28)),
-        burstScanBlocks: manualDeep ? Math.min(180, Number(state.settings.burstScanBlocks||180)) : Math.min(80, Number(state.settings.burstScanBlocks||80)),
-        maxLeadExpansionsPerCycle: manualDeep ? Math.min(2, Number(state.settings.maxLeadExpansionsPerCycle||2)) : 1,
-        neighborBlockBurst: manualDeep ? Math.min(8, Number(state.settings.neighborBlockBurst||8)) : 4,
-        routeDepthBurst: manualDeep ? 1 : 1,
-        deepSweepEvery: 999999,
-        aggressiveFollowups: 0,
-        awacsAutoUse: false,
-        autoRefresh: Math.max(90000, Number(state.settings.autoRefresh||90000)),
-        sourceCoverageCheckEvery: 999999,
-        revisitStalledLeadsEvery: 999999,
-        allowanceDiffEvery: 999999,
-        slotClassificationEvery: 999999
-      });
-      $('syncStatus').textContent=manualDeep?'safe-slice deep proving':'lite quick-lock';
-      $('syncStatus').className='status info';
-      try{ $('rpcMeta').textContent='RPC: '+String((state.settings.privateRpc||'').trim() || (Array.isArray(state.settings.rpcs)&&state.settings.rpcs[0]) || '—'); }catch{}
-      let model;
-      if(manualDeep){
-        try{
-          await new Promise(r=>setTimeout(r,50));
-          model = await Promise.race([
-            buildModel(),
-            new Promise((_, reject)=>setTimeout(()=>reject(new Error('Safe-slice deep proving timeout after 8s')), 8000))
-          ]);
-        }catch(err){
-          model = await buildStableLockModel().catch(()=>null);
-          if(!model) throw err;
-          state.quickLockFallback = err.message || String(err);
-        }
-      }else{
-        model = await buildStableLockModel();
-      }
-      render(model);
-      state.lastLiveLock = true;
-      const persistedLast=saveLastGood(snapshot(model));
-      const hist=loadHistory(); hist.push(snapshot(model));
-      const persistedHistory=saveHistory(hist.slice(-24));
-      const persistWarn=[persistedLast, persistedHistory].filter(x=>x && x.ok && x.via && x.via!=='local').map(x=>x.via);
-      $('syncStatus').textContent=manualDeep?(state.quickLockFallback?'safe-slice→quick-lock':'safe-slice ok'):'live';
-      $('syncStatus').className='status ok';
-      let msg = `Last sync: ${fmtTs(model.latestTsMs || model.createdAt)} • ${manualDeep ? 'safe-slice deep pass' : 'crash-safe lite quick-lock'}`;
-      if(state.quickLockFallback) msg += ` • fallback (${state.quickLockFallback})`;
-      if(persistWarn.length) msg += ` • storage running in ${uniq(persistWarn, x=>x).join(', ')} mode`;
-      $('lastSync').textContent=msg;
-    }catch(err){
-      console.error(err);
-      const detail = `Last error: ${err.message||String(err)}${state.rpcUsed?` • RPC ${state.rpcUsed}`:''} • crash-safe mode`;
-      const fallback = state.importedBundle ? safeImportedRender(state.importedBundle) : state.lastGood;
-      if(fallback){
-        render(fallback);
-        $('syncStatus').textContent='degraded'; $('syncStatus').className='status warn';
-        $('lastSync').textContent=detail+' • showing imported / cached snapshot';
-      }else{
-        $('syncStatus').textContent='sync failed'; $('syncStatus').className='status bad';
-        $('lastSync').textContent=detail;
-      }
-    }finally{
-      if(state.preSyncSettings){ state.settings = state.preSyncSettings; state.preSyncSettings = null; }
-      state.bootstrapMode=false;
-      state.quickLockFallback='';
-      state.syncing=false;
-      try{ __v468Header(); __v468InjectBtn(); }catch{}
-    }
-  };
   const __start = () => {
     try { pushSettings(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Startup settings error: '+(err.message||String(err)); throw err; }
     if(state.timer) clearInterval(state.timer);
     state.timer=setInterval(() => { try { sync(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Scheduled sync error: '+(err.message||String(err)); } }, Math.max(12000, state.settings.autoRefresh||30000));
-    if(state.lastGood){ try{ render(state.lastGood); $('syncStatus').textContent='cached'; $('syncStatus').className='status warn'; }catch{} } else { try{ $('syncStatus').textContent='ready'; $('syncStatus').className='status warn'; }catch{} }
+    if(state.lastGood){ try{ render(state.lastGood); $('syncStatus').textContent='cached'; $('syncStatus').className='status warn'; }catch{} }
     Promise.resolve().then(() => sync()).catch(err => { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Initial sync error: '+(err.message||String(err)); });
   };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', __start, {once:true}); else __start();
   } catch(err) { try { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Boot error: '+(err.message||String(err)); console.error(err); } catch{} }
 })();
 
-
-</script>
-
-<script>
+// ===== V43.2 source-hardening patch =====
 (function(){
-  try{
-    if (typeof __buildModelV44 === 'function') {
-      buildModel = async function(){ return await __buildModelV44(); };
-    }
-    if (typeof __renderV44 === 'function') {
-      render = function(model){ __renderV44(model); };
-    }
-    function stripAwacsUi(){
-      ['v44IntelTri','v45AwacsHost','v46Host','v45AwacsPanel','v44VideoPanel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
-      ['v44QuickMediaBtn','deepProveBtn'].forEach(id=>{ const el=document.getElementById(id); if(el && id==='v44QuickMediaBtn') el.remove(); });
-      const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V47.0 No-AWACS Core Auditor';
-      const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V47.0 removes the integrated AWACS, video-lab, and replay panels from the one-file build so deep proving falls back to the lighter pre-AWACS core engine. Live quick-lock remains, and formal execution stays hard-gated by slot / shell / reserve closure.';
-      const chips=document.querySelector('.chips'); if(chips) chips.innerHTML='<div class="chip good">Upgrades the attached V46.x code in place</div><div class="chip info">AWACS / video-lab / replay panels removed</div><div class="chip warn">Deep proving uses the lighter pre-AWACS core engine</div><div class="chip bad">Still proof-gates governance / blueprint theories behind chain closure</div>';
-      const boxTitle=document.querySelector('#settingsBox .boxTitle'); if(boxTitle) boxTitle.textContent='V47.0 no-AWACS core settings';
-      const sync=document.getElementById('syncStatus');
-      if(sync && String(sync.textContent||'').toLowerCase().includes('deep proving')){ sync.textContent='core proving'; sync.className='status info'; }
-      const btns=document.querySelector('.panel.grid2 .btns');
-      if(btns && !document.getElementById('coreDeepBtn')){
-        const b=document.createElement('button');
-        b.id='coreDeepBtn'; b.className='secondary'; b.textContent='Core deep prove';
-        b.onclick=async ()=>{ state.manualDeepOnce=true; try{ await sync(); }catch(err){ console.error(err); } };
-        btns.insertBefore(b, btns.firstChild);
+  function v43_2SeedUrlInfo(url){
+    const u=String(url||'').trim();
+    const low=u.toLowerCase();
+    if(!u) return {seed:false, platform:'', reason:''};
+    const ytConcrete = /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/|clip\/)|youtu\.be\/)/i.test(low);
+    const ytSeed = /youtube\.com\/@[^\s?#]+(?:\/(?:streams|videos|shorts))?\/?(?:[?#].*)?$/i.test(low) && !ytConcrete;
+    if(ytSeed) return {seed:true, platform:'youtube', reason:'channel-page'};
+    const xSeed = /(?:x\.com|twitter\.com)\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/(?:status|i\/status)\//i.test(low);
+    if(xSeed) return {seed:true, platform:'x', reason:'profile-page'};
+    const tgSeed = /t\.me\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/t\.me\/[^\/\s?#]+\/\d+/i.test(low);
+    if(tgSeed) return {seed:true, platform:'telegram', reason:'channel-root'};
+    return {seed:false, platform:inferPlatform(u,''), reason:''};
+  }
+  function v43_2IsSeedOnlyCue(item){
+    if(!item) return false;
+    if(item.seedOnly) return true;
+    const info=v43_2SeedUrlInfo(item.url||'');
+    return !!info.seed;
+  }
+  const __parseMariaCueText = parseMariaCueText;
+  parseMariaCueText = function(raw){
+    const rows = __parseMariaCueText(raw).map((item)=>{
+      const info=v43_2SeedUrlInfo(item?.url||'');
+      if(info.seed){
+        const tags=Array.isArray(item.tags)?item.tags.slice():[];
+        if(!tags.includes('source-seed')) tags.push('source-seed');
+        return Object.assign({}, item, {
+          seedOnly:true,
+          realCue:false,
+          kind:item.kind || 'maria-cue',
+          tags,
+          phase:item.phase==='social' ? 'source-seed' : item.phase,
+          code:item.code || info.reason || 'seed'
+        });
       }
-      const quick=document.getElementById('deepProveBtn'); if(quick) quick.textContent='Core deep prove';
-    }
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', stripAwacsUi, {once:false}); else stripAwacsUi();
-    const _sync = sync;
-    sync = async function(){ await _sync(); try{ stripAwacsUi(); }catch{} };
-  }catch(err){ console.error('V47 patch error', err); }
+      return item;
+    });
+    return rows;
+  };
+  const __collectSocial = collectSocial;
+  collectSocial = async function(imported){
+    const rows = await __collectSocial(imported);
+    return (Array.isArray(rows)?rows:[]).filter(x=>!v43_2IsSeedOnlyCue(x));
+  };
+  const __buildWindows = buildWindows;
+  buildWindows = function(latestBlock, latestTsMs, items, liveBlockSec){
+    return __buildWindows(latestBlock, latestTsMs, (Array.isArray(items)?items:[]).filter(x=>!v43_2IsSeedOnlyCue(x)), liveBlockSec);
+  };
+  const __v43GatherImportedSocial = v43GatherImportedSocial;
+  v43GatherImportedSocial = function(imported){
+    const out = __v43GatherImportedSocial(imported);
+    const all = Array.isArray(out?.social)?out.social:[];
+    const seedOnly = all.filter(v43_2IsSeedOnlyCue);
+    const concrete = all.filter(x=>!v43_2IsSeedOnlyCue(x));
+    return Object.assign({}, out, {social:concrete, seedOnlyCount:seedOnly.length, concreteCount:concrete.length});
+  };
+  const __v43ResolveImportedWindows = v43ResolveImportedWindows;
+  v43ResolveImportedWindows = function(imported, social, last){
+    const concrete=(Array.isArray(social)?social:[]).filter(x=>!v43_2IsSeedOnlyCue(x));
+    if(!concrete.length) return {windows:[], rebuilt:false, sanitized:true};
+    const out=__v43ResolveImportedWindows(imported, concrete, last);
+    const filtered=(Array.isArray(out?.windows)?out.windows:[]).filter(w=>!v43_2IsSeedOnlyCue(w));
+    return Object.assign({}, out, {windows:filtered, sanitized:filtered.length !== (Array.isArray(out?.windows)?out.windows.length:0)});
+  };
+  const __v43BuildSelfAudit = v43BuildSelfAudit;
+  v43BuildSelfAudit = function(baseModel){
+    const audit = __v43BuildSelfAudit(baseModel);
+    const rawCueText = state.settings.mariaCueDrop || state.settings.mariaCueMemory || state.importedBundle?.settings?.mariaCueDrop || state.importedBundle?.settings?.mariaCueMemory || '';
+    const cueLines = mergeCueLines(rawCueText).split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    const seedLines = cueLines.filter(line=>v43_2SeedUrlInfo((String(line).match(/https?:\/\/\S+/i)||[])[0]||'').seed).length;
+    const concreteLines = Math.max(0, cueLines.length - seedLines);
+    audit.rows.splice(3, 0, {
+      label:'Cue specificity',
+      value:`${concreteLines} concrete / ${seedLines} source-seed`,
+      hint: seedLines ? 'Generic channel/profile URLs are now treated as source coverage, not as timing windows.' : 'Cue lines appear specific enough for timing-window use.',
+      cls: seedLines ? 'warn' : 'good'
+    });
+    audit.summary = `${audit.summary} V43.2 filters source-family URLs out of social timing windows.`;
+    return audit;
+  };
+  const __applyV43Upgrade = applyV43Upgrade;
+  applyV43Upgrade = function(baseModel){
+    const model = __applyV43Upgrade(baseModel);
+    const rawCueText = state.settings.mariaCueDrop || state.settings.mariaCueMemory || state.importedBundle?.settings?.mariaCueDrop || state.importedBundle?.settings?.mariaCueMemory || '';
+    const cueLines = mergeCueLines(rawCueText).split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    const seedLines = cueLines.filter(line=>v43_2SeedUrlInfo((String(line).match(/https?:\/\/\S+/i)||[])[0]||'').seed).length;
+    model.version='V43.2 Source-Hardened Predator Gatekeeper Auditor';
+    model.v43 = Object.assign({}, model.v43, {
+      sourceHardening:{seedLines, concreteLines:Math.max(0, cueLines.length-seedLines), summary: seedLines ? 'Source-family URLs were detected and filtered out of timing windows.' : 'Cue inputs are concrete enough for timing-window use.'}
+    });
+    model.systemAudit = Object.assign({}, model.systemAudit, {
+      summary:`${model.systemAudit?.summary||''}${model.systemAudit?.summary?' • ':''}V43.2 filters generic source pages out of cue timing so /streams, /videos, /shorts, and profile roots do not masquerade as real windows.`
+    });
+    const titleEl=document.querySelector('.title');
+    if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V43.2 Source-Hardened Predator Gatekeeper Auditor';
+    const subEl=document.querySelector('.sub');
+    if(subEl) subEl.textContent='V43.2 upgrades your attached V42.9/V43.0 tool in place: deterministic bundle import, self-audit and consistency checks, stronger Maria rehydration, source-family cue hardening, clearer lead-vs-focus logic, and an interactive flashpoint simulator layered on top of the existing social-scout, gatekeeper, priming, and gravity lanes.';
+    return model;
+  };
 })();
-</script>
+// ===== end V43.2 patch =====
 
+</script>
 </body>
 </html>
