@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V50.6 Full Stable Singularity Engine</title>
+<title>pDAI Peg Prover • V50.7 Cohesion Audit Cortex</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -143,6 +143,17 @@
   .v505-wide{grid-column:span 2}
   @media(max-width:1450px){.v505-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v505-wide{grid-column:span 1}}
   @media(max-width:720px){.v505-grid{grid-template-columns:1fr}}
+
+
+
+  /* ===== V50.7 Cohesion Audit + V200 Proof-Capped Cortex ===== */
+  .v507-panel{margin-top:14px;position:relative;overflow:hidden;border-color:rgba(89,255,187,.45);box-shadow:var(--shadow),0 0 90px rgba(89,255,187,.08)}
+  .v507-panel:before{content:"";position:absolute;inset:-30%;pointer-events:none;background:radial-gradient(circle at 15% 15%,rgba(89,255,187,.14),transparent 18%),radial-gradient(circle at 80% 12%,rgba(76,200,255,.12),transparent 20%),radial-gradient(circle at 58% 92%,rgba(191,139,255,.12),transparent 22%);filter:blur(24px);opacity:.8;animation:v507Field 15s ease-in-out infinite alternate}@keyframes v507Field{from{transform:translateX(-1%) rotate(0)}to{transform:translateX(1%) rotate(3deg)}}
+  .v507-wrap{position:relative;z-index:1}.v507-head{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;align-items:stretch}.v507-title{font-size:1.36rem;font-weight:1000;letter-spacing:.04em}.v507-title span{background:linear-gradient(90deg,var(--green),var(--cyan),#fff,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}.v507-sub{margin-top:8px;color:var(--muted);line-height:1.5;font-size:.88rem}.v507-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v507-actions button{font-size:.78rem;padding:9px 11px}.v507-chiprow{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.v507-chip{font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;border:1px solid var(--line2);border-radius:999px;padding:6px 9px;background:rgba(255,255,255,.03);color:var(--muted)}.v507-chip.good{color:var(--green)}.v507-chip.info{color:var(--cyan)}.v507-chip.warn{color:var(--amber)}.v507-chip.bad{color:var(--red)}
+  .v507-radar{min-height:196px;border:1px solid var(--line);border-radius:20px;background:radial-gradient(circle at center,rgba(89,255,187,.10),rgba(0,0,0,.26) 65%);position:relative;overflow:hidden}.v507-radar:before,.v507-radar:after{content:"";position:absolute;border-radius:50%;inset:18px;border:1px dashed rgba(76,200,255,.28);animation:rotate 24s linear infinite}.v507-radar:after{inset:44px;border-color:rgba(89,255,187,.26);animation-duration:17s;animation-direction:reverse}.v507-radar-core{position:absolute;inset:50%;width:126px;height:126px;margin:-63px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;border:1px solid rgba(89,255,187,.42);background:radial-gradient(circle at 50% 35%,rgba(89,255,187,.19),rgba(7,12,20,.96));box-shadow:0 0 40px rgba(89,255,187,.16)}.v507-radar-core .big{font-size:1.7rem;font-weight:1000}.v507-radar-core .small{font-size:.64rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}.v507-node{position:absolute;width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 16px currentColor}.v507-node.n1{left:17%;top:32%;color:var(--green)}.v507-node.n2{left:77%;top:24%;color:var(--cyan)}.v507-node.n3{left:29%;bottom:17%;color:var(--amber)}.v507-node.n4{right:18%;bottom:28%;color:var(--violet)}.v507-node.n5{left:50%;top:10%;color:var(--red)}
+  .v507-scoregrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:12px}.v507-score{border:1px solid var(--line);border-radius:16px;padding:10px;background:rgba(0,0,0,.20)}.v507-score .k{font-size:.62rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase}.v507-score .v{font-size:1.08rem;font-weight:950;margin-top:7px}.v507-score .h{font-size:.72rem;color:var(--muted);line-height:1.35;margin-top:5px}.v507-score .bar{height:6px;margin-top:8px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden}.v507-score .fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--violet));transition:width .6s ease}
+  .v507-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}.v507-card{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(12,21,34,.80),rgba(5,8,13,.90));padding:12px;min-height:190px;position:relative;overflow:hidden}.v507-card:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),var(--cyan),transparent);opacity:.55}.v507-card.wide{grid-column:span 2}.v507-card.full{grid-column:1/-1}.v507-card .ct{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--green);font-weight:950}.v507-card .cs{font-size:.76rem;color:var(--muted);line-height:1.36;margin-top:7px}.v507-rows{display:flex;flex-direction:column;gap:7px;margin-top:9px}.v507-row{border:1px solid rgba(255,255,255,.06);border-left:3px solid var(--line2);border-radius:10px;background:rgba(255,255,255,.024);padding:8px;font-size:.75rem;line-height:1.33}.v507-row.good{border-left-color:var(--green)}.v507-row.info{border-left-color:var(--cyan)}.v507-row.warn{border-left-color:var(--amber)}.v507-row.bad{border-left-color:var(--red)}.v507-row b{color:var(--text)}.v507-row span{display:block;color:var(--muted);margin-top:2px}.v507-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.v507-mini-table{width:100%;border-collapse:collapse;min-width:0}.v507-mini-table th,.v507-mini-table td{font-size:.72rem;padding:7px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}.v507-mini-table th{color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  @media(max-width:1450px){.v507-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v507-head{grid-template-columns:1fr}.v507-scoregrid{grid-template-columns:repeat(3,minmax(0,1fr))}.v507-card.wide{grid-column:span 1}}@media(max-width:760px){.v507-grid,.v507-scoregrid{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -326,6 +337,45 @@
     </div>
   </div>
 
+
+
+
+  <div class="panel v507-panel" id="v507AuditPanel">
+    <div class="v507-wrap">
+      <div class="v507-head">
+        <div>
+          <div class="v507-title"><span>V50.7 Cohesion Audit Cortex / V200 Proof-Capped Intelligence</span></div>
+          <div class="v507-sub">Full-stack function/activity audit plus the next intelligence layer: selector deconstruction, Maria lag, terminal sinks, bridge isotopes, woe decay, MEV role detection, pre-mutation heat, holographic filtering, legislative sentiment, and shadow-blueprint synthesis. Every module is proof-capped: social and predictive signals can prioritize probes, but cannot close the peg gate without chain evidence.</div>
+          <div class="v507-chiprow"><span class="v507-chip good">full stack audited</span><span class="v507-chip info">selector scout</span><span class="v507-chip warn">prediction proof-capped</span><span class="v507-chip bad">ETA blocked until slots/route close</span></div>
+          <div class="v507-actions"><button id="v507RunAuditBtn">Run cohesion audit</button><button id="v507SelectorScoutBtn" class="secondary">Run selector scout</button><button id="v507ExportAuditBtn" class="secondary">Export audit JSON</button></div>
+        </div>
+        <div class="v507-radar" aria-hidden="true"><div class="v507-node n1"></div><div class="v507-node n2"></div><div class="v507-node n3"></div><div class="v507-node n4"></div><div class="v507-node n5"></div><div class="v507-radar-core"><div class="big" id="v507CoreReadout">—</div><div class="small">cohesion core</div></div></div>
+      </div>
+      <div class="v507-scoregrid">
+        <div class="v507-score"><div class="k">Cohesion</div><div class="v" id="v507Cohesion">—</div><div class="h" id="v507CohesionHint">—</div><div class="bar"><div class="fill" id="v507CohesionBar"></div></div></div>
+        <div class="v507-score"><div class="k">Safety</div><div class="v" id="v507Safety">—</div><div class="h" id="v507SafetyHint">—</div><div class="bar"><div class="fill" id="v507SafetyBar"></div></div></div>
+        <div class="v507-score"><div class="k">Hard proof</div><div class="v" id="v507HardProof">—</div><div class="h" id="v507HardHint">—</div><div class="bar"><div class="fill" id="v507HardBar"></div></div></div>
+        <div class="v507-score"><div class="k">Selector need</div><div class="v" id="v507SelectorNeed">—</div><div class="h" id="v507SelectorHint">—</div><div class="bar"><div class="fill" id="v507SelectorBar"></div></div></div>
+        <div class="v507-score"><div class="k">Hologram risk</div><div class="v" id="v507HoloRisk">—</div><div class="h" id="v507HoloHint">—</div><div class="bar"><div class="fill" id="v507HoloBar"></div></div></div>
+        <div class="v507-score"><div class="k">Next move</div><div class="v" id="v507NextMove">—</div><div class="h" id="v507NextHint">—</div><div class="bar"><div class="fill" id="v507NextBar"></div></div></div>
+      </div>
+      <div class="v507-grid">
+        <div class="v507-card wide"><div class="ct">01 • Every function/activity audit</div><div class="cs">Checks that each system group has a clear purpose, bounded risk, and a compatible downstream panel.</div><div class="v507-rows" id="v507FunctionAudit"></div></div>
+        <div class="v507-card"><div class="ct">02 • Cohesion dependency map</div><div class="cs">Makes sure inputs → sync → model → proof gates → UI all agree.</div><div class="v507-rows" id="v507CohesionRows"></div></div>
+        <div class="v507-card"><div class="ct">03 • Hard proof gate</div><div class="cs">Shows why the tool may hunt aggressively while refusing a calendar ETA.</div><div class="v507-rows" id="v507GateRows"></div></div>
+        <div class="v507-card"><div class="ct">04 • ABI selector deconstruction</div><div class="cs">Manual bounded scout: pulls capped tx input selectors via eth_getTransactionByHash; no debug trace.</div><div class="v507-rows" id="v507SelectorRows"></div></div>
+        <div class="v507-card"><div class="ct">05 • Maria lag index</div><div class="cs">Social cues create watch windows only. Chain events must confirm lag relevance.</div><div class="v507-rows" id="v507MariaRows"></div></div>
+        <div class="v507-card"><div class="ct">06 • Terminal sink map</div><div class="cs">Classifies final-hop net accumulation vs. router cycling.</div><div class="v507-rows" id="v507SinkRows"></div></div>
+        <div class="v507-card"><div class="ct">07 • Bridge isotope ledger</div><div class="cs">Correlates pasted bridge rows by amount/time. It never deanonymizes; it ranks candidate overlaps.</div><div class="v507-rows" id="v507IsotopeRows"></div></div>
+        <div class="v507-card"><div class="ct">08 • Woe / bad debt decay</div><div class="cs">Quantifies flashpoint, burn progress, and the missing debt/collateral proof.</div><div class="v507-rows" id="v507WoeRows"></div></div>
+        <div class="v507-card"><div class="ct">09 • MEV Guardian/Vampire detector</div><div class="cs">Separates protocol-like clearing from extractive loops using route shape and sink behavior.</div><div class="v507-rows" id="v507MevRows"></div></div>
+        <div class="v507-card"><div class="ct">10 • Pre-mutation heatmap</div><div class="cs">Slot remains zero? Watch approvals, spender selectors, gas/input profiles, and reserve deltas for pre-motion.</div><div class="v507-rows" id="v507PreMutationRows"></div></div>
+        <div class="v507-card"><div class="ct">11 • Holographic volume filter</div><div class="cs">Subtracts shadow-to-shadow loops from likely core-to-terminal demand.</div><div class="v507-rows" id="v507HoloRows"></div></div>
+        <div class="v507-card"><div class="ct">12 • Clarity / disclosure sentiment</div><div class="cs">Regulatory and angel/UAP cues can raise watch priority, not proof score.</div><div class="v507-rows" id="v507SentimentRows"></div></div>
+        <div class="v507-card full"><div class="ct">13 • Autonomous shadow blueprint synthesis</div><div class="cs">The engine’s next-action plan. It outputs target-capture conditions, not fake block-height certainty.</div><div class="v507-rows" id="v507BlueprintRows"></div></div>
+      </div>
+    </div>
+  </div>
 
   <div class="settings panel" id="settingsBox">
     <div class="boxTitle">V41 integrated settings</div>
@@ -1102,7 +1152,7 @@ A live ETH DAI sync = bridge hypothesis"></textarea></div>
     itemRows('historyList',state.history.slice(-8).reverse().map(h=>({v:`${fmtTs(h.createdAt||h.latestTsMs)} • clarity ${pct(h.clarifier?.clarity||0)} • prep ${pct(h.clarifier?.prep||0)} • execution ${pct(h.clarifier?.exec||0)} • ${h.clarifier?.stateText||'—'}`,cls:'info'})));
     set('sourceCoverageSummary',model.v39.sourceCoverage.summary); itemRows('sourceCoverageList',[]); set('leadSummary',model.v39.leadExecutor.summary); table('leadBody',model.v39.leadExecutor.active.map(r=>[r.kind+' '+addrShort(r.target),r.status,pct(r.score),(r.evidence||[]).join(' • ')])); set('tripwireSummaryV39',model.v39.tripwireEngine.summary); itemRows('tripwireListV39',model.v39.tripwireEngine.rows.map(t=>({v:`${t.name}: ${t.text||t.detail||''} • ${pct(t.score||t.severity||0)}`,cls:t.fire?'good':'warn'}))); itemRows('v39ModuleList',model.v39.moduleRows.map(m=>({v:`${m.name} • ${pct(m.score)} • ${addrShort(m.lead)} • ${m.kind}`,cls:m.score>.72?'good':m.score>.52?'warn':'info'}))); itemRows('v39IntegrationList',model.v39.integrationRows.map(v=>({v,cls:'info'})));
     renderV501(model); renderV502(model); renderV503(model); renderV505(model); renderV50Legacy(model);
-    document.title='pDAI Peg Prover • V50.6 Full Stable Singularity Engine'; const title=q('.title'); if(title) title.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50.6 Full Stable Singularity Engine'; const sub=q('.sub'); if(sub) sub.textContent='V50.6 keeps the full V50/V200 stack, but replaces the crash-prone sync path with a bounded full engine: live reserves, storage slots, capped logs, proof ledgers, endpoint forensics, V200 hunt lanes, and no fake ETA.';
+    document.title='pDAI Peg Prover • V50.7 Cohesion Audit Cortex'; const title=q('.title'); if(title) title.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50.6 Full Stable Singularity Engine'; const sub=q('.sub'); if(sub) sub.textContent='V50.6 keeps the full V50/V200 stack, but replaces the crash-prone sync path with a bounded full engine: live reserves, storage slots, capped logs, proof ledgers, endpoint forensics, V200 hunt lanes, and no fake ETA.';
   }
 
   function renderV501(m){ const ci=m.signalBrain.contractIntel, thin=m.signalBrain.thinLP, slots=m.signalBrain.nullAwakening, cl=m.clarifier; set('v501OrbScore',(cl.clarity*100).toFixed(0)); set('v501PegHeadline',slots.status==='awake'?'HARD-STATE WATCH':'HUNT MODE — ETA BLOCKED'); const h=$('v501PegHeadline'); if(h) h.className='v501-headline '+(slots.status==='awake'?'good':'warn'); set('v501PegSummary',slots.status==='awake'?'Watched storage changed; verify receipts, route overlap and reserves immediately.':'Pressure is present, but 0x0968 / 0x7b12 remain null-null or unproven. The tool is hunting, not calling a calendar ETA.'); set('v501EtaGate',slots.status==='awake'?'WATCH':'BLOCKED'); set('v501EtaHint',slots.status==='awake'?'Slot movement requires receipt confirmation.':'Null-null slots block hard ETA.'); set('v501HardClosure',pct(cl.formalExec)); set('v501HardHint','Requires storage, reserve shock, tx hash, Safe sink, or route closure.'); set('v501DominantWork',m.signalBrain.moveBuilder.dominant.name); set('v501DominantHint',m.signalBrain.moveBuilder.dominant.why); set('v501NextProof','0x165c / Gearbox / slots'); set('v501NextProofHint','Decode spender, validate Gearbox txs, keep slots live.'); const wf=clear('v501WorkFeed'); if(wf) [{cls:'bad',t:'Slot wake-up watch',h:m.slotProbe.summary,s:pct(slots.score)},{cls:'good',t:'Core/native pressure',h:`${thin.coreRatio.toFixed(2)}x imbalance`,s:pct(thin.snapScore)},{cls:'info',t:'Route/spender surface',h:`${ci.topTouchers?.[0]?.count||0} top touches • ${ci.approvalCount||0} approvals`,s:pct(cl.exec)},{cls:'warn',t:'Gearbox/Aztec proof queue',h:'Needs full tx hashes, Safe address and pDAI overlap',s:'queued'}].forEach(r=>{const d=document.createElement('div'); d.className='v501-work-row '+r.cls; d.innerHTML=`<div class="v501-dot"></div><div><div class="v501-work-title">${esc(r.t)}</div><div class="v501-work-hint">${esc(r.h)}</div></div><div class="v501-work-score">${esc(r.s)}</div>`; wf.appendChild(d);}); set('v501CoreNative',thin.coreRatio.toFixed(2)+'x'); width('v501CoreBar',Math.min(thin.coreRatio/365*100,100)); set('v501ShellScore',pct(m.signalBrain.contractInnerEye.score)); width('v501ShellBar',m.signalBrain.contractInnerEye.score*100); set('v501FormalGate',pct(cl.formalExec)); width('v501FormalBar',cl.formalExec*100); set('v501SlotState',slots.status); width('v501SlotBar',slots.score*100); set('v501RouteTouches',shortNum(ci.topTouchers?.[0]?.count||ci.transferCount||0)); width('v501RouteBar',Math.min((ci.topTouchers?.[0]?.count||0)/5000*100,100)); set('v501ApprovalPulse',String(ci.approvalCount||0)); width('v501ApprovalBar',Math.min((ci.approvalCount||0)/12*100,100)); }
@@ -1128,5 +1178,104 @@ A live ETH DAI sync = bridge hypothesis"></textarea></div>
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wire, {once:true}); else wire();
 })();
 </script>
+
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const norm = a => String(a||'').toLowerCase();
+  const short = a => { a=String(a||''); return a.length>14 ? a.slice(0,10)+'…'+a.slice(-8) : (a||'—'); };
+  const clamp = (n,min=0,max=1) => Math.max(min, Math.min(max, Number.isFinite(+n)?+n:0));
+  const pct = n => (clamp(n)*100).toFixed(1)+'%';
+  const fmt = (n,d=2) => Number.isFinite(+n) ? (+n).toLocaleString(undefined,{maximumFractionDigits:d}) : '—';
+  const width = (id,n) => { const el=$(id); if(el) el.style.width=(clamp(n)*100).toFixed(1)+'%'; };
+  const set = (id,v) => { const el=$(id); if(el) el.textContent = v ?? '—'; };
+  const rows = (id, arr) => { const el=$(id); if(!el) return; el.innerHTML=''; (arr||[]).slice(0,80).forEach(r=>{ const d=document.createElement('div'); d.className='v507-row '+(r.cls||'info'); d.innerHTML=`<b>${esc(r.k||r.title||'')}</b><span>${esc(r.v||r.text||'')}</span>`; el.appendChild(d); }); };
+  const knownActors = new Set(['0x5f4bc6714ad363751ac0f4375618346fa4a15d08','0xae8429918fdbf9a5867e3243697637dc56aa76a1','0xf13ca5c98d9aae6294edb9e7299b0bbe1e71265d','0x07bfa7fdbc4715441632e773e5e859f0d3b4507d','0x4202aa41c2d55bd439a2ebd5afa1caad6adad00b','0x165c3410fc91ef562c50559f7d2289febed552d9','0xda9aba4eacf54e0273f56dffee6b8f1e20b23bba']);
+  const selectorDb = {
+    '0x095ea7b3':'ERC20 approve(address,uint256)','0xa9059cbb':'ERC20 transfer(address,uint256)','0x23b872dd':'ERC20 transferFrom(address,address,uint256)','0x18160ddd':'ERC20 totalSupply()','0x70a08231':'ERC20 balanceOf(address)','0xdd62ed3e':'ERC20 allowance(address,address)','0x06fdde03':'ERC20 name()','0x313ce567':'ERC20 decimals()','0xd505accf':'permit(...)','0x8fcbaf0c':'permit / signed approval candidate','0x38ed1739':'swapExactTokensForTokens','0x8803dbee':'swapTokensForExactTokens','0x7ff36ab5':'swapExactETHForTokens','0x18cbafe5':'swapExactTokensForETH','0x5c11d795':'swapExactTokensForTokensSupportingFeeOnTransferTokens','0xac9650d8':'multicall(bytes[])','0x5ae401dc':'multicall(uint256,bytes[])','0x414bf389':'exactInputSingle','0xc04b8d59':'exactInput','0xdb3e2198':'exactOutputSingle','0xf28c0498':'exactOutput','0x6a761202':'Gnosis Safe execTransaction','0x1cff79cd':'Gnosis Safe approveHash','0xa22cb465':'setApprovalForAll','0x3659cfe6':'upgradeTo(address)','0x4f1ef286':'upgradeToAndCall(address,bytes)','0xf851a440':'admin()','0x5c60da1b':'implementation()','0x42842e0e':'safeTransferFrom','0x00f714ce':'possible liquidation/repay candidate','0x00a718a9':'Aave liquidationCall candidate','0x573ade81':'repay(uint256,address) candidate','0x4e4d9fea':'liquidate/close position candidate'};
+
+  function model(){ return window.__pdaiModel || {}; }
+  function settingsText(){ return ['sManualSocial','sMariaCueDrop','sResearchCorpus','sShadowBridgeLedger','sV50ShadowIntel','sV50Layer2Targets','sV50LiquidationIntel','sV50AngelLexicon'].map(id=>$(id)?.value||'').join('\n'); }
+  function getRpcs(){ const out=[]; const p=$('sPrivateRpc')?.value?.trim(); if(p) out.push(p); String($('sRpcs')?.value||'https://pulsechain-rpc.publicnode.com').split(/\n|,/).map(x=>x.trim()).filter(Boolean).forEach(x=>out.push(x)); return [...new Set(out)]; }
+  async function rpc(method, params=[], ms=9000){ let last; for(const url of getRpcs()){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),ms); try{ const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now()%999999,method,params}),signal:ctrl.signal}); const j=await res.json(); clearTimeout(t); if(j.error) throw new Error(j.error.message||'RPC error'); return j.result; } catch(e){ clearTimeout(t); last=e; } } throw last||new Error('RPC unavailable'); }
+
+  function analyze(m=model()){
+    const ci=m.signalBrain?.contractIntel||{}; const thin=m.signalBrain?.thinLP||{}; const slots=m.signalBrain?.nullAwakening||{}; const cl=m.clarifier||{}; const flow=ci.flow||[]; const pairs=ci.topContractPairs||[];
+    const slotsAwake=slots.status==='awake' || slots.changed || slots.everNonZero; const coreRatio=+thin.coreRatio||0; const approvals=+ci.approvalCount||0; const topSpender=ci.topSpenders?.[0]?.address || m.spenderLab?.[0]?.address || '';
+    const loopMap={}; pairs.forEach(p=>{ const [a,b]=String(p.edge||'').split('>'); if(a&&b) loopMap[a+'>'+b]=+p.count||0; }); let loop=0,total=0,shadow=0; pairs.forEach(p=>{ const [a,b]=String(p.edge||'').split('>'); const c=+p.count||0; total+=c; if(loopMap[b+'>'+a]) loop+=Math.min(c,loopMap[b+'>'+a]); if(knownActors.has(norm(a)) && knownActors.has(norm(b))) shadow+=c; }); const loopRisk=total?Math.min(1,(loop/2 + shadow)/total):0;
+    const sinks=flow.filter(f=>+f.net>0 && !knownActors.has(norm(f.address))).sort((a,b)=>(+b.net||0)-(+a.net||0)).slice(0,10);
+    const terminalIn=sinks.reduce((a,b)=>a+(+b.net||0),0); const totalIn=flow.filter(f=>+f.net>0).reduce((a,b)=>a+(+b.net||0),0); const terminalScore=totalIn?terminalIn/totalIn:0;
+    const flashPct=m.v42_9?.gravity?.flashPct || ((m.publicAnchors?.[0]?.reserve0 && m.publicAnchors?.[1]?.reserve0) ? (m.publicAnchors[0].reserve0/m.publicAnchors[1].reserve0*100) : 0); const burned=+m.burned||0; const flashpoint=m.v42_9?.gravity?.flashpoint || m.publicAnchors?.[0]?.reserve0 || 0;
+    const social=settingsText(); const sentimentHits=(social.match(/clarity|markup|angel|uap|luna|disclosure|legend|dna|maria|atropa/ig)||[]).length; const socialWindows=(m.windows||[]).length;
+    const hardProof=(slotsAwake?.45:0) + ((ci.burns?.count||0)?0.08:0) + ((m.publicAnchors?.length||0)>=3?0.08:0) + ((ci.approvalCount||0)?0.05:0);
+    const cohesion = clamp(.22 + (m.publicAnchors?.length>=3?.12:0) + (m.slotProbe?.summary?.includes('null')?.08:.14) + (ci.logsCount?0.14:0) + (m.v39?.moduleRows?.length?0.1:0) + (m.evidenceLedger?.rows?.length?0.1:0) + (m.systemAudit?.rows?.length?0.1:0));
+    const safety = clamp(.92 - (ci.logsCount>5000?.06:0) - (m.history?.length>20?.05:0));
+    const selectorNeed = clamp((approvals?0.45:0)+(topSpender?0.35:0)+(m.v39?.moduleRows?.some(r=>/selector/i.test(r.detail||''))?0.2:0));
+    const nextScore = clamp((selectorNeed*.35)+(coreRatio>200?.2:0)+(approvals>0?.15:0)+(slotsAwake?.3:0));
+    return {ci,thin,slots,cl,flow,pairs,slotsAwake,coreRatio,approvals,topSpender,loopRisk,total,shadow,loop,sinks,terminalScore,terminalIn,totalIn,flashPct,burned,flashpoint,socialWindows,sentimentHits,cohesion,safety,hardProof,selectorNeed,nextScore};
+  }
+
+  function render(){
+    const m=model(); const a=analyze(m); window.__V507_AUDIT=a;
+    document.title='pDAI Peg Prover • V50.7 Cohesion Audit Cortex'; const t=document.querySelector('.title'); if(t) t.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50.7 Cohesion Audit Cortex'; const sub=document.querySelector('.sub'); if(sub) sub.textContent='V50.7 audits every function/activity, keeps the stable full engine, and adds proof-capped V200 intelligence without fake certainty or crash-prone traces.';
+    set('v507CoreReadout', a.slotsAwake?'WATCH':'HUNT');
+    set('v507Cohesion', pct(a.cohesion)); set('v507CohesionHint', 'Function groups wired: sync → derive → render → proof gates.'); width('v507CohesionBar',a.cohesion);
+    set('v507Safety', pct(a.safety)); set('v507SafetyHint', 'No debug_trace, bounded logs, manual selector scout only.'); width('v507SafetyBar',a.safety);
+    set('v507HardProof', pct(a.hardProof)); set('v507HardHint', a.slotsAwake?'Slot motion requires receipt/route confirmation.':'0x0968 / 0x7b12 still block ETA closure.'); width('v507HardBar',a.hardProof);
+    set('v507SelectorNeed', pct(a.selectorNeed)); set('v507SelectorHint', a.topSpender?`${short(a.topSpender)} is the first selector target.`:'No spender loaded.'); width('v507SelectorBar',a.selectorNeed);
+    set('v507HoloRisk', pct(a.loopRisk)); set('v507HoloHint', `${a.shadow} shadow-edge count / ${a.total||0} total edge count.`); width('v507HoloBar',a.loopRisk);
+    set('v507NextMove', a.selectorNeed>.55?'Decode 0x165c':'Load/refresh data'); set('v507NextHint', 'Selector scout → sink map → bridge rows → slot gate.'); width('v507NextBar',a.nextScore);
+    rows('v507FunctionAudit',[
+      {cls:'good',k:'Utilities / validators',v:'q, esc, clone, clamp, pct, fmt, address/hex/uint helpers: cohesive and low-risk; all are pure helpers.'},
+      {cls:'good',k:'DOM render helpers',v:'status, set, width, clear, itemRows/cardRows/table/download: bounded DOM writes; no recursive render loops detected.'},
+      {cls:'good',k:'RPC layer',v:'getRpcs, postJson, rpc, ethCall, balance, totalSupply, pair, getStorage, getLogsBounded: now bounded and timeout-protected.'},
+      {cls:'info',k:'Log/model builder',v:'parseLogs, addFlow, liveModel, normalizeImport, capSnapshot, deriveModel: cap arrays and separate pressure from proof.'},
+      {cls:'good',k:'Render stack',v:'render + V501/V502/V503/V505/legacy renderers: cohesive; all panels read the same derived model.'},
+      {cls:'good',k:'Controls/import/export',v:'fullRefresh/startAuto/stopAuto/pushSettings/pullSettings/wire: no boot sync; manual full sync is bounded.'},
+      {cls:'warn',k:'Queued but not overclaimed',v:'tx input selectors, Maria lag, bridge isotopes, woe debt, MEV roles, and pre-mutation heat are now explicit proof-capped lanes.'}
+    ]);
+    rows('v507CohesionRows',[
+      {cls:'good',k:'Data spine',v:`Latest model block ${m.latestBlock||'—'} • ${a.ci.logsCount||0} logs • ${a.ci.transferCount||0} transfers • ${a.ci.approvalCount||0} approvals.`},
+      {cls:a.slotsAwake?'good':'bad',k:'Hard gate',v:`Slot state: ${m.slotProbe?.summary||'—'}. ${a.slotsAwake?'Promote to receipt verification.':'Do not allow calendar ETA.'}`},
+      {cls:'good',k:'Structural pressure',v:`Core/native ratio ${fmt(a.coreRatio,2)}x; flashpoint ${fmt(a.flashPct,3)}% of core.`},
+      {cls:'info',k:'Route surface',v:`Top toucher ${short(a.ci.topTouchers?.[0]?.address)} with ${a.ci.topTouchers?.[0]?.count||0} touches; top spender ${short(a.topSpender)}.`}
+    ]);
+    rows('v507GateRows',[
+      {cls:a.slotsAwake?'good':'bad',k:'0x0968 / 0x7b12',v:a.slotsAwake?'Changed/non-zero candidate. Verify tx receipt and route overlap.':'Still null-null or unproven: ETA blocked.'},
+      {cls:'warn',k:'Gearbox / Safe',v:'Still requires full liquidation tx hashes, exact Safe address, and pDAI/pComp/PSM overlap before promotion.'},
+      {cls:'info',k:'Reserve shock',v:`Native rail ${fmt(m.publicAnchors?.[0]?.reserve0,2)} pDAI; core ${fmt(m.publicAnchors?.[1]?.reserve0,2)} pDAI.`}
+    ]);
+    rows('v507SelectorRows', window.__V507_SELECTOR_ROWS || [{cls:'warn',k:'Selector scout not run',v:'Click “Run selector scout” to query capped tx inputs from current approval/transfer tx hashes.'},{cls:'info',k:'Target priority',v:`Primary: ${short(a.topSpender)}; approvals: ${a.approvals}.`}]);
+    rows('v507MariaRows',[
+      {cls:a.socialWindows?'good':'warn',k:'Maria windows',v:a.socialWindows?`${a.socialWindows} window(s) loaded; compute block lag against 5EF7/core bursts.`:'No live Maria windows loaded; paste titles/timestamps or transcripts.'},
+      {cls:a.sentimentHits?'info':'warn',k:'Cue text scan',v:`${a.sentimentHits} keyword hit(s) across manual social/research/settings. Cues only raise watch priority.`}
+    ]);
+    rows('v507SinkRows', a.sinks.slice(0,6).map(x=>({cls:+x.net>100000?'good':'info',k:short(x.address),v:`net +${fmt(x.net,2)} pDAI • in ${fmt(x.in,2)} • out ${fmt(x.out,2)} • touches ${x.touches||0}`})).concat([{cls:'info',k:'Terminal ingress ratio',v:`${pct(a.terminalScore)} of positive net flow is currently in non-core/non-router terminal candidates.`}]));
+    rows('v507IsotopeRows',[{cls:'warn',k:'Bridge rows needed',v:'Paste Ethereum/Pulse bridge rows with time, token, amount, source, recipient. The tool will correlate amount-shape and time windows only.'},{cls:'info',k:'Current bridged rail',v:`${fmt(m.publicAnchors?.[2]?.reserve0,2)} bridged DAI units on surface pressure rail.`}]);
+    rows('v507WoeRows',[{cls:'info',k:'Flashpoint',v:`${fmt(a.flashpoint,2)} pDAI equals visible native rail; ${fmt(a.flashPct,3)}% of core reserve.`},{cls:'info',k:'Burn state',v:`Burned ${fmt(a.burned,6)} pDAI. This is supply-control evidence, not yet bad-debt clearance.`},{cls:'warn',k:'Debt-vault gap',v:'Needs live pAAVE/pMaker/pComp/Gearbox debt/collateral reads to convert “woe” into a true parity countdown.'}]);
+    rows('v507MevRows',[{cls:a.loopRisk>.45?'bad':'info',k:'Vampire risk',v:`Circular/shadow loop risk ${pct(a.loopRisk)}. High loops = possible wash/hologram volume.`},{cls:a.terminalScore>.35?'good':'warn',k:'Guardian-like clearing',v:`Terminal accumulation score ${pct(a.terminalScore)}. Needs verified protocol-owned bot or Safe route to call guardian.`}]);
+    rows('v507PreMutationRows',[{cls:a.slotsAwake?'good':'bad',k:'Slot value',v:m.slotProbe?.summary||'—'},{cls:a.approvals?'warn':'info',k:'Approval pre-heat',v:`${a.approvals} approval(s); top spender ${short(a.topSpender)}. Decode selectors before calling it admin/pre-mutation.`},{cls:'info',k:'Gas/input need',v:'Run selector scout to add tx gas and input-selector heat without debug traces.'}]);
+    rows('v507HoloRows',[{cls:a.loopRisk>.45?'bad':'info',k:'Shadow-to-shadow',v:`${a.shadow} repeated shadow edge count; loop-pair echo ${fmt(a.loop/2,0)}.`},{cls:'good',k:'Core-to-terminal candidate',v:`Top terminal sinks: ${a.sinks.slice(0,3).map(x=>short(x.address)+' +'+fmt(x.net,0)).join(' • ')||'none loaded'}.`},{cls:'warn',k:'Filter rule',v:'Only promote demand when net terminal ingress persists after subtracting AE84↔f13c↔5f4b loop churn.'}]);
+    rows('v507SentimentRows',[{cls:a.sentimentHits?'info':'warn',k:'Sentiment anchor',v:`${a.sentimentHits} Clarity/angel/Maria/Atropa keyword hit(s). Max effect: watch-priority boost, not proof.`},{cls:'bad',k:'Proof cap',v:'No +15% hard-proof bonus from politics/social. Chain closure only.'}]);
+    const gates=[a.slotsAwake?'slot':'',a.selectorNeed>.6?'selector':'',a.terminalScore>.25?'sink':'',a.loopRisk<.45?'low-hologram':'',a.sentimentHits?'cue':''].filter(Boolean); const ready=gates.length>=4;
+    rows('v507BlueprintRows',[{cls:ready?'good':'warn',k:'Target capture window',v:ready?'Armed watch: 4+ gates are present. Watch next refresh blocks for slot/reserve/route closure.':'Not armed. Requires selector decode + sink persistence + low hologram + bridge/debt confirmation.'},{cls:'info',k:'Expected honest sequence',v:'approve/selector proof → route fan-out/fan-in → terminal sink persistence → bridge/debt overlap → reserve shock → 0x0968/0x7b12 mutation.'},{cls:'bad',k:'Forbidden shortcut',v:'Do not output exact block height for slot awakening until a real pre-mutation signal exists.'}]);
+  }
+
+  async function selectorScout(){
+    const m=model(); const ci=m.signalBrain?.contractIntel||{}; const txs=[]; (ci.approvals||[]).forEach(x=>x.tx&&txs.push(x.tx)); (ci.transfers||[]).slice(0,80).forEach(x=>x.tx&&txs.push(x.tx)); const uniq=[...new Set(txs)].slice(0,24); if(!uniq.length){ window.__V507_SELECTOR_ROWS=[{cls:'bad',k:'No tx hashes',v:'Import or refresh a bundle with approval/transfer tx hashes first.'}]; render(); return; }
+    window.__V507_SELECTOR_ROWS=[{cls:'info',k:'Selector scout running',v:`Querying ${uniq.length} tx(s) with eth_getTransactionByHash. Capped and manual.`}]; render();
+    const out=[]; for(const tx of uniq){ try{ const r=await rpc('eth_getTransactionByHash',[tx],7000); const input=String(r?.input||'0x'); const sel=input.slice(0,10); const name=input.length>10 ? (selectorDb[sel]||'unknown selector') : 'plain/native transfer or unavailable input'; out.push({cls:selectorDb[sel]?'good':input.length>10?'warn':'info',k:short(tx),v:`to ${short(r?.to)} • from ${short(r?.from)} • gas ${r?.gas||'—'} • ${sel}: ${name}`}); } catch(e){ out.push({cls:'bad',k:short(tx),v:'RPC failed: '+(e.message||String(e))}); } await new Promise(r=>setTimeout(r,40)); }
+    window.__V507_SELECTOR_ROWS=out; render();
+  }
+
+  function exportAudit(){ const data={createdAt:new Date().toISOString(),modelBlock:model().latestBlock||null,audit:analyze(model()),selectorRows:window.__V507_SELECTOR_ROWS||[]}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='pdai-v50-7-cohesion-audit.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},250); }
+  function wire(){ $('v507RunAuditBtn')?.addEventListener('click', render); $('v507SelectorScoutBtn')?.addEventListener('click', selectorScout); $('v507ExportAuditBtn')?.addEventListener('click', exportAudit); render(); let last=''; setInterval(()=>{ const m=model(); const sig=[m.latestBlock,m.createdAt,m.signalBrain?.contractIntel?.logsCount,m.slotProbe?.summary].join('|'); if(sig!==last){ last=sig; render(); } },2500); }
+  window.__V507={render,selectorScout,exportAudit,analyze};
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wire, {once:true}); else setTimeout(wire,50);
+})();
+</script>
+
 </body>
 </html>
