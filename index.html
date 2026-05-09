@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V43.2 Source-Hardened Predator Gatekeeper Auditor</title>
+<title>pDAI Peg Prover • V50 FINAL Shadow-Layer War-Room Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -84,13 +84,13 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V43.2 Source-Hardened Predator Gatekeeper Auditor</h1>
-      <div class="sub">V43.2 upgrades your attached V42.9/V43.0 tool in place: deterministic bundle import, self-audit and consistency checks, stronger Maria rehydration, source-family cue hardening, clearer lead-vs-focus logic, and an interactive flashpoint simulator layered on top of the existing social-scout, gatekeeper, priming, and gravity lanes.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V50 FINAL Shadow-Layer War-Room Auditor</h1>
+      <div class="sub">V50 FINAL upgrades the attached V43.x tool in place: shadow-layer route hunting, Gearbox liquidation queueing, L2/RollupProcessor lead hardening, multisig sink profiling, Maria/Atropa angel cue mapping, protocol-consolidation radar, and stricter proof-gating so pressure never masquerades as closure.</div>
       <div class="chips">
-        <div class="chip good">Upgrades the attached V42.9 code in place</div>
-        <div class="chip info">Adds deterministic import + self-audit</div>
-        <div class="chip warn">Adds source-seed filtering + flashpoint simulator</div>
-        <div class="chip bad">Keeps governance / blueprint theories proof-gated behind chain closure</div>
+        <div class="chip good">V50 FINAL in-place upgrade</div>
+        <div class="chip info">Adds shadow-layer / L2 rail hunter</div>
+        <div class="chip warn">Adds Gearbox + multisig forensic queue</div>
+        <div class="chip bad">Hard-caps ETA claims until chain closure fires</div>
       </div>
     </div>
     <div>
@@ -154,6 +154,17 @@
       <div class="field"><label>Governance / admin hints</label><textarea id="sGovernanceHints" placeholder="proposal 224, proposal 225, admin pending, 9E6F, VAT, refresh, unaccepted admin"></textarea></div>
       <div class="field"><label>Governance targets / addresses</label><textarea id="sGovernanceTargets" placeholder="one per line: 0xA30190...9E6F or labels like VAT 0x9759...A28"></textarea></div>
       <div class="field"><label>Shadow bridge ledger / pre-ingress notes</label><textarea id="sShadowBridgeLedger" placeholder="JSON rows or lines like: eDAI 1200000 pending eth-bridge"></textarea></div>
+      <div class="field"><label>V50 shadow intel seed / L2 notes</label><textarea id="sV50ShadowIntel" placeholder="Gearbox, Aztec, RollupProcessor, RollupProxy, PSM, multisig, pComp, pMakerDAO, bridge notes"></textarea></div>
+      <div class="field"><label>V50 Layer-2 / bridge targets</label><textarea id="sV50Layer2Targets" placeholder="Aztec
+RollupProcessor
+RollupProxy
+PSM
+Bridge validation
+0x... full addresses"></textarea></div>
+      <div class="field"><label>V50 liquidation intel / tx hashes</label><textarea id="sV50LiquidationIntel" placeholder="May 3 06:26-06:34 UTC • 0xfdb...1967 • tx hashes • Gearbox V2 • pstETH/pWETH"></textarea></div>
+      <div class="field"><label>V50 angel / Maria / Atropa lexicon</label><textarea id="sV50AngelLexicon" placeholder="angel = disclosure/peg visibility
+Constantine = exorcise broken lending systems
+A live ETH DAI sync = bridge hypothesis"></textarea></div>
     </div>
     <div class="btns" style="margin-top:12px">
       <button id="saveSettingsBtn">Save settings</button>
@@ -558,6 +569,59 @@
     </div>
   </div>
 
+  <div class="tri v50-grid">
+    <div class="panel v50-panel">
+      <div class="boxTitle">V50 FINAL command deck</div>
+      <div class="small">Single-pane verdict: what is real chain evidence, what is pressure, what is only a social or symbolic lead, and what exact event would close the peg case.</div>
+      <div id="v50CommandDeckList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel v50-panel">
+      <div class="boxTitle">Layer-2 / shadow rail hunter</div>
+      <div class="small">Tracks Aztec / RollupProcessor / RollupProxy / PSM / bridge-sync language against actual Pulse-side routes, proxy shapes, and full-address evidence.</div>
+      <div id="v50L2ShadowList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel v50-panel">
+      <div class="boxTitle">Gearbox liquidation queue</div>
+      <div class="small">Turns the May 3 Gearbox V2 liquidation lead into an audit queue: operator, time window, seized/repay assets, tx hashes, Safe sink, and pDAI-touch requirement.</div>
+      <div id="v50GearboxList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="tri v50-grid">
+    <div class="panel v50-panel">
+      <div class="boxTitle">Cross-layer route correlation</div>
+      <div class="small">Looks for multi-hop transactions, routed ingress, focus-nexus handoffs, anchor/core adjacency, and whether bridge language lands in the same addresses.</div>
+      <div id="v50RouteList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel v50-panel">
+      <div class="boxTitle">Multisig / Safe sink profiler</div>
+      <div class="small">Separates actual full-address Safe evidence from incomplete fragments, while also surfacing live recurring sinks from pDAI transfer flow.</div>
+      <div id="v50SafeList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel v50-panel">
+      <div class="boxTitle">Maria / Atropa angel cue mapper</div>
+      <div class="small">Angel, Constantine, disclosure, Cynthia, Atropa, and Maria signals are scored as timing / symbolic leads only; chain closure still has to fire underneath.</div>
+      <div id="v50AngelList" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="tri v50-grid">
+    <div class="panel v50-panel">
+      <div class="boxTitle">Forked-protocol consolidation radar</div>
+      <div class="small">Monitors pMakerDAO, pAAVE, pCOMP, pBalancer, pCurve, pBadger, pGearbox, cDAI and PSM language as one protocol-control map instead of isolated rumors.</div>
+      <div id="v50ProtocolList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel v50-panel">
+      <div class="boxTitle">Proof ledger / closure gates</div>
+      <div class="small">Hard proof gates: watched slot wake-up, real pDAI route touch, tx-hash validation, full multisig address, reserve shock, and trace/proof availability.</div>
+      <div id="v50ProofLedgerList" style="margin-top:12px"></div>
+    </div>
+    <div class="panel v50-panel">
+      <div class="boxTitle">Contradiction ladder</div>
+      <div class="small">The tool now raises debt when social pressure climbs but slots, reserves, tx hashes, bridge rows, or route evidence stay flat.</div>
+      <div id="v50ContradictionList" style="margin-top:12px"></div>
+    </div>
+  </div>
 
 </div>
 
@@ -661,7 +725,11 @@
     focusNexus:'',
     governanceHints:'',
     governanceTargets:'',
-    shadowBridgeLedger:''
+    shadowBridgeLedger:'',
+    v50ShadowIntel:'',
+    v50Layer2Targets:'',
+    v50LiquidationIntel:'',
+    v50AngelLexicon:''
   };
 
   const state={settings:loadSettings(), history:loadHistory(), socialCache:loadSocialCache(), lastGood:loadLastGood(), timer:null, syncing:false, importedBundle:null, rpcUsed:'', cycle:0, deepMode:false, sourceHealth:[], persistIssue:''};
@@ -4184,6 +4252,10 @@ ${state.settings.researchCorpus||''}`);
     $('sGovernanceHints').value=state.settings.governanceHints||'';
     $('sGovernanceTargets').value=state.settings.governanceTargets||'';
     $('sShadowBridgeLedger').value=state.settings.shadowBridgeLedger||'';
+    if($('sV50ShadowIntel')) $('sV50ShadowIntel').value=state.settings.v50ShadowIntel||'';
+    if($('sV50Layer2Targets')) $('sV50Layer2Targets').value=state.settings.v50Layer2Targets||'';
+    if($('sV50LiquidationIntel')) $('sV50LiquidationIntel').value=state.settings.v50LiquidationIntel||'';
+    if($('sV50AngelLexicon')) $('sV50AngelLexicon').value=state.settings.v50AngelLexicon||'';
   }
   function pullSettings(){
     state.settings.privateRpc=$('sPrivateRpc').value.trim();
@@ -4225,6 +4297,10 @@ ${state.settings.researchCorpus||''}`);
     state.settings.governanceHints=$('sGovernanceHints').value;
     state.settings.governanceTargets=$('sGovernanceTargets').value;
     state.settings.shadowBridgeLedger=$('sShadowBridgeLedger').value;
+    if($('sV50ShadowIntel')) state.settings.v50ShadowIntel=$('sV50ShadowIntel').value;
+    if($('sV50Layer2Targets')) state.settings.v50Layer2Targets=$('sV50Layer2Targets').value;
+    if($('sV50LiquidationIntel')) state.settings.v50LiquidationIntel=$('sV50LiquidationIntel').value;
+    if($('sV50AngelLexicon')) state.settings.v50AngelLexicon=$('sV50AngelLexicon').value;
     saveSettings();
     if(state.timer) clearInterval(state.timer);
     state.timer=setInterval(sync, Math.max(12000, state.settings.autoRefresh||30000));
@@ -4242,7 +4318,7 @@ ${state.settings.researchCorpus||''}`);
   $('clearHistoryBtn').onclick=()=>{ if(confirm('Clear local integrated history?')){ saveHistory([]); $('historyMeta').textContent='History: 0 local'; } };
   $('refreshBtn').onclick=()=>sync();
   $('importBtn').onclick=()=> $('importFile').click();
-  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v43-history.json', state.history);
+  $('exportHistoryBtn').onclick=()=> downloadJson('pdai-v50-history.json', state.history);
   $('exportBtn').onclick=()=> {
     state.settings=rehydrateMariaSettings(state.settings,{history:state.history,lastGood:state.lastGood,socialCache:state.socialCache,social:state.lastGood?.social||[],windows:state.lastGood?.windows||[],importedBundle:state.importedBundle});
     if(state.lastGood && typeof state.lastGood==='object'){
@@ -4251,7 +4327,7 @@ ${state.settings.researchCorpus||''}`);
     }
     if(state.settings.mariaStateFault) state.persistIssue=`Maria persistence fault: ${state.settings.mariaStateFault}`;
     if(state.settings.mariaCueMemory || state.settings.mariaCueDrop) saveMariaCueMemoryStore(state.settings.mariaCueMemory || state.settings.mariaCueDrop);
-    downloadJson('pdai-v43-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
+    downloadJson('pdai-v50-bundle.json', {settings:state.settings, history:state.history, socialCache:state.socialCache, lastGood:state.lastGood, importedBundle:state.importedBundle});
   };
   $('importFile').addEventListener('change', async (e)=>{
     const file=e.target.files?.[0]; if(!file) return;
@@ -4276,6 +4352,271 @@ ${state.settings.researchCorpus||''}`);
     e.target.value='';
   });
 
+
+
+  // ===== V50 FINAL Shadow-Layer War-Room Upgrade =====
+  const V50_VERSION='V50 FINAL Shadow-Layer War-Room Auditor';
+  const V50_DEFAULT_SHADOW_INTEL=[
+    'May 3 Gearbox V2 liquidation lead: wallet 0xfdb...1967 allegedly executed 06:26-06:34 UTC liquidation burst, seized 689 pstETH, repaid 661 pWETH, netted ~28 pstETH + 22.87 dWETH, and routed profits to a 5-of-9 Gnosis Safe multisig. Treat as a lead until full tx hashes and full Safe address are supplied.',
+    'Linked-fragment lead: 0x...5996 tied to L2 RollupProxy interactions and PSM activity; 0x...0000 described as vanity-address funder. Fragment-only evidence must not close proof gates.',
+    'Infrastructure lead: Aztec RollupProcessor / bridge validation / value without transferring coins. Use this as a shadow-ingress hypothesis only until Pulse-side routes touch pDAI, pComp/cDAI, PSM, reserve anchors, or watched slots.',
+    'Protocol-control lead: pMakerDAO, pAAVE, pCOMP, pBalancer, pCurve, pBadger, pGearbox; test whether forked protocol cleanups converge into the same Safe, PSM, core, or pDAI manifold.',
+    'Social-timing lead: Maria / Atropa / angel / Constantine / A live ETH DAI sync. Symbolic cues can open timing windows, but cannot override slot, reserve, route, and tx-hash closure gates.'
+  ].join('\n');
+  const V50_DEFAULT_L2_TARGETS='Aztec\nRollupProcessor\nRollupProxy\nBridge validation\nL2\nPSM\npComp\ncDAI\nGearbox\nGnosis Safe\n5-of-9 multisig\n0xfdb...1967\n0x...5996\n0x...0000';
+  const V50_DEFAULT_ANGELS='angel = disclosure / hidden value becoming visible\nConstantine = exorcise broken lending systems / cleanup agent\nConnor = direct fight / Terminator lane\nA live ETH DAI sync = bridge-sync hypothesis\nMaria = timing + symbolic logic layer\nAtropa = semantic/social ecosystem context; not proof by itself';
+  Object.assign(DEFAULTS, {
+    v50ShadowIntel: V50_DEFAULT_SHADOW_INTEL,
+    v50Layer2Targets: V50_DEFAULT_L2_TARGETS,
+    v50LiquidationIntel: V50_DEFAULT_SHADOW_INTEL,
+    v50AngelLexicon: V50_DEFAULT_ANGELS
+  });
+  state.settings=Object.assign({}, DEFAULTS, state.settings||{});
+  if(!String(state.settings.v50ShadowIntel||'').trim()) state.settings.v50ShadowIntel=V50_DEFAULT_SHADOW_INTEL;
+  if(!String(state.settings.v50Layer2Targets||'').trim()) state.settings.v50Layer2Targets=V50_DEFAULT_L2_TARGETS;
+  if(!String(state.settings.v50LiquidationIntel||'').trim()) state.settings.v50LiquidationIntel=V50_DEFAULT_SHADOW_INTEL;
+  if(!String(state.settings.v50AngelLexicon||'').trim()) state.settings.v50AngelLexicon=V50_DEFAULT_ANGELS;
+
+  function v50SeedUrlInfo(url){
+    const u=String(url||'').trim(); const low=u.toLowerCase();
+    if(!u) return {seed:false, platform:'', reason:''};
+    const ytConcrete=/(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/|clip\/)|youtu\.be\/)/i.test(low);
+    const ytSeed=/youtube\.com\/@[^\s?#]+(?:\/(?:streams|videos|shorts))?\/?(?:[?#].*)?$/i.test(low) && !ytConcrete;
+    if(ytSeed) return {seed:true, platform:'youtube', reason:'channel-page'};
+    const xSeed=/(?:x\.com|twitter\.com)\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/(?:status|i\/status)\//i.test(low);
+    if(xSeed) return {seed:true, platform:'x', reason:'profile-page'};
+    const tgSeed=/t\.me\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/t\.me\/[^\/\s?#]+\/\d+/i.test(low);
+    if(tgSeed) return {seed:true, platform:'telegram', reason:'channel-root'};
+    return {seed:false, platform:inferPlatform(u,''), reason:''};
+  }
+  function v50IsSeedOnlyCue(item){ if(!item) return false; if(item.seedOnly) return true; return !!v50SeedUrlInfo(item.url||'').seed; }
+  const __parseMariaCueTextV50=parseMariaCueText;
+  parseMariaCueText=function(raw){
+    return __parseMariaCueTextV50(raw).map(item=>{
+      const info=v50SeedUrlInfo(item?.url||'');
+      if(info.seed){
+        const tags=Array.isArray(item.tags)?item.tags.slice():[]; if(!tags.includes('source-seed')) tags.push('source-seed');
+        return Object.assign({}, item, {seedOnly:true, realCue:false, kind:item.kind||'maria-cue', tags, phase:item.phase==='social'?'source-seed':item.phase, code:item.code||info.reason||'seed'});
+      }
+      return item;
+    });
+  };
+  const __collectSocialV50=collectSocial;
+  collectSocial=async function(imported){ const rows=await __collectSocialV50(imported); return (Array.isArray(rows)?rows:[]).filter(x=>!v50IsSeedOnlyCue(x)); };
+  const __buildWindowsV50=buildWindows;
+  buildWindows=function(latestBlock, latestTsMs, items, liveBlockSec){ return __buildWindowsV50(latestBlock, latestTsMs, (Array.isArray(items)?items:[]).filter(x=>!v50IsSeedOnlyCue(x)), liveBlockSec); };
+  if(typeof v43GatherImportedSocial==='function'){
+    const __v43GatherImportedSocialV50=v43GatherImportedSocial;
+    v43GatherImportedSocial=function(imported){
+      const out=__v43GatherImportedSocialV50(imported); const all=Array.isArray(out?.social)?out.social:[];
+      const seedOnly=all.filter(v50IsSeedOnlyCue); const concrete=all.filter(x=>!v50IsSeedOnlyCue(x));
+      return Object.assign({}, out, {social:concrete, seedOnlyCount:seedOnly.length, concreteCount:concrete.length});
+    };
+  }
+
+  function v50AllText(model){
+    const parts=[]; const push=v=>{ const t=cueTextFromAny(v); if(t) parts.push(t); };
+    push(state.settings.v50ShadowIntel); push(state.settings.v50Layer2Targets); push(state.settings.v50LiquidationIntel); push(state.settings.v50AngelLexicon);
+    push(state.settings.shadowBridgeLedger); push(state.settings.researchCorpus); push(state.settings.manualSocial); push(state.settings.mariaCueDrop); push(state.settings.mariaCueMemory); push(state.settings.mariaGlossary); push(state.settings.relayerHints); push(state.settings.governanceHints); push(state.settings.governanceTargets);
+    push(state.importedBundle?.settings?.v50ShadowIntel); push(state.importedBundle?.settings?.shadowBridgeLedger); push(state.importedBundle?.settings?.researchCorpus); push(state.importedBundle?.settings?.manualSocial); push(state.importedBundle?.settings?.mariaCueDrop);
+    (Array.isArray(model?.social)?model.social:[]).forEach(s=>push(`${s.author||''} ${s.title||''} ${s.text||''} ${s.url||''}`));
+    (Array.isArray(model?.windows)?model.windows:[]).forEach(w=>push(`${w.label||''} ${w.title||''} ${w.text||''} ${w.url||''}`));
+    return parts.filter(Boolean).join('\n');
+  }
+  function v50TermHits(text, terms){
+    const low=String(text||'').toLowerCase();
+    return (terms||[]).map(term=>({term, count:(low.match(new RegExp(String(term).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'))||[]).length})).filter(x=>x.count>0);
+  }
+  function v50ExtractAddresses(text){
+    const s=String(text||'');
+    const full=uniq((s.match(/0x[a-fA-F0-9]{40}/g)||[]).map(norm).filter(isAddr), x=>x);
+    const txs=uniq((s.match(/0x[a-fA-F0-9]{64}/g)||[]).map(x=>x.toLowerCase()), x=>x);
+    const fragments=uniq((s.match(/0x[a-fA-F0-9]{1,12}\s*(?:…|\.\.\.)\s*[a-fA-F0-9]{1,12}/g)||[]).map(x=>x.replace(/\s+/g,'')), x=>x.toLowerCase());
+    return {full, txs, fragments};
+  }
+  function v50RowsFromHits(label, hits, hint){
+    const value=hits.length ? hits.slice(0,8).map(x=>`${x.term}×${x.count}`).join(' • ') : 'none';
+    return {label, value, hint, cls:hits.length?'info':'warn'};
+  }
+  function v50AddRow(rows,label,value,hint,cls='info'){ rows.push({label,value,hint,cls}); }
+  function v50Module(summary, score, rows){ return {summary, score:clamp(score,0,1), rows:rows||[]}; }
+  function v50RenderModule(id, mod){
+    const el=$(id); if(!el) return; clearEl(el);
+    if(!mod){ pushItem(el,'No V50 model has been built yet.','warn'); return; }
+    pushItem(el, `${mod.summary||'watching'}${Number.isFinite(Number(mod.score))?' • score '+pct(mod.score):''}`, mod.score>.66?'good':mod.score>.33?'info':'warn');
+    (Array.isArray(mod.rows)?mod.rows:[]).forEach(r=>pushItem(el, `${r.label}: ${r.value}${r.hint?' • '+r.hint:''}`, r.cls||'info'));
+  }
+  function v50GroupTransfersByTx(transfers){ const m={}; (Array.isArray(transfers)?transfers:[]).forEach(t=>{ const tx=String(t.tx||'').toLowerCase(); if(!tx) return; (m[tx]||(m[tx]=[])).push(t); }); return m; }
+  function v50BuildShadowRailHunter(model){
+    const text=v50AllText(model); const extracted=v50ExtractAddresses(text);
+    const rollup=v50TermHits(text,['aztec','rollupprocessor','rollupproxy','rollup','layer 2','l2','bridge validation','bridge','psm','sync','eth dai']);
+    const liquidation=v50TermHits(text,['gearbox','liquidation','liquidations','credit account','seized','repaid','psteth','pweth','dweth']);
+    const rows=[];
+    rows.push(v50RowsFromHits('Rollup / bridge vocabulary', rollup, 'Vocabulary is treated as target-generation pressure until full addresses and tx hashes are attached.'));
+    rows.push(v50RowsFromHits('Liquidation vocabulary', liquidation, 'Gearbox/liquidation terms promote the lead queue but do not prove pDAI routing alone.'));
+    v50AddRow(rows,'Full addresses parsed', extracted.full.length?extracted.full.slice(0,6).map(addrShort).join(' • '):'none', extracted.full.length?'Full addresses can be contract-probed and route-checked.':'Fragment-only leads are capped until full addresses are supplied.', extracted.full.length?'good':'warn');
+    v50AddRow(rows,'Fragment leads parsed', extracted.fragments.length?extracted.fragments.join(' • '):'none', 'Fragments like 0xfdb...1967 are kept as search targets but cannot be queried by RPC.', extracted.fragments.length?'info':'warn');
+    const score=Math.min(1, rollup.length*.08 + liquidation.length*.08 + extracted.full.length*.07 + extracted.txs.length*.12);
+    const cap=extracted.full.length||extracted.txs.length ? score : Math.min(score,0.42);
+    return v50Module(cap>=0.66?'Shadow-rail hypothesis is address-backed enough for route probing.':cap>=0.33?'Shadow-rail pressure is present but still proof-capped.':'Shadow-rail lane is mostly seeded, not yet evidenced.', cap, rows);
+  }
+  function v50BuildGearboxQueue(model){
+    const text=v50AllText(model); const e=v50ExtractAddresses(text); const low=text.toLowerCase(); const rows=[];
+    const hasGearbox=/gearbox/i.test(text), hasWindow=/(may\s*3|06:26|06:34|utc)/i.test(text), hasSafe=/(gnosis|safe|multisig|5\s*-\s*of\s*-\s*9|5-of-9)/i.test(text);
+    const has1967=/(1967|0xfdb)/i.test(text), has5996=/5996/i.test(text), has0000=/(0x\.\.\.0000|vanity-address funder|vanity address funder)/i.test(low);
+    v50AddRow(rows,'Gearbox operator lead', has1967?'0xfdb…1967 fragment present':'missing', 'Needs the full 20-byte operator address before RPC validation.', has1967?'info':'warn');
+    v50AddRow(rows,'Liquidation window', hasWindow?'May 3 / 06:26-06:34 UTC lead present':'not supplied', 'The tool can use this as a block-window target only after a block number or tx hash is supplied.', hasWindow?'info':'warn');
+    v50AddRow(rows,'Safe sink evidence', hasSafe?'Gnosis Safe / 5-of-9 language present':'missing', 'Full Safe address is required before sink profiling can be hard evidence.', hasSafe?'info':'warn');
+    v50AddRow(rows,'Linked wallet fragments', [has5996?'0x…5996':'',has0000?'0x…0000':''].filter(Boolean).join(' • ')||'none', 'Fragments are preserved as clue labels, not chain-verifiable identifiers.', (has5996||has0000)?'info':'warn');
+    v50AddRow(rows,'Transaction hashes supplied', e.txs.length?e.txs.slice(0,4).map(shortHash).join(' • '):'none', e.txs.length?'Tx hashes are enough for direct receipt/trace verification.':'This remains a research queue until tx hashes are pasted.', e.txs.length?'good':'bad');
+    const score=(hasGearbox?0.18:0)+(hasWindow?0.12:0)+(has1967?0.12:0)+(hasSafe?0.12:0)+(e.txs.length?0.32:0)+(e.full.length?0.14:0);
+    return v50Module(e.txs.length?'Gearbox lead has tx-hash material for direct validation.':'Gearbox liquidation lead is prioritized, but proof is capped by missing full tx/address data.', Math.min(score,e.txs.length?1:.62), rows);
+  }
+  function v50BuildCrossLayerRoute(model){
+    const ci=model?.signalBrain?.contractIntel||{}; const transfers=Array.isArray(ci.transfers)?ci.transfers:[]; const byTx=v50GroupTransfersByTx(transfers); const rows=[];
+    const focus=[state.settings.focusNexus,state.settings.focusSpender,state.settings.focusWallet,state.settings.focusCore,'0xae8429918fdbf9a5867e3243697637dc56aa76a1','0x5f4bc6714ad363751ac0f4375618346fa4a15d08','0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8','0x5ef7aac0de4f2012cb36730da140025b113fada4'].map(norm).filter(isAddr);
+    const multi=Object.entries(byTx).map(([tx,rows])=>({tx, rows, n:rows.length, focusHits:rows.filter(r=>focus.includes(norm(r.from))||focus.includes(norm(r.to))).length, amount:rows.reduce((a,b)=>a+Math.abs(Number(b.amount)||0),0)})).filter(x=>x.n>=3).sort((a,b)=>(b.focusHits-b.focusHits)||(b.n-a.n)||(b.amount-a.amount));
+    const best=multi[0];
+    v50AddRow(rows,'Recent multi-hop pDAI txs', multi.length?`${multi.length} tx(s)`:'none', 'Multi-hop transactions are the local Pulse-side proxy for shadow routes.', multi.length?'good':'warn');
+    v50AddRow(rows,'Best focus-linked route', best?`${shortHash(best.tx)} • ${best.n} transfer legs • ${best.focusHits} focus hit(s)`:'none', best?'This tx should be opened first in explorer / trace for route sequencing.':'No focus-linked multi-hop route surfaced in the current scan.', best?'good':'warn');
+    const routedSupport=(model?.clarifier?.supports||[]).find(x=>/routed ingress is live/i.test(String(x)))||'';
+    v50AddRow(rows,'Routed-ingress prior', routedSupport?trimLongText(routedSupport,220):'not currently stated', 'Imported/live clarifier support is used as a prior, not as independent proof.', routedSupport?'info':'warn');
+    const bridgeHits=v50TermHits(v50AllText(model),['bridge','rollup','psm','aztec','sync']);
+    v50AddRow(rows,'Bridge vocabulary attached', bridgeHits.length?bridgeHits.map(x=>x.term).slice(0,6).join(' • '):'none', 'The target is to catch these terms landing on the same tx/address graph.', bridgeHits.length?'info':'warn');
+    const score=Math.min(1, multi.length*.08 + (best?.focusHits||0)*.14 + (routedSupport?.length?0.18:0) + bridgeHits.length*.04);
+    return v50Module(score>.66?'Cross-layer route correlation is active on Pulse-side flow.':score>.33?'Route pressure exists but needs bridge-side rows or tx hashes.':'Route correlation is still below hard-evidence threshold.', score, rows);
+  }
+  function v50BuildSafeSink(model){
+    const text=v50AllText(model); const e=v50ExtractAddresses(text); const transfers=model?.signalBrain?.contractIntel?.transfers||[]; const rows=[];
+    const inbound={};
+    transfers.forEach(t=>{ const to=norm(t.to), from=norm(t.from); if(!isAddr(to)||!isAddr(from)) return; const o=inbound[to]||(inbound[to]={addr:to,count:0,unique:new Set(),amount:0}); o.count++; o.unique.add(from); o.amount+=Math.abs(Number(t.amount)||0); });
+    const ranked=Object.values(inbound).sort((a,b)=>(b.unique.size-a.unique.size)||(b.count-a.count)||(b.amount-a.amount)); const top=ranked[0];
+    const safeTerms=v50TermHits(text,['gnosis','safe','multisig','5-of-9','5 of 9','owners','threshold']);
+    v50AddRow(rows,'Safe / multisig terms', safeTerms.length?safeTerms.map(x=>`${x.term}×${x.count}`).join(' • '):'none', 'Safe language must be connected to a full address before it becomes chain evidence.', safeTerms.length?'info':'warn');
+    v50AddRow(rows,'Full Safe candidates', e.full.length?e.full.slice(0,4).map(addrShort).join(' • '):'none', 'Paste the exact Safe address here to harden the sink profiler.', e.full.length?'info':'warn');
+    v50AddRow(rows,'Live recurring sink candidate', top?`${addrShort(top.addr)} • ${top.unique.size} sources • ${top.count} in-leg(s) • ${fmtShort(top.amount)} pDAI flow`:'none', 'This is a live pDAI-flow sink candidate, not automatically the Gearbox Safe.', top&&top.unique.size>=3?'good':'info');
+    const score=Math.min(1, safeTerms.length*.1 + e.full.length*.08 + (top&&top.unique.size>=3?.22:0) + (top&&top.count>=6?.14:0));
+    return v50Module(score>.66?'A sink profile is forming; exact Safe validation is the next closure step.':score>.33?'Multisig/sink pressure exists but identity remains unproven.':'No strong Safe sink evidence is validated yet.', score, rows);
+  }
+  function v50BuildAngelMapper(model){
+    const text=v50AllText(model); const rows=[];
+    const angel=v50TermHits(text,['angel','angels','disclosure','constantine','john constantine','john connor','cynthia davis lee','live eth dai sync','maria','atropa','靈脅用','anagram','luna']);
+    const concreteCueLines=mergeCueLines(state.settings.mariaCueDrop,state.settings.mariaCueMemory).split(/\n+/).map(s=>s.trim()).filter(Boolean).filter(line=>!v50SeedUrlInfo((line.match(/https?:\/\/\S+/i)||[])[0]||'').seed);
+    rows.push(v50RowsFromHits('Angel / disclosure vocabulary', angel, 'These are symbolic/timing leads only. They never close peg proof without chain evidence.'));
+    v50AddRow(rows,'Concrete Maria cue lines', concreteCueLines.length?String(concreteCueLines.length):'none', concreteCueLines.length?'Cue lines can generate timing windows if timestamps/durations are parsable.':'Paste exact Maria video links, titles, durations, or timestamps to build real windows.', concreteCueLines.length?'good':'warn');
+    v50AddRow(rows,'Proof-gate warning','symbolic cap enforced','Angel/anagram/social tracks can lift search priority, but cannot lift formal execution unless route/slot/reserve gates also fire.','bad');
+    const chainScore=(model?.v42_9?.gatekeeper?.score||0)+(model?.v42_9?.shadowIngress?.score||0)+(model?.v42_9?.primingLab?.score||0);
+    const score=Math.min(.64, angel.length*.05 + concreteCueLines.length*.04 + chainScore*.08);
+    return v50Module(angel.length?'Angel/Maria/Atropa cue layer is active but proof-capped.':'Angel/Maria cue layer is quiet in loaded settings.', score, rows);
+  }
+  function v50BuildProtocolRadar(model){
+    const text=v50AllText(model); const rows=[];
+    const prot=v50TermHits(text,['pmakerdao','makerdao','paave','pcomp','pcompound','pbalancer','pcurve','pbadger','pgearbox','gearbox','cdai','cwbTC','ceth','steth','psm','vat','pot','vow','jug','spotter']);
+    const transferAddrs=new Set((model?.signalBrain?.contractIntel?.transfers||[]).flatMap(t=>[norm(t.from),norm(t.to)]).filter(isAddr));
+    const full=v50ExtractAddresses(text).full; const liveOverlap=full.filter(a=>transferAddrs.has(norm(a)));
+    rows.push(v50RowsFromHits('Forked protocol vocabulary', prot, 'Protocol names are target generators. They require contract/address overlap to become evidence.'));
+    v50AddRow(rows,'Full-address overlap with live pDAI flow', liveOverlap.length?liveOverlap.slice(0,6).map(addrShort).join(' • '):'none', liveOverlap.length?'A pasted protocol target also appeared in current pDAI transfer flow.':'No pasted protocol address is currently visible in the pDAI transfer window.', liveOverlap.length?'good':'warn');
+    const score=Math.min(1, prot.length*.055 + liveOverlap.length*.22 + (model?.v42_9?.shadowIngress?.score||0)*.2);
+    return v50Module(score>.66?'Protocol consolidation radar has chain overlap.':score>.33?'Protocol-control pressure exists, but address overlap is limited.':'Protocol consolidation remains mostly narrative until addresses/txs overlap.', score, rows);
+  }
+  function v50BuildProofLedger(model){
+    const rows=[]; const slotAllZero=!!model?.slotProbe?.allZero; const nullScore=model?.v42_9?.primingLab?.score||0; const shadow=model?.v42_9?.shadowIngress?.score||model?.v50?.shadowRail?.score||0; const gearbox=model?.v50?.gearboxQueue?.score||0;
+    v50AddRow(rows,'Watched storage slots', slotAllZero?'null-null / proof capped':'non-zero or changed', slotAllZero?'Formal execution remains capped until 0x7b12 / 0x0968 or another named slot wakes.':'Slot movement is a closure-grade event; inspect values immediately.', slotAllZero?'bad':'good');
+    v50AddRow(rows,'DNA / proxy implementation', model?.dnaProbe?.implAddress?addrShort(model.dnaProbe.implAddress):'no implementation decoded', 'EIP-1967 implementation slot is treated separately from narrative bridge claims.', model?.dnaProbe?.implAddress?'good':'warn');
+    v50AddRow(rows,'Shadow ingress score', pct(shadow), 'Bridge/liquidity pressure only; direct peg proof requires route overlap.', shadow>.4?'info':'warn');
+    v50AddRow(rows,'Primed-storage synthesis', pct(nullScore), 'Zero-write/trie/gateword hints are strong only when trace support is real and repeated.', nullScore>.5?'info':'warn');
+    v50AddRow(rows,'Gearbox validation state', gearbox>.66?'tx-hash ready':gearbox>.33?'lead queued':'seed only', 'Liquidation claims need full operator/Safe/tx identifiers before being counted as proof.', gearbox>.66?'good':gearbox>.33?'info':'warn');
+    const closed=[!slotAllZero,!!model?.dnaProbe?.implAddress,shadow>.5,nullScore>.6,gearbox>.66].filter(Boolean).length;
+    return v50Module(closed>=3?'Several V50 closure gates are firing; inspect proofs manually.':closed?'Some V50 closure gates are warm, but formal proof remains incomplete.':'V50 proof ledger remains capped; the tool should hunt, not declare.', closed/5, rows);
+  }
+  function v50BuildContradiction(model){
+    const rows=[]; const text=v50AllText(model); const e=v50ExtractAddresses(text); const highSocial=v50TermHits(text,['angel','clarity act','cynthia','maria','atropa','pdai to $1','wife changing','life changing']).length;
+    const slotAllZero=!!model?.slotProbe?.allZero; const noTx=!e.txs.length; const noFull=!e.full.length; const noWindows=!(model?.windows||[]).length; const noBridgeRows=!(String(state.settings.shadowBridgeLedger||'').trim()) || /0xfdb\.\.\.1967|0x\.\.\.5996/i.test(String(state.settings.shadowBridgeLedger||''));
+    const misses=[];
+    if(highSocial&&slotAllZero) misses.push('Social pressure is high while watched slots remain null-null.');
+    if(/gearbox|liquidation/i.test(text)&&noTx) misses.push('Gearbox liquidation lead lacks tx hashes.');
+    if(/gnosis|safe|multisig/i.test(text)&&noFull) misses.push('Safe/multisig lead lacks full address.');
+    if(/maria|angel|靈脅用/i.test(text)&&noWindows) misses.push('Maria/angel cue layer has no concrete timing windows loaded.');
+    if(/aztec|rollup|bridge/i.test(text)&&noBridgeRows) misses.push('Bridge/RollupProcessor lane has no external bridge row or full on-chain target.');
+    misses.forEach((m,i)=>v50AddRow(rows,`Debt ${i+1}`,m,'Resolve this before increasing ETA confidence.', i<2?'bad':'warn'));
+    if(!misses.length) v50AddRow(rows,'Contradiction scan','clear on loaded data','No major V50 contradiction was detected in the current loaded state.','good');
+    const score=Math.min(1, misses.length/5);
+    return v50Module(score>.66?'Contradiction debt is high: do not issue a peg ETA.':score>.33?'Contradiction debt is material; keep ETA blocked.':'Contradiction debt is controlled for the loaded state.', score, rows);
+  }
+  async function v50ContractShapeProbe(model){
+    const text=v50AllText(model); const e=v50ExtractAddresses(text);
+    const priority=[...(e.full||[]), state.settings.focusSpender, state.settings.focusNexus, state.settings.focusWallet, state.settings.focusCore, ...(model?.v42_9?.gatekeeper?.targets||[])].map(norm).filter(isAddr);
+    const sample=uniq(priority, x=>x).slice(0,5); const rows=[];
+    if(!sample.length) return v50Module('No full addresses available for V50 contract-shape probe.',0, [{label:'Probe status', value:'waiting for full addresses', hint:'Paste full operator/Safe/Rollup/PSM addresses to enable this lane.', cls:'warn'}]);
+    const timeout=(ms)=>new Promise(res=>setTimeout(()=>res({timeout:true}), ms));
+    const jobs=sample.map(async addr=>{
+      const out=await Promise.race([(async()=>{
+        const code=await getCode(addr).catch(e=>{ throw e; });
+        const bytes=Math.max(0, (String(code||'0x').length-2)/2);
+        let impl='';
+        if(bytes>0){ const raw=await getStorageAt(addr,EIP1967_SLOT).catch(()=>NULL32); if(raw && raw!==NULL32) impl='0x'+String(raw).slice(-40); }
+        return {addr, bytes, impl, timeout:false};
+      })(), timeout(2400)]);
+      return out.timeout?{addr, timeout:true}:out;
+    });
+    const results=await Promise.all(jobs).catch(()=>[]);
+    results.forEach(r=>v50AddRow(rows,addrShort(r.addr), r.timeout?'timeout':`${r.bytes||0} byte(s)${r.impl?' • proxy '+addrShort(r.impl):''}`, r.timeout?'RPC probe timed out; try private RPC or refresh.':(r.bytes?'Contract/proxy shape available for target triage.':'EOA or empty-code address.'), r.timeout?'warn':r.bytes?'good':'info'));
+    const contracts=results.filter(r=>!r.timeout && r.bytes>0).length; const proxies=results.filter(r=>r.impl).length;
+    return v50Module(proxies?'V50 found proxy-shaped targets in the supplied/full-address set.':contracts?'V50 found contract-shaped targets for route/bridge triage.':'V50 probe found no contract-shaped targets in sample.', Math.min(1,contracts*.16+proxies*.22), rows);
+  }
+  function v50SynthesizeModel(model){
+    if(!model||typeof model!=='object') return model;
+    const v50=model.v50||{};
+    const shadowRail=v50BuildShadowRailHunter(model); const gearboxQueue=v50BuildGearboxQueue(model); const route=v50BuildCrossLayerRoute(model); const safe=v50BuildSafeSink(model); const angel=v50BuildAngelMapper(model); const protocol=v50BuildProtocolRadar(model);
+    const seed=Object.assign({}, v50, {shadowRail, gearboxQueue, crossLayerRoute:route, safeSink:safe, angelMapper:angel, protocolRadar:protocol});
+    model.v50=seed;
+    model.v50.proofLedger=v50BuildProofLedger(model);
+    model.v50.contradiction=v50BuildContradiction(model);
+    const hardCap=!!model?.slotProbe?.allZero;
+    const pressure=clamp((shadowRail.score*.16)+(gearboxQueue.score*.12)+(route.score*.16)+(safe.score*.1)+(angel.score*.08)+(protocol.score*.1)+(model.v50.proofLedger.score*.18)+(model.v50.contradiction.score*-0.18)+(model?.clarifier?.prep||0)*.14+(model?.clarifier?.exec||0)*.10,0,1);
+    const etaBlocked=hardCap || model.v50.contradiction.score>.32 || gearboxQueue.score<.66;
+    const deckRows=[];
+    v50AddRow(deckRows,'V50 pressure composite',pct(pressure),'Blends hard chain lanes, shadow-rail pressure, and contradiction debt.', pressure>.66?'good':pressure>.33?'info':'warn');
+    v50AddRow(deckRows,'ETA status',etaBlocked?'blocked':'watch-only / no calendar claim',etaBlocked?'No calendar ETA should be displayed until slot/route/tx-hash closure improves.':'Even here, the tool should state trigger conditions, not dates.', etaBlocked?'bad':'warn');
+    v50AddRow(deckRows,'Primary closure target', hardCap?'0x7b12 / 0x0968 slot wake or equivalent hard state change':'route + reserve confirmation', 'The final version prioritizes hard state changes over narrative heat.', hardCap?'bad':'good');
+    v50AddRow(deckRows,'Best next manual input', gearboxQueue.score<.66?'paste Gearbox tx hashes + full Safe/operator addresses':'open the best focus-linked route tx and compare receipts/traces', 'This is the shortest path from lead to proof.', 'info');
+    model.v50.commandDeck=v50Module(etaBlocked?'V50 is in hunt mode: pressure may be rising, but peg ETA remains blocked.':'V50 has enough closure pressure for trigger-watch mode, not date prediction.', pressure, deckRows);
+    model.version=V50_VERSION;
+    model.systemAudit=Object.assign({}, model.systemAudit, {summary:`${model.systemAudit?.summary||''}${model.systemAudit?.summary?' • ':''}V50 adds shadow-layer rail hunting, Gearbox queueing, Safe sink profiling, angel cue proof-capping, and contradiction-led ETA suppression.`});
+    return model;
+  }
+  async function applyV50UltimateUpgrade(model){
+    model=v50SynthesizeModel(model);
+    if(!model.v50.contractShape || state.deepMode || state.cycle<=1){
+      try{ model.v50.contractShape=await v50ContractShapeProbe(model); }catch(e){ model.v50.contractShape=v50Module('V50 contract-shape probe failed safely.',0,[{label:'Probe error',value:e.message||String(e),hint:'The main audit continues without contract-shape enrichment.',cls:'warn'}]); }
+    }
+    model.v50.proofLedger=v50BuildProofLedger(model);
+    model.v50.contradiction=v50BuildContradiction(model);
+    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50 FINAL Shadow-Layer War-Room Auditor';
+    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V50 FINAL upgrades the attached V43.x tool in place: shadow-layer route hunting, Gearbox liquidation queueing, L2/RollupProcessor lead hardening, multisig sink profiling, Maria/Atropa angel cue mapping, protocol-consolidation radar, and stricter proof-gating so pressure never masquerades as closure.';
+    document.title='pDAI Peg Prover • V50 FINAL Shadow-Layer War-Room Auditor';
+    return model;
+  }
+  const __buildModelV50=buildModel;
+  buildModel=async function(){ const model=await __buildModelV50(); return await applyV50UltimateUpgrade(model); };
+  function renderV50(model){
+    if(!model?.v50) model=v50SynthesizeModel(model);
+    v50RenderModule('v50CommandDeckList', model.v50?.commandDeck);
+    v50RenderModule('v50L2ShadowList', model.v50?.shadowRail);
+    v50RenderModule('v50GearboxList', model.v50?.gearboxQueue);
+    v50RenderModule('v50RouteList', model.v50?.crossLayerRoute);
+    v50RenderModule('v50SafeList', model.v50?.safeSink);
+    v50RenderModule('v50AngelList', model.v50?.angelMapper);
+    v50RenderModule('v50ProtocolList', model.v50?.protocolRadar);
+    const proof=model.v50?.proofLedger;
+    if(proof && model.v50?.contractShape){ proof.rows=[...(proof.rows||[]), ...(model.v50.contractShape.rows||[]).slice(0,5).map(r=>Object.assign({},r,{label:'Contract shape • '+r.label}))]; }
+    v50RenderModule('v50ProofLedgerList', proof);
+    v50RenderModule('v50ContradictionList', model.v50?.contradiction);
+  }
+  const __renderV50=render;
+  render=function(model){ if(model && !model.v50) model=v50SynthesizeModel(model); __renderV50(model); renderV50(model); };
+  // ===== end V50 FINAL patch =====
+
   const __start = () => {
     try { pushSettings(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Startup settings error: '+(err.message||String(err)); throw err; }
     if(state.timer) clearInterval(state.timer);
@@ -4287,109 +4628,6 @@ ${state.settings.researchCorpus||''}`);
   } catch(err) { try { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Boot error: '+(err.message||String(err)); console.error(err); } catch{} }
 })();
 
-// ===== V43.2 source-hardening patch =====
-(function(){
-  function v43_2SeedUrlInfo(url){
-    const u=String(url||'').trim();
-    const low=u.toLowerCase();
-    if(!u) return {seed:false, platform:'', reason:''};
-    const ytConcrete = /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/|clip\/)|youtu\.be\/)/i.test(low);
-    const ytSeed = /youtube\.com\/@[^\s?#]+(?:\/(?:streams|videos|shorts))?\/?(?:[?#].*)?$/i.test(low) && !ytConcrete;
-    if(ytSeed) return {seed:true, platform:'youtube', reason:'channel-page'};
-    const xSeed = /(?:x\.com|twitter\.com)\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/(?:status|i\/status)\//i.test(low);
-    if(xSeed) return {seed:true, platform:'x', reason:'profile-page'};
-    const tgSeed = /t\.me\/[^\/\s?#]+\/?(?:[?#].*)?$/i.test(low) && !/t\.me\/[^\/\s?#]+\/\d+/i.test(low);
-    if(tgSeed) return {seed:true, platform:'telegram', reason:'channel-root'};
-    return {seed:false, platform:inferPlatform(u,''), reason:''};
-  }
-  function v43_2IsSeedOnlyCue(item){
-    if(!item) return false;
-    if(item.seedOnly) return true;
-    const info=v43_2SeedUrlInfo(item.url||'');
-    return !!info.seed;
-  }
-  const __parseMariaCueText = parseMariaCueText;
-  parseMariaCueText = function(raw){
-    const rows = __parseMariaCueText(raw).map((item)=>{
-      const info=v43_2SeedUrlInfo(item?.url||'');
-      if(info.seed){
-        const tags=Array.isArray(item.tags)?item.tags.slice():[];
-        if(!tags.includes('source-seed')) tags.push('source-seed');
-        return Object.assign({}, item, {
-          seedOnly:true,
-          realCue:false,
-          kind:item.kind || 'maria-cue',
-          tags,
-          phase:item.phase==='social' ? 'source-seed' : item.phase,
-          code:item.code || info.reason || 'seed'
-        });
-      }
-      return item;
-    });
-    return rows;
-  };
-  const __collectSocial = collectSocial;
-  collectSocial = async function(imported){
-    const rows = await __collectSocial(imported);
-    return (Array.isArray(rows)?rows:[]).filter(x=>!v43_2IsSeedOnlyCue(x));
-  };
-  const __buildWindows = buildWindows;
-  buildWindows = function(latestBlock, latestTsMs, items, liveBlockSec){
-    return __buildWindows(latestBlock, latestTsMs, (Array.isArray(items)?items:[]).filter(x=>!v43_2IsSeedOnlyCue(x)), liveBlockSec);
-  };
-  const __v43GatherImportedSocial = v43GatherImportedSocial;
-  v43GatherImportedSocial = function(imported){
-    const out = __v43GatherImportedSocial(imported);
-    const all = Array.isArray(out?.social)?out.social:[];
-    const seedOnly = all.filter(v43_2IsSeedOnlyCue);
-    const concrete = all.filter(x=>!v43_2IsSeedOnlyCue(x));
-    return Object.assign({}, out, {social:concrete, seedOnlyCount:seedOnly.length, concreteCount:concrete.length});
-  };
-  const __v43ResolveImportedWindows = v43ResolveImportedWindows;
-  v43ResolveImportedWindows = function(imported, social, last){
-    const concrete=(Array.isArray(social)?social:[]).filter(x=>!v43_2IsSeedOnlyCue(x));
-    if(!concrete.length) return {windows:[], rebuilt:false, sanitized:true};
-    const out=__v43ResolveImportedWindows(imported, concrete, last);
-    const filtered=(Array.isArray(out?.windows)?out.windows:[]).filter(w=>!v43_2IsSeedOnlyCue(w));
-    return Object.assign({}, out, {windows:filtered, sanitized:filtered.length !== (Array.isArray(out?.windows)?out.windows.length:0)});
-  };
-  const __v43BuildSelfAudit = v43BuildSelfAudit;
-  v43BuildSelfAudit = function(baseModel){
-    const audit = __v43BuildSelfAudit(baseModel);
-    const rawCueText = state.settings.mariaCueDrop || state.settings.mariaCueMemory || state.importedBundle?.settings?.mariaCueDrop || state.importedBundle?.settings?.mariaCueMemory || '';
-    const cueLines = mergeCueLines(rawCueText).split(/\n+/).map(x=>x.trim()).filter(Boolean);
-    const seedLines = cueLines.filter(line=>v43_2SeedUrlInfo((String(line).match(/https?:\/\/\S+/i)||[])[0]||'').seed).length;
-    const concreteLines = Math.max(0, cueLines.length - seedLines);
-    audit.rows.splice(3, 0, {
-      label:'Cue specificity',
-      value:`${concreteLines} concrete / ${seedLines} source-seed`,
-      hint: seedLines ? 'Generic channel/profile URLs are now treated as source coverage, not as timing windows.' : 'Cue lines appear specific enough for timing-window use.',
-      cls: seedLines ? 'warn' : 'good'
-    });
-    audit.summary = `${audit.summary} V43.2 filters source-family URLs out of social timing windows.`;
-    return audit;
-  };
-  const __applyV43Upgrade = applyV43Upgrade;
-  applyV43Upgrade = function(baseModel){
-    const model = __applyV43Upgrade(baseModel);
-    const rawCueText = state.settings.mariaCueDrop || state.settings.mariaCueMemory || state.importedBundle?.settings?.mariaCueDrop || state.importedBundle?.settings?.mariaCueMemory || '';
-    const cueLines = mergeCueLines(rawCueText).split(/\n+/).map(x=>x.trim()).filter(Boolean);
-    const seedLines = cueLines.filter(line=>v43_2SeedUrlInfo((String(line).match(/https?:\/\/\S+/i)||[])[0]||'').seed).length;
-    model.version='V43.2 Source-Hardened Predator Gatekeeper Auditor';
-    model.v43 = Object.assign({}, model.v43, {
-      sourceHardening:{seedLines, concreteLines:Math.max(0, cueLines.length-seedLines), summary: seedLines ? 'Source-family URLs were detected and filtered out of timing windows.' : 'Cue inputs are concrete enough for timing-window use.'}
-    });
-    model.systemAudit = Object.assign({}, model.systemAudit, {
-      summary:`${model.systemAudit?.summary||''}${model.systemAudit?.summary?' • ':''}V43.2 filters generic source pages out of cue timing so /streams, /videos, /shorts, and profile roots do not masquerade as real windows.`
-    });
-    const titleEl=document.querySelector('.title');
-    if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V43.2 Source-Hardened Predator Gatekeeper Auditor';
-    const subEl=document.querySelector('.sub');
-    if(subEl) subEl.textContent='V43.2 upgrades your attached V42.9/V43.0 tool in place: deterministic bundle import, self-audit and consistency checks, stronger Maria rehydration, source-family cue hardening, clearer lead-vs-focus logic, and an interactive flashpoint simulator layered on top of the existing social-scout, gatekeeper, priming, and gravity lanes.';
-    return model;
-  };
-})();
-// ===== end V43.2 patch =====
 
 </script>
 </body>
