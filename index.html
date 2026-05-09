@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>pDAI Peg Prover • V50 FINAL Shadow-Layer War-Room Auditor</title>
+<title>pDAI Peg Prover • V50.1 Omni-State Settlement Auditor</title>
 <style>
   :root{
     --bg:#050914; --bg2:#09192f; --panel:#0c1522; --panel2:#0a1018; --line:#21344d; --line2:#30557a;
@@ -77,6 +77,39 @@
   .fill{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));width:0%}
   .eta{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02);margin-bottom:8px}
   .ribbon{display:inline-block;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,rgba(89,255,187,.18),rgba(76,200,255,.15));border:1px solid rgba(89,255,187,.28);font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+
+  /* ===== V50.1 top peg-status command center ===== */
+  .v501-status-panel{margin-top:14px;border-color:rgba(0,255,157,.26);position:relative;overflow:hidden}
+  .v501-status-panel:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 10%,rgba(89,255,187,.12),transparent 20%),radial-gradient(circle at 82% 14%,rgba(76,200,255,.10),transparent 22%)}
+  .v501-status-panel:after{content:"";position:absolute;left:-20%;right:-20%;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),var(--cyan),transparent);animation:v501Sweep 4.8s linear infinite;opacity:.8}
+  @keyframes v501Sweep{0%{transform:translateX(-45%)}100%{transform:translateX(45%)}}
+  .v501-hero{display:grid;grid-template-columns:320px 1fr 390px;gap:14px;align-items:stretch;position:relative;z-index:1}
+  .v501-orb-shell{min-height:260px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.18));position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .v501-orb-shell:before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:conic-gradient(from 0deg,rgba(89,255,187,.15),rgba(76,200,255,.04),rgba(191,139,255,.10),rgba(255,202,97,.06),rgba(89,255,187,.15));animation:rotate 18s linear infinite;filter:blur(2px)}
+  .v501-orb-shell:after{content:"";position:absolute;inset:18px;border-radius:18px;background:linear-gradient(0deg,rgba(0,0,0,.38),transparent 45%,rgba(255,255,255,.03));pointer-events:none}
+  .v501-orb{width:172px;height:172px;border-radius:50%;position:relative;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.25),transparent 18%),radial-gradient(circle at center,#0b1824 0,#07101a 62%,#02060a 100%);border:1px solid rgba(76,200,255,.42);box-shadow:0 0 52px rgba(76,200,255,.18),inset 0 0 38px rgba(89,255,187,.07);z-index:1}
+  .v501-orb .v501-ring{position:absolute;inset:-22px;border-radius:50%;border:1px dashed rgba(76,200,255,.36);animation:rotate 10s linear infinite}
+  .v501-orb .v501-ring.r2{inset:-45px;border-color:rgba(89,255,187,.22);animation-duration:16s;animation-direction:reverse}
+  .v501-orb .v501-core-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:16px}
+  .v501-core-text .big{font-size:2rem;font-weight:1000;line-height:1}.v501-core-text .smallcap{margin-top:6px;font-size:.66rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+  .v501-status-main{display:flex;flex-direction:column;gap:10px}
+  .v501-headline{font-size:2.05rem;font-weight:1000;letter-spacing:.02em;line-height:1.05}.v501-headline.good{color:var(--green)}.v501-headline.warn{color:var(--amber)}.v501-headline.bad{color:var(--red)}.v501-headline.info{color:var(--cyan)}
+  .v501-summary{font-size:.94rem;color:var(--muted);line-height:1.55;max-width:900px}
+  .v501-gates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:auto}
+  .v501-gate{border:1px solid var(--line);border-radius:15px;padding:10px;background:rgba(0,0,0,.16);min-height:78px}
+  .v501-gate .k{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}.v501-gate .v{margin-top:7px;font-size:1.05rem;font-weight:950}.v501-gate .h{margin-top:5px;font-size:.72rem;color:var(--muted);line-height:1.3}
+  .v501-workbox{border:1px solid var(--line);border-radius:20px;padding:14px;background:linear-gradient(180deg,rgba(8,17,26,.8),rgba(0,0,0,.24));position:relative;overflow:hidden}
+  .v501-workbox:before{content:"";position:absolute;top:-40%;left:0;right:0;height:40%;background:linear-gradient(180deg,transparent,rgba(89,255,187,.10),transparent);animation:v501Scan 3.6s linear infinite;pointer-events:none}@keyframes v501Scan{to{transform:translateY(420%)}}
+  .v501-work-feed{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;max-height:250px;overflow:hidden}
+  .v501-work-row{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:start;border:1px solid rgba(255,255,255,.055);border-radius:12px;padding:9px;background:rgba(255,255,255,.025);font-size:.78rem;line-height:1.35}
+  .v501-dot{width:10px;height:10px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px currentColor;margin-top:3px}.v501-work-row.good .v501-dot{background:var(--green)}.v501-work-row.warn .v501-dot{background:var(--amber)}.v501-work-row.bad .v501-dot{background:var(--red)}
+  .v501-work-title{font-weight:850}.v501-work-hint{color:var(--muted);margin-top:2px}.v501-work-score{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);font-weight:850}
+  .v501-metric-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:12px;position:relative;z-index:1}
+  .v501-mini{border:1px solid var(--line);border-radius:16px;padding:11px;background:rgba(255,255,255,.025)}.v501-mini .label{font-size:.62rem}.v501-mini .value{font-size:1.15rem;margin-top:7px}.v501-mini .bar{height:5px;margin-top:9px}.v501-route-viz{position:relative;z-index:1;margin-top:12px;border:1px solid var(--line);border-radius:18px;padding:13px;background:rgba(0,0,0,.18);overflow:hidden}
+  .v501-route-viz svg{width:100%;height:82px;display:block}.v501-route-viz .caption{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.75rem;margin-top:4px;flex-wrap:wrap}
+  .v501-pulse-line{stroke-dasharray:10 12;animation:v501Dash 1.6s linear infinite}@keyframes v501Dash{to{stroke-dashoffset:-44}}
+  @media (max-width:1300px){.v501-hero{grid-template-columns:1fr}.v501-gates,.v501-metric-grid{grid-template-columns:1fr 1fr}.v501-orb-shell{min-height:220px}}
+
   @media (max-width:1300px){.grid2,.hero,.summary,.tri,.twocol,.four,.five,.form{grid-template-columns:1fr}}
 </style>
 </head>
@@ -84,11 +117,11 @@
 <div class="wrap">
   <div class="panel grid2">
     <div>
-      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V50 FINAL Shadow-Layer War-Room Auditor</h1>
-      <div class="sub">V50 FINAL upgrades the attached V43.x tool in place: shadow-layer route hunting, Gearbox liquidation queueing, L2/RollupProcessor lead hardening, multisig sink profiling, Maria/Atropa angel cue mapping, protocol-consolidation radar, and stricter proof-gating so pressure never masquerades as closure.</div>
+      <h1 class="title"><span class="glow">pDAI Peg Prover</span> • V50.1 Omni-State Settlement Auditor</h1>
+      <div class="sub">V50.1 folds the newest V50 bundle into a stricter Omni-State Settlement Auditor: live peg-status command center, terminal-discharge sink profiling, bridge/proxy settlement radar, same-code cluster triage, and proof-capped Maria/Atropa timing windows.</div>
       <div class="chips">
-        <div class="chip good">V50 FINAL in-place upgrade</div>
-        <div class="chip info">Adds shadow-layer / L2 rail hunter</div>
+        <div class="chip good">V50.1 newest-bundle upgrade</div>
+        <div class="chip info">Adds settlement / terminal sink radar</div>
         <div class="chip warn">Adds Gearbox + multisig forensic queue</div>
         <div class="chip bad">Hard-caps ETA claims until chain closure fires</div>
       </div>
@@ -109,6 +142,50 @@
         <button id="exportHistoryBtn" class="secondary">Export history</button>
       </div>
       <input id="importFile" type="file" accept="application/json" style="display:none" />
+    </div>
+  </div>
+
+
+  <div class="panel v501-status-panel" id="v501PegStatusPanel">
+    <div class="v501-hero">
+      <div class="v501-orb-shell">
+        <div class="v501-orb">
+          <div class="v501-ring"></div><div class="v501-ring r2"></div>
+          <div class="v501-core-text"><div class="big" id="v501OrbScore">—</div><div class="smallcap" id="v501OrbLabel">peg status</div></div>
+        </div>
+      </div>
+      <div class="v501-status-main">
+        <div class="boxTitle">V50.1 live peg status / newest-bundle command summary</div>
+        <div class="v501-headline warn" id="v501PegHeadline">loading peg state…</div>
+        <div class="v501-summary" id="v501PegSummary">Waiting for imported bundle or live RPC sync.</div>
+        <div class="v501-gates">
+          <div class="v501-gate"><div class="k">ETA gate</div><div class="v" id="v501EtaGate">—</div><div class="h" id="v501EtaHint">—</div></div>
+          <div class="v501-gate"><div class="k">Hard closure</div><div class="v" id="v501HardClosure">—</div><div class="h" id="v501HardHint">—</div></div>
+          <div class="v501-gate"><div class="k">Dominant work</div><div class="v" id="v501DominantWork">—</div><div class="h" id="v501DominantHint">—</div></div>
+          <div class="v501-gate"><div class="k">Best next proof</div><div class="v" id="v501NextProof">—</div><div class="h" id="v501NextProofHint">—</div></div>
+        </div>
+      </div>
+      <div class="v501-workbox">
+        <div class="boxTitle">Live work engine</div>
+        <div class="small">Shows what the auditor is actively trying to prove instead of pretending a calendar ETA exists.</div>
+        <div class="v501-work-feed" id="v501WorkFeed" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <div class="v501-metric-grid">
+      <div class="v501-mini"><div class="label">Core/native imbalance</div><div class="value" id="v501CoreNative">—</div><div class="bar"><div class="fill" id="v501CoreBar"></div></div></div>
+      <div class="v501-mini"><div class="label">Token shell / execution</div><div class="value" id="v501ShellScore">—</div><div class="bar"><div class="fill" id="v501ShellBar"></div></div></div>
+      <div class="v501-mini"><div class="label">Formal execution gate</div><div class="value" id="v501FormalGate">—</div><div class="bar"><div class="fill" id="v501FormalBar"></div></div></div>
+      <div class="v501-mini"><div class="label">Slot state</div><div class="value" id="v501SlotState">—</div><div class="bar"><div class="fill" id="v501SlotBar"></div></div></div>
+      <div class="v501-mini"><div class="label">Route touches</div><div class="value" id="v501RouteTouches">—</div><div class="bar"><div class="fill" id="v501RouteBar"></div></div></div>
+      <div class="v501-mini"><div class="label">Approvals / spenders</div><div class="value" id="v501ApprovalPulse">—</div><div class="bar"><div class="fill" id="v501ApprovalBar"></div></div></div>
+    </div>
+    <div class="v501-route-viz">
+      <svg viewBox="0 0 1100 82" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="v501g" x1="0" x2="1"><stop offset="0" stop-color="#59ffbb" stop-opacity=".25"/><stop offset=".5" stop-color="#4cc8ff" stop-opacity=".9"/><stop offset="1" stop-color="#bf8bff" stop-opacity=".35"/></linearGradient></defs>
+        <path class="v501-pulse-line" d="M20 42 C170 6, 250 78, 390 42 S650 12, 780 42 S980 74, 1080 42" fill="none" stroke="url(#v501g)" stroke-width="4"/>
+        <circle cx="80" cy="42" r="10" fill="#59ffbb" opacity=".95"/><circle cx="310" cy="42" r="8" fill="#4cc8ff" opacity=".9"/><circle cx="550" cy="42" r="13" fill="#ffca61" opacity=".88"/><circle cx="800" cy="42" r="8" fill="#bf8bff" opacity=".9"/><circle cx="1030" cy="42" r="11" fill="#ff6b7c" opacity=".88"/>
+      </svg>
+      <div class="caption"><span>core reserve / 5EF7</span><span>AE84 / focus wallet</span><span>Gearbox + rollup leads</span><span>Safe / terminal sink</span><span>closure gate</span></div>
     </div>
   </div>
 
@@ -4592,9 +4669,9 @@ ${state.settings.researchCorpus||''}`);
     }
     model.v50.proofLedger=v50BuildProofLedger(model);
     model.v50.contradiction=v50BuildContradiction(model);
-    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50 FINAL Shadow-Layer War-Room Auditor';
-    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V50 FINAL upgrades the attached V43.x tool in place: shadow-layer route hunting, Gearbox liquidation queueing, L2/RollupProcessor lead hardening, multisig sink profiling, Maria/Atropa angel cue mapping, protocol-consolidation radar, and stricter proof-gating so pressure never masquerades as closure.';
-    document.title='pDAI Peg Prover • V50 FINAL Shadow-Layer War-Room Auditor';
+    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50.1 Omni-State Settlement Auditor';
+    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V50.1 folds the newest V50 bundle into a stricter Omni-State Settlement Auditor: live peg-status command center, terminal-discharge sink profiling, bridge/proxy settlement radar, same-code cluster triage, and proof-capped Maria/Atropa timing windows.';
+    document.title='pDAI Peg Prover • V50.1 Omni-State Settlement Auditor';
     return model;
   }
   const __buildModelV50=buildModel;
@@ -4616,6 +4693,86 @@ ${state.settings.researchCorpus||''}`);
   const __renderV50=render;
   render=function(model){ if(model && !model.v50) model=v50SynthesizeModel(model); __renderV50(model); renderV50(model); };
   // ===== end V50 FINAL patch =====
+
+
+  // ===== V50.1 Omni-State Settlement Status Upgrade =====
+  const V501_VERSION='V50.1 Omni-State Settlement Auditor';
+  const V501_SEED={"latestBlock":26488921,"latestTsMs":1778351725000,"total":44358933298.16725,"burned":521277.927801972,"coreNative":354.56805257627906,"snapScore":0.9750621445847675,"nativeNow":15331056.23152832,"bridgedNow":56057945683.930016,"slotSummary":"null-null equality","slotsAllZero":true,"moveState":"the token shell is waking up but confirmation is still incomplete","moveConfidence":0.9088777965063145,"dominant":"Warehousing","dominantScore":1,"rivalWinner":"Generic Liberty / ecosystem expansion","logsCount":11373,"transferCount":11355,"approvalCount":18,"watcherTouches":96,"anchorTouches":137,"promotedTouches":10992,"topTouchers":[{"address":"0x5f4bc6714ad363751ac0f4375618346fa4a15d08","count":8678},{"address":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","count":2712},{"address":"0xf13ca5c98d9aae6294edb9e7299b0bbe1e71265d","count":2038},{"address":"0x07bfa7fdbc4715441632e773e5e859f0d3b4507d","count":499},{"address":"0xab38e37bfcd22650ec45c93476d68c0e252ad519","count":220}],"topSpenders":[{"address":"0x165c3410fc91ef562c50559f7d2289febed552d9","count":10},{"address":"0xda9aba4eacf54e0273f56dffee6b8f1e20b23bba","count":3},{"address":"0x9e504458e22918cb90943ba56f6306aa5a3349ba","count":2},{"address":"0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6","count":1},{"address":"0x0ab0c9c78a63793e36cb861b8dceee8b4a65e2ce","count":1}],"flow":[{"address":"0x0c83ab4742a77b8f7064612a1bfaf942b794a179","net":799999.9999999999,"in":799999.9999999999,"out":0,"touches":1},{"address":"0xd586925e55cba08c4bdc8c4a22201db9faa611e6","net":-763733.7798559353,"in":0,"out":763733.7798559353,"touches":11},{"address":"0x5ef7aac0de4f2012cb36730da140025b113fada4","net":-549278.214284331,"in":0,"out":549278.214284331,"touches":96},{"address":"0x78d58247be592f3cb7b87a5650c6b466ce4a5476","net":217070.51902226105,"in":266229.00096637703,"out":49158.48194411597,"touches":30},{"address":"0xf13ca5c98d9aae6294edb9e7299b0bbe1e71265d","net":-214226.5069583828,"in":584204.9861076657,"out":798431.4930660485,"touches":2038}],"stages":[{"name":"Intake routes","score":0.8055111860252582,"why":"Bridge / route / API / intake cues plus surface pressure rails."},{"name":"Warehousing","score":1,"why":"5EF7 and the top shadow candidate hold supply."},{"name":"Thin-LP corridor","score":0.9750621445847675,"why":"Core/native imbalance and optical-rail attrition."},{"name":"Shadow routing","score":0.97,"why":"Promoted counterparties outrunning cold legacy watchers."},{"name":"Token-shell wake-up","score":0.86,"why":"Contract pulse, window reactivity, and shell stance."},{"name":"Formal execution","score":0.35,"why":"Non-zero slots, clear reserve shocks, or literal mint/burn proof."}],"probePlanner":[{"title":"Deepen reserve-window archaeology around strongest windows","why":"Clarification improves fastest when a social window and anchor reserve motion overlap.","score":0.93},{"title":"Keep slot-awakening watch at window boundaries","why":"Null-null equality is still the biggest missing structural proof.","score":0.89},{"title":"Rank approval spenders by proxy / selector fingerprint","why":"Approval recipients may reveal the real manifolds earlier than legacy watchers do.","score":0.85},{"title":"Map same-code route clusters and their graph edges","why":"Factory-style plumber contracts can expose the real routing lane before the shell wakes up.","score":0.84},{"title":"Inspect lead spender for pull-based routing behavior","why":"The approval leader is the best live execution-hunt target right now.","score":0.83}]};
+  function v501N(x, fallback=0){ x=Number(x); return Number.isFinite(x)?x:fallback; }
+  function v501Fmt(x,d=2){ x=Number(x); if(!Number.isFinite(x)) return '—'; const a=Math.abs(x); if(a>=1e9) return (x/1e9).toFixed(d)+'B'; if(a>=1e6) return (x/1e6).toFixed(d)+'M'; if(a>=1e3) return (x/1e3).toFixed(d)+'K'; return x.toFixed(d); }
+  function v501Pct(x){ x=Number(x); return Number.isFinite(x)?(x*100).toFixed(1)+'%':'—'; }
+  function v501Set(id,txt,cls){ const el=$(id); if(!el) return; el.textContent=txt; if(cls) el.className=el.className.replace(/\b(good|warn|bad|info)\b/g,'').trim()+' '+cls; }
+  function v501Width(id,x){ const el=$(id); if(el) el.style.width=Math.max(0,Math.min(100,Number(x)||0)).toFixed(1)+'%'; }
+  function v501Stage(model,name){ const stages=model?.signalBrain?.moveBuilder?.stages||V501_SEED.stages||[]; const s=stages.find(x=>String(x.name||'').toLowerCase().includes(name)); return s?Number(s.score)||0:0; }
+  function v501LatestModel(model){ return model || state.lastGood || state.importedBundle?.lastGood || (state.importedBundle?.history||[]).slice(-1)[0] || V501_SEED; }
+  function v501BuildWorkRows(model){
+    const planner=model?.signalBrain?.probePlanner||V501_SEED.probePlanner||[];
+    const out=[];
+    (planner||[]).slice(0,4).forEach((p,i)=>out.push({title:p.title||('Probe '+(i+1)), hint:p.why||'Next audit probe.', score:Number(p.score)||0, cls:(Number(p.score)||0)>.88?'good':'info'}));
+    const ci=model?.signalBrain?.contractIntel||{};
+    if((ci.topSpenders||[]).length) out.push({title:'Rank approval spenders by proxy fingerprint', hint:'Top spender '+addrShort(ci.topSpenders[0].address)+' fired '+(ci.topSpenders[0].count||0)+' approval event(s).', score:.85, cls:'warn'});
+    if(model?.slotProbe?.allZero) out.push({title:'Keep 0x7b12 / 0x0968 on hard closure watch', hint:'Slots are still null-null; this blocks ETA claims.', score:.89, cls:'bad'});
+    if((model?.v50?.gearboxQueue?.score||0)<.66) out.push({title:'Resolve Gearbox lead into tx hashes + full Safe address', hint:'The May 3 liquidation claim remains a lead until full addresses and receipts close.', score:.82, cls:'warn'});
+    return out.slice(0,7);
+  }
+  function v501RenderWork(model){
+    const box=$('v501WorkFeed'); if(!box) return; box.innerHTML='';
+    const rows=v501BuildWorkRows(model);
+    rows.forEach((r,i)=>{
+      const div=document.createElement('div'); div.className='v501-work-row '+(r.cls||'info');
+      div.innerHTML='<div class="v501-dot"></div><div><div class="v501-work-title"></div><div class="v501-work-hint"></div></div><div class="v501-work-score"></div>';
+      div.querySelector('.v501-work-title').textContent=r.title;
+      div.querySelector('.v501-work-hint').textContent=r.hint;
+      div.querySelector('.v501-work-score').textContent=v501Pct(r.score||0);
+      box.appendChild(div);
+    });
+  }
+  function renderV501(model){
+    model=v501LatestModel(model);
+    const sb=model.signalBrain||{}, ci=sb.contractIntel||{}, move=sb.moveBuilder||{}, thin=sb.thinLP||{}, inner=sb.contractInnerEye||{};
+    const slotsNull=!!(model.slotProbe?.allZero);
+    const proofScore=Number(model.v50?.proofLedger?.score||0);
+    const contradiction=Number(model.v50?.contradiction?.score||0);
+    const shell=Number(inner.score || v501Stage(model,'token-shell') || 0);
+    const formal=v501Stage(model,'formal execution') || 0.35;
+    const coreRatio=Number(thin.coreRatio || V501_SEED.coreNative || 0);
+    const routeTouches=Number(ci.promotedTouches || ci.watcherTouches || 0);
+    const approvals=Number(ci.approvalCount || 0);
+    const gateBlocked=slotsNull || proofScore<.55 || contradiction>.32;
+    const headline=gateBlocked?'HUNT MODE — ETA BLOCKED':'TRIGGER WATCH — NO CALENDAR ETA';
+    const cls=gateBlocked?'warn':'good';
+    v501Set('v501PegHeadline',headline,cls);
+    v501Set('v501OrbScore', gateBlocked?'HUNT':'WATCH');
+    v501Set('v501OrbLabel', slotsNull?'slots null-null':'closure warming');
+    const latestBlock=model.latestBlock||V501_SEED.latestBlock;
+    const top=(ci.topTouchers||V501_SEED.topTouchers||[])[0];
+    const topTxt=top?.address?addrShort(top.address)+' ('+(top.count||0)+' touches)':'no top toucher loaded';
+    const summary='Latest bundle/live state: block '+(latestBlock||'—')+' • core/native imbalance '+v501Fmt(coreRatio,2)+'x • shell score '+v501Pct(shell)+' • formal execution '+v501Pct(formal)+' • top route '+topTxt+'. '+(slotsNull?'Watched slots remain null-null, so the tool hunts for closure instead of printing a peg ETA.':'Hard closure has warmed; still show trigger conditions rather than dates.');
+    v501Set('v501PegSummary',summary);
+    v501Set('v501EtaGate', gateBlocked?'blocked':'watch-only');
+    v501Set('v501EtaHint', gateBlocked?'Needs slot, tx-hash, route, reserve, or Safe closure.':'Still no date prediction; only trigger state.');
+    v501Set('v501HardClosure', slotsNull?'null-null':'warming');
+    v501Set('v501HardHint', model.slotProbe?.summary || V501_SEED.slotSummary || 'slot probe pending');
+    v501Set('v501DominantWork', (move.dominant?.name || V501_SEED.dominant || 'route archaeology'));
+    v501Set('v501DominantHint', move.stateText || V501_SEED.moveState || 'audit state pending');
+    const nextProof=slotsNull?'slot wake-up':(model.v50?.gearboxQueue?.score||0)<.66?'Gearbox receipts':'reserve / route shock';
+    v501Set('v501NextProof', nextProof);
+    v501Set('v501NextProofHint', slotsNull?'0x7b12 / 0x0968 or equivalent hard state transition.':'Full tx + trace + pDAI-touch validation.');
+    v501Set('v501CoreNative', coreRatio?v501Fmt(coreRatio,2)+'x':'—');
+    v501Width('v501CoreBar', Math.min(100, coreRatio/4));
+    v501Set('v501ShellScore', v501Pct(shell)); v501Width('v501ShellBar', shell*100);
+    v501Set('v501FormalGate', v501Pct(formal)); v501Width('v501FormalBar', formal*100);
+    v501Set('v501SlotState', slotsNull?'null-null':'non-zero'); v501Width('v501SlotBar', slotsNull?8:92);
+    v501Set('v501RouteTouches', routeTouches?v501Fmt(routeTouches,0):'—'); v501Width('v501RouteBar', Math.min(100, routeTouches/120));
+    v501Set('v501ApprovalPulse', approvals?approvals+' approvals':'—'); v501Width('v501ApprovalBar', Math.min(100, approvals*5.5));
+    v501RenderWork(model);
+    const titleEl=document.querySelector('.title'); if(titleEl) titleEl.innerHTML='<span class="glow">pDAI Peg Prover</span> • V50.1 Omni-State Settlement Auditor';
+    const subEl=document.querySelector('.sub'); if(subEl) subEl.textContent='V50.1 folds the newest V50 bundle into a stricter Omni-State Settlement Auditor: live peg-status command center, terminal-discharge sink profiling, bridge/proxy settlement radar, same-code cluster triage, and proof-capped Maria/Atropa timing windows.';
+    document.title='pDAI Peg Prover • V50.1 Omni-State Settlement Auditor';
+  }
+  const __renderV501=render;
+  render=function(model){ __renderV501(model); try{ renderV501(model); }catch(e){ console.warn('V50.1 render failed safely', e); } };
+  // ===== end V50.1 patch =====
 
   const __start = () => {
     try { pushSettings(); } catch(err) { __bootStatus('sync failed', 'bad'); const ls=document.getElementById('lastSync'); if(ls) ls.textContent='Startup settings error: '+(err.message||String(err)); throw err; }
