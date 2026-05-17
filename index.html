@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>pDAI Peg Prover • V63.3 Bridge-to-Peg Hook Autopilot Cortex</title>
+<title>pDAI Peg Prover • V63.3.1 Autopilot Watchdog Fixed Cortex</title>
 <style>
 :root{--bg:#05070b;--panel:rgba(10,16,26,.72);--panel2:rgba(255,255,255,.045);--line:rgba(151,200,255,.16);--line2:rgba(151,200,255,.28);--text:#f4fbff;--muted:#8fa6b8;--green:#65ffbd;--cyan:#62dcff;--blue:#7ea6ff;--violet:#c49aff;--amber:#ffd166;--red:#ff6b8a;--shadow:0 24px 80px rgba(0,0,0,.38),0 0 80px rgba(98,220,255,.08);--r:26px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -23,7 +23,7 @@ body:after{content:"";position:fixed;inset:-25%;pointer-events:none;z-index:-1;b
 <body>
 <div class="app">
   <section class="glass pad top">
-    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.3 Bridge-to-Peg Hook Autopilot Cortex</h1><div class="sub">V63.3 absorbs the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now hunts for the bridge-to-peg hook: the moment passive bridge custody starts coupling with F33C/F406, Reserve ERC-1967 governance, settlement-basin candidates, and pDAI control-plane flows. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
+    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.3.1 Autopilot Watchdog Fixed Cortex</h1><div class="sub">V63.3 absorbs the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now hunts for the bridge-to-peg hook: the moment passive bridge custody starts coupling with F33C/F406, Reserve ERC-1967 governance, settlement-basin candidates, and pDAI control-plane flows. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
     <div><div id="status" class="status warn"><span class="dot"></span><span>ready</span></div><div class="meta"><div id="rpcMeta">RPC: —</div><div id="blockMeta">Block: —</div><div id="taskMeta">Last task: —</div></div><div class="controls"><button class="btn primary" id="runBtn">Manual deep cycle</button><button class="btn" id="f33cBtn">F33C watcher</button><button class="btn" id="launchBtn">Launch + 1M autopsy</button><button class="btn" id="onwardBtn">Onward flow</button><button class="btn" id="intersectBtn">Explain intersections</button><button class="btn" id="endBtn">End / cage scan</button><button class="btn" id="proxyBtn">ERC-1967 scan</button><button class="btn" id="routeBtn">Route autopsy</button><button class="btn" id="accrualBtn">Accrual autopsy</button><button class="btn" id="auditBtn">Self-audit</button><button class="btn" id="gateBtn">Hard-gate ledger</button><button class="btn" id="classifyBtn">Proxy classify</button><button class="btn" id="diffBtn">Diff timeline</button><button class="btn" id="warRoomBtn">V62.4 war-room</button><button class="btn" id="inferBtn">Convergence reasoner</button><button class="btn" id="canonProofBtn">Proven canon</button><button class="btn" id="bayesBtn">Bayesian model</button><button class="btn" id="identityBtn">Identity hunter</button><button class="btn" id="geminiBtn">Gemini packet</button><button class="btn" id="canonBtn">Canon falsifier</button><input id="txHashInput" class="mono" value="0x515a010fdb97cf00b6aaa1c7d5050ebd353a0b2cb259087cf1d91642a4e9e03c" style="min-width:360px;max-width:100%;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.24);color:var(--text);padding:10px 12px" /><button class="btn" id="tweetTxBtn">Tweet tx autopsy</button><button class="btn" id="reserveBtn">Reserve control-plane</button><button class="btn" id="nestedBtn">Nested governance</button><button class="btn" id="batchTxBtn">Batch tx packet</button><button class="btn" id="doctrineBtn">Proof doctrine</button><button class="btn" id="importBtn">Import report</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" /><button class="btn" id="autoBtn">Start autopilot</button><button class="btn danger" id="stopBtn">Stop</button><button class="btn" id="settingsBtn">Settings</button><button class="btn" id="exportBtn">Export report</button></div></div>
   </section>
 
@@ -116,7 +116,7 @@ const DICT={'0x01339c21':'launch()','0x8091f3bf':'launched()','0x8da5cb5b':'owne
 const ERC1967={impl:'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',admin:'0xb53127684a568b3173ae13b9f8a6016e0192b2d357c43a0a358d3b8a2b35133d',beacon:'0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'};
 const ROLLUP_SELECTORS=['9e461a3d','8f23c0b3','e4d661ac','4d03b5ef','3659cfe6','4f1ef286','52d1902d','2f54bf6e','d7bb99ba','8da5cb5b','8091f3bf','01339c21'];
 
-const VERSION='V63.3 Bridge-to-Peg Hook Autopilot Cortex'; const BASELINE_KEY='pdai-v624-compact-baseline';
+const VERSION='V63.3.1 Autopilot Watchdog Fixed Cortex'; const BASELINE_KEY='pdai-v624-compact-baseline';
 let state={cfg:JSON.parse(JSON.stringify(CFG)),rpc:0,block:0,lastBlockScan:0,busy:false,timer:null,thoughts:[],snapshot:null,f33c:null,end:null,pcomp:null,bridge:null,proxy:null,routes:null,sinks:null,routeAutopsy:null,accrual:null,launch:null,onward:null,tactics:null,addresses:new Map(),selectors:new Map(),models:null,cognition:null,evidence:[],hypotheses:[],proofQueue:[],dotLinks:[],learning:null,targetIntel:null,hardGates:null,persistence:null,diff:null,proxyClassifier:null,falsifier:null,terminalLadder:null,flowMap:null,terminalClassifier:null,proxyFirewall:null,scoreSplit:null,reviewPacket:null,identityHunter:null,geminiPacket:null,convergence:null,canonProof:null,bayesModel:null,counterfactual:null,tweetTx:null,reserveControl:null,batchTx:null,nestedGov:null,proofDoctrine:null,cycles:0};
 const $=id=>document.getElementById(id); const short=a=>a&&a.length>14?a.slice(0,8)+'…'+a.slice(-6):(a||'—'); const lc=a=>(a||'').toLowerCase(); const isAddr=a=>/^0x[a-fA-F0-9]{40}$/.test(a||''); const uniq=a=>[...new Set(a.filter(Boolean))]; const pct=n=>Math.max(0,Math.min(100,Number(n)||0)); const fmt=(n,d=2)=>Number.isFinite(+n)?(+n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';
 function thought(kind,title,msg){state.thoughts.unshift({kind,title,msg,ts:new Date().toLocaleTimeString()}); state.thoughts=state.thoughts.slice(0,80); renderFeed();}
@@ -1597,7 +1597,7 @@ const V631_baseExportReport=exportReport;
 exportReport=function(){sanitizePrimaryTxPanels('pre-export'); const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,v631:state.v631,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts}; const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-1-omnibridge-recycling-autopilot-report.json'; a.click(); URL.revokeObjectURL(a.href);};
 
 
-/* ========================= V63.3 Bridge-to-Peg Hook Autopilot Cortex ========================= */
+/* ========================= V63.3.1 Autopilot Watchdog Fixed Cortex ========================= */
 const V632_FEE_COLLECTOR='0xba86ca0aeca30247f9e2fd8736879997bcd01dc4';
 const V632_EXPECTED_RELAY_AMOUNT=125657216.06820547;
 const V632_EXPECTED_FEE=376971.6482046164;
@@ -1689,7 +1689,7 @@ const V632_baseExportReport=exportReport;
 exportReport=function(){sanitizePrimaryTxPanels('pre-export'); const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,v631:state.v631,v632:state.v632,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts}; const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-2-native-pdai-bridge-autopilot-report.json'; a.click(); URL.revokeObjectURL(a.href);}
 
 
-/* ========================= V63.3 Bridge-to-Peg Hook Autopilot Cortex ========================= */
+/* ========================= V63.3.1 Autopilot Watchdog Fixed Cortex ========================= */
 const V633_RESERVE_EXECUTOR='0x22d7937438b4bbf02f6ca55e3831abb94bd0b6f1';
 const V633_RESERVE_IMPL='0x98122d3682db4e2e869b568178621c90e1d3a712';
 const V633_F33C='0xf33c0bb40d1bbf6eafaaea2adfb7d2d3ebc1e49c';
@@ -1787,6 +1787,79 @@ const V633_baseBoot=boot;
 boot=function(){ensureV633UI(); V633_baseBoot(); setTimeout(()=>v633Afterburner(),2200); thought('good','V63.3 loaded','Bridge-to-peg hook matrix, F33C/Reserve coupling sentinel, and passive-vs-active peg classifier are running in autopilot.');};
 const V633_baseExportReport=exportReport;
 exportReport=function(){sanitizePrimaryTxPanels('pre-export'); const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,v631:state.v631,v632:state.v632,v633:state.v633,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts}; const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-3-bridge-to-peg-hook-autopilot-report.json'; a.click(); URL.revokeObjectURL(a.href);}
+
+
+/* ========================= V63.3.1 Autopilot Watchdog Fix =========================
+   The V63.3 report exposed a boot-state problem: afterburner-only panels could render and export
+   while the live cognition cycle had not yet produced a snapshot (block stayed 0). This patch makes
+   autopilot non-optional and self-healing: it starts immediately, retries if block/snapshot are empty,
+   and marks exports as pre-live if the user exports before RPC returns. */
+const V6331_baseStartAuto=startAuto;
+let v6331WatchdogTimer=null;
+function v6331HideManualControls(){
+  const keep=new Set(['importBtn','importFile','settingsBtn','exportBtn','stopBtn']);
+  document.querySelectorAll('.controls .btn,.controls input').forEach(el=>{
+    if(!keep.has(el.id)) el.style.display='none';
+  });
+  if($('summary')) $('summary').textContent='Autopilot is now self-starting. Import/export/settings remain available; live telemetry will populate automatically when RPC returns.';
+  if($('v63Auto')) $('v63Auto').textContent='ARMED';
+}
+function v6331Kick(reason='watchdog'){
+  try{
+    v63EnsureSeeds?.(); v631EnsureConfig?.();
+    if(!state.timer){
+      state.timer=setInterval(()=>{ if(!state.busy) autonomousDig(); }, Math.max(30000,+state.cfg.autoRefresh||60000));
+      if($('loopPill')){$('loopPill').textContent='autopilot'; $('loopPill').className='pill good'}
+    }
+    if(!state.busy && (!state.snapshot || !state.block)){
+      setStatus('info','autopilot live sync');
+      thought('good','Autopilot watchdog fired',`${reason}: live cycle forced because snapshot/block were empty.`);
+      autonomousDig();
+    }
+  }catch(e){ thought('bad','Autopilot watchdog failed', e.message||String(e)); }
+}
+function v6331StartWatchdog(){
+  v6331HideManualControls();
+  v6331Kick('initial boot');
+  clearInterval(v6331WatchdogTimer);
+  let tries=0;
+  v6331WatchdogTimer=setInterval(()=>{
+    tries++;
+    if(state.snapshot && state.block>0){
+      if($('v63Auto')) $('v63Auto').textContent='LIVE';
+      if($('blockMeta')) $('blockMeta').textContent='Block: '+state.block.toLocaleString();
+      clearInterval(v6331WatchdogTimer);
+      return;
+    }
+    if(tries<=12) v6331Kick('retry '+tries);
+  },5000);
+}
+startAuto=function(){
+  v6331HideManualControls();
+  if(!state.timer){
+    state.timer=setInterval(()=>{ if(!state.busy) autonomousDig(); }, Math.max(30000,+state.cfg.autoRefresh||60000));
+    if($('loopPill')){$('loopPill').textContent='autopilot'; $('loopPill').className='pill good'};
+    thought('good','V63.3.1 autopilot armed','Watchdog-backed live cycles are active. Manual proof buttons are no longer required.');
+  }
+  if(!state.busy) autonomousDig();
+};
+const V6331_baseBoot=boot;
+boot=function(){
+  V6331_baseBoot();
+  v6331StartWatchdog();
+  setTimeout(()=>v6331Kick('boot +1s'),1000);
+  setTimeout(()=>v6331Kick('boot +4s'),4000);
+  setTimeout(()=>v6331Kick('boot +9s'),9000);
+  thought('good','V63.3.1 loaded','Autopilot watchdog fix installed: block 0 / null snapshot exports are now treated as pre-live, and the live cycle is forced until it returns data.');
+};
+const V6331_baseExportReport=exportReport;
+exportReport=function(){
+  if(!state.snapshot || !state.block){
+    thought('warn','Pre-live export warning','Autopilot has not returned a live snapshot yet. Wait until Block shows a non-zero value for a full report. A retry has been started.');
+    v6331Kick('pre-export guard');
+  }
+  return V6331_baseExportReport();
+};
 
 bindControls(); boot();
 </script>
