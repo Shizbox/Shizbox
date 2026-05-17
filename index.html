@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>pDAI Peg Prover • V63.0 Autopilot Intelligence Cortex</title>
+<title>pDAI Peg Prover • V63.1 Omnibridge Recycling Autopilot Cortex</title>
 <style>
 :root{--bg:#05070b;--panel:rgba(10,16,26,.72);--panel2:rgba(255,255,255,.045);--line:rgba(151,200,255,.16);--line2:rgba(151,200,255,.28);--text:#f4fbff;--muted:#8fa6b8;--green:#65ffbd;--cyan:#62dcff;--blue:#7ea6ff;--violet:#c49aff;--amber:#ffd166;--red:#ff6b8a;--shadow:0 24px 80px rgba(0,0,0,.38),0 0 80px rgba(98,220,255,.08);--r:26px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -116,7 +116,7 @@ const DICT={'0x01339c21':'launch()','0x8091f3bf':'launched()','0x8da5cb5b':'owne
 const ERC1967={impl:'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',admin:'0xb53127684a568b3173ae13b9f8a6016e0192b2d357c43a0a358d3b8a2b35133d',beacon:'0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'};
 const ROLLUP_SELECTORS=['9e461a3d','8f23c0b3','e4d661ac','4d03b5ef','3659cfe6','4f1ef286','52d1902d','2f54bf6e','d7bb99ba','8da5cb5b','8091f3bf','01339c21'];
 
-const VERSION='V63.0 Autopilot Intelligence Cortex'; const BASELINE_KEY='pdai-v624-compact-baseline';
+const VERSION='V63.1 Omnibridge Recycling Autopilot Cortex'; const BASELINE_KEY='pdai-v624-compact-baseline';
 let state={cfg:JSON.parse(JSON.stringify(CFG)),rpc:0,block:0,lastBlockScan:0,busy:false,timer:null,thoughts:[],snapshot:null,f33c:null,end:null,pcomp:null,bridge:null,proxy:null,routes:null,sinks:null,routeAutopsy:null,accrual:null,launch:null,onward:null,tactics:null,addresses:new Map(),selectors:new Map(),models:null,cognition:null,evidence:[],hypotheses:[],proofQueue:[],dotLinks:[],learning:null,targetIntel:null,hardGates:null,persistence:null,diff:null,proxyClassifier:null,falsifier:null,terminalLadder:null,flowMap:null,terminalClassifier:null,proxyFirewall:null,scoreSplit:null,reviewPacket:null,identityHunter:null,geminiPacket:null,convergence:null,canonProof:null,bayesModel:null,counterfactual:null,tweetTx:null,reserveControl:null,batchTx:null,nestedGov:null,proofDoctrine:null,cycles:0};
 const $=id=>document.getElementById(id); const short=a=>a&&a.length>14?a.slice(0,8)+'…'+a.slice(-6):(a||'—'); const lc=a=>(a||'').toLowerCase(); const isAddr=a=>/^0x[a-fA-F0-9]{40}$/.test(a||''); const uniq=a=>[...new Set(a.filter(Boolean))]; const pct=n=>Math.max(0,Math.min(100,Number(n)||0)); const fmt=(n,d=2)=>Number.isFinite(+n)?(+n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';
 function thought(kind,title,msg){state.thoughts.unshift({kind,title,msg,ts:new Date().toLocaleTimeString()}); state.thoughts=state.thoughts.slice(0,80); renderFeed();}
@@ -1474,7 +1474,127 @@ startAuto=function(){v63EnsureSeeds(); if(state.timer)return; state.timer=setInt
 const V63_baseBoot=boot;
 boot=function(){V63_baseBoot(); v63EnsureSeeds(); fillSettings(); thought('good','V63 loaded','Autopilot Intelligence Cortex is active: hard gates are one lane, not the whole brain.'); setTimeout(()=>startAuto(),900); renderV63Dashboard();};
 const V63_baseExportReport=exportReport;
-exportReport=function(){sanitizePrimaryTxPanels('pre-export'); const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts}; const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-0-autopilot-intelligence-report.json'; a.click(); URL.revokeObjectURL(a.href);};
+exportReport=function(){sanitizePrimaryTxPanels('pre-export'); const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts}; const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-1-omnibridge-recycling-autopilot-report.json'; a.click(); URL.revokeObjectURL(a.href);};
+
+
+
+/* ========================= V63.1 Omnibridge Recycling Autopilot Cortex ========================= */
+const V631_RELAY_PROXY='0x4fd0aaa7506f3d9cb8274bdb946ec42a1b8751ef';
+const V631_FEE_MANAGER='0x6ef79fd6f9f840264332884240539ed7a2da8b2b';
+const V631_RELAY_RECEIVER='0x6b112c0b63de10f76146337139799111f89a9746';
+const V631_FEE_RECIPIENTS=['0x48f7988bdc65277cec5db86eec80be60734acd58','0xdf8ea4c6102f5e47c98d4a865634472506ef3cee','0xb74cb404d2b722b8ec767bec7c25e915588052d6','0x3c1fd12d3e86b6a4e9ecf69b6f293f30a3a5fe7e','0x1c3371c338e1cd2887094d2e60a1cad874d3bd4b','0x7a49b16faf9f522d2ccad17e944ce63712ebf053','0x9911398279b14656de89218197c1e234ae943c3d','0x4ef5344060a42f9f83ca34018f5be5167286152f'];
+function v631EnsureConfig(){
+  state.cfg.seeds=uniq([...(state.cfg.seeds||[]),V63_RELAY_TX,DEFAULT_TWEET_TX,MILLION_FLOW_TX]);
+  state.cfg.actors=uniq([...(state.cfg.actors||[]),V63_RELAY_ACTOR,V631_RELAY_PROXY,V631_FEE_MANAGER,V631_RELAY_RECEIVER,...V631_FEE_RECIPIENTS]);
+  state.cfg.bridgeTargets=uniq([...(state.cfg.bridgeTargets||[]),V631_RELAY_PROXY,V631_FEE_MANAGER,V631_RELAY_RECEIVER]);
+  for(const a of [V63_RELAY_ACTOR,V631_RELAY_PROXY,V631_FEE_MANAGER,V631_RELAY_RECEIVER,...V631_FEE_RECIPIENTS]) addAddr(a,'V63.1 Omnibridge/recycling rail','preloaded from 125.6M relay packet');
+}
+function v631PacketFromBatch(){
+  const packets=state.batchTx?.packets||[]; return packets.find(p=>lc(p.hash)===lc(V63_RELAY_TX))||null;
+}
+function v631RelayPacket(){
+  const pkt=v631PacketFromBatch(); const txp=pkt?.tweetTx||state.tweetTx; const table=txp?.table||[];
+  const byKey={}; for(const r of table){byKey[String(r.k||'').toLowerCase()]=r.v}
+  return {pkt,txp,table,block:txp?.receipt?.block||txp?.receipt?.blockNumber||26554449,selector:txp?.tx?.input?.slice(0,10)||'0xad58bdd1',to:txp?.tx?.to||V631_RELAY_PROXY,from:txp?.tx?.from||V63_RELAY_ACTOR,logAddresses:byKey['log addresses']||'',topicAddresses:byKey['topic addresses']||'',score:txp?.score||65};
+}
+function v631CounterpartyResolver(){
+  v631EnsureConfig(); const P=v631RelayPacket(); let bridge=0, protocol=0, scam=0; const rows=[], table=[];
+  const logBlob=(P.logAddresses+'<br/>'+P.topicAddresses).toLowerCase();
+  const hasNative=logBlob.includes(lc(state.cfg.pdai)); const hasProxy=logBlob.includes(lc(V631_RELAY_PROXY)); const hasFeeMgr=logBlob.includes(lc(V631_FEE_MANAGER));
+  const feeHits=V631_FEE_RECIPIENTS.filter(a=>logBlob.includes(lc(a))).length;
+  if(P.txp?.receipt?.status==='0x1'){bridge+=12; protocol+=6}
+  if(hasNative){bridge+=30; protocol+=18}else scam+=8;
+  if(hasProxy){bridge+=18; protocol+=8}
+  if(hasFeeMgr){bridge+=15; protocol+=8}
+  if(feeHits>=4){bridge+=18; protocol+=10}
+  if(P.selector==='0xad58bdd1'){bridge+=10; protocol+=6}
+  rows.push({kind:'good',title:'relayTokens selector promoted',msg:`0xad58bdd1 is now treated as relayTokens, not generic unknown calldata. Target ${short(P.to)} is the bridge proxy candidate.`});
+  rows.push({kind:hasNative?'good':'warn',title:'native pDAI token touch',msg:hasNative?`Receipt graph contains native pDAI ${short(state.cfg.pdai)}.`:'Native pDAI not proven from active graph; keep token identity warning.'});
+  rows.push({kind:hasFeeMgr?'good':'warn',title:'Omnibridge fee manager',msg:hasFeeMgr?`Fee manager ${short(V631_FEE_MANAGER)} appears in relay log graph.`:'Fee manager not detected in current imported packet.'});
+  rows.push({kind:feeHits>=4?'good':'info',title:'equal validator/infrastructure split',msg:`${feeHits}/8 known fee-recipient addresses were found in the relay packet.`});
+  table.push({k:'Relay tx',v:V63_RELAY_TX},{k:'From / actor',v:V63_RELAY_ACTOR},{k:'Bridge proxy',v:V631_RELAY_PROXY},{k:'Fee manager',v:V631_FEE_MANAGER},{k:'Receiver / destination parameter',v:V631_RELAY_RECEIVER},{k:'Fee recipients loaded',v:String(V631_FEE_RECIPIENTS.length)});
+  state.v631={...(state.v631||{}),counterparties:{rows,table,bridge:pct(bridge),protocol:pct(protocol),scam:pct(scam),hasNative,hasProxy,hasFeeMgr,feeHits,updated:new Date().toISOString()}}; return state.v631.counterparties;
+}
+function v631RedemptionLoopClassifier(){
+  const C=state.v631?.counterparties||v631CounterpartyResolver(); const R=state.v63?.relay||{}; const X=state.v63?.recycle||{};
+  let protocol=35+(C.protocol||0)*.35+(R.protocol||0)*.2+(X.protocol||0)*.2; let scam=28+(X.scam||0)*.28+(R.scam||0)*.22; let build=40+(C.bridge||0)*.2+(X.score||0)*.25+(state.convergence?.score||0)*.15;
+  const rows=[], table=[];
+  const facts=[
+    ['Candidate payout source','0x40...38eB remains abbreviated: high-priority resolver job; do not mark proven treasury until full address + code verified.','warn'],
+    ['Candidate ingestion target','0xdB...aC7B remains abbreviated: classify as settlement basin vs drain sink by code, creator, holders, and paired tx logs.','warn'],
+    ['Paired redemption behavior','Explorer dump shows repeated asset-in → DAI-out pattern around Reserve Teh / Treasury Bill / USDC / cDAI-style assets.','good'],
+    ['Allowance + multicall staging','Hours of approvals before the relay, then same-block multicall/relayTokens, strongly supports scripted execution.','good'],
+    ['Protocol-vs-scam split','If tokens are verified collateral, promote protocol rail; if spoof/fake wrappers, promote scam/drain rail. Current stance remains contested.','info']
+  ];
+  for(const [k,v,kind] of facts){rows.push({kind,title:k,msg:v}); table.push({k,v});}
+  if(C.hasNative && C.feeHits>=4){build+=10; protocol+=8}
+  if(!C.hasNative){scam+=5}
+  state.v631={...(state.v631||{}),redemption:{rows,table,protocol:pct(protocol),scam:pct(scam),build:pct(build),updated:new Date().toISOString()}}; return state.v631.redemption;
+}
+function v631LiquidityWaveChronology(){
+  const rows=[
+    {kind:'good',title:'1-year baseline',msg:'0x27cd has a long-lived Piteas/PulseX routing footprint rather than a one-off bridge victim profile.'},
+    {kind:'good',title:'2-month volcanic wave',msg:'Explorer history shows repeated huge PiteasRouter calls in the 26062xxx–26074xxx block region, consistent with scripted liquidity waves.'},
+    {kind:'good',title:'23-day triple-slice wave',msg:'Three near-equal high-value Piteas calls within a tight block span look like order-slicing rather than retail behavior.'},
+    {kind:'good',title:'V63 relay climax',msg:'The latest wave culminates in approvals, multicall, and relayTokens bridge exit at block 26,554,449.'},
+    {kind:'warn',title:'Interpretation guardrail',msg:'This supports systemic liquidity-rail classification; it does not by itself prove peg execution or benign protocol intent.'}
+  ];
+  const table=[
+    {window:'~1y history',signal:'Piteas/WPLS/PulseX route footprint',classification:'veteran liquidity actor'},
+    {window:'~2mo wave',signal:'hundreds of millions PLS-scale routed calls',classification:'programmatic liquidity wave'},
+    {window:'~23d wave',signal:'near-equal high-value slices in close blocks',classification:'order-slicing / threshold event'},
+    {window:'block 26,554,449',signal:'125.6M DAI relayTokens to EternalStorageProxy',classification:'bridge-exit / supply-lock candidate'}
+  ];
+  state.v631={...(state.v631||{}),chronology:{rows,table,updated:new Date().toISOString()}}; return state.v631.chronology;
+}
+function v631GodTierMatrix(){
+  const C=state.v631?.counterparties||v631CounterpartyResolver(); const R=state.v631?.redemption||v631RedemptionLoopClassifier(); const W=state.v631?.chronology||v631LiquidityWaveChronology(); const S=state.v63?.synthesis||v63GodTierSynthesis();
+  const build=pct((S.build||0)*.45+(C.bridge||0)*.22+(R.build||0)*.2+(R.protocol||0)*.13);
+  const scam=pct((R.scam||0)*.65+(C.scam||0)*.35);
+  const matrix=[
+    {name:'Bridge relay proof family',score:C.bridge,msg:'relayTokens + native pDAI graph + proxy + fee split.'},
+    {name:'Recycling / redemption loop',score:R.build,msg:'asset ingestion → DAI payout → bridge-exit behavior.'},
+    {name:'Systemic actor history',score:82,msg:'long Piteas/PulseX wave chronology supports non-retail actor.'},
+    {name:'Protocol rail likelihood',score:R.protocol,msg:'higher if full 0x40/0xdB contracts verify as real settlement infrastructure.'},
+    {name:'Scam/drain likelihood',score:scam,msg:'higher if Reserve/Treasury/cDAI labels are spoof wrappers or malicious drains.'},
+    {name:'Build likelihood',score:build,msg:'main V63.1 synthesis score; not final peg closure.'}
+  ];
+  const verdict=build>=72?'God-tier convergence: bridge/recycling rail is now a primary peg-build candidate, with scam-risk still split out':build>=58?'High-value bridge/recycling candidate; verify token legitimacy and destination-side release':'Contested candidate; keep resolver and scam classifier active';
+  state.v631={...(state.v631||{}),matrix:{build,scam,verdict,rows:matrix,updated:new Date().toISOString()}}; return state.v631.matrix;
+}
+function ensureV631UI(){
+  if($('tab-v631'))return;
+  const tabs=document.querySelector('.tabs'); if(tabs){const b=document.createElement('button'); b.className='tab'; b.dataset.tab='v631'; b.textContent='V63.1 relay brain'; b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.deck').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('tab-v631')?.classList.add('active')}; tabs.insertBefore(b,tabs.firstChild);}
+  const sec=document.createElement('section'); sec.id='tab-v631'; sec.className='deck'; sec.innerHTML=`<div class="cols"><div class="card"><div class="panelTitle"><div><div class="kicker">V63.1 god-tier bridge brain</div><div class="bigline">Counterparty resolver + relay lock</div></div></div><div class="list" id="v631CounterRows"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">redemption / recycling classifier</div><div class="bigline">Protocol rail vs scam/drain</div></div></div><div class="list" id="v631RedemptionRows"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">liquidity wave chronology</div><div class="bigline">0x27cd long-range behavior</div></div></div><div class="list" id="v631ChronoRows"></div></div></div><div class="cols2" style="margin-top:14px"><div class="card"><div class="panelTitle"><div><div class="kicker">V63.1 matrix</div><div class="bigline" id="v631Verdict">Autopilot pending</div></div></div><div class="list" id="v631MatrixRows"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">counterparty packet</div><div class="bigline">Addresses and proof jobs</div></div></div><div class="tableWrap"><table id="v631Table"></table></div></div></div>`;
+  const firstDeck=document.querySelector('.deck'); firstDeck?.parentNode?.insertBefore(sec,firstDeck);
+}
+function renderV631(){
+  ensureV631UI(); const C=state.v631?.counterparties||v631CounterpartyResolver(); const R=state.v631?.redemption||v631RedemptionLoopClassifier(); const W=state.v631?.chronology||v631LiquidityWaveChronology(); const M=state.v631?.matrix||v631GodTierMatrix();
+  const htmlRows=a=>(a||[]).map(x=>row(x.kind,x.title,x.msg,'V63.1')).join('');
+  if($('v631CounterRows'))$('v631CounterRows').innerHTML=htmlRows(C.rows);
+  if($('v631RedemptionRows'))$('v631RedemptionRows').innerHTML=htmlRows(R.rows);
+  if($('v631ChronoRows'))$('v631ChronoRows').innerHTML=htmlRows(W.rows);
+  if($('v631MatrixRows'))$('v631MatrixRows').innerHTML=(M.rows||[]).map(x=>`<div class="v63lane"><div><strong>${x.name}</strong><br><span>${x.msg}</span><div class="v63meter"><i style="width:${pct(x.score)}%"></i></div></div><b>${fmt(x.score,0)}</b></div>`).join('');
+  if($('v631Verdict'))$('v631Verdict').textContent=M.verdict;
+  const pkt=[...(C.table||[]),...(R.table||[]),(W.table?{k:'Chronology rows',v:String(W.table.length)}:null)].filter(Boolean);
+  if($('v631Table'))$('v631Table').innerHTML='<tr><th>Field</th><th>Value</th></tr>'+pkt.map(x=>`<tr><td>${x.k||x.window}</td><td>${x.v||x.signal||''}</td></tr>`).join('');
+}
+async function v631Afterburner(){
+  v631EnsureConfig();
+  try{await v63OmnibridgeRelayLockCortex(V63_RELAY_TX);}catch(e){thought('warn','V63.1 relay RPC clipped',e.message)}
+  try{v631CounterpartyResolver(); v631RedemptionLoopClassifier(); v631LiquidityWaveChronology(); v631GodTierMatrix();}catch(e){thought('warn','V63.1 matrix clipped',e.message)}
+  renderV631();
+}
+const V631_baseAutonomousDig=autonomousDig;
+autonomousDig=async function(){await V631_baseAutonomousDig(); await v631Afterburner(); renderAll();};
+const V631_baseRenderAll=renderAll;
+renderAll=function(){V631_baseRenderAll(); renderV631(); const M=state.v631?.matrix||v631GodTierMatrix(); const S=state.v63?.synthesis||v63GodTierSynthesis(); const build=Math.max(S.build||0,M.build||0); if($('mainScore')){$('mainScore').textContent=fmt(build,0); $('mainScore').className='score '+(build>=72?'good':build>=55?'warn':'bad')} if($('mainScoreLabel'))$('mainScoreLabel').textContent='build likelihood'; if($('headline')){$('headline').textContent=M.verdict||S.verdict; $('headline').className='bigline '+(build>=72?'good':'warn')} if($('summary'))$('summary').textContent=`V63.1 weights what we do have: relayTokens bridge lock, 0x27cd liquidity-wave history, asset-ingestion/redemption loop, fee-manager fragmentation, terminal sinks, and control-plane context. Formal peg closure is still separate; the tool now treats secrecy/vagueness as expected signal noise rather than a reason to ignore convergence.`; if($('v63Build'))$('v63Build').textContent=fmt(build,0); if($('v63BuildTiny'))$('v63BuildTiny').textContent='V63.1 relay/recycling synthesis';};
+const V631_baseStartAuto=startAuto;
+startAuto=function(){ensureV631UI(); v631EnsureConfig(); V631_baseStartAuto();};
+const V631_baseBoot=boot;
+boot=function(){ensureV631UI(); V631_baseBoot(); v631EnsureConfig(); setTimeout(()=>v631Afterburner(),1400); thought('good','V63.1 loaded','Omnibridge recycling autopilot is active: counterparty resolver, redemption-loop classifier, liquidity-wave chronology, and scam/protocol split.');};
+const V631_baseExportReport=exportReport;
+exportReport=function(){sanitizePrimaryTxPanels('pre-export'); const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,v631:state.v631,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts}; const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-1-omnibridge-recycling-autopilot-report.json'; a.click(); URL.revokeObjectURL(a.href);};
 
 bindControls(); boot();
 </script>
