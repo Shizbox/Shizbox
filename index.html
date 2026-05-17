@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>pDAI Peg Prover • V63.3.1 Autopilot Watchdog Fixed Cortex</title>
+<title>pDAI Peg Prover • V63.3.2 Live Snapshot Boot Repair</title>
 <style>
 :root{--bg:#05070b;--panel:rgba(10,16,26,.72);--panel2:rgba(255,255,255,.045);--line:rgba(151,200,255,.16);--line2:rgba(151,200,255,.28);--text:#f4fbff;--muted:#8fa6b8;--green:#65ffbd;--cyan:#62dcff;--blue:#7ea6ff;--violet:#c49aff;--amber:#ffd166;--red:#ff6b8a;--shadow:0 24px 80px rgba(0,0,0,.38),0 0 80px rgba(98,220,255,.08);--r:26px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -18,12 +18,20 @@ body:after{content:"";position:fixed;inset:-25%;pointer-events:none;z-index:-1;b
 .v63bar{margin:14px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.v63tile{position:relative;overflow:hidden;border:1px solid rgba(101,255,189,.2);border-radius:22px;background:linear-gradient(135deg,rgba(101,255,189,.09),rgba(98,220,255,.055),rgba(196,154,255,.05));padding:14px;box-shadow:0 18px 60px rgba(0,0,0,.22)}.v63tile:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(101,255,189,.16),transparent 40%);pointer-events:none}.v63tile .v{font-size:28px;font-weight:900;letter-spacing:-.04em}.v63tile .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}.v63tile .tiny{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}.v63grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin:14px 0}.v63hero{border:1px solid rgba(98,220,255,.18);border-radius:var(--r);background:linear-gradient(135deg,rgba(10,16,26,.82),rgba(5,7,11,.76));box-shadow:var(--shadow);padding:18px;position:relative;overflow:hidden}.v63hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(98,220,255,.16),transparent 38%),radial-gradient(circle at 100% 0%,rgba(101,255,189,.10),transparent 42%);pointer-events:none}.v63hero>*{position:relative}.v63headline{font-size:26px;font-weight:900;letter-spacing:-.035em}.v63sub{margin-top:6px;color:var(--muted);line-height:1.45}.v63lane{display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);border-radius:18px;padding:12px;margin-top:10px}.v63lane strong{font-size:15px}.v63lane span{font-size:12px;color:var(--muted)}.v63meter{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}.v63meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan),var(--violet));border-radius:999px}.tabs{position:sticky;top:0;z-index:4;backdrop-filter:blur(18px);background:linear-gradient(180deg,rgba(5,7,11,.82),rgba(5,7,11,.42));border-bottom:1px solid rgba(255,255,255,.06);padding:10px 0}.tab{border-radius:999px}.btn.primary{box-shadow:0 0 0 transparent}.deck .card{backdrop-filter:blur(16px)}
 @media(max-width:960px){.v63bar{grid-template-columns:1fr 1fr}.v63grid{grid-template-columns:1fr}}
 
+
+
+/* V63.3.2 live-start repair: keep the emergency controls visible while autopilot runs. */
+.controls .btn,.controls input{display:none!important}
+.controls #runBtn,.controls #autoBtn,.controls #stopBtn,.controls #importBtn,.controls #settingsBtn,.controls #exportBtn,.controls #launchBtn,.controls #onwardBtn{display:inline-flex!important}
+.controls #txHashInput{display:inline-block!important}
+#status.status.info .dot{animation:pulse 1.15s infinite}
+
 </style>
 </head>
 <body>
 <div class="app">
   <section class="glass pad top">
-    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.3.1 Autopilot Watchdog Fixed Cortex</h1><div class="sub">V63.3 absorbs the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now hunts for the bridge-to-peg hook: the moment passive bridge custody starts coupling with F33C/F406, Reserve ERC-1967 governance, settlement-basin candidates, and pDAI control-plane flows. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
+    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.3.2 Live Snapshot Boot Repair</h1><div class="sub">V63.3 absorbs the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now hunts for the bridge-to-peg hook: the moment passive bridge custody starts coupling with F33C/F406, Reserve ERC-1967 governance, settlement-basin candidates, and pDAI control-plane flows. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
     <div><div id="status" class="status warn"><span class="dot"></span><span>ready</span></div><div class="meta"><div id="rpcMeta">RPC: —</div><div id="blockMeta">Block: —</div><div id="taskMeta">Last task: —</div></div><div class="controls"><button class="btn primary" id="runBtn">Manual deep cycle</button><button class="btn" id="f33cBtn">F33C watcher</button><button class="btn" id="launchBtn">Launch + 1M autopsy</button><button class="btn" id="onwardBtn">Onward flow</button><button class="btn" id="intersectBtn">Explain intersections</button><button class="btn" id="endBtn">End / cage scan</button><button class="btn" id="proxyBtn">ERC-1967 scan</button><button class="btn" id="routeBtn">Route autopsy</button><button class="btn" id="accrualBtn">Accrual autopsy</button><button class="btn" id="auditBtn">Self-audit</button><button class="btn" id="gateBtn">Hard-gate ledger</button><button class="btn" id="classifyBtn">Proxy classify</button><button class="btn" id="diffBtn">Diff timeline</button><button class="btn" id="warRoomBtn">V62.4 war-room</button><button class="btn" id="inferBtn">Convergence reasoner</button><button class="btn" id="canonProofBtn">Proven canon</button><button class="btn" id="bayesBtn">Bayesian model</button><button class="btn" id="identityBtn">Identity hunter</button><button class="btn" id="geminiBtn">Gemini packet</button><button class="btn" id="canonBtn">Canon falsifier</button><input id="txHashInput" class="mono" value="0x515a010fdb97cf00b6aaa1c7d5050ebd353a0b2cb259087cf1d91642a4e9e03c" style="min-width:360px;max-width:100%;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.24);color:var(--text);padding:10px 12px" /><button class="btn" id="tweetTxBtn">Tweet tx autopsy</button><button class="btn" id="reserveBtn">Reserve control-plane</button><button class="btn" id="nestedBtn">Nested governance</button><button class="btn" id="batchTxBtn">Batch tx packet</button><button class="btn" id="doctrineBtn">Proof doctrine</button><button class="btn" id="importBtn">Import report</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" /><button class="btn" id="autoBtn">Start autopilot</button><button class="btn danger" id="stopBtn">Stop</button><button class="btn" id="settingsBtn">Settings</button><button class="btn" id="exportBtn">Export report</button></div></div>
   </section>
 
@@ -116,7 +124,7 @@ const DICT={'0x01339c21':'launch()','0x8091f3bf':'launched()','0x8da5cb5b':'owne
 const ERC1967={impl:'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',admin:'0xb53127684a568b3173ae13b9f8a6016e0192b2d357c43a0a358d3b8a2b35133d',beacon:'0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'};
 const ROLLUP_SELECTORS=['9e461a3d','8f23c0b3','e4d661ac','4d03b5ef','3659cfe6','4f1ef286','52d1902d','2f54bf6e','d7bb99ba','8da5cb5b','8091f3bf','01339c21'];
 
-const VERSION='V63.3.1 Autopilot Watchdog Fixed Cortex'; const BASELINE_KEY='pdai-v624-compact-baseline';
+const VERSION='V63.3.2 Live Snapshot Boot Repair'; const BASELINE_KEY='pdai-v624-compact-baseline';
 let state={cfg:JSON.parse(JSON.stringify(CFG)),rpc:0,block:0,lastBlockScan:0,busy:false,timer:null,thoughts:[],snapshot:null,f33c:null,end:null,pcomp:null,bridge:null,proxy:null,routes:null,sinks:null,routeAutopsy:null,accrual:null,launch:null,onward:null,tactics:null,addresses:new Map(),selectors:new Map(),models:null,cognition:null,evidence:[],hypotheses:[],proofQueue:[],dotLinks:[],learning:null,targetIntel:null,hardGates:null,persistence:null,diff:null,proxyClassifier:null,falsifier:null,terminalLadder:null,flowMap:null,terminalClassifier:null,proxyFirewall:null,scoreSplit:null,reviewPacket:null,identityHunter:null,geminiPacket:null,convergence:null,canonProof:null,bayesModel:null,counterfactual:null,tweetTx:null,reserveControl:null,batchTx:null,nestedGov:null,proofDoctrine:null,cycles:0};
 const $=id=>document.getElementById(id); const short=a=>a&&a.length>14?a.slice(0,8)+'…'+a.slice(-6):(a||'—'); const lc=a=>(a||'').toLowerCase(); const isAddr=a=>/^0x[a-fA-F0-9]{40}$/.test(a||''); const uniq=a=>[...new Set(a.filter(Boolean))]; const pct=n=>Math.max(0,Math.min(100,Number(n)||0)); const fmt=(n,d=2)=>Number.isFinite(+n)?(+n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';
 function thought(kind,title,msg){state.thoughts.unshift({kind,title,msg,ts:new Date().toLocaleTimeString()}); state.thoughts=state.thoughts.slice(0,80); renderFeed();}
@@ -1859,6 +1867,168 @@ exportReport=function(){
     v6331Kick('pre-export guard');
   }
   return V6331_baseExportReport();
+};
+
+
+
+// V63.3.2 compatibility alias: V63.3 referenced V62_TWEET_TX, but the actual constant in this file is DEFAULT_TWEET_TX.
+const V62_TWEET_TX=(typeof DEFAULT_TWEET_TX!=='undefined'?DEFAULT_TWEET_TX:'0x515a010fdb97cf00b6aaa1c7d5050ebd353a0b2cb259087cf1d91642a4e9e03c');
+
+/* ========================= V63.3.2 Live Snapshot Boot Repair =========================
+   This repair fixes the remaining V63.3.1 failure mode visible in the exported report:
+   the watchdog could start a heavy cycle, but a stalled first RPC left block=0 and
+   snapshot=null. V63.3.2 adds RPC timeouts, a lightweight first snapshot, stuck-cycle
+   recovery, and keeps emergency controls visible. */
+const V6332_RPC_TIMEOUT_MS=8500;
+const V6332_STUCK_MS=32000;
+const V6332_DEEP_DELAY_MS=900;
+state.v6332={...(state.v6332||{}),version:'V63.3.2 Live Snapshot Boot Repair',rpcTimeoutMs:V6332_RPC_TIMEOUT_MS,events:[]};
+function v6332Event(kind,title,msg){
+  state.v6332.events.unshift({kind,title,msg,ts:new Date().toLocaleTimeString()});
+  state.v6332.events=state.v6332.events.slice(0,40);
+  try{thought(kind,title,msg)}catch{}
+}
+function v6332ShowControls(){
+  const show=new Set(['runBtn','autoBtn','stopBtn','importBtn','settingsBtn','exportBtn','launchBtn','onwardBtn','txHashInput']);
+  document.querySelectorAll('.controls .btn,.controls input').forEach(el=>{
+    el.style.display=show.has(el.id)?'inline-flex':'none';
+    if(el.id==='txHashInput') el.style.display='inline-block';
+  });
+  if($('v63Auto')) $('v63Auto').textContent=state.snapshot&&state.block?'LIVE':'ARMED';
+}
+let v6332LastRpcProgress=Date.now();
+rpc=async function(method,params=[]){
+  const list=(state.cfg?.rpcs?.length?state.cfg.rpcs:CFG.rpcs).filter(Boolean);
+  let err;
+  for(let i=0;i<list.length;i++){
+    const idx=(state.rpc+i)%list.length;
+    const url=list[idx];
+    const ctl=new AbortController();
+    const timer=setTimeout(()=>{try{ctl.abort()}catch{}},V6332_RPC_TIMEOUT_MS);
+    try{
+      const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now(),method,params}),signal:ctl.signal,cache:'no-store'});
+      clearTimeout(timer);
+      if(!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+      const j=await res.json();
+      if(j.error) throw new Error(j.error.message||JSON.stringify(j.error));
+      state.rpc=idx; v6332LastRpcProgress=Date.now();
+      if($('rpcMeta')) $('rpcMeta').textContent='RPC: '+url;
+      return j.result;
+    }catch(e){
+      clearTimeout(timer);
+      err=e?.name==='AbortError'?new Error(`${method} timed out after ${V6332_RPC_TIMEOUT_MS}ms on ${url}`):e;
+      if($('rpcMeta')) $('rpcMeta').textContent='RPC failed: '+short(url);
+    }
+  }
+  throw err||new Error('all RPCs failed');
+};
+async function v6332FastSnapshot(reason='boot'){
+  if(state.v6332.fastBusy) return false;
+  state.v6332.fastBusy=true;
+  try{
+    setStatus('info','fast live sync');
+    v6332Event('info','Fast live snapshot',`${reason}: fetching block, pDAI supply, burn balance, and watched slots before the heavy cycle.`);
+    const latest=hexToNum(await rpc('eth_blockNumber'));
+    state.block=latest;
+    if($('blockMeta')) $('blockMeta').textContent='Block: '+latest.toLocaleString();
+    const slotPairs=await Promise.all((state.cfg.slots||[]).map(async sl=>[sl,await rpc('eth_getStorageAt',[state.cfg.pdai,sl,'latest']).catch(()=>null)]));
+    const slots=Object.fromEntries(slotPairs);
+    const [totalRaw,burned]=await Promise.all([call(state.cfg.pdai,SEL.totalSupply),balance(state.cfg.pdai,state.cfg.dead,18)]);
+    state.snapshot={
+      ...(state.snapshot||{}),
+      latest,
+      total:totalRaw?weiToUnit(hexToBig(totalRaw)):((state.snapshot||{}).total||0),
+      burned:Number.isFinite(+burned)?burned:((state.snapshot||{}).burned||0),
+      anchors:(state.snapshot||{}).anchors||[],
+      slots,
+      logsCount:(state.snapshot||{}).logsCount||0,
+      transfers:(state.snapshot||{}).transfers||[],
+      approvals:(state.snapshot||{}).approvals||[],
+      fromBlock:(state.snapshot||{}).fromBlock||Math.max(0,latest-Math.min(+state.cfg.scanBlocks||180,500)),
+      fast:true,
+      fastReason:reason,
+      fastUpdated:new Date().toISOString()
+    };
+    state.v6332.lastFastSnapshot=state.snapshot.fastUpdated;
+    setStatus('good','snapshot live');
+    v6332Event('good','Fast snapshot online',`Block ${latest.toLocaleString()} loaded. Heavy proof cycle can now run without exporting block 0/null snapshot.`);
+    try{renderAll()}catch(e){v6332Event('warn','Render clipped after fast snapshot',e.message||String(e))}
+    return true;
+  }catch(e){
+    state.v6332.lastFastError=e.message||String(e);
+    setStatus('bad','rpc blocked');
+    v6332Event('bad','Fast snapshot failed',`${e.message||e}. Check browser network/CORS or try Start autopilot again.`);
+    return false;
+  }finally{state.v6332.fastBusy=false;}
+}
+function v6332ResetIfStuck(reason='watchdog'){
+  const age=Date.now()-v6332LastRpcProgress;
+  if(state.busy && !state.snapshot && age>V6332_STUCK_MS){
+    state.busy=false;
+    v6332Event('warn','Stuck cycle released',`${reason}: no RPC progress for ${Math.round(age/1000)}s before first snapshot, so the busy lock was cleared and fast sync will retry.`);
+    return true;
+  }
+  return false;
+}
+const V6332_baseAutonomousDig=autonomousDig;
+autonomousDig=async function(){
+  if(state.busy) return;
+  if(!state.snapshot || !state.block){
+    const ok=await v6332FastSnapshot('deep-cycle preflight');
+    if(!ok) return;
+    await new Promise(r=>setTimeout(r,V6332_DEEP_DELAY_MS));
+  }
+  return V6332_baseAutonomousDig();
+};
+function v6332ArmTimer(){
+  if(!state.timer){
+    state.timer=setInterval(()=>{
+      v6332ResetIfStuck('interval');
+      if(!state.busy){
+        if(!state.snapshot || !state.block) v6332FastSnapshot('interval retry').then(ok=>{if(ok) autonomousDig()});
+        else autonomousDig();
+      }
+    },Math.max(30000,+state.cfg.autoRefresh||60000));
+  }
+  if($('loopPill')){$('loopPill').textContent='autopilot'; $('loopPill').className='pill good'}
+}
+startAuto=function(){
+  v6332ShowControls();
+  v6332ArmTimer();
+  v6332ResetIfStuck('manual/start');
+  v6332FastSnapshot('autopilot start').then(ok=>{if(ok && !state.busy) setTimeout(()=>autonomousDig(),V6332_DEEP_DELAY_MS)});
+  v6332Event('good','V63.3.2 autopilot armed','Fast snapshot + timeout-backed heavy cycle are active; emergency controls stay visible.');
+};
+if(typeof v6331Kick==='function'){
+  v6331Kick=function(reason='watchdog'){
+    try{
+      v6332ShowControls();
+      v6332ArmTimer();
+      v6332ResetIfStuck(reason);
+      if(!state.snapshot || !state.block){
+        v6332FastSnapshot(reason).then(ok=>{if(ok && !state.busy) setTimeout(()=>autonomousDig(),V6332_DEEP_DELAY_MS)});
+      }else if(!state.busy){
+        autonomousDig();
+      }
+    }catch(e){v6332Event('bad','V63.3.2 watchdog failed',e.message||String(e));}
+  };
+}
+const V6332_baseBoot=boot;
+boot=function(){
+  V6332_baseBoot();
+  v6332ShowControls();
+  setTimeout(()=>startAuto(),350);
+  setTimeout(()=>{v6332ResetIfStuck('boot safety'); if(!state.snapshot||!state.block) v6332FastSnapshot('boot safety retry')},12000);
+  v6332Event('good','V63.3.2 loaded','Remaining block 0/null snapshot failure repaired with timeout RPC, fast boot snapshot, stuck-cycle release, and visible emergency controls.');
+};
+const V6332_baseExportReport=exportReport;
+exportReport=function(){
+  state.v6332={...(state.v6332||{}),exportedAt:new Date().toISOString(),exportHadLiveSnapshot:!!(state.snapshot&&state.block)};
+  if(!state.snapshot || !state.block){
+    v6332Event('warn','Export blocked from being misleading','The report is being exported before live RPC returned. A fast snapshot retry has been started and the report will clearly mark exportHadLiveSnapshot=false.');
+    v6332FastSnapshot('export guard');
+  }
+  return V6332_baseExportReport();
 };
 
 bindControls(); boot();
