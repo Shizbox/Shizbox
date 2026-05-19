@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>pDAI Peg Prover • V63.4.4 OSINT Export Integrity Guard</title>
+<title>pDAI Peg Prover • V63.4.5 Export Mirror Integrity Guard</title>
 <style>
 :root{--bg:#05070b;--panel:rgba(10,16,26,.72);--panel2:rgba(255,255,255,.045);--line:rgba(151,200,255,.16);--line2:rgba(151,200,255,.28);--text:#f4fbff;--muted:#8fa6b8;--green:#65ffbd;--cyan:#62dcff;--blue:#7ea6ff;--violet:#c49aff;--amber:#ffd166;--red:#ff6b8a;--shadow:0 24px 80px rgba(0,0,0,.38),0 0 80px rgba(98,220,255,.08);--r:26px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -31,7 +31,7 @@ body:after{content:"";position:fixed;inset:-25%;pointer-events:none;z-index:-1;b
 <body>
 <div class="app">
   <section class="glass pad top">
-    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.4.4 OSINT Export Integrity Guard</h1><div class="sub">V63.4.1 absorbs the new 5996 / ERC-1967 trace packet, the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now promotes/demotes the bridge-to-peg hook candidates: F33C/F406 custody, Reserve ERC-1967 slot flips, proxy-admin calls, settlement-basin persistence, destination-side bridge release, and irreversible supply sinks. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip good">V63.4 active hook promotion</span><span class="chip good">V63.4.2 5996 lane auditor</span><span class="chip good">V63.4.4 OSINT firewall</span><span class="chip warn">tweet-to-trace quarantine</span><span class="chip warn">promotion/demotion ledger</span><span class="chip good">Reserve slot-tripwire</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
+    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.4.5 Export Mirror Integrity Guard</h1><div class="sub">V63.4.1 absorbs the new 5996 / ERC-1967 trace packet, the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now promotes/demotes the bridge-to-peg hook candidates: F33C/F406 custody, Reserve ERC-1967 slot flips, proxy-admin calls, settlement-basin persistence, destination-side bridge release, and irreversible supply sinks. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip good">V63.4 active hook promotion</span><span class="chip good">V63.4.2 5996 lane auditor</span><span class="chip good">V63.4.5 export mirror</span><span class="chip warn">tweet-to-trace quarantine</span><span class="chip warn">promotion/demotion ledger</span><span class="chip good">Reserve slot-tripwire</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
     <div><div id="status" class="status warn"><span class="dot"></span><span>ready</span></div><div class="meta"><div id="rpcMeta">RPC: —</div><div id="blockMeta">Block: —</div><div id="taskMeta">Last task: —</div></div><div class="controls"><button class="btn primary" id="runBtn">Manual deep cycle</button><button class="btn" id="f33cBtn">F33C watcher</button><button class="btn" id="launchBtn">Launch + 1M autopsy</button><button class="btn" id="onwardBtn">Onward flow</button><button class="btn" id="intersectBtn">Explain intersections</button><button class="btn" id="endBtn">End / cage scan</button><button class="btn" id="proxyBtn">ERC-1967 scan</button><button class="btn" id="routeBtn">Route autopsy</button><button class="btn" id="accrualBtn">Accrual autopsy</button><button class="btn" id="auditBtn">Self-audit</button><button class="btn" id="gateBtn">Hard-gate ledger</button><button class="btn" id="classifyBtn">Proxy classify</button><button class="btn" id="diffBtn">Diff timeline</button><button class="btn" id="warRoomBtn">V62.4 war-room</button><button class="btn" id="inferBtn">Convergence reasoner</button><button class="btn" id="canonProofBtn">Proven canon</button><button class="btn" id="bayesBtn">Bayesian model</button><button class="btn" id="identityBtn">Identity hunter</button><button class="btn" id="geminiBtn">Gemini packet</button><button class="btn" id="canonBtn">Canon falsifier</button><input id="txHashInput" class="mono" value="0x515a010fdb97cf00b6aaa1c7d5050ebd353a0b2cb259087cf1d91642a4e9e03c" style="min-width:360px;max-width:100%;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.24);color:var(--text);padding:10px 12px" /><button class="btn" id="tweetTxBtn">Tweet tx autopsy</button><button class="btn" id="reserveBtn">Reserve control-plane</button><button class="btn" id="nestedBtn">Nested governance</button><button class="btn" id="batchTxBtn">Batch tx packet</button><button class="btn" id="doctrineBtn">Proof doctrine</button><button class="btn" id="importBtn">Import report</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" /><button class="btn" id="autoBtn">Start autopilot</button><button class="btn danger" id="stopBtn">Stop</button><button class="btn" id="settingsBtn">Settings</button><button class="btn" id="exportBtn">Export report</button></div></div>
   </section>
 
@@ -124,7 +124,7 @@ const DICT={'0x01339c21':'launch()','0x8091f3bf':'launched()','0x8da5cb5b':'owne
 const ERC1967={impl:'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',admin:'0xb53127684a568b3173ae13b9f8a6016e0192b2d357c43a0a358d3b8a2b35133d',beacon:'0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50'};
 const ROLLUP_SELECTORS=['9e461a3d','8f23c0b3','e4d661ac','4d03b5ef','3659cfe6','4f1ef286','52d1902d','2f54bf6e','d7bb99ba','8da5cb5b','8091f3bf','01339c21'];
 
-const VERSION='V63.4.4 OSINT Export Integrity Guard'; const BASELINE_KEY='pdai-v624-compact-baseline';
+const VERSION='V63.4.5 Export Mirror Integrity Guard'; const BASELINE_KEY='pdai-v624-compact-baseline';
 let state={cfg:JSON.parse(JSON.stringify(CFG)),rpc:0,block:0,lastBlockScan:0,busy:false,timer:null,thoughts:[],snapshot:null,f33c:null,end:null,pcomp:null,bridge:null,proxy:null,routes:null,sinks:null,routeAutopsy:null,accrual:null,launch:null,onward:null,tactics:null,addresses:new Map(),selectors:new Map(),models:null,cognition:null,evidence:[],hypotheses:[],proofQueue:[],dotLinks:[],learning:null,targetIntel:null,hardGates:null,persistence:null,diff:null,proxyClassifier:null,falsifier:null,terminalLadder:null,flowMap:null,terminalClassifier:null,proxyFirewall:null,scoreSplit:null,reviewPacket:null,identityHunter:null,geminiPacket:null,convergence:null,canonProof:null,bayesModel:null,counterfactual:null,tweetTx:null,reserveControl:null,batchTx:null,nestedGov:null,proofDoctrine:null,cycles:0};
 const $=id=>document.getElementById(id); const short=a=>a&&a.length>14?a.slice(0,8)+'…'+a.slice(-6):(a||'—'); const lc=a=>(a||'').toLowerCase(); const isAddr=a=>/^0x[a-fA-F0-9]{40}$/.test(a||''); const uniq=a=>[...new Set(a.filter(Boolean))]; const pct=n=>Math.max(0,Math.min(100,Number(n)||0)); const fmt=(n,d=2)=>Number.isFinite(+n)?(+n).toLocaleString(undefined,{maximumFractionDigits:d}):'—';
 function thought(kind,title,msg){state.thoughts.unshift({kind,title,msg,ts:new Date().toLocaleTimeString()}); state.thoughts=state.thoughts.slice(0,80); renderFeed();}
@@ -2331,11 +2331,11 @@ exportReport=function(){try{state.v634={...(state.v634||{}),v6341:state.v6341};}
 try{v6341SeedIntel(); ensureV6341UI();}catch{}
 
 
-/* ========================= V63.4.4 OSINT Export Integrity Guard =========================
+/* ========================= V63.4.5 Export Mirror Integrity Guard =========================
    The uploaded May 18 infographic / explanatory packet is useful intelligence, but it is not
    chain proof by itself. V63.4.3 converts it into a quarantined OSINT claim ledger and ties
    every narrative claim back to the V63.4.1 receipt/slot/custody tests. */
-state.v6343={...(state.v6343||{}),version:'V63.4.4 OSINT Export Integrity Guard',updated:null,status:'OSINT-PENDING',score:0,rows:[],claims:[],gates:[],actions:[],verdict:'OSINT packet not scored yet'};
+state.v6343={...(state.v6343||{}),version:'V63.4.5 Export Mirror Integrity Guard',updated:null,status:'OSINT-PENDING',score:0,rows:[],claims:[],gates:[],actions:[],verdict:'OSINT packet not scored yet'};
 const V6343_PACKET={
   title:'On-chain detective story: VietDong 5996',
   date:'May 18 2026',
@@ -2405,13 +2405,13 @@ function v6343BuildFirewall(){
     {kind:'bad',title:'No narrative score jump',msg:'Do not drop coincidence debt or raise peg-proof score from community graphics alone. Only the chain audit can promote.'}
   ];
   const verdict=status==='CHAIN-PROMOTED'?'OSINT packet chain-promoted, but still below final peg closure.':status==='OSINT-CORROBORATED'?'OSINT packet partially corroborated by exact tx/proxy/actor evidence; still hard-gated.':'OSINT packet quarantined as narrative intelligence until tx/log/slot/custody evidence confirms it.';
-  state.v6343={version:'V63.4.4 OSINT Export Integrity Guard',updated:new Date().toISOString(),status,score,rows,claims,gates,actions,metrics:m,verdict,packet:V6343_PACKET};
+  state.v6343={version:'V63.4.5 Export Mirror Integrity Guard',updated:new Date().toISOString(),status,score,rows,claims,gates,actions,metrics:m,verdict,packet:V6343_PACKET};
   return state.v6343;
 }
 function ensureV6343UI(){
   if($('tab-v6343'))return;
-  const tabs=document.querySelector('.tabs'); if(tabs){const b=document.createElement('button'); b.className='tab'; b.dataset.tab='v6343'; b.textContent='V63.4.4 OSINT'; b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.deck').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('tab-v6343')?.classList.add('active')}; tabs.insertBefore(b,tabs.firstChild);}
-  const sec=document.createElement('section'); sec.id='tab-v6343'; sec.className='deck'; sec.innerHTML=`<div class="cols"><div class="card"><div class="panelTitle"><div><div class="kicker">V63.4.4 OSINT evidence firewall</div><div class="bigline" id="v6343Verdict">OSINT packet pending</div></div></div><div class="list" id="v6343Rows"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">claim quarantine ledger</div><div class="bigline">Graphic/thread claims vs chain gates</div></div></div><div class="list" id="v6343Claims"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">next proof actions</div><div class="bigline">Convert story into receipts</div></div></div><div class="list" id="v6343Actions"></div></div></div><div class="card" style="margin-top:14px"><div class="panelTitle"><div><div class="kicker">hard-gate table</div><div class="bigline">What must close before score promotion</div></div></div><div class="tableWrap"><table id="v6343Table"></table></div></div>`;
+  const tabs=document.querySelector('.tabs'); if(tabs){const b=document.createElement('button'); b.className='tab'; b.dataset.tab='v6343'; b.textContent='V63.4.5 OSINT'; b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.deck').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('tab-v6343')?.classList.add('active')}; tabs.insertBefore(b,tabs.firstChild);}
+  const sec=document.createElement('section'); sec.id='tab-v6343'; sec.className='deck'; sec.innerHTML=`<div class="cols"><div class="card"><div class="panelTitle"><div><div class="kicker">V63.4.5 OSINT evidence firewall</div><div class="bigline" id="v6343Verdict">OSINT packet pending</div></div></div><div class="list" id="v6343Rows"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">claim quarantine ledger</div><div class="bigline">Graphic/thread claims vs chain gates</div></div></div><div class="list" id="v6343Claims"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">next proof actions</div><div class="bigline">Convert story into receipts</div></div></div><div class="list" id="v6343Actions"></div></div></div><div class="card" style="margin-top:14px"><div class="panelTitle"><div><div class="kicker">hard-gate table</div><div class="bigline">What must close before score promotion</div></div></div><div class="tableWrap"><table id="v6343Table"></table></div></div>`;
   const first=document.querySelector('.deck'); first?.parentNode?.insertBefore(sec,first);
 }
 function renderV6343(){
@@ -2423,7 +2423,7 @@ function renderV6343(){
   if($('v6343Table'))$('v6343Table').innerHTML='<tr><th>Gate</th><th>Status</th><th>Needed proof</th></tr>'+(P.gates||[]).map(g=>`<tr><td>${g.k}</td><td>${g.v}</td><td>${g.need}</td></tr>`).join('');
 }
 const V6343_baseRenderAll=renderAll;
-renderAll=function(){try{v6343BuildFirewall();}catch(e){} V6343_baseRenderAll(); renderV6343(); const P=state.v6343||{}; if($('v63BuildTiny'))$('v63BuildTiny').textContent=P.status==='CHAIN-PROMOTED'?'V63.4.4 OSINT chain-promoted':'V63.4.4 OSINT firewall active'; if($('summary'))$('summary').textContent='V63.4.4 ingests the new 5996 infographic/thread as OSINT. It can create targets and proof jobs, but it cannot raise formal peg proof until receipts, approval logs, ERC-1967 slot deltas, pDAI custody, bridge adjacency, Reserve/rToken identity, or settlement paths verify it on-chain.';};
+renderAll=function(){try{v6343BuildFirewall();}catch(e){} V6343_baseRenderAll(); renderV6343(); const P=state.v6343||{}; if($('v63BuildTiny'))$('v63BuildTiny').textContent=P.status==='CHAIN-PROMOTED'?'V63.4.5 OSINT chain-promoted':'V63.4.5 export mirror active'; if($('summary'))$('summary').textContent='V63.4.4 ingests the new 5996 infographic/thread as OSINT. It can create targets and proof jobs, but it cannot raise formal peg proof until receipts, approval logs, ERC-1967 slot deltas, pDAI custody, bridge adjacency, Reserve/rToken identity, or settlement paths verify it on-chain.';};
 const V6343_baseBoot=boot;
 boot=function(){ensureV6343UI(); v6343BuildFirewall(); V6343_baseBoot(); setTimeout(()=>{try{v6343BuildFirewall();renderV6343();}catch(e){}},6200); thought('good','V63.4.4 loaded','OSINT Evidence Firewall is armed: uploaded graphics/thread now become a quarantined claim ledger with chain-gated promotion tests.');};
 const V6343_baseExportReport=exportReport;
@@ -2431,12 +2431,12 @@ exportReport=function(){try{v6343BuildFirewall(); state.v6343=state.v6343;}catch
 try{ensureV6343UI(); v6343BuildFirewall();}catch{}
 
 
-/* ========================= V63.4.4 OSINT Export Integrity Guard =========================
+/* ========================= V63.4.5 Export Mirror Integrity Guard =========================
    The uploaded 2026-05-19 report proved the user was still exporting from an older V63.4.1
    build: version stayed V63.4.1 and the 5996 lane still contained v6341BridgeActors ReferenceErrors.
    V63.4.4 makes build integrity visible and guarantees the export carries v6341, v6343 and v6344
    payloads instead of burying the OSINT firewall inside UI-only state. */
-state.v6344={...(state.v6344||{}),version:'V63.4.4 OSINT Export Integrity Guard',updated:null,rows:[],table:[],verdict:'build integrity pending'};
+state.v6344={...(state.v6344||{}),version:'V63.4.5 Export Mirror Integrity Guard',updated:null,rows:[],table:[],verdict:'build integrity pending'};
 function v6344BuildIntegrity(){
   const hasBridgeResolver=typeof v6341BridgeActors==='function';
   const has5996=!!state.v6341;
@@ -2461,7 +2461,7 @@ function v6344BuildIntegrity(){
     {k:'export ready',v:String(exportReady)}
   ];
   const verdict=exportReady?'Export integrity closed: V63.4.4 will include 5996 + OSINT state and no old bridgeActors ReferenceError.':priorRefErr?'Stale V63.4.1 report detected; rerun/export from this V63.4.4 file.':'Export integrity watch: boot/live audit still building one or more state lanes.';
-  state.v6344={version:'V63.4.4 OSINT Export Integrity Guard',updated:new Date().toISOString(),rows,table,verdict,exportReady,priorRefErr,loadedVersion};
+  state.v6344={version:'V63.4.5 Export Mirror Integrity Guard',updated:new Date().toISOString(),rows,table,verdict,exportReady,priorRefErr,loadedVersion};
   state.v634={...(state.v634||{}),v6341:state.v6341,v6343:state.v6343,v6344:state.v6344};
   return state.v6344;
 }
@@ -2490,6 +2490,70 @@ exportReport=function(){
   const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-4-4-osint-export-integrity-report.json'; a.click(); URL.revokeObjectURL(a.href);
 };
 try{ensureV6344UI();v6344BuildIntegrity();}catch{}
+
+
+/* ========================= V63.4.5 Export Mirror Integrity Guard =========================
+   V63.4.4 proved the bootfix was healthy, but the uploaded JSON showed a serialization edge:
+   v6341/v6343/v6344 could exist under state.v634.* while missing as top-level JSON keys.
+   V63.4.5 mirrors nested lanes to top-level during export and reports that mirror explicitly. */
+function v6345ResolveLane(name){
+  try{return state?.[name] || state?.v634?.[name] || null;}catch(e){return null;}
+}
+function v6345MirrorLanes(){
+  try{
+    state.v634={...(state.v634||{})};
+    for(const k of ['v6341','v6343','v6344']){
+      const lane=v6345ResolveLane(k);
+      if(lane){ state[k]=lane; state.v634[k]=lane; }
+    }
+    state.v6345={
+      version:'V63.4.5 Export Mirror Integrity Guard',
+      updated:new Date().toISOString(),
+      rows:[
+        {kind:'good',title:'Top-level mirror active',msg:'v6341, v6343, and v6344 now mirror from nested state.v634.* into top-level export fields.'},
+        {kind:v6345ResolveLane('v6341')?'good':'warn',title:'v6341 mirror',msg:v6345ResolveLane('v6341')?'5996 lane exports both top-level and nested v634.v6341.':'5996 lane not present yet.'},
+        {kind:v6345ResolveLane('v6343')?'good':'warn',title:'v6343 mirror',msg:v6345ResolveLane('v6343')?'OSINT firewall exports both top-level and nested v634.v6343.':'OSINT firewall not present yet.'},
+        {kind:v6345ResolveLane('v6344')?'good':'warn',title:'v6344 mirror',msg:v6345ResolveLane('v6344')?'Integrity lane exports both top-level and nested v634.v6344.':'Integrity lane not present yet.'}
+      ],
+      table:[
+        {k:'v6341 resolver',v:String(!!v6345ResolveLane('v6341'))},
+        {k:'v6343 resolver',v:String(!!v6345ResolveLane('v6343'))},
+        {k:'v6344 resolver',v:String(!!v6345ResolveLane('v6344'))},
+        {k:'nested fallback source',v:'state.v634.*'},
+        {k:'export filename',v:'pdai-v63-4-5-export-mirror-integrity-report.json'}
+      ],
+      verdict:'V63.4.5 closes the export mirror edge: lane state serializes both nested and top-level.'
+    };
+    state.v634.v6345=state.v6345;
+  }catch(e){try{thought('warn','V63.4.5 lane mirror clipped',e.message||String(e));}catch{}}
+}
+function ensureV6345UI(){
+  if($('tab-v6345'))return;
+  const tabs=document.querySelector('.tabs');
+  if(tabs){const b=document.createElement('button'); b.className='tab'; b.dataset.tab='v6345'; b.textContent='V63.4.5 export'; b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.deck').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('tab-v6345')?.classList.add('active')}; tabs.insertBefore(b,tabs.firstChild);}
+  const sec=document.createElement('section'); sec.id='tab-v6345'; sec.className='deck'; sec.innerHTML=`<div class="cols2"><div class="card"><div class="panelTitle"><div><div class="kicker">V63.4.5 export mirror</div><div class="bigline" id="v6345Verdict">Mirror pending</div></div></div><div class="list" id="v6345Rows"></div></div><div class="card"><div class="panelTitle"><div><div class="kicker">serialization contents</div><div class="bigline">Top-level and nested lanes</div></div></div><div class="tableWrap"><table id="v6345Table"></table></div></div></div>`;
+  const first=document.querySelector('.deck'); first?.parentNode?.insertBefore(sec,first);
+}
+function renderV6345(){
+  ensureV6345UI(); v6345MirrorLanes(); const I=state.v6345||{};
+  if($('v6345Verdict')){$('v6345Verdict').textContent=I.verdict||'Mirror pending'; $('v6345Verdict').className='bigline good';}
+  if($('v6345Rows'))$('v6345Rows').innerHTML=(I.rows||[]).map(x=>row(x.kind,x.title,x.msg,'V63.4.5')).join('');
+  if($('v6345Table'))$('v6345Table').innerHTML='<tr><th>Field</th><th>Value</th></tr>'+(I.table||[]).map(x=>`<tr><td>${x.k}</td><td>${x.v}</td></tr>`).join('');
+}
+const V6345_baseRenderAll=renderAll;
+renderAll=function(){try{v6345MirrorLanes();}catch(e){} V6345_baseRenderAll(); renderV6345(); if($('v63Auto'))$('v63Auto').textContent='V63.4.5';};
+const V6345_baseBoot=boot;
+boot=function(){ensureV6345UI(); v6345MirrorLanes(); V6345_baseBoot(); setTimeout(()=>{try{v6345MirrorLanes();renderV6345();}catch(e){}},8200); thought('good','V63.4.5 loaded','Export Mirror Integrity Guard is armed: v6341/v6343/v6344 lanes serialize both top-level and nested, even when imported state only has nested v634 lanes.');};
+exportReport=function(){
+  sanitizePrimaryTxPanels('pre-export');
+  if(!state.snapshot || !state.block){try{thought('warn','Pre-live export warning','Wait until Block shows a non-zero value for a full report. Export will still include all available lane mirrors.');}catch{}}
+  try{v6341SeedIntel?.(); v6343BuildFirewall?.(); v6344BuildIntegrity?.(); v6345MirrorLanes?.();}catch(e){try{thought('warn','V63.4.5 export preflight clipped',e.message||String(e));}catch{}}
+  const lane1=v6345ResolveLane('v6341'), lane3=v6345ResolveLane('v6343'), lane4=v6345ResolveLane('v6344'), lane5=state.v6345;
+  try{state.v634={...(state.v634||{}),v6341:lane1,v6343:lane3,v6344:lane4,v6345:lane5};}catch{}
+  const obj={createdAt:new Date().toISOString(),version:VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,v631:state.v631,v632:state.v632,v633:state.v633,v6332:state.v6332,v634:state.v634,v6341:lane1,v6343:lane3,v6344:lane4,v6345:lane5,addresses:[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),thoughts:state.thoughts};
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pdai-v63-4-5-export-mirror-integrity-report.json'; a.click(); URL.revokeObjectURL(a.href);
+};
+try{ensureV6345UI();v6345MirrorLanes();}catch{}
 
 
 </script>
