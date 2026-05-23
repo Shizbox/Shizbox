@@ -2931,5 +2931,258 @@ body.v640-minimal .controls #importBtn,body.v640-minimal .controls #settingsBtn,
 })();
 </script>
 
+
+<style id="v641-style">
+body.v641-cinematic .v640Main{min-height:318px;background:
+ radial-gradient(circle at 12% 20%,rgba(101,255,189,.16),transparent 30%),
+ radial-gradient(circle at 86% 8%,rgba(196,154,255,.14),transparent 28%),
+ linear-gradient(180deg,rgba(10,16,26,.80),rgba(3,7,13,.92));}
+body.v641-cinematic .v640Main:after{content:"";position:absolute;inset:0;pointer-events:none;background:
+ linear-gradient(90deg,transparent,rgba(98,220,255,.08),transparent);
+ mask:linear-gradient(180deg,transparent,#000 25%,#000 75%,transparent);
+ animation:v641Sweep 5.5s ease-in-out infinite}
+@keyframes v641Sweep{0%,100%{transform:translateX(-55%);opacity:.2}50%{transform:translateX(55%);opacity:.8}}
+.v641Ring{position:absolute;right:26px;bottom:22px;width:185px;height:185px;border-radius:50%;border:1px solid rgba(98,220,255,.25);box-shadow:0 0 60px rgba(98,220,255,.12),inset 0 0 40px rgba(101,255,189,.05);display:grid;place-items:center;z-index:0}
+.v641Ring:before,.v641Ring:after{content:"";position:absolute;inset:-16px;border-radius:50%;border:1px dashed rgba(101,255,189,.24);animation:spin 13s linear infinite}
+.v641Ring:after{inset:-34px;border-color:rgba(196,154,255,.18);animation-duration:21s;animation-direction:reverse}
+.v641Ring span{font-weight:1000;font-size:1.25rem;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
+.v641NetGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.v641RpcDot{border:1px solid rgba(151,200,255,.13);border-radius:14px;padding:9px;background:rgba(255,255,255,.026)}
+.v641RpcDot .u{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v641RpcDot .h{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
+.v641RpcDot.good .h{color:var(--green)}.v641RpcDot.warn .h{color:var(--amber)}.v641RpcDot.bad .h{color:var(--red)}
+.v641Mode{border:1px solid rgba(101,255,189,.28)!important;color:var(--green)!important;background:rgba(101,255,189,.06)!important}
+.v641Aggro{background:linear-gradient(90deg,rgba(101,255,189,.24),rgba(196,154,255,.14))!important;border-color:rgba(101,255,189,.38)!important}
+.v641Toast{position:fixed;right:18px;bottom:18px;max-width:420px;border:1px solid rgba(101,255,189,.24);border-radius:20px;background:rgba(5,9,15,.86);backdrop-filter:blur(16px);box-shadow:0 24px 80px rgba(0,0,0,.34);padding:12px 14px;z-index:9999;color:var(--muted);font-size:.82rem;line-height:1.35;display:none}
+.v641Toast b{color:var(--text)}
+@media(max-width:900px){.v641Ring{display:none}.v641NetGrid{grid-template-columns:1fr}}
+</style>
+<script id="v641-script">
+(function(){
+  const V641_VERSION='V64.1 Cinematic Aggressive RPC';
+  const V641_EXPORT='pdai-v64-1-cinematic-aggressive-rpc-report.json';
+  const V641_EXTRA_RPCS=[
+    'https://pulsechain-rpc.publicnode.com',
+    'https://rpc.pulsechain.com',
+    'https://rpc-pulsechain.g4mm4.io'
+  ];
+  const V641_ZKSYNC_PROXY='0x8ECa806Aecc86CE90Da803b080Ca4E3A9b8097ad';
+  const V641_ZKSYNC_TXS=[
+    '0x9b5955cf3841d097fc9df9e6a52580e1c09814637a7b5d038b1b91dbb7594736',
+    '0xb4684216170d6a33c1e95df4a0830509be6c86674cd7319cb3139891d4c006d5',
+    '0xe42a669c4bc3cd4140838858f8e02d0ac7a1430325269bfb3ab4d4b6533f279f',
+    '0xa0f4d8244da619936d0b5e0de0a0d92dbfb9c52de322ed81c30a050fc58d7bd7'
+  ];
+  const V641_TERMINAL='0x92444f0000000000000000000000000000fc192e';
+  function el(id){return document.getElementById(id)}
+  function safe(fn,fb){try{return fn()}catch(e){return fb}}
+  function num(v,d){v=Number(v);return Number.isFinite(v)?v:(d||0)}
+  function pct(v){return Math.max(0,Math.min(100,Math.round(num(v,0))))}
+  function short(a){return a&&a.length>14?a.slice(0,8)+'…'+a.slice(-6):(a||'—')}
+  function uniq(a){return [...new Set((a||[]).filter(Boolean))]}
+  function rowx(kind,title,msg,tag){ if(typeof row==='function') return row(kind,title,msg,tag||'V64.1'); return '<div class="row '+(kind||'info')+'"><div class="rk"><span>'+title+'</span><span class="tag">'+(tag||'V64.1')+'</span></div><div class="rv">'+msg+'</div></div>'; }
+  function toast(title,msg){let t=el('v641Toast'); if(!t){t=document.createElement('div');t.id='v641Toast';t.className='v641Toast';document.body.appendChild(t)} t.innerHTML='<b>'+title+'</b><br>'+msg; t.style.display='block'; clearTimeout(t._x); t._x=setTimeout(()=>t.style.display='none',5200);}
+  function ensureState(){
+    document.body.classList.add('v641-cinematic');
+    state.v641=state.v641||{version:V641_VERSION,rpc:{calls:0,ok:0,fail:0,cacheHits:0,races:0,chunkedLogs:0,fastest:'—'},cycles:0,mode:'aggressive',last:null};
+    state.cfg=state.cfg||JSON.parse(JSON.stringify(CFG));
+    state.cfg.rpcs=uniq([...(state.cfg.rpcs||[]),...V641_EXTRA_RPCS]);
+    state.cfg.seeds=uniq([...(state.cfg.seeds||[]),...V641_ZKSYNC_TXS]);
+    state.cfg.bridgeTargets=uniq([...(state.cfg.bridgeTargets||[]),V641_ZKSYNC_PROXY,'0xF406a3Ab62Ce9316b39cF8C7A50623777B2A6Fb9','0xba86ca0aeca30247f9e2fd8736879997bcd01dc4']);
+    state.cfg.proxyTargets=uniq([...(state.cfg.proxyTargets||[]),V641_ZKSYNC_PROXY,'0x22d7937438b4bbf02f6ca55e3831abb94bd0b6f1','0x98122d3682db4e2e869b568178621c90e1d3a712']);
+    state.cfg.autoRefresh=Math.min(Math.max(12000,+state.cfg.autoRefresh||20000),25000);
+  }
+  const RPC_HEALTH=new Map();
+  const RPC_CACHE=new Map();
+  function endpoints(){ensureState(); return uniq([...(state.cfg.rpcs||[]),...V641_EXTRA_RPCS]);}
+  function health(url){ if(!RPC_HEALTH.has(url)) RPC_HEALTH.set(url,{ok:0,fail:0,lat:9999,downUntil:0,last:'never'}); return RPC_HEALTH.get(url); }
+  function ranked(){
+    const now=Date.now();
+    return endpoints().sort((a,b)=>{
+      const A=health(a),B=health(b);
+      const ad=A.downUntil>now?1e7:0, bd=B.downUntil>now?1e7:0;
+      return (ad+A.lat+A.fail*900-A.ok*30)-(bd+B.lat+B.fail*900-B.ok*30);
+    });
+  }
+  function cacheTTL(method){
+    if(method==='eth_blockNumber') return 1700;
+    if(method==='eth_getTransactionReceipt'||method==='eth_getTransactionByHash'||method==='eth_getCode') return 45000;
+    if(method==='eth_call') return 5500;
+    return 0;
+  }
+  function timeoutFor(method){
+    if(method==='eth_getLogs') return 10500;
+    if(method==='eth_call'||method==='eth_blockNumber') return 5200;
+    return 7200;
+  }
+  async function postRpc(url,method,params,ms){
+    const ctrl=new AbortController(); const id=setTimeout(()=>ctrl.abort(),ms);
+    const start=performance.now();
+    try{
+      const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:Date.now()+Math.random(),method,params}),signal:ctrl.signal});
+      const j=await res.json();
+      if(j.error) throw new Error(j.error.message||JSON.stringify(j.error));
+      const h=health(url); h.ok++; h.lat=Math.round((h.lat*0.65)+(performance.now()-start)*0.35); h.downUntil=0; h.last='ok';
+      state.v641.rpc.ok++; state.v641.rpc.fastest=url;
+      if(el('rpcMeta')) el('rpcMeta').textContent='RPC: '+url+' • '+h.lat+'ms';
+      return j.result;
+    }catch(e){
+      const h=health(url); h.fail++; h.last=(e&&e.name==='AbortError')?'timeout':'fail'; h.downUntil=Date.now()+Math.min(45000,2500*h.fail);
+      state.v641.rpc.fail++;
+      throw e;
+    }finally{clearTimeout(id);}
+  }
+  async function v641Rpc(method,params=[]){
+    ensureState(); state.v641.rpc.calls++;
+    const key=method+'|'+JSON.stringify(params||[]);
+    const ttl=cacheTTL(method);
+    const now=Date.now();
+    const cached=RPC_CACHE.get(key);
+    if(ttl && cached && cached.exp>now){state.v641.rpc.cacheHits++; return cached.val;}
+    const urls=ranked();
+    const fastRace=(method==='eth_blockNumber'||method==='eth_call'||method==='eth_getCode') && urls.length>1;
+    let lastErr;
+    if(fastRace){
+      state.v641.rpc.races++;
+      const top=urls.slice(0,Math.min(2,urls.length));
+      try{
+        const val=await Promise.any(top.map(u=>postRpc(u,method,params,timeoutFor(method))));
+        if(ttl) RPC_CACHE.set(key,{exp:now+ttl,val});
+        return val;
+      }catch(e){lastErr=e;}
+    }
+    for(const u of urls){
+      try{
+        const val=await postRpc(u,method,params,timeoutFor(method));
+        if(ttl) RPC_CACHE.set(key,{exp:Date.now()+ttl,val});
+        return val;
+      }catch(e){lastErr=e;}
+    }
+    throw lastErr||new Error('all RPCs failed');
+  }
+  window.rpc=v641Rpc; try{rpc=v641Rpc;}catch(e){}
+  async function v641GetLogs(address,from,to,topics){
+    ensureState();
+    let start=Number(from), end=Number(to);
+    if(!Number.isFinite(start)||!Number.isFinite(end)||end<start) return [];
+    let chunk=end-start>80?45:Math.max(1,end-start+1);
+    const out=[];
+    for(let s=start;s<=end;){
+      const e=Math.min(end,s+chunk-1);
+      try{
+        const logs=await v641Rpc('eth_getLogs',[{address,fromBlock:'0x'+s.toString(16),toBlock:'0x'+e.toString(16),topics}]);
+        out.push(...(logs||[])); s=e+1;
+      }catch(err){
+        if(chunk>8){chunk=Math.max(8,Math.floor(chunk/2)); state.v641.rpc.chunkedLogs++; continue;}
+        safe(()=>thought('warn','RPC log chunk skipped','eth_getLogs failed even at '+chunk+' block chunks: '+(err.message||String(err))),null);
+        s=e+1;
+      }
+    }
+    return out;
+  }
+  window.getLogs=v641GetLogs; try{getLogs=v641GetLogs;}catch(e){}
+  function withTimeout(p,label,ms){
+    let done=false;
+    const t=new Promise(resolve=>setTimeout(()=>resolve({timeout:true,label}),ms));
+    return Promise.race([Promise.resolve().then(()=>p()).then(v=>{done=true;return {ok:true,val:v,label}}).catch(e=>({ok:false,error:e,label})),t]).then(r=>{ if(r.timeout) safe(()=>thought('warn','Aggressive step clipped',label+' exceeded '+Math.round(ms/1000)+'s; continuing.'),null); return r;});
+  }
+  async function step(fnName,ms){
+    const fn=window[fnName] || safe(()=>eval(fnName),null);
+    if(typeof fn!=='function') return {skip:true,label:fnName};
+    return await withTimeout(()=>fn(),fnName,ms);
+  }
+  async function v641AggressiveDig(){
+    ensureState();
+    if(state.busy){safe(()=>thought('warn','Aggressive cycle skipped','Prior cycle still owns the state lock.'),null);return;}
+    state.busy=true; state.v641.cycles++; const cycleNo=state.v641.cycles;
+    safe(()=>setStatus('info','aggressive'),null);
+    const start=Date.now();
+    try{
+      await step('syncSnapshot',11000);
+      await Promise.allSettled(['f33cWatcher','bridgeScan','erc1967Scan'].map(n=>step(n,13000)));
+      await Promise.allSettled(['routeAndSinkAnalysis','selectorScout','seedReceipts'].map(n=>step(n,11000)));
+      if(cycleNo%2===0) await Promise.allSettled(['routeAutopsyMode','launchMillionAutopsy','onwardFlowTracker','proxyClassifierV2'].map(n=>step(n,14000)));
+      if(cycleNo%3===0) await Promise.allSettled(['terminalWarRoomCycle','authorityScout','identityHunter','convergenceReasoningCortex','hardGateLedger'].map(n=>step(n,12000)));
+      safe(()=>{ if(typeof dualScoreSplit==='function') dualScoreSplit(); if(typeof bayesianPegBuildModel==='function') bayesianPegBuildModel(); if(typeof renderAll==='function') renderAll(); },null);
+      state.v641.last={ok:true,ms:Date.now()-start,cycle:cycleNo,block:state.block,rpc:{...state.v641.rpc}};
+      safe(()=>setStatus('good','aggressive complete'),null);
+      safe(()=>{ if(el('taskMeta')) el('taskMeta').textContent='Last task: V64.1 aggressive cycle '+cycleNo+' • '+Math.round((Date.now()-start)/1000)+'s'; },null);
+      safe(()=>thought('good','V64.1 aggressive cycle complete','Parallel quick lanes finished; deep lanes run every 2nd/3rd cycle so the UI stays fast while hunting harder.'),null);
+    }catch(e){
+      state.v641.last={ok:false,error:e.message||String(e),cycle:cycleNo};
+      safe(()=>setStatus('bad','aggressive error'),null); safe(()=>thought('bad','V64.1 aggressive cycle failed',e.message||String(e)),null);
+    }finally{state.busy=false; renderV641();}
+  }
+  window.autonomousDig=v641AggressiveDig; try{autonomousDig=v641AggressiveDig;}catch(e){}
+  function v641StartAuto(){
+    ensureState();
+    if(state.timer) clearInterval(state.timer);
+    state.timer=setInterval(v641AggressiveDig, Math.max(12000, Math.min(25000,+state.cfg.autoRefresh||18000)));
+    safe(()=>{ if(el('loopPill')){el('loopPill').textContent='aggressive'; el('loopPill').className='pill good';}},null);
+    safe(()=>thought('good','V64.1 aggressive autopilot started','Fast cycles every '+Math.round((+state.cfg.autoRefresh||18000)/1000)+'s with RPC racing, chunked logs, and cache-assisted calls.'),null);
+    v641AggressiveDig();
+  }
+  window.startAuto=v641StartAuto; try{startAuto=v641StartAuto;}catch(e){}
+  function ensureUI(){
+    ensureState();
+    const main=document.querySelector('.v640Main');
+    if(main && !main.querySelector('.v641Ring')){ const ring=document.createElement('div'); ring.className='v641Ring'; ring.innerHTML='<span>pDAI<br>BUILD</span>'; main.appendChild(ring); }
+    const side=document.querySelector('.v640Side');
+    if(side && !el('v641RpcPanel')){
+      const card=document.createElement('div'); card.className='card'; card.id='v641RpcPanel';
+      card.innerHTML='<div class="v640PanelTitle"><div><div class="v640Label">RPC storm shield</div><div class="bigline">Fast path health</div></div></div><div class="v641NetGrid" id="v641RpcGrid"></div><div class="v640Rows" id="v641RpcRows" style="margin-top:10px"></div>';
+      side.insertBefore(card,side.firstChild);
+    }
+    const dockR=document.querySelector('.v640DockR');
+    if(dockR && !el('v641AggroBtn')){
+      const b=document.createElement('button'); b.className='v640Btn v641Aggro'; b.id='v641AggroBtn'; b.textContent='Aggressive scan'; b.onclick=v641AggressiveDig; dockR.insertBefore(b,dockR.firstChild);
+    }
+    const dockState=el('v640DockState'); if(dockState){dockState.classList.add('v641Mode'); dockState.textContent='Aggressive minimal mode';}
+    const run=el('v640Run'); if(run) run.onclick=v641AggressiveDig;
+    const auto=el('v640AutoBtn'); if(auto) auto.onclick=()=>{ if(state.timer){clearInterval(state.timer); state.timer=null; auto.textContent='Autopilot'; safe(()=>thought('warn','V64.1 autopilot stopped','Manual mode restored.'),null);} else {auto.textContent='Stop autopilot'; v641StartAuto();}};
+    const runBtn=el('runBtn'); if(runBtn) runBtn.onclick=v641AggressiveDig;
+    const autoBtn=el('autoBtn'); if(autoBtn) autoBtn.onclick=v641StartAuto;
+  }
+  function renderV641(){
+    ensureUI();
+    safe(()=>{ 
+      const title=document.querySelector('.title'); if(title) title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.1 Cinematic Aggressive RPC';
+      document.title='pDAI Peg Prover • '+V641_VERSION;
+      const sub=document.querySelector('.sub'); if(sub) sub.textContent='Cinematic minimal deck + aggressive autonomous scanner. RPC calls are raced, cached, timed out, and log scans are chunked so the tool hunts faster without freezing the browser.';
+    },null);
+    const V=state.v640||{}; const S=state.v641||{};
+    if(el('v640Verdict')) el('v640Verdict').textContent=(V.verdict||'Build radar')+' • aggressive';
+    if(el('v640Explain')) el('v640Explain').textContent=(V.summary||'Build-confidence radar active.')+' RPC storm shield is active: raced endpoints, chunked logs, short cache, and aggressive scan cadence.';
+    const grid=el('v641RpcGrid');
+    if(grid){
+      grid.innerHTML=ranked().slice(0,3).map(u=>{const h=health(u); const cls=h.fail>h.ok+2?'bad':h.fail?'warn':'good'; return '<div class="v641RpcDot '+cls+'"><div class="u">'+u.replace(/^https?:\\/\\//,'')+'</div><div class="h">'+cls+' • '+(h.lat<9999?h.lat+'ms':'pending')+'</div></div>';}).join('');
+    }
+    if(el('v641RpcRows')){
+      const r=S.rpc||{};
+      el('v641RpcRows').innerHTML=[
+        rowx('good','RPC calls',String(r.calls||0)+' total • '+String(r.ok||0)+' ok • '+String(r.fail||0)+' failed'),
+        rowx('info','Speed guards',String(r.races||0)+' races • '+String(r.cacheHits||0)+' cache hits • '+String(r.chunkedLogs||0)+' log chunks'),
+        rowx('warn','Aggressive cadence','Fast lanes every 12–25s; heavy lanes rotate every 2nd/3rd cycle to avoid browser death.')
+      ].join('');
+    }
+    if(el('v640Jobs')){
+      const extra=[
+        rowx('good','Terminal lead isolated','Prior export named 0x92444f…fc192e as top retained receiver dossier; V64.1 keeps it as a routing-priority lead.'),
+        rowx('info','Selector truth locked','launch() selector is 0x01339c21. 0x165c3410 is treated as address-prefix noise, not a launch trigger.'),
+        rowx('warn','zkSync exodus packet queued','The attached Gemini/Bizzee packet is now a bridge-fuel watchlist: '+short(V641_ZKSYNC_PROXY)+' plus four receipt hashes.')
+      ].join('');
+      if(!el('v640Jobs').dataset.v641){el('v640Jobs').innerHTML=extra+el('v640Jobs').innerHTML; el('v640Jobs').dataset.v641='1';}
+    }
+  }
+  function exportObj(){
+    let obj=safe(()=>window.v6349ExportObject&&window.v6349ExportObject(),null)||safe(()=>window.v640ExportObject&&window.v640ExportObject(),null)||{createdAt:new Date().toISOString(),cfg:state.cfg,block:state.block,snapshot:state.snapshot,thoughts:state.thoughts};
+    obj.version=V641_VERSION; obj.baseVersion=obj.baseVersion||'V64.0 Minimal Signal Deck'; obj.v640=state.v640; obj.v641=state.v641; obj.rpcHealth=[...RPC_HEALTH.entries()].map(([url,h])=>({url,...h})); obj.zkSyncBridgePacket={proxy:V641_ZKSYNC_PROXY,txs:V641_ZKSYNC_TXS,source:'user supplied Gemini/Bizzee packet; OSINT creates proof jobs only'}; obj.terminalLead={addressFragment:'0x92444f…fc192e',note:'Fragment from user-supplied report narrative; exact full address should be confirmed from the exported identityHunter rows.'}; return obj;
+  }
+  window.exportReport=function(){ensureState(); renderV641(); const obj=exportObj(); const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=V641_EXPORT; a.click(); URL.revokeObjectURL(a.href); toast('Export complete',V641_EXPORT+' includes v640, v641, rpcHealth, and all prior proof lanes.');};
+  const oldRender=window.renderAll; window.renderAll=function(){safe(()=>oldRender&&oldRender(),null); renderV641();};
+  setTimeout(()=>{ensureUI(); renderV641(); safe(()=>thought('good','V64.1 loaded','Cinematic Aggressive RPC layer is active: raced RPCs, chunked logs, cache, aggressive scan button, and cleaner visual deck.'),null);},600);
+})();
+</script>
+
 </body>
 </html>
