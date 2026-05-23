@@ -305,8 +305,45 @@ async function tweetTxProxyAutopsy(hash){
 
 async function selectorScout(){thought('info','Selector scout','Fetching recent transaction inputs for top pDAI tx hashes and decoding known selectors.'); const txs=uniq((state.snapshot?.transfers||[]).map(t=>t.tx)).slice(0,36); const rows=[]; for(const h of txs){const t=await tx(h); if(!t)continue; const sig=(t.input||'').slice(0,10); if(sig&&sig!=='0x'){rows.push({hash:h,from:t.from,to:t.to,selector:sig,fn:DICT[sig]||'unknown'}); state.selectors.set(sig,(state.selectors.get(sig)||0)+1); if(t.to)addAddr(t.to,'selector target',DICT[sig]||sig); addAddr(t.from,'selector caller',DICT[sig]||sig);}}
  state.selectorRows=rows; thought('good','Selector scout complete',`${rows.length} transaction input(s) decoded. launch() is 0x01339c21; 0x165c... is an address prefix, not the launch selector.`);}
-async function authorityScout(){thought('info','Authority scout','Testing wards(address) on discovered contracts against known actors.'); const targets=uniq([...state.cfg.makerTargets,...[...state.addresses.values()].filter(r=>r.contract).map(r=>r.address)]).slice(0,36); const actors=uniq([...state.cfg.actors,state.cfg.f33c,...[...state.addresses.values()].map(r=>r.address)]).slice(0,48); const hits=[]; for(const target of targets){for(const actor of actors){const out=await call(target,encAddr(SEL.wards,actor)); if(out&&hexToBig(out)>0n){hits.push({target,actor}); addAddr(actor,'ward on '+short(target),'wards(address) true');}}}
- state.authority={hits,targets:targets.length,actors:actors.length}; thought(hits.length?'good':'info','Authority scout complete',hits.length?`${hits.length} ward relation(s) found. Verify what each target controls.`:'No ward relation found in bounded candidate set.');}
+async function authorityScout(){
+  const __started=Date.now();
+  thought('info','Authority scout','V64.2 bounded scout: testing only the highest-value ward pairs with a hard 9s ceiling.');
+  const cfgTargets=uniq([...(state.cfg.makerTargets||[]),...(state.cfg.proxyTargets||[]),...(state.cfg.bridgeTargets||[])]).filter(isAddr);
+  const discovered=[...state.addresses.values()]
+    .filter(r=>r.contract && ((r.pdai||0)>0 || (r.roles&&[...r.roles].join(' ').match(/proxy|bridge|reserve|maker|candidate/i))))
+    .map(r=>r.address);
+  const targets=uniq([...cfgTargets,...discovered]).slice(0,10);
+  const actorRows=[...(state.addresses?.values?.()||[])]
+    .sort((a,b)=>(b.pdai||0)-(a.pdai||0))
+    .map(r=>r.address);
+  const actors=uniq([...(state.cfg.actors||[]),state.cfg.f33c,...actorRows]).filter(isAddr).slice(0,18);
+  const pairs=[];
+  for(const target of targets){for(const actor of actors)pairs.push([target,actor]);}
+  const hits=[]; let tested=0, clipped=false, idx=0;
+  async function probe(target,actor){
+    if(Date.now()-__started>9000){clipped=true; return;}
+    tested++;
+    const out=await Promise.race([
+      call(target,encAddr(SEL.wards,actor)),
+      new Promise(resolve=>setTimeout(()=>resolve(null),2400))
+    ]);
+    if(out&&hexToBig(out)>0n){
+      hits.push({target,actor});
+      addAddr(actor,'ward on '+short(target),'wards(address) true');
+    }
+  }
+  const workers=Array.from({length:Math.min(10,pairs.length)},async()=>{
+    while(idx<pairs.length && Date.now()-__started<9000){
+      const [target,actor]=pairs[idx++];
+      try{await probe(target,actor);}catch(e){}
+    }
+  });
+  await Promise.race([Promise.allSettled(workers),new Promise(resolve=>setTimeout(resolve,9200))]);
+  if(idx<pairs.length) clipped=true;
+  state.authority={hits,targets:targets.length,actors:actors.length,tested,totalPairs:pairs.length,clipped,ms:Date.now()-__started,v642Bounded:true};
+  thought(hits.length?'good':(clipped?'warn':'info'),'Authority scout complete',
+    `${hits.length} ward relation(s), ${tested}/${pairs.length} pair(s) tested in ${Math.round((Date.now()-__started)/1000)}s${clipped?' • clipped safely, cycle continues.':''}`);
+}
 
 function addEvidence(kind,claim,impact,why){state.evidence.unshift({kind,claim,impact,why,ts:new Date().toLocaleTimeString(),block:state.block}); state.evidence=state.evidence.slice(0,60);}
 function loadLearning(){try{return JSON.parse(localStorage.getItem('pdai-v60-8-learning')||'[]')}catch{return []}}
@@ -1276,7 +1313,84 @@ function normalizeImportedAddresses(arr){state.addresses=new Map(); for(const r 
 function loadReportObject(obj){if(!obj||typeof obj!=='object')throw new Error('Invalid JSON report.'); state.cfg={...JSON.parse(JSON.stringify(CFG)),...(obj.cfg||{})}; for(const k of ['block','snapshot','f33c','end','pcomp','bridge','proxy','routeAutopsy','accrual','launch','onward','targetIntel','tactics','routes','sinks','authority','hypotheses','evidence','dotLinks','proofQueue','learning','hardGates','persistence','diff','proxyClassifier','falsifier','terminalLadder','flowMap','terminalClassifier','proxyFirewall','scoreSplit','reviewPacket','identityHunter','geminiPacket','convergence','tweetTx','reserveControl','nestedGov','batchTx','proofDoctrine']){if(obj[k]!==undefined)state[k]=obj[k];} sanitizePrimaryTxPanels('imported report'); normalizeImportedAddresses(obj.addresses||[]); deriveModels(); persistenceSentinel(); terminalWarRoomCycle(false); terminalIdentityHunter(); geminiRequiredPacketMatrix(); convergenceReasoningCortex(); falsifierEngine(); hardGateLedger(); diffTimeline(false); fillSettings(); renderAll(); thought('good','Telemetry report imported',`Loaded ${obj.version||'unknown version'} at block ${obj.block||obj.snapshot?.latest||'—'}. V62.4 replayed hard gates, terminal ladder, identity dossiers, convergence reasoning, proxy firewall, score split, falsifier, and diff without needing live RPC.`);}
 function importReportFile(file){if(!file)return; const fr=new FileReader(); fr.onload=()=>{try{loadReportObject(JSON.parse(fr.result)); setStatus('good','report imported');}catch(e){thought('bad','Import failed',e.message); setStatus('bad','import error');}}; fr.readAsText(file);}
 
-async function autonomousDig(){if(state.busy)return; state.busy=true; setStatus('info','running'); try{await syncSnapshot(); await seedReceipts(); await historicalAccrualAutopsy(); await classifyAddresses([...state.cfg.actors,state.cfg.f33c,...state.cfg.anchors.map(x=>x[1])]); await f33cWatcher(); await launchMillionAutopsy(); await onwardFlowTracker(); targetIntersectionExplainer(); persistenceSentinel(); await endCageScan(); await bridgeScan(); await erc1967Scan(); await proxyClassifierV2(); await routeAndSinkAnalysis(); await routeAutopsyMode(); await terminalWarRoomCycle(true); await selectorScout(); await classifyAddresses([...state.addresses.values()].map(r=>r.address)); await authorityScout(); codeTacticsAudit(); deriveModels(); cognitionLoop(); convergenceReasoningCortex(); hardGateLedger(); falsifierEngine(); diffTimeline(true); renderAll(); setStatus('good','cycle complete'); proofDoctrineGovernor(); $('taskMeta').textContent='Last task: V62.7 reserve/control-plane cognition cycle complete'; thought('good','V62.7 reserve/control-plane cognition cycle complete','All prior lanes plus Reserve control-plane doctrine, soft-gate convergence, and proof boundaries fed the same model.');}catch(e){setStatus('bad','error'); thought('bad','Cycle failed',e.message);} finally{state.busy=false;}}
+async function autonomousDig(){
+  if(state.busy){
+    const age=Date.now()-(state.busySince||Date.now());
+    if(age<45000){thought('warn','Cycle already running',`Current task ${state.currentTask||'unknown'} has been running ${Math.round(age/1000)}s; watchdog will release it if it exceeds the safety ceiling.`);return;}
+    thought('bad','Stale lock released',`Previous task ${state.currentTask||'unknown'} exceeded ${Math.round(age/1000)}s. V64.2 released the lock and started a fresh bounded cycle.`);
+    state.busy=false;
+  }
+  state.busy=true; state.busySince=Date.now(); state.currentTask='boot'; state.cycles=(state.cycles||0)+1;
+  setStatus('info','warp scan');
+  const cycleId=Date.now()+'-'+Math.random().toString(16).slice(2);
+  state.v642=state.v642||{version:'V64.2 Watchdog Warp Core',cycles:0,timeouts:0,steps:[],last:null};
+  state.v642.cycles++;
+  state.v642.activeCycle=cycleId;
+  const started=Date.now();
+  const runStep=async(name,fn,ms=9000,critical=false)=>{
+    state.currentTask=name; state.lastProgressAt=Date.now();
+    $('taskMeta')&&($('taskMeta').textContent=`Last task: ${name} running…`);
+    thought('info',name,`Started with ${Math.round(ms/1000)}s ceiling.`);
+    const t0=Date.now();
+    let timer;
+    try{
+      const res=await Promise.race([
+        Promise.resolve().then(fn).then(v=>({ok:true,v})).catch(e=>({ok:false,e})),
+        new Promise(resolve=>{timer=setTimeout(()=>resolve({timeout:true}),ms);})
+      ]);
+      clearTimeout(timer);
+      const took=Date.now()-t0;
+      state.v642.steps.unshift({name,ok:!!res.ok,timeout:!!res.timeout,ms:took,cycle:state.v642.cycles});
+      state.v642.steps=state.v642.steps.slice(0,80);
+      if(res.timeout){
+        state.v642.timeouts++;
+        thought(critical?'bad':'warn',name+' clipped',`${name} exceeded ${Math.round(ms/1000)}s. V64.2 skipped forward instead of freezing.`);
+        return null;
+      }
+      if(!res.ok){
+        thought(critical?'bad':'warn',name+' failed',(res.e&&res.e.message)||String(res.e||'unknown error'));
+        return null;
+      }
+      thought('good',name+' complete',`${name} finished in ${Math.round(took/1000)}s.`);
+      return res.v;
+    }catch(e){
+      clearTimeout(timer);
+      thought(critical?'bad':'warn',name+' exception',e.message||String(e));
+      return null;
+    }finally{
+      state.lastProgressAt=Date.now();
+    }
+  };
+  try{
+    await runStep('Live sync',()=>syncSnapshot(),12000,true);
+    await runStep('Seed receipts',()=>seedReceipts(),9000,false);
+    await runStep('F33C watcher',()=>f33cWatcher(),8500,false);
+    await runStep('Launch + 1M autopsy',()=>launchMillionAutopsy(),9000,false);
+    await runStep('Onward flow',()=>onwardFlowTracker(),12000,false);
+    targetIntersectionExplainer?.(); persistenceSentinel?.();
+    await runStep('Bridge scan',()=>bridgeScan(),9000,false);
+    await runStep('ERC-1967 scan',()=>erc1967Scan(),11000,false);
+    await runStep('Route + sink analysis',()=>routeAndSinkAnalysis(),9000,false);
+    await runStep('Route autopsy',()=>routeAutopsyMode(),10000,false);
+    await runStep('Selector scout',()=>selectorScout(),8000,false);
+    if(state.cycles%2===0) await runStep('End / cage scan',()=>endCageScan(),9000,false);
+    if(state.cycles%2===0) await runStep('Proxy classifier',()=>proxyClassifierV2(),8000,false);
+    if(state.cycles%3===0) await runStep('Authority scout',()=>authorityScout(),9500,false);
+    if(state.cycles%3===0) await runStep('Terminal war room',()=>terminalWarRoomCycle(true),9500,false);
+    codeTacticsAudit?.(); deriveModels?.(); cognitionLoop?.(); convergenceReasoningCortex?.(); hardGateLedger?.(); falsifierEngine?.(); diffTimeline?.(true); proofDoctrineGovernor?.();
+    if(typeof renderAll==='function')renderAll();
+    setStatus('good','warp complete');
+    $('taskMeta')&&($('taskMeta').textContent=`Last task: V64.2 warp cycle complete • ${Math.round((Date.now()-started)/1000)}s`);
+    state.v642.last={ok:true,ms:Date.now()-started,block:state.block,cycle:state.v642.cycles,timeouts:state.v642.timeouts};
+    thought('good','V64.2 warp cycle complete',`Bounded scan finished in ${Math.round((Date.now()-started)/1000)}s. No single module can freeze the terminal now.`);
+  }catch(e){
+    setStatus('bad','warp error');
+    state.v642.last={ok:false,error:e.message||String(e),ms:Date.now()-started};
+    thought('bad','V64.2 cycle failed',e.message||String(e));
+  }finally{
+    state.busy=false; state.currentTask='idle'; state.busySince=0;
+  }
+}
 function deriveModels(){const snap=state.snapshot||{}; const slots=snap.slots||{}; const slotOpen=Object.values(slots).some(v=>v&&/^0x/.test(v)&&hexToBig(v)>0n); const native=snap.anchors?.find(a=>lc(a.address)===lc('0x947b4633e32e0c7f2c76753b43f008480715416d')); const core=snap.anchors?.find(a=>lc(a.address)===lc('0x5ef7aac0de4f2012cb36730da140025b113fada4')); const ratio=native&&core?core.reserve0/(native.reserve0||1):0; const f33=state.f33c||{}; const f33cLinked=(f33.pdaiBal||0)>0 || (state.sinks?.f33cDelta||0)>0 || (state.bridge?.hits||[]).some(h=>lc(h.to)===lc(state.cfg.f33c)); const endCaged=(state.end?.rows||[]).some(r=>r.live===false); const settle=(state.end?.settleHits||[]).length; const bridge=(state.bridge?.hits||[]).length; const proxyHits=(state.proxy?.rows||[]).length; const rollupLike=(state.proxy?.rollupLike||[]).length; const upgrades=(state.proxy?.upgradeHits||[]).length; const sink=(state.sinks?.deadDelta||0)+(state.sinks?.f33cDelta||0); const hard=(slotOpen?25:0)+(f33.launched?15:0)+(f33cLinked?15:0)+(endCaged?10:0)+(settle?10:0)+(bridge?15:0)+(rollupLike?15:0)+(upgrades?10:0)+(sink>1000?10:0); state.models={score:Math.min(100,hard),slotOpen,ratio,endCaged,settle,bridge,proxyHits,rollupLike,upgrades,sink,f33cLinked,hardClosed:hard>=70 && (slotOpen||bridge||settle||rollupLike) && f33cLinked};}
 function renderFeed(){if(!$('feed'))return; $('feed').innerHTML=state.thoughts.map(t=>row(t.kind,t.title,t.msg,t.ts)).join('')||row('info','Idle','Run the V62 cognition cycle to start autonomous work.','ready');}
 function renderAll(){deriveModels(); const m=state.models||{}; $('mainScore').textContent=fmt(m.score,0); $('mainScore').className='score '+(m.hardClosed?'good':m.score>40?'warn':'bad'); const C0=state.convergence||convergenceReasoningCortex(); const B0=state.bayesModel||bayesianPegBuildModel(); $('headline').textContent=m.hardClosed?'Hard closure improving — verify manually before acting':(B0.score>=68?'Strong peg-build likelihood — formal close still gated':(C0.score>=70?'Strong peg-build convergence — formal close still gated':'Hunt mode — formal ETA still blocked')); $('headline').className='bigline '+(m.hardClosed?'good':'warn'); $('phasePill').textContent=m.hardClosed?'hard gates firing':(B0.score>=68?'probable build':(C0.score>=70?'soft convergence':'proof-capped')); $('phasePill').className='pill '+(m.hardClosed?'good':'warn'); $('summary').textContent=summaryText(m); $('mF33c').textContent=state.f33c?(state.f33c.launched?'launched':'locked'):'—'; $('bF33c').style.width=pct((state.f33c?.launched?55:20)+(m.f33cLinked?35:0))+'%'; $('mEnd').textContent=m.endCaged?'caged?':'open/unknown'; $('bEnd').style.width=pct((m.endCaged?40:10)+(m.settle?35:0))+'%'; $('mBridge').textContent=m.bridge?m.bridge+' hit(s)':'none'; $('bBridge').style.width=pct(m.bridge?45:8)+'%'; $('mSink').textContent=fmt(m.sink,0); $('bSink').style.width=pct(Math.log10(Math.max(1,m.sink))*18)+'%'; $('mainScoreLabel').textContent='formal proof'; renderFeed(); renderRows(); renderCognition(); renderAutopsy(); renderAccrual(); renderLaunch(); renderOnward(); renderTargetIntel(); renderHardGates(); renderSentinel(); renderTerminalLadder(); renderFlowMap(); renderTerminalClassifier(); renderProxyFirewall(); convergenceReasoningCortex(); renderScoreSplit(); renderConvergence(); renderTweetTx(); renderReserveControl(); renderNestedGovernance(); renderBatchTx(); renderProofDoctrine(); renderCanonProof(); renderBayesianModel(); renderCounterfactualPressure(); renderCanon(); renderControlPlane(); renderDefence(); renderExternal(); renderIdentityHunter(); renderGeminiPacket(); renderDiff(); renderFalsifier(); renderAudit(); renderMesh();}
@@ -2758,7 +2872,7 @@ body.v640-minimal .controls #importBtn,body.v640-minimal .controls #settingsBtn,
 </style>
 <script id="v640-script">
 (function(){
-  const V640_VERSION='V64.0 Minimal Signal Deck';
+  const V640_VERSION='V64.2 Watchdog Warp Core';
   const V640_EXPORT='pdai-v64-0-minimal-signal-deck-report.json';
   const V640_PROXY='0x8ECa806Aecc86CE90Da803b080Ca4E3A9b8097ad';
   const V640_BRIDGE_TXS=['0x9b5955cf3841d097fc9df9e6a52580e1c09814637a7b5d038b1b91dbb7594736','0xb4684216170d6a33c1e95df4a0830509be6c86674cd7319cb3139891d4c006d5','0xe42a669c4bc3cd4140838858f8e02d0ac7a1430325269bfb3ab4d4b6533f279f','0xa0f4d8244da619936d0b5e0de0a0d92dbfb9c52de322ed81c30a050fc58d7bd7'];
@@ -2884,8 +2998,8 @@ body.v640-minimal .controls #importBtn,body.v640-minimal .controls #settingsBtn,
   function renderV640(){
     ensureDeck();
     const V=deriveV640();
-    const title=document.querySelector('.title'); if(title) title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.0 Minimal Signal Deck';
-    const sub=document.querySelector('.sub'); if(sub) sub.textContent='V64.0 keeps the autonomous proving engine and exports intact, but compresses the interface into a cleaner graphical deck. The front page now scores whether a real peg system is being built, while preserving formal peg proof as a separate lane.';
+    const title=document.querySelector('.title'); if(title) title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.2 Watchdog Warp Core';
+    const sub=document.querySelector('.sub'); if(sub) sub.textContent='V64.2 keeps the cinematic minimal deck, adds hard watchdog protection, bounds every slow module, and prevents authority/ward scans from freezing the terminal.';
     document.title='pDAI Peg Prover • '+V640_VERSION;
     const big=el('v640Big'); if(big) big.textContent=V.buildConfidence+'/100';
     const exp=el('v640Explain'); if(exp) exp.textContent=V.summary;
@@ -2959,7 +3073,7 @@ body.v641-cinematic .v640Main:after{content:"";position:absolute;inset:0;pointer
 </style>
 <script id="v641-script">
 (function(){
-  const V641_VERSION='V64.1 Cinematic Aggressive RPC';
+  const V641_VERSION='V64.2 Watchdog Warp Core';
   const V641_EXPORT='pdai-v64-1-cinematic-aggressive-rpc-report.json';
   const V641_EXTRA_RPCS=[
     'https://pulsechain-rpc.publicnode.com',
@@ -3146,7 +3260,7 @@ body.v641-cinematic .v640Main:after{content:"";position:absolute;inset:0;pointer
   function renderV641(){
     ensureUI();
     safe(()=>{ 
-      const title=document.querySelector('.title'); if(title) title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.1 Cinematic Aggressive RPC';
+      const title=document.querySelector('.title'); if(title) title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.2 Watchdog Warp Core';
       document.title='pDAI Peg Prover • '+V641_VERSION;
       const sub=document.querySelector('.sub'); if(sub) sub.textContent='Cinematic minimal deck + aggressive autonomous scanner. RPC calls are raced, cached, timed out, and log scans are chunked so the tool hunts faster without freezing the browser.';
     },null);
@@ -3176,11 +3290,84 @@ body.v641-cinematic .v640Main:after{content:"";position:absolute;inset:0;pointer
   }
   function exportObj(){
     let obj=safe(()=>window.v6349ExportObject&&window.v6349ExportObject(),null)||safe(()=>window.v640ExportObject&&window.v640ExportObject(),null)||{createdAt:new Date().toISOString(),cfg:state.cfg,block:state.block,snapshot:state.snapshot,thoughts:state.thoughts};
-    obj.version=V641_VERSION; obj.baseVersion=obj.baseVersion||'V64.0 Minimal Signal Deck'; obj.v640=state.v640; obj.v641=state.v641; obj.rpcHealth=[...RPC_HEALTH.entries()].map(([url,h])=>({url,...h})); obj.zkSyncBridgePacket={proxy:V641_ZKSYNC_PROXY,txs:V641_ZKSYNC_TXS,source:'user supplied Gemini/Bizzee packet; OSINT creates proof jobs only'}; obj.terminalLead={addressFragment:'0x92444f…fc192e',note:'Fragment from user-supplied report narrative; exact full address should be confirmed from the exported identityHunter rows.'}; return obj;
+    obj.version=V641_VERSION; obj.baseVersion=obj.baseVersion||'V64.2 Watchdog Warp Core'; obj.v640=state.v640; obj.v641=state.v641; obj.rpcHealth=[...RPC_HEALTH.entries()].map(([url,h])=>({url,...h})); obj.zkSyncBridgePacket={proxy:V641_ZKSYNC_PROXY,txs:V641_ZKSYNC_TXS,source:'user supplied Gemini/Bizzee packet; OSINT creates proof jobs only'}; obj.terminalLead={addressFragment:'0x92444f…fc192e',note:'Fragment from user-supplied report narrative; exact full address should be confirmed from the exported identityHunter rows.'}; return obj;
   }
   window.exportReport=function(){ensureState(); renderV641(); const obj=exportObj(); const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=V641_EXPORT; a.click(); URL.revokeObjectURL(a.href); toast('Export complete',V641_EXPORT+' includes v640, v641, rpcHealth, and all prior proof lanes.');};
   const oldRender=window.renderAll; window.renderAll=function(){safe(()=>oldRender&&oldRender(),null); renderV641();};
   setTimeout(()=>{ensureUI(); renderV641(); safe(()=>thought('good','V64.1 loaded','Cinematic Aggressive RPC layer is active: raced RPCs, chunked logs, cache, aggressive scan button, and cleaner visual deck.'),null);},600);
+})();
+</script>
+
+
+<style id="v642-style">
+.v642Watchdog{position:fixed;left:18px;bottom:18px;z-index:9998;max-width:460px;border:1px solid rgba(255,209,102,.22);border-radius:20px;background:rgba(5,9,15,.86);backdrop-filter:blur(16px);box-shadow:0 24px 80px rgba(0,0,0,.34);padding:12px 14px;color:var(--muted);font-size:.82rem;line-height:1.35}
+.v642Watchdog b{color:var(--amber)}
+.v642Mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.v642Mini span{border:1px solid rgba(151,200,255,.14);border-radius:999px;padding:6px 8px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}
+.v642Hot{color:var(--amber)}.v642Ok{color:var(--green)}.v642Bad{color:var(--red)}
+#v642ForceBtn{border:1px solid rgba(255,209,102,.35);background:rgba(255,209,102,.08);color:var(--amber);border-radius:999px;padding:7px 10px;font-weight:900;cursor:pointer;margin-top:8px}
+</style>
+<script id="v642-script">
+(function(){
+  const V642_VERSION='V64.2 Watchdog Warp Core';
+  const V642_EXPORT='pdai-v64-2-watchdog-warp-core-report.json';
+  function el(id){return document.getElementById(id)}
+  function safe(fn,fb){try{return fn()}catch(e){return fb}}
+  function ensureWatchdogUI(){
+    if(!el('v642Watchdog')){
+      const d=document.createElement('div'); d.id='v642Watchdog'; d.className='v642Watchdog';
+      d.innerHTML='<b>V64.2 watchdog</b><div id="v642WatchText">arming…</div><div class="v642Mini"><span id="v642Task">task —</span><span id="v642Age">0s</span><span id="v642Timeouts">0 clips</span></div><button id="v642ForceBtn">Release stuck task</button>';
+      document.body.appendChild(d);
+      el('v642ForceBtn').onclick=function(){
+        state.busy=false; state.currentTask='manual release'; state.busySince=0;
+        safe(()=>setStatus('warn','released'),null);
+        safe(()=>thought('warn','Manual watchdog release','You released the busy lock. Start a fresh warp scan when ready.'),null);
+        renderWatchdog();
+      };
+    }
+  }
+  function renderWatchdog(){
+    ensureWatchdogUI();
+    const busy=!!state.busy;
+    const age=busy&&state.busySince?Math.round((Date.now()-state.busySince)/1000):0;
+    const t=state.currentTask||'idle';
+    el('v642WatchText').innerHTML=busy?('running <b>'+t+'</b>; auto-release at 75s if no progress'):'idle / ready';
+    el('v642Task').textContent='task '+t;
+    el('v642Task').className=busy?'v642Hot':'v642Ok';
+    el('v642Age').textContent=age+'s';
+    el('v642Age').className=age>45?'v642Bad':age>25?'v642Hot':'v642Ok';
+    el('v642Timeouts').textContent=((state.v642&&state.v642.timeouts)||0)+' clips';
+  }
+  function releaseIfStuck(){
+    const age=state.busy&&state.busySince?Date.now()-state.busySince:0;
+    const progressAge=state.busy&&state.lastProgressAt?Date.now()-state.lastProgressAt:0;
+    if(age>75000 || progressAge>45000){
+      const old=state.currentTask||'unknown';
+      state.busy=false; state.currentTask='watchdog released'; state.busySince=0;
+      state.v642=state.v642||{version:V642_VERSION}; state.v642.releases=(state.v642.releases||0)+1;
+      safe(()=>setStatus('warn','watchdog release'),null);
+      safe(()=>thought('bad','Watchdog released stuck task',old+' exceeded the safety ceiling. The lock is clear; autopilot can continue instead of sitting frozen.'),null);
+    }
+    renderWatchdog();
+  }
+  function patchButtons(){
+    const run=el('runBtn'); if(run) run.onclick=autonomousDig;
+    const vrun=el('v640Run'); if(vrun) vrun.onclick=autonomousDig;
+    const aggro=el('v641AggroBtn'); if(aggro) aggro.onclick=autonomousDig;
+    const auto=el('autoBtn'); if(auto) auto.onclick=function(){ if(state.timer)clearInterval(state.timer); state.timer=setInterval(autonomousDig,18000); autonomousDig(); safe(()=>thought('good','V64.2 autopilot started','Warp cycles run every 18s; slow modules are clipped and rotated.'),null); };
+    const vauto=el('v640AutoBtn'); if(vauto) vauto.onclick=function(){ if(state.timer){clearInterval(state.timer); state.timer=null; vauto.textContent='Autopilot'; safe(()=>thought('warn','V64.2 autopilot stopped','Manual mode restored.'),null); } else {vauto.textContent='Stop autopilot'; if(auto)auto.onclick(); else {state.timer=setInterval(autonomousDig,18000); autonomousDig();}} };
+  }
+  const oldRender=window.renderAll;
+  window.renderAll=function(){safe(()=>oldRender&&oldRender(),null); patchButtons(); renderWatchdog(); safe(()=>{const title=document.querySelector('.title'); if(title)title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.2 Watchdog Warp Core'; document.title='pDAI Peg Prover • '+V642_VERSION;},null);};
+  window.exportReport=function(){
+    const base=safe(()=>window.v6349ExportObject&&window.v6349ExportObject(),null)||{createdAt:new Date().toISOString(),cfg:state.cfg,block:state.block,snapshot:state.snapshot,thoughts:state.thoughts};
+    base.version=V642_VERSION;
+    base.v640=state.v640; base.v641=state.v641; base.v642=state.v642;
+    base.watchdog={busy:!!state.busy,currentTask:state.currentTask||'idle',releases:(state.v642&&state.v642.releases)||0,timeouts:(state.v642&&state.v642.timeouts)||0};
+    const blob=new Blob([JSON.stringify(base,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=V642_EXPORT; a.click(); URL.revokeObjectURL(a.href);
+    safe(()=>thought('good','V64.2 export complete','Exported watchdog state, timeout clips, and all prior lanes.'),null);
+  };
+  setInterval(releaseIfStuck,3000);
+  setTimeout(()=>{patchButtons(); renderWatchdog(); safe(()=>thought('good','V64.2 loaded','Watchdog Warp Core is active: Authority Scout is bounded, every proof module has a ceiling, and stuck tasks auto-release.'),null); safe(()=>renderAll(),null);},700);
 })();
 </script>
 
