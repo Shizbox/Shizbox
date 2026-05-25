@@ -3371,5 +3371,314 @@ body.v641-cinematic .v640Main:after{content:"";position:absolute;inset:0;pointer
 })();
 </script>
 
+
+<style id="v643-style">
+.v643ExportChip{position:fixed;right:18px;top:18px;z-index:9999;border:1px solid rgba(101,255,189,.28);border-radius:999px;background:rgba(5,9,15,.82);backdrop-filter:blur(16px);padding:9px 12px;color:var(--green);font-size:.7rem;font-weight:1000;letter-spacing:.13em;text-transform:uppercase;box-shadow:0 18px 55px rgba(0,0,0,.25)}
+.v643ExportChip.bad{color:var(--red);border-color:rgba(255,107,138,.35)}
+</style>
+<script id="v643-script">
+(function(){
+  const V643_VERSION='V64.3 Export Dominance Watchdog';
+  const V643_EXPORT='pdai-v64-3-export-dominance-watchdog-report.json';
+  function el(id){return document.getElementById(id)}
+  function safe(fn,fb){try{return fn()}catch(e){return fb}}
+  function clone(x){try{return JSON.parse(JSON.stringify(x))}catch(e){return x}}
+  function addrRows(){return safe(()=>[...state.addresses.values()].map(r=>({...r,roles:[...r.roles],why:[...r.why]})),[])}
+  function ensureChip(){
+    let c=el('v643Chip');
+    if(!c){c=document.createElement('div');c.id='v643Chip';c.className='v643ExportChip';document.body.appendChild(c)}
+    c.textContent='V64.3 export dominant';
+  }
+  function gatherBase(){
+    const old=safe(()=>window.__v643OldV6349ExportObject&&window.__v643OldV6349ExportObject(),null);
+    const base=old&&typeof old==='object'?clone(old):{};
+    const direct={createdAt:new Date().toISOString(),version:V643_VERSION,cfg:state.cfg,block:state.block,snapshot:state.snapshot,f33c:state.f33c,end:state.end,pcomp:state.pcomp,bridge:state.bridge,proxy:state.proxy,routeAutopsy:state.routeAutopsy,accrual:state.accrual,launch:state.launch,onward:state.onward,targetIntel:state.targetIntel,tactics:state.tactics,routes:state.routes,sinks:state.sinks,authority:state.authority,hypotheses:state.hypotheses,evidence:state.evidence,dotLinks:state.dotLinks,proofQueue:state.proofQueue,learning:state.learning,terminalLadder:state.terminalLadder,flowMap:state.flowMap,terminalClassifier:state.terminalClassifier,proxyFirewall:state.proxyFirewall,scoreSplit:state.scoreSplit,reviewPacket:state.reviewPacket,canon:state.canon,controlPlane:state.controlPlane,defence:state.defence,externalFirewall:state.externalFirewall,identityHunter:state.identityHunter,geminiPacket:state.geminiPacket,convergence:state.convergence,tweetTx:state.tweetTx,reserveControl:state.reserveControl,nestedGov:state.nestedGov,batchTx:state.batchTx,proofDoctrine:state.proofDoctrine,v63:state.v63,v631:state.v631,v632:state.v632,v633:state.v633,v6332:state.v6332,v634:state.v634,v6341:state.v6341||(state.v634&&state.v634.v6341),v6343:state.v6343||(state.v634&&state.v634.v6343),v6344:state.v6344||(state.v634&&state.v634.v6344),v6345:state.v6345||(state.v634&&state.v634.v6345),v6349:state.v6349||(state.v634&&state.v634.v6349),v640:state.v640,v641:state.v641,v642:state.v642,addresses:addrRows(),thoughts:state.thoughts};
+    const out=Object.assign({},base,direct);
+    out.createdAt=new Date().toISOString();
+    out.version=V643_VERSION;
+    out.baseVersion=base.version||base.baseVersion||'unknown';
+    out.v643={version:V643_VERSION,exportDominant:true,buttonRebound:true,baseVersion:out.baseVersion,block:state.block,hasV640:!!state.v640,hasV641:!!state.v641,hasV642:!!state.v642,authorityBounded:!!(state.authority&&state.authority.v642Bounded),currentTask:state.currentTask||'idle',busy:!!state.busy,watchdogReleases:(state.v642&&state.v642.releases)||0,timeoutClips:(state.v642&&state.v642.timeouts)||0,ts:new Date().toISOString()};
+    out.watchdog={busy:!!state.busy,currentTask:state.currentTask||'idle',busySince:state.busySince||0,lastProgressAt:state.lastProgressAt||0,releases:(state.v642&&state.v642.releases)||0,timeouts:(state.v642&&state.v642.timeouts)||0,steps:(state.v642&&state.v642.steps)||[]};
+    out.exportIntegrity={expectedVersion:V643_VERSION,actualVersion:out.version,hasTopLevelV640:!!out.v640,hasTopLevelV641:!!out.v641,hasTopLevelV642:!!out.v642,hasTopLevelV643:!!out.v643,filename:V643_EXPORT,staleV6349Blocked:true};
+    return out;
+  }
+  if(!window.__v643OldV6349ExportObject) window.__v643OldV6349ExportObject=window.v6349ExportObject;
+  window.v643ExportObject=gatherBase;
+  window.v6349ExportObject=gatherBase;
+  window.exportReport=function(){
+    const obj=gatherBase();
+    const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=V643_EXPORT; a.click(); URL.revokeObjectURL(a.href);
+    safe(()=>thought('good','V64.3 export complete','Export dominance patch forced version '+V643_VERSION+' and serialized v640/v641/v642/v643 at top level.'),null);
+    ensureChip();
+  };
+  try{exportReport=window.exportReport;}catch(e){}
+  function rebind(){
+    ensureChip();
+    safe(()=>{const title=document.querySelector('.title'); if(title) title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.3 Export Dominance Watchdog'; document.title='pDAI Peg Prover • '+V643_VERSION;},null);
+    const ids=['exportBtn','v640Export'];
+    ids.forEach(id=>{const b=el(id); if(b){b.onclick=window.exportReport; b.dataset.v643='dominant'; if(id==='v640Export')b.textContent='Export V64.3';}});
+    const rows=el('v641RpcRows')||el('v640Rows');
+    if(rows&&!rows.dataset.v643Export){rows.innerHTML='<div class="row good"><div class="rk"><span>Export dominance fixed</span><span class="tag">V64.3</span></div><div class="rv">The export button is rebound to V64.3 and now serializes v640/v641/v642/v643. No more stale V63.4.9 report headers.</div></div>'+rows.innerHTML;rows.dataset.v643Export='1';}
+  }
+  setInterval(rebind,1500);
+  setTimeout(()=>{rebind(); safe(()=>thought('good','V64.3 loaded','Export Dominance Watchdog is active: stale V63.4.9 export headers are blocked and the export button is forcibly rebound.'),null);},600);
+})();
+</script>
+
+
+<style id="v644-style">
+:root{--v644-glow:0 0 42px rgba(101,255,189,.16),0 0 80px rgba(98,220,255,.10)}
+body.v644-pioneer .chips{display:none!important}
+body.v644-pioneer .hero{display:none!important}
+body.v644-pioneer .v63bar{display:none!important}
+body.v644-pioneer .v63grid{display:none!important}
+body.v644-pioneer .top{grid-template-columns:1fr .62fr}
+body.v644-pioneer .sub{max-width:780px}
+.v644Shell{margin-top:14px;display:grid;grid-template-columns:1.25fr .75fr;gap:14px}
+.v644Panel{border:1px solid rgba(151,200,255,.14);background:linear-gradient(180deg,rgba(9,15,25,.78),rgba(4,8,14,.92));border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(18px);overflow:hidden}
+.v644Hero{position:relative;min-height:390px;padding:20px;display:flex;flex-direction:column;justify-content:space-between}
+.v644Hero:before{content:"";position:absolute;inset:-20%;background:
+ radial-gradient(circle at 18% 12%,rgba(101,255,189,.20),transparent 26%),
+ radial-gradient(circle at 82% 4%,rgba(196,154,255,.15),transparent 28%),
+ radial-gradient(circle at 52% 90%,rgba(98,220,255,.12),transparent 34%);filter:blur(4px);pointer-events:none}
+.v644Hero:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 0%,rgba(255,255,255,.055) 45%,transparent 62%);transform:translateX(-120%);animation:v644Sweep 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes v644Sweep{50%{transform:translateX(120%)}100%{transform:translateX(120%)}}
+.v644Hero>*{position:relative;z-index:1}.v644K{font-size:.68rem;color:var(--muted);font-weight:950;letter-spacing:.18em;text-transform:uppercase}
+.v644Title{font-size:clamp(36px,5.5vw,86px);font-weight:1000;line-height:.88;letter-spacing:-.065em;margin-top:8px}
+.v644Sub{max-width:760px;color:var(--muted);line-height:1.55;margin-top:12px}
+.v644TopRow{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}.v644Badge{border:1px solid rgba(101,255,189,.28);background:rgba(101,255,189,.06);color:var(--green);border-radius:999px;padding:10px 13px;font-size:.72rem;text-transform:uppercase;letter-spacing:.13em;font-weight:950;white-space:nowrap}
+.v644MegaBar{margin-top:22px}.v644Track{height:26px;border:1px solid rgba(151,200,255,.16);border-radius:999px;overflow:hidden;position:relative;background:rgba(255,255,255,.06);box-shadow:inset 0 0 30px rgba(0,0,0,.22)}
+.v644Fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,rgba(101,255,189,.96),rgba(98,220,255,.96),rgba(196,154,255,.96));box-shadow:var(--v644-glow);transition:width .55s ease}
+.v644Scan{position:absolute;inset:-40% auto -40% -16%;width:20%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.27),transparent);filter:blur(3px);animation:v644Scan 2.8s linear infinite}
+@keyframes v644Scan{to{transform:translateX(650%)}}
+.v644Scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.69rem;letter-spacing:.12em;text-transform:uppercase;margin-top:8px}
+.v644Metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:16px}
+.v644Metric{border:1px solid rgba(151,200,255,.13);background:rgba(255,255,255,.034);border-radius:18px;padding:12px;min-height:96px}
+.v644Metric .v{font-size:2rem;font-weight:1000;margin-top:6px}.v644Metric .s{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.35}
+.v644Side{padding:16px;display:grid;gap:12px;align-content:start}.v644Rows{display:flex;flex-direction:column;gap:8px}.v644Rows .row{margin:0}
+.v644Dock{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px}
+.v644DockLeft,.v644DockRight{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.v644Pill{border:1px solid rgba(151,200,255,.16);border-radius:999px;padding:8px 10px;color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
+.v644Btn{border:1px solid var(--line2);border-radius:14px;background:linear-gradient(180deg,rgba(98,220,255,.16),rgba(7,12,20,.82));color:var(--text);font-weight:900;cursor:pointer;padding:10px 12px}.v644Btn.primary{border-color:rgba(101,255,189,.42);background:linear-gradient(90deg,rgba(101,255,189,.25),rgba(98,220,255,.16))}.v644Btn.warn{border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.07);color:var(--amber)}
+.v644Grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.v644Card{border:1px solid rgba(151,200,255,.13);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));padding:14px}
+.v644Table{width:100%;border-collapse:collapse}.v644Table th,.v644Table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);font-size:.78rem;text-align:left}.v644Table th{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.v644Toast{position:fixed;right:18px;bottom:18px;z-index:9999;max-width:430px;border:1px solid rgba(101,255,189,.24);border-radius:20px;background:rgba(5,9,15,.88);backdrop-filter:blur(16px);box-shadow:0 24px 80px rgba(0,0,0,.34);padding:12px 14px;color:var(--muted);font-size:.82rem;line-height:1.35;display:none}.v644Toast b{color:var(--text)}
+@media(max-width:1240px){.v644Shell,.v644Grid{grid-template-columns:1fr}.v644Metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){body.v644-pioneer .top{grid-template-columns:1fr}.v644Metrics{grid-template-columns:1fr}.v644TopRow{flex-direction:column}.v644Title{font-size:40px}}
+</style>
+<script id="v644-script">
+(function(){
+  const V644_VERSION='V64.4 Pioneer Cortex';
+  const V644_EXPORT='pdai-v64-4-pioneer-cortex-report.json';
+  const P='0x6B175474E89094C44Da98b954EedeAC495271d0F';
+  const WATCH=[
+    {name:'DA9ABA choke hub',addr:'0xda9aba4eacf54e0273f56dffee6b8f1e20b23bba',role:'route/spender hub'},
+    {name:'083D terminal receiver',addr:'0x083d25ce4c7e30c72580245607849b2385df93ad',role:'post-DA9ABA receiver'},
+    {name:'F33C settlement gate',addr:'0xF33C0bB40d1BBf6EAfaAea2ADFb7d2D3EbC1E49C',role:'launch-gated settlement candidate'},
+    {name:'F406 execution proxy',addr:'0xF406a3Ab62Ce9316b39cF8C7A50623777B2A6Fb9',role:'Reserve/execution candidate'},
+    {name:'BA86 fee manager',addr:'0xba86ca0aeca30247f9e2fd8736879997bcd01dc4',role:'fee/bridge split manager'},
+    {name:'Omnibridge relay',addr:'0x4fd0aaa7506f3d9cb8274bdb946ec42a1b8751ef',role:'native bridge lock proxy'},
+    {name:'Reserve executor',addr:'0x22d7937438b4bbf02f6ca55e3831abb94bd0b6f1',role:'reserve executor watch'},
+    {name:'Reserve impl candidate',addr:'0x98122d3682db4e2e869b568178621c90e1d3a712',role:'implementation watch'},
+    {name:'zkSync Lite proxy',addr:'0x8ECa806Aecc86CE90Da803b080Ca4E3A9b8097ad',role:'exodus/fuel bridge watch'},
+    {name:'5996 actor',addr:'0xb8698cffdfaaf26ca21fe8aa560c18cc2b2f5996',role:'pioneer/proxy lane'}
+  ];
+  const SEEDS=[
+    '0xfbcfa9447ecde4443b0341ce9ad6f2c7a94aca2d0f32fbaadbce4a16a550c617',
+    '0x9b5955cf3841d097fc9df9e6a52580e1c09814637a7b5d038b1b91dbb7594736',
+    '0xb4684216170d6a33c1e95df4a0830509be6c86674cd7319cb3139891d4c006d5',
+    '0xe42a669c4bc3cd4140838858f8e02d0ac7a1430325269bfb3ab4d4b6533f279f',
+    '0xa0f4d8244da619936d0b5e0de0a0d92dbfb9c52de322ed81c30a050fc58d7bd7'
+  ];
+  function el(id){return document.getElementById(id)}
+  function safe(fn,fb){try{return fn()}catch(e){return fb}}
+  function lc(x){return String(x||'').toLowerCase()}
+  function short(a){return a&&a.length>14?a.slice(0,8)+'…'+a.slice(-6):(a||'—')}
+  function num(v,d){v=Number(v);return Number.isFinite(v)?v:(d||0)}
+  function pct(v){return Math.max(0,Math.min(100,Math.round(num(v,0))))}
+  function uniq(a){return [...new Set((a||[]).filter(Boolean))]}
+  function topicAddr(a){return '0x'+String(a||'').replace(/^0x/,'').padStart(64,'0').slice(-40)}
+  function encAddrLocal(sel,addr){return sel+'000000000000000000000000'+lc(addr).replace(/^0x/,'')}
+  function fmt(n,d=2){return Number.isFinite(+n)?(+n).toLocaleString(undefined,{maximumFractionDigits:d}):'—'}
+  function rowx(kind,title,msg,tag){ if(typeof row==='function')return row(kind,title,msg,tag||'V64.4'); return '<div class="row '+(kind||'info')+'"><div class="rk"><span>'+title+'</span><span class="tag">'+(tag||'V64.4')+'</span></div><div class="rv">'+msg+'</div></div>'; }
+  function toast(t,m){let d=el('v644Toast'); if(!d){d=document.createElement('div');d.id='v644Toast';d.className='v644Toast';document.body.appendChild(d)} d.innerHTML='<b>'+t+'</b><br>'+m; d.style.display='block'; clearTimeout(d._x); d._x=setTimeout(()=>d.style.display='none',5200)}
+  function ensureState(){
+    state.v644=state.v644||{version:V644_VERSION,cycles:0,events:[],targets:[],watchlist:WATCH,seeds:SEEDS,scores:{build:0,pioneer:0,activation:0,hard:0},last:null};
+    state.cfg=state.cfg||JSON.parse(JSON.stringify(CFG));
+    state.cfg.seeds=uniq([...(state.cfg.seeds||[]),...SEEDS]);
+    state.cfg.actors=uniq([...(state.cfg.actors||[]),...WATCH.filter(x=>x.name.includes('5996')).map(x=>x.addr)]);
+    state.cfg.bridgeTargets=uniq([...(state.cfg.bridgeTargets||[]),...WATCH.filter(x=>/bridge|BA86|zkSync|relay/i.test(x.name+' '+x.role)).map(x=>x.addr)]);
+    state.cfg.proxyTargets=uniq([...(state.cfg.proxyTargets||[]),...WATCH.filter(x=>/F33C|F406|Reserve|zkSync/i.test(x.name+' '+x.role)).map(x=>x.addr)]);
+    document.body.classList.add('v644-pioneer');
+  }
+  async function rpcSafe(method,params,ms=6500){
+    if(typeof rpc!=='function')throw new Error('rpc not available');
+    return await Promise.race([
+      rpc(method,params),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error(method+' timeout '+ms+'ms')),ms))
+    ]);
+  }
+  async function callSafe(to,data,ms=4500){
+    try{return await rpcSafe('eth_call',[{to,data},'latest'],ms)}catch(e){return null}
+  }
+  function hexBig(h){try{return BigInt(h||'0x0')}catch(e){return 0n}}
+  function unit(bi){try{return Number(bi)/1e18}catch(e){return 0}}
+  async function balanceOf(addr){const out=await callSafe(P,encAddrLocal('0x70a08231',addr),4200); return out?unit(hexBig(out)):0}
+  async function codeSize(addr){try{const c=await rpcSafe('eth_getCode',[addr,'latest'],4200); return c&&c!=='0x'?Math.max(0,(c.length-2)/2):0}catch(e){return -1}}
+  async function slotAddr(proxy,slot){try{const x=await rpcSafe('eth_getStorageAt',[proxy,slot,'latest'],4200); const a=topicAddr(x); return /^0x0{40}$/.test(a)?'':a}catch(e){return ''}}
+  async function tinyLogsFor(addr,latest){
+    const from=Math.max(0,(latest||state.block||0)-55), to=latest||state.block||0;
+    const out={in:0,out:0,approvals:0,hardTouches:0,txs:[],errors:[]};
+    if(!from||!to)return out;
+    const transfer=(typeof SEL!=='undefined'&&SEL.transferTopic)||'0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+    const approval=(typeof SEL!=='undefined'&&SEL.approval)||'0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
+    const tAddr='0x000000000000000000000000'+lc(addr).replace(/^0x/,'');
+    const filters=[
+      {kind:'in',topics:[transfer,null,tAddr]},
+      {kind:'out',topics:[transfer,tAddr,null]},
+      {kind:'approvalOut',topics:[approval,tAddr,null]},
+      {kind:'approvalIn',topics:[approval,null,tAddr]}
+    ];
+    for(const f of filters){
+      try{
+        const logs=await rpcSafe('eth_getLogs',[{address:P,fromBlock:'0x'+from.toString(16),toBlock:'0x'+to.toString(16),topics:f.topics}],5200);
+        const arr=logs||[];
+        if(f.kind==='in')out.in+=arr.length;
+        if(f.kind==='out')out.out+=arr.length;
+        if(f.kind.indexOf('approval')>=0)out.approvals+=arr.length;
+        for(const l of arr.slice(0,8)){
+          out.txs.push(l.transactionHash);
+          const other=(f.kind==='in')?topicAddr(l.topics?.[1]):topicAddr(l.topics?.[2]);
+          if(WATCH.some(w=>lc(w.addr)===lc(other)) || /f33c|f406|ba86|4fd0|22d793|98122/i.test(other))out.hardTouches++;
+        }
+      }catch(e){out.errors.push(f.kind+': '+(e.message||String(e)).slice(0,80));}
+    }
+    out.txs=uniq(out.txs).slice(0,18);
+    return out;
+  }
+  async function pioneerMicroScan(){
+    ensureState();
+    const started=Date.now();
+    state.v644.cycles++;
+    safe(()=>setStatus('info','pioneer scan'),null);
+    safe(()=>thought('info','V64.4 Pioneer scan','Running event-driven choke-point scan: DA9ABA, 083D terminal receiver, F33C/F406/BA86/bridge/Reserve targets.'),null);
+    let latest=state.block||0;
+    try{latest=parseInt(await rpcSafe('eth_blockNumber',[],3500),16)||latest; state.block=latest; if(el('blockMeta'))el('blockMeta').textContent='Block: '+latest;}catch(e){}
+    const targets=[];
+    for(const w of WATCH){
+      const rec={...w,balance:0,codeSize:0,impl:'',admin:'',beacon:'',logs:{in:0,out:0,approvals:0,hardTouches:0,txs:[],errors:[]},score:0,status:'watch'};
+      try{
+        const [bal,cs,lg]=await Promise.all([balanceOf(w.addr),codeSize(w.addr),tinyLogsFor(w.addr,latest)]);
+        rec.balance=bal; rec.codeSize=cs; rec.logs=lg||rec.logs;
+        if(cs>0 && typeof ERC1967!=='undefined'){
+          const [impl,admin,beacon]=await Promise.all([slotAddr(w.addr,ERC1967.impl),slotAddr(w.addr,ERC1967.admin),slotAddr(w.addr,ERC1967.beacon)]);
+          rec.impl=impl; rec.admin=admin; rec.beacon=beacon;
+        }
+      }catch(e){rec.error=e.message||String(e)}
+      rec.score=pct((rec.balance>100000?28:rec.balance>1000?12:0)+(rec.codeSize>0?10:0)+(rec.impl?14:0)+(rec.admin?10:0)+(rec.logs.in+rec.logs.out)*3+rec.logs.approvals*9+rec.logs.hardTouches*18);
+      rec.status=rec.score>=70?'promote':rec.score>=42?'hot':rec.score>=20?'watch':'quiet';
+      targets.push(rec);
+    }
+    const hardNames=['F33C settlement gate','F406 execution proxy','BA86 fee manager','Omnibridge relay','Reserve executor','Reserve impl candidate'];
+    const hardTargets=targets.filter(t=>hardNames.includes(t.name));
+    const choke=targets.find(t=>t.name==='DA9ABA choke hub')||{};
+    const terminal=targets.find(t=>t.name==='083D terminal receiver')||{};
+    const proofTouch=hardTargets.reduce((s,t)=>s+(t.logs?.in||0)+(t.logs?.out||0)+(t.logs?.approvals||0)+(t.logs?.hardTouches||0)+(t.balance>0?1:0),0);
+    const scoreSplit=state.scoreSplit||{};
+    const promotion=num((state.v648||state.v6348||state.v634||{}).promotionScore,0);
+    const convergence=num(scoreSplit.convergenceScore||((state.convergence||{}).score),0);
+    const hard=num(scoreSplit.pegProofScore,0);
+    const chokeScore=pct((choke.logs?.in||0)*6+(choke.logs?.out||0)*6+(choke.logs?.approvals||0)*18+(choke.balance>100000?18:0);
+    const terminalScore=pct((terminal.balance>100000?26:0)+(terminal.logs?.in||0)*8+(terminal.logs?.out||0)*4);
+    const pioneer=pct(Math.round(chokeScore*.28+terminalScore*.18+promotion*.22+convergence*.20+proofTouch*5));
+    const activation=pct((proofTouch*12)+(hardTargets.some(t=>t.balance>0)?22:0)+(hardTargets.some(t=>t.impl||t.admin)?18:0)+hard);
+    const build=pct(Math.round(Math.max(num((state.v640||{}).buildConfidence,0), pioneer*.55+num((state.v640||{}).capitalFuelScore,0)*.2+num((state.v640||{}).settlementReadiness,0)*.25)));
+    const verdict=activation>=65?'activation proximity rising':pioneer>=60?'pioneer path hot':build>=45?'build phase strengthening':'watching choke points';
+    state.v644.targets=targets.sort((a,b)=>b.score-a.score);
+    state.v644.scores={build,pioneer,activation,hard,chokeScore,terminalScore,promotion,convergence,proofTouch};
+    state.v644.last={ok:true,ms:Date.now()-started,block:latest,verdict};
+    const events=[];
+    if(chokeScore>=30)events.push({kind:'good',title:'DA9ABA is the current alpha hub',msg:`${short(choke.addr)} has score ${chokeScore}; balance ${fmt(choke.balance,2)} pDAI, recent in/out ${choke.logs?.in||0}/${choke.logs?.out||0}, approvals ${choke.logs?.approvals||0}.`});
+    if(terminalScore>=25)events.push({kind:'good',title:'083D terminal receiver remains priority',msg:`${short(terminal.addr)} scored ${terminalScore}; monitor persistence or forwarding into F33C/F406/BA86/Reserve.`});
+    if(proofTouch>0)events.push({kind:'good',title:'Proof target touched in micro window',msg:`${proofTouch} live touch(es) involving F33C/F406/BA86/bridge/Reserve targets.`});
+    else events.push({kind:'warn',title:'No hard target touch yet',msg:'The tool sees routing/fuel architecture, but not the F33C/F406/BA86/Reserve custody/slot event that would move this from build alpha to activation alpha.'});
+    events.push({kind:'info',title:'Pioneer logic',msg:'Micro-scans now prioritize choke-points and event edges instead of trying to re-walk the entire labyrinth every cycle.'});
+    state.v644.events=events.concat(state.v644.events||[]).slice(0,80);
+    safe(()=>thought('good','V64.4 Pioneer scan complete',`${verdict} • build ${build}/100 • pioneer ${pioneer}/100 • activation ${activation}/100 • ${Date.now()-started}ms.`),null);
+    renderV644();
+    return state.v644;
+  }
+  function ensureUI(){
+    ensureState();
+    if(el('v644Mount'))return;
+    const top=document.querySelector('.top'); if(!top)return;
+    const shell=document.createElement('section'); shell.id='v644Mount'; shell.className='v644Shell';
+    shell.innerHTML='<div><div class="v644Panel v644Hero"><div><div class="v644TopRow"><div><div class="v644K">PulseChain pioneer mode</div><div class="v644Title"><span class="grad">Pioneer Cortex</span></div><div class="v644Sub" id="v644Sub">Event-driven peg-build radar. It watches the choke-points a pioneer would watch: DA9ABA, 083D, F33C, F406, BA86, bridge relay, Reserve executor, zkSync exodus proxy, and 5996.</div></div><div class="v644Badge" id="v644Verdict">arming</div></div><div class="v644MegaBar"><div class="v644Track"><div class="v644Fill" id="v644Fill"></div><div class="v644Scan"></div></div><div class="v644Scale"><span>route noise</span><span>build</span><span>pioneer path</span><span>activation</span></div></div></div><div class="v644Metrics"><div class="v644Metric"><div class="v644K">Build</div><div class="v" id="v644Build">—</div><div class="s">system assembly score</div></div><div class="v644Metric"><div class="v644K">Pioneer path</div><div class="v" id="v644Pioneer">—</div><div class="s">choke-point alignment</div></div><div class="v644Metric"><div class="v644K">Activation</div><div class="v" id="v644Activation">—</div><div class="s">hard target proximity</div></div><div class="v644Metric"><div class="v644K">DA9ABA</div><div class="v" id="v644Choke">—</div><div class="s">route/spender hub</div></div><div class="v644Metric"><div class="v644K">Proof touches</div><div class="v" id="v644Touches">—</div><div class="s">F33C/F406/BA86/Reserve</div></div></div></div><div class="v644Dock v644Panel"><div class="v644DockLeft"><span class="v644Pill" id="v644Block">block —</span><span class="v644Pill" id="v644Mode">micro-first</span><span class="v644Pill" id="v644Last">not run</span></div><div class="v644DockRight"><button class="v644Btn primary" id="v644ScanBtn">Pioneer scan</button><button class="v644Btn" id="v644DeepBtn">Deep cycle</button><button class="v644Btn warn" id="v644AutoBtn">Pioneer autopilot</button><button class="v644Btn" id="v644ExportBtn">Export</button></div></div><div class="v644Grid"><div class="v644Card"><div class="v644K">Live alpha feed</div><div class="v644Rows" id="v644Events"></div></div><div class="v644Card"><div class="v644K">Choke-point table</div><div style="overflow:auto;margin-top:10px"><table class="v644Table" id="v644Table"></table></div></div></div></div><div class="v644Panel v644Side"><div class="v644Card"><div class="v644K">5x upgrade logic</div><div class="v644Rows" id="v644UpgradeRows"></div></div><div class="v644Card"><div class="v644K">Immediate watch rules</div><div class="v644Rows" id="v644WatchRows"></div></div></div>';
+    top.insertAdjacentElement('afterend',shell);
+    el('v644ScanBtn').onclick=pioneerMicroScan;
+    el('v644DeepBtn').onclick=function(){ if(typeof v643DeepCycle==='function')v643DeepCycle(); else if(typeof autonomousDig==='function')autonomousDig(); };
+    el('v644ExportBtn').onclick=exportV644;
+    el('v644AutoBtn').onclick=function(){
+      if(state.v644Timer){clearInterval(state.v644Timer);state.v644Timer=null;this.textContent='Pioneer autopilot';toast('Pioneer autopilot stopped','Manual mode restored.');return}
+      state.v644Timer=setInterval(pioneerMicroScan,12000); this.textContent='Stop pioneer autopilot'; pioneerMicroScan(); toast('Pioneer autopilot started','Micro-scans every 12s. Deep legacy scans stay available but no longer dominate the hunt.');
+    };
+    const exp=el('exportBtn'); if(exp)exp.onclick=exportV644;
+    const run=el('runBtn'); if(run)run.onclick=pioneerMicroScan;
+    const auto=el('autoBtn'); if(auto)auto.onclick=function(){el('v644AutoBtn')?.click()};
+    const title=document.querySelector('.title'); if(title)title.innerHTML='<span class="grad">pDAI Peg Prover</span><br/>V64.4 Pioneer Cortex';
+    const sub=document.querySelector('.sub'); if(sub)sub.textContent='V64.4 thinks like a PulseChain pioneer: micro-first, event-driven, choke-point focused, with DA9ABA/083D/F33C/F406/BA86/Reserve/bridge radar and clean exports.';
+    document.title='pDAI Peg Prover • '+V644_VERSION;
+  }
+  function renderV644(){
+    ensureUI();
+    const V=state.v644||{}; const S=V.scores||{};
+    if(el('v644Verdict'))el('v644Verdict').textContent=(V.last&&V.last.verdict)||'armed';
+    if(el('v644Fill'))el('v644Fill').style.width=pct(Math.max(S.build||0,S.pioneer||0,S.activation||0))+'%';
+    if(el('v644Build'))el('v644Build').textContent=pct(S.build||0);
+    if(el('v644Pioneer'))el('v644Pioneer').textContent=pct(S.pioneer||0);
+    if(el('v644Activation'))el('v644Activation').textContent=pct(S.activation||0);
+    if(el('v644Choke'))el('v644Choke').textContent=pct(S.chokeScore||0);
+    if(el('v644Touches'))el('v644Touches').textContent=String(S.proofTouch||0);
+    if(el('v644Block'))el('v644Block').textContent='block '+(state.block||'—');
+    if(el('v644Last'))el('v644Last').textContent=V.last?Math.round((V.last.ms||0)/1000)+'s scan':'not run';
+    if(el('v644Events'))el('v644Events').innerHTML=(V.events||[]).slice(0,8).map(x=>rowx(x.kind,x.title,x.msg)).join('');
+    if(el('v644UpgradeRows'))el('v644UpgradeRows').innerHTML=[
+      rowx('good','1. Choke-point first','DA9ABA and 083D are scanned every micro-cycle before expensive route walking.'),
+      rowx('good','2. Proof-target proximity','F33C/F406/BA86/bridge/Reserve are scored by live pDAI balance, approvals, transfer edges, and ERC-1967 slots.'),
+      rowx('info','3. Micro/deep split','Fast scans run often; deep labyrinth scans are optional so the browser stays alive.'),
+      rowx('info','4. Build vs activation split','The tool can raise build confidence without pretending the peg is already proven.'),
+      rowx('warn','5. Pioneer export discipline','Every report serializes v644 targets, scores, watchlist, seeds, and prior lanes.')
+    ].join('');
+    if(el('v644WatchRows'))el('v644WatchRows').innerHTML=[
+      rowx('warn','Highest alert','DA9ABA or 083D → F33C/F406/BA86/Reserve/bridge transfer, approval, delegate/proxy call, or nonzero pDAI custody.'),
+      rowx('warn','Slot alert','Any ERC-1967 impl/admin/beacon value appearing or changing on F406, Reserve executor, zkSync proxy, or bridge-adjacent contracts.'),
+      rowx('info','Fuel alert','Recovered WBTC/USDC/USDT/AAVE pathing into BA86, F406, Reserve, or terminal pDAI sinks.')
+    ].join('');
+    if(el('v644Table')){
+      const rows=(V.targets||[]).slice(0,10);
+      el('v644Table').innerHTML='<tr><th>target</th><th>score</th><th>pDAI</th><th>code</th><th>impl/admin</th><th>logs</th><th>status</th></tr>'+
+        rows.map(t=>`<tr><td><b>${t.name}</b><br><span class="mono">${short(t.addr)}</span><br>${t.role}</td><td>${t.score}</td><td>${fmt(t.balance,2)}</td><td>${t.codeSize}</td><td>${t.impl?short(t.impl):'—'} / ${t.admin?short(t.admin):'—'}</td><td>in ${t.logs?.in||0} / out ${t.logs?.out||0} / app ${t.logs?.approvals||0}</td><td>${t.status}</td></tr>`).join('');
+    }
+  }
+  function exportV644(){
+    ensureState(); renderV644();
+    let base=safe(()=>window.v6349ExportObject&&window.v6349ExportObject(),null)||{createdAt:new Date().toISOString(),cfg:state.cfg,block:state.block,snapshot:state.snapshot,thoughts:state.thoughts};
+    base.version=V644_VERSION; base.baseVersion=base.baseVersion||'V64.3 Export Dominance Watchdog';
+    base.v640=state.v640; base.v641=state.v641; base.v642=state.v642; base.v643=state.v643; base.v644=state.v644;
+    base.pioneerCortex={watchlist:WATCH,seeds:SEEDS,scores:state.v644.scores,last:state.v644.last,targets:state.v644.targets};
+    base.exportIntegrity={version:V644_VERSION,topLevelV644:!!base.v644,filename:V644_EXPORT,staleV63TitleBlocked:true};
+    const blob=new Blob([JSON.stringify(base,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=V644_EXPORT; a.click(); URL.revokeObjectURL(a.href);
+    toast('V64.4 export complete',V644_EXPORT+' includes Pioneer Cortex state, choke-point table, watchlist, and prior lanes.');
+  }
+  const oldRender=window.renderAll;
+  window.renderAll=function(){safe(()=>oldRender&&oldRender(),null);renderV644();};
+  const oldBoot=window.boot;
+  window.boot=function(){safe(()=>oldBoot&&oldBoot(),null);setTimeout(()=>{ensureUI();renderV644();safe(()=>thought('good','V64.4 loaded','Pioneer Cortex is active: micro-first choke-point radar, DA9ABA/083D watch, proof-target proximity scoring, and export dominance.'),null);},850)};
+  window.v644PioneerScan=pioneerMicroScan;
+  window.v644Export=exportV644;
+  setTimeout(()=>{ensureUI();renderV644();safe(()=>thought('good','V64.4 loaded','Pioneer Cortex is active: think like a PulseChain pioneer — watch choke-points, fuel, slots, approvals, and terminal persistence before the crowd sees price.'),null);},700);
+})();
+</script>
+
 </body>
 </html>
