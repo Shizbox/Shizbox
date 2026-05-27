@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>pDAI Peg Cortex • V66 Condensed Autonomous Module</title>
+<title>pDAI Peg Cortex • V66.1 Flow-Reality Autonomous Module</title>
 <style>
 :root {
   --bg:#07090d; --panel:#0d1219cc; --panel2:#101722; --line:#233140; --muted:#8996a8;
@@ -94,7 +94,7 @@ summary { cursor:pointer; color:#dbe8f7; font-weight:750 }
     <div class="row between">
       <div>
         <div class="row">
-          <span class="badge good">V66 condensed module</span>
+          <span class="badge good">V66.1 flow-reality module</span>
           <span class="badge" id="seedVersion">Seed: loading…</span>
           <span class="badge" id="rpcBadge">RPC idle</span>
           <span class="badge warn">No hunt gates</span>
@@ -258,6 +258,7 @@ let state = {
   hypotheses: [],
   targets: [],
   cues: {addresses:[], txs:[], motifs:[], windows:[], pressure:0},
+  flowIntel: null,
   auto: null,
   rpcIndex: 0
 };
@@ -464,6 +465,17 @@ function scoreReport(report, live=null) {
     if (live.nonzeroSlots) add(24, 'Watched storage slot opened', `${live.nonzeroSlots} watched storage slot(s) non-zero.`, 'good', 16, 0, 10);
     if (live.proxySlots) add(Math.min(14, live.proxySlots*4), 'Live proxy slot evidence', `${live.proxySlots} non-zero ERC-1967 slot(s) found across proxy targets.`, 'good', Math.min(10,live.proxySlots*2), 0, 7);
     if (live.bigBalances) add(Math.min(12, live.bigBalances*2), 'Live large target balances', `${live.bigBalances} target(s) currently hold >1M pDAI.`, 'good', 3, 0, 6);
+    const flow = state.flowIntel || analyzeFlowIntel(report, live);
+    if (flow?.targetRatio > .70) add(12, 'Target-dominant live flow', `${Math.round(flow.targetRatio*100)}% of counted live pDAI logs intersect watched targets.`, 'good', 4, 0, 9);
+    if (flow?.repeatedChains?.[0]?.count > 8) {
+      const c = flow.repeatedChains[0];
+      add(10, 'Two-hop relay manifold', `${short(c.from)} → ${short(c.mid)} → ${short(c.to)} repeats ${c.count} time(s) in same-tx flow.`, 'good', 2, 1, 10);
+    }
+    if (flow?.decays?.[0]) {
+      const d = flow.decays[0];
+      add(7, 'Descending calibration ladder', `${short(d.from)} → ${short(d.to)} drifts ${fmt(d.first)} → ${fmt(d.last)} across ${d.count} visible hop(s).`, 'warn', 1, 2, 8);
+    }
+    if (flow?.exportSampleRatio && flow.exportSampleRatio < .75) add(0, 'Compressed export sample', `Export includes ${flow.visibleTransfers}/${flow.countedTransfers} counted transfer rows; live counters remain authoritative.`, 'warn', 0, 1, 2);
   }
 
   const build = clamp(evidence.reduce((s,e)=>s+Number(e.pts||0),0));
@@ -472,6 +484,73 @@ function scoreReport(report, live=null) {
   const dot = clamp(evidence.reduce((s,e)=>s+Number(e.dot||0),0));
   return {build, proof, debt, dot, evidence};
 }
+
+
+function countMapTop(map, limit=8) {
+  return [...map.entries()].map(([key,val]) => ({key, ...val})).sort((a,b)=>(b.count-a.count)||(b.amount-a.amount)).slice(0,limit);
+}
+
+function analyzeFlowIntel(report, live=null) {
+  const src = live?.transfers?.length ? live.transfers : (report.snapshot?.transfers || []);
+  const transfers = (src || []).filter(t => isAddr(t.from) && isAddr(t.to));
+  const counted = Number(live?.transferCount || transfers.length || 0);
+  const visible = transfers.length;
+  const targetTouches = Number(live?.targetTouches || 0);
+  const targetRatio = counted ? clamp(targetTouches / counted, 0, 2) : 0;
+  const byFrom = new Map(), byTo = new Map(), byEdge = new Map(), byTx = new Map(), byBlock = new Map();
+  const bump = (m,k,amt=0) => { const o=m.get(k)||{count:0,amount:0}; o.count++; o.amount += Number(amt||0); m.set(k,o); };
+  transfers.forEach(t => {
+    const f=lc(t.from), to=lc(t.to), amt=Number(t.amount||0);
+    bump(byFrom,f,amt); bump(byTo,to,amt); bump(byEdge,f+'>'+to,amt); bump(byBlock,String(t.block||0),amt);
+    const arr = byTx.get(t.tx) || []; arr.push({...t, from:f, to}); byTx.set(t.tx, arr);
+  });
+  const topFrom = countMapTop(byFrom,8).map(x=>({addr:x.key,count:x.count,amount:x.amount}));
+  const topTo = countMapTop(byTo,8).map(x=>({addr:x.key,count:x.count,amount:x.amount}));
+  const topEdges = countMapTop(byEdge,12).map(x => { const [from,to]=x.key.split('>'); return {from,to,count:x.count,amount:x.amount}; });
+  const chains = new Map();
+  byTx.forEach(arr => {
+    const edges = arr.map(x=>({from:x.from,to:x.to,amount:Number(x.amount||0)}));
+    for (const a of edges) for (const b of edges) {
+      if (a.to === b.from && a.from !== b.to) bump(chains, a.from+'>'+a.to+'>'+b.to, Math.min(a.amount,b.amount));
+    }
+  });
+  const repeatedChains = countMapTop(chains,6).map(x => { const [from,mid,to]=x.key.split('>'); return {from,mid,to,count:x.count,amount:x.amount}; });
+  const decays = [];
+  topEdges.slice(0,8).forEach(e => {
+    const seq = transfers.filter(t => lc(t.from)===e.from && lc(t.to)===e.to).map(t => Number(t.amount||0)).filter(n=>Number.isFinite(n));
+    if (seq.length >= 8) {
+      let down=0, up=0;
+      for (let i=1;i<seq.length;i++) { if (seq[i] < seq[i-1]) down++; else if (seq[i] > seq[i-1]) up++; }
+      const drift = seq[seq.length-1] - seq[0], ratio = (down+up) ? down/(down+up) : 0;
+      if (ratio > .68 || Math.abs(drift) > Math.max(1, Math.abs(seq[0])*.002)) decays.push({from:e.from,to:e.to,count:seq.length,first:seq[0],last:seq[seq.length-1],drift,downRatio:ratio});
+    }
+  });
+  const blocks = [...byBlock.keys()].map(Number).filter(Boolean).sort((a,b)=>a-b);
+  const large = transfers.filter(t => Number(t.amount||0) >= 1000);
+  const largeAmount = large.reduce((a,t)=>a+Number(t.amount||0),0);
+  const exportSampleRatio = counted ? visible / counted : 1;
+  const pressure = clamp(
+    targetRatio*24 +
+    (repeatedChains[0]?.count||0)*1.5 +
+    (decays[0]?.count||0)*.7 +
+    Math.min(18, large.length*1.2) +
+    Math.min(18, (live?.proxySlots||0)*6 + (live?.bigBalances||0)*2.5) +
+    Math.min(12, blocks.length ? visible/blocks.length : 0)
+  );
+  const notes = [];
+  if (targetRatio > .70) notes.push(`${Math.round(targetRatio*100)}% of counted live logs intersect watched targets`);
+  if (repeatedChains[0]?.count > 8) notes.push(`dominant two-hop chain repeats ${repeatedChains[0].count} times`);
+  if (decays[0]) notes.push(`calibration ladder detected on ${short(decays[0].from)}→${short(decays[0].to)}`);
+  if (exportSampleRatio && exportSampleRatio < .75) notes.push(`export stores a ${Math.round(exportSampleRatio*100)}% sample of counted logs`);
+  return {
+    countedTransfers: counted, visibleTransfers: visible, targetTouches, targetRatio,
+    topFrom, topTo, topEdges, repeatedChains, decays,
+    blockSpan: blocks.length ? {from:blocks[0], to:blocks[blocks.length-1], blocks:blocks.length, avgPerBlock:visible/blocks.length} : null,
+    largeFlows:{count:large.length, amount:largeAmount, sample:large.slice(0,8)},
+    exportSampleRatio, pressure, notes
+  };
+}
+
 
 function buildGraph(report, live=null) {
   const nodes = new Map();
@@ -530,6 +609,16 @@ function hypotheses(report, live=null) {
   if ((proxy.rows||[]).length) out.push({kind:'warn',title:'Proxy control-plane model',msg:`${proxy.rows.length} ERC-1967 proxy surface(s) exist. V66 watches them for upgrade/relevance edges instead of throwing them away for lacking immediate pDAI custody.`});
   const core = (snap.anchors||[]).find(a=>/ATROPA|core/i.test(a.name||'')); const native = (snap.anchors||[]).find(a=>/Native/i.test(a.name||'')); 
   if (core && native) out.push({kind:'good',title:'Core reservoir dominance model',msg:`Core reserve ${fmt(core.reserve0)} pDAI vs native reserve ${fmt(native.reserve0)} pDAI. That asymmetry is a mechanical pressure clue and a priority scan anchor.`});
+  const flow = state.flowIntel || analyzeFlowIntel(report, live);
+  if (flow?.repeatedChains?.[0]) {
+    const c = flow.repeatedChains[0];
+    out.push({kind:'good',title:'Flow-reality relay model',msg:`Dominant live chain ${short(c.from)} → ${short(c.mid)} → ${short(c.to)} repeated ${c.count} time(s). V66.1 treats this as a route-shape fact and uses it to choose the next scan, not as a final peg claim.`});
+  }
+  if (flow?.decays?.[0]) {
+    const d = flow.decays[0];
+    out.push({kind:'warn',title:'Calibration ladder model',msg:`The strongest repeating edge is not random-sized: ${short(d.from)} → ${short(d.to)} moved ${fmt(d.first)} → ${fmt(d.last)} over ${d.count} visible hop(s). Hunt whether this is arbitrage churn, staged balancing, or a settlement rehearsal.`});
+  }
+  if (flow?.largeFlows?.count) out.push({kind:'good',title:'Large-flow triage model',msg:`${flow.largeFlows.count} visible transfer(s) over 1,000 pDAI total ${fmt(flow.largeFlows.amount)} pDAI. These become first-class next-hop tracing candidates.`});
   if (state.cues.pressure) out.push({kind:'warn',title:'Semantic ingress model',msg:`${state.cues.motifs.length} motif(s), ${state.cues.addresses.length} address(es), and ${state.cues.txs.length} tx(s) parsed from cue text. They steer scan windows and targets, but their proof value comes only from chain intersections.`});
   if (live?.targetTouches) out.unshift({kind:'good',title:'Live intersection just fired',msg:`${live.targetTouches} watched target touch(es) appeared in the live scan. These are immediately added to the graph and scoring loop.`});
   return out;
@@ -603,6 +692,7 @@ async function runLiveScan() {
       slots, ms: Math.round(performance.now()-started)
     };
     state.live = live;
+    state.flowIntel = analyzeFlowIntel(state.report, live);
     state.scores = scoreReport(state.report, live);
     buildGraph(state.report, live);
     state.audit = auditReport(state.report);
@@ -636,6 +726,9 @@ function recomputeTargetScores() {
     eByAddr.set(e.from, (eByAddr.get(e.from)||0)+e.count+Math.log10((e.amount||0)+1));
     eByAddr.set(e.to, (eByAddr.get(e.to)||0)+e.count+Math.log10((e.amount||0)+1));
   });
+  const flow = state.flowIntel || analyzeFlowIntel(state.report, state.live);
+  const chainAddrs = new Set();
+  (flow.repeatedChains||[]).slice(0,3).forEach(c => { chainAddrs.add(c.from); chainAddrs.add(c.mid); chainAddrs.add(c.to); });
   state.targets.forEach(t => {
     let s = 0, why = [...(t.why||[])];
     if (t.balance > 1e8) { s += 26; why.push('Huge pDAI custody'); }
@@ -645,6 +738,8 @@ function recomputeTargetScores() {
     if (/bridge|relay/i.test(t.role)) s += 10;
     if (/proxy|execution|impl|settlement/i.test(t.role)) s += 8;
     if (/reserve|anchor|core/i.test(t.role)) s += 8;
+    if (chainAddrs.has(lc(t.addr))) { s += 7; why.push('In dominant two-hop relay chain'); }
+    if ((flow.topEdges||[]).some(e => e.from===lc(t.addr)||e.to===lc(t.addr))) { s += 4; why.push('In top live edge set'); }
     s += Math.min(18, eByAddr.get(lc(t.addr))||0);
     t.score = clamp(Math.max(t.score||0, s),0,100);
     t.why = uniq(why).slice(-5);
@@ -670,6 +765,7 @@ function parseCues() {
   });
   const pressure = motifs.length*2 + addresses.length*3 + txs.length*2 + windows.length*3;
   state.cues = {addresses, txs, motifs, windows, pressure};
+  state.flowIntel = analyzeFlowIntel(state.report, state.live);
   state.scores = scoreReport(state.report, state.live);
   buildGraph(state.report, state.live);
   state.hypotheses = hypotheses(state.report, state.live);
@@ -724,7 +820,7 @@ function renderSummary() {
   const live = state.live;
   const snap = state.report.snapshot || {};
   const summary = {
-    module:'V66 Condensed Autonomous Peg Cortex',
+    module:'V66.1 Flow-Reality Peg Cortex',
     seedVersion: state.report.version,
     seedBlock: state.report.block || snap.latest,
     liveBlock: live?.latest || null,
@@ -736,6 +832,13 @@ function renderSummary() {
     graphNodes: state.graph.nodes.length,
     graphEdges: state.graph.edges.length,
     live: live ? {span:live.span, transfers:live.transferCount, targetTouches:live.targetTouches, nonzeroSlots:live.nonzeroSlots, proxySlots:live.proxySlots} : null,
+    flowReality: state.flowIntel ? {
+      pressure: Math.round(state.flowIntel.pressure||0),
+      targetRatio: Math.round((state.flowIntel.targetRatio||0)*100),
+      visibleTransfers: state.flowIntel.visibleTransfers,
+      dominantChain: state.flowIntel.repeatedChains?.[0] ? `${short(state.flowIntel.repeatedChains[0].from)}>${short(state.flowIntel.repeatedChains[0].mid)}>${short(state.flowIntel.repeatedChains[0].to)}` : null,
+      largeFlows: state.flowIntel.largeFlows?.count || 0
+    } : null,
     cuePressure: state.cues.pressure
   };
   $('summaryBox').textContent = JSON.stringify(summary,null,2);
@@ -803,7 +906,7 @@ function drawGraph() {
 function exportState() {
   const pack = {
     createdAt:new Date().toISOString(),
-    module:'V66 Condensed Autonomous Peg Cortex',
+    module:'V66.1 Flow-Reality Peg Cortex',
     seedVersion:state.report.version,
     scores:state.scores,
     live:state.live,
@@ -811,11 +914,12 @@ function exportState() {
     hypotheses:state.hypotheses,
     targets:state.targets,
     cues:state.cues,
+    flowIntel:state.flowIntel,
     graph:state.graph
   };
   const blob = new Blob([JSON.stringify(pack,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='pdai-v66-condensed-cortex-export.json'; a.click();
+  const a = document.createElement('a'); a.href=url; a.download='pdai-v66-1-flow-reality-cortex-export.json'; a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
@@ -839,13 +943,37 @@ function addTargetFromCues() {
   buildGraph(state.report,state.live); renderAll(); addFeed('good','Manual target added',a);
 }
 
+
+function hydrateCortexExport(r, fileName='export') {
+  state.live = r.live || state.live;
+  state.cues = r.cues || state.cues || {addresses:[],txs:[],motifs:[],windows:[],pressure:0};
+  state.targets = Array.isArray(r.targets) && r.targets.length ? r.targets : state.targets;
+  state.graph = r.graph || state.graph;
+  state.flowIntel = r.flowIntel || analyzeFlowIntel(state.report, state.live);
+  state.scores = scoreReport(state.report, state.live);
+  state.audit = [
+    ...(Array.isArray(r.audit)?r.audit:[]),
+    {kind:'good', title:'V66.1 export regression loaded', msg:`${fileName} hydrated live counters, targets, graph, and flow-reality intelligence without replacing the seed report.`},
+    {kind:'warn', title:'Next scan priority refined', msg:'Autopilot now prioritizes dominant relay chains, calibration ladders, bridge quiet-custody, and F33C custody/touch deltas.'}
+  ].slice(-18);
+  state.hypotheses = hypotheses(state.report, state.live);
+  recomputeTargetScores();
+  renderAll();
+  addFeed('good','Export hydrated', `${fileName} loaded as a live-regression run. Seed report kept; V66.1 flow intelligence recalculated.`);
+}
+
 function importReportFile(file) {
   const reader = new FileReader();
   reader.onload = () => {
     try {
       const r = JSON.parse(reader.result);
+      if (r && r.module && r.scores && r.live && Array.isArray(r.targets)) {
+        hydrateCortexExport(r, file.name);
+        return;
+      }
       state.report = r;
       state.targets = buildTargets(r);
+      state.flowIntel = analyzeFlowIntel(r, state.live);
       state.audit = auditReport(r);
       state.scores = scoreReport(r, state.live);
       buildGraph(r,state.live);
@@ -861,6 +989,7 @@ function importReportFile(file) {
 function init() {
   state.targets = buildTargets(state.report);
   state.audit = auditReport(state.report);
+  state.flowIntel = analyzeFlowIntel(state.report, null);
   state.scores = scoreReport(state.report, null);
   buildGraph(state.report,null);
   state.hypotheses = hypotheses(state.report,null);
