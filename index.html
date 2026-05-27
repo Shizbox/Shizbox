@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>pDAI Peg Prover • V63.4.9 Omni Scoreline Reconciler</title>
+<title>pDAI Peg Prover • V64.5 Dominion Intelligence Auditor</title>
 <style>
 :root{--bg:#05070b;--panel:rgba(10,16,26,.72);--panel2:rgba(255,255,255,.045);--line:rgba(151,200,255,.16);--line2:rgba(151,200,255,.28);--text:#f4fbff;--muted:#8fa6b8;--green:#65ffbd;--cyan:#62dcff;--blue:#7ea6ff;--violet:#c49aff;--amber:#ffd166;--red:#ff6b8a;--shadow:0 24px 80px rgba(0,0,0,.38),0 0 80px rgba(98,220,255,.08);--r:26px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -26,12 +26,40 @@ body:after{content:"";position:fixed;inset:-25%;pointer-events:none;z-index:-1;b
 .controls #txHashInput{display:inline-block!important}
 #status.status.info .dot{animation:pulse 1.15s infinite}
 
+
+/* V64.5 Dominion Intelligence Auditor */
+.v645Wrap{margin:14px 0;border:1px solid rgba(101,255,189,.22);border-radius:28px;background:linear-gradient(135deg,rgba(101,255,189,.08),rgba(98,220,255,.045),rgba(196,154,255,.035));box-shadow:0 22px 80px rgba(0,0,0,.28),0 0 80px rgba(101,255,189,.06);padding:16px;position:relative;overflow:hidden}
+.v645Wrap:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 15% 0%,rgba(101,255,189,.12),transparent 30%),radial-gradient(circle at 95% 10%,rgba(98,220,255,.12),transparent 28%);pointer-events:none}
+.v645Wrap>*{position:relative}
+.v645Head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.v645Title{font-size:26px;font-weight:1000;letter-spacing:-.04em}
+.v645Sub{color:var(--muted);font-size:.9rem;line-height:1.45;max-width:1040px;margin-top:5px}
+.v645Actions{display:flex;gap:8px;flex-wrap:wrap}
+.v645Grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+.v645Tile{border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(255,255,255,.035);padding:12px}
+.v645Tile .k{font-size:11px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;font-weight:900}
+.v645Tile .v{font-size:28px;font-weight:1000;margin-top:6px;letter-spacing:-.03em}
+.v645Tile .t{font-size:12px;color:var(--muted);line-height:1.35;margin-top:5px}
+.v645Cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.v645Mission,.v645Target{border:1px solid rgba(255,255,255,.075);border-radius:20px;background:rgba(5,7,11,.32);padding:12px;min-height:220px}
+.v645Rows{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.v645Row{border:1px solid rgba(255,255,255,.07);border-left:3px solid var(--line2);border-radius:14px;background:rgba(255,255,255,.027);padding:10px;font-size:.82rem;line-height:1.35}
+.v645Row.good{border-left-color:var(--green)}.v645Row.warn{border-left-color:var(--amber)}.v645Row.bad{border-left-color:var(--red)}.v645Row.info{border-left-color:var(--cyan)}
+.v645Row b{display:block;margin-bottom:4px}.v645Row span{color:var(--muted)}
+.v645Table{overflow:auto;border:1px solid rgba(255,255,255,.07);border-radius:16px;margin-top:10px}
+.v645Table table{min-width:820px}
+.v645Badge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(101,255,189,.3);border-radius:999px;padding:7px 10px;color:var(--green);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em}
+.v645Badge i{display:block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
+@media(max-width:1100px){.v645Grid,.v645Cols{grid-template-columns:1fr 1fr}.v645Grid .v645Tile:last-child{grid-column:1/-1}}
+@media(max-width:720px){.v645Grid,.v645Cols{grid-template-columns:1fr}}
+.controls #v645Btn{display:inline-flex!important}
+
 </style>
 </head>
 <body>
 <div class="app">
   <section class="glass pad top">
-    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V63.4.9 Omni Scoreline Reconciler</h1><div class="sub">V63.4.1 absorbs the new 5996 / ERC-1967 trace packet, the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now promotes/demotes the bridge-to-peg hook candidates: F33C/F406 custody, Reserve ERC-1967 slot flips, proxy-admin calls, settlement-basin persistence, destination-side bridge release, and irreversible supply sinks. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip good">V63.4 active hook promotion</span><span class="chip good">V63.4.2 5996 lane auditor</span><span class="chip good">V63.4.9 scoreline reconciler</span><span class="chip warn">tweet-to-trace quarantine</span><span class="chip warn">promotion/demotion ledger</span><span class="chip good">Reserve slot-tripwire</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
+    <div><h1 class="title"><span class="grad">pDAI Peg Prover</span><br/>V64.5 Dominion Intelligence Auditor</h1><div class="sub">V63.4.1 absorbs the new 5996 / ERC-1967 trace packet, the native pDAI Omnibridge confirmation, BA86 fee-manager graph, 8-way infrastructure split, collateral-recycling evidence, and now promotes/demotes the bridge-to-peg hook candidates: F33C/F406 custody, Reserve ERC-1967 slot flips, proxy-admin calls, settlement-basin persistence, destination-side bridge release, and irreversible supply sinks. V63 shifts the tool from button-driven proof hunting into autonomous intelligence synthesis. It still preserves formal proof as a visible lane, but the main brain now weights what we DO have: bridge relay locks, collateral-recycling loops, terminal hoards, Reserve/control-plane evidence, approval bursts, router history, burn mechanics, Canon-confirmed on-chain data, and counterfactual pressure. The goal is not to pretend pDAI has pegged; the goal is to detect a secretive peg-build before it becomes obvious.</div><div class="chips"><span class="chip good">no import required</span><span class="chip info">unified cognition loop</span><span class="chip info">F33C launch-gate watcher</span><span class="chip good">ERC-1967 proxy tracker</span><span class="chip info">DaiJoin accrual autopsy</span><span class="chip good">Launch + 1M-flow autopsy</span><span class="chip warn">End settlement scanner</span><span class="chip bad">ETA blocked until hard closure</span><span class="chip good">V62 hard-gate ledger</span><span class="chip info">proxy classifier v2</span><span class="chip warn">persistence sentinel</span><span class="chip info">import + diff replay</span><span class="chip good">V62.1 terminal ladder</span><span class="chip info">1M flow map</span><span class="chip warn">proxy firewall</span><span class="chip good">dual score split</span><span class="chip info">V62.2 canon claim graph</span><span class="chip warn">external-claim firewall</span><span class="chip good">1967 control-plane watch</span><span class="chip info">3-line defence matrix</span><span class="chip good">V62.3 identity hunter</span><span class="chip warn">Gemini packet gates</span><span class="chip info">terminal receiver dossiers</span><span class="chip good">V62.4 convergence reasoning</span><span class="chip warn">soft-gate inference lane</span><span class="chip info">coincidence-debt score</span><span class="chip good">V62.5 proven canon registry</span><span class="chip warn">Bayesian peg-build model</span><span class="chip info">counterfactual pressure engine</span><span class="chip good">10x reasoning dashboard</span><span class="chip warn">V62.6 tweet-tx firewall</span><span class="chip good">localized proxy upgrade autopsy</span><span class="chip info">C5 promotion engine</span><span class="chip good">V62.7 Reserve control-plane hunter</span><span class="chip warn">upgrade receipt promotion</span><span class="chip info">multi-tx batch autopsy</span><span class="chip good">soft/hard doctrine governor</span><span class="chip good">V62.8 nested governance decoder</span><span class="chip warn">implementation slot before/after diff</span><span class="chip info">executor payload unpacker</span><span class="chip good">V63.3 bridge-to-peg hook matrix</span><span class="chip good">V63.4 active hook promotion</span><span class="chip good">V63.4.2 5996 lane auditor</span><span class="chip good">V63.4.9 scoreline reconciler</span><span class="chip good">V64.5 dominion intelligence</span><span class="chip warn">delta-crusher gates</span><span class="chip info">attached-report lens</span><span class="chip warn">tweet-to-trace quarantine</span><span class="chip warn">promotion/demotion ledger</span><span class="chip good">Reserve slot-tripwire</span><span class="chip warn">passive bridge vs active peg classifier</span><span class="chip good">Reserve/F33C coupling sentinel</span><span class="chip info">autopilot-only proof queue</span></div></div>
     <div><div id="status" class="status warn"><span class="dot"></span><span>ready</span></div><div class="meta"><div id="rpcMeta">RPC: —</div><div id="blockMeta">Block: —</div><div id="taskMeta">Last task: —</div></div><div class="controls"><button class="btn primary" id="runBtn">Manual deep cycle</button><button class="btn" id="f33cBtn">F33C watcher</button><button class="btn" id="launchBtn">Launch + 1M autopsy</button><button class="btn" id="onwardBtn">Onward flow</button><button class="btn" id="intersectBtn">Explain intersections</button><button class="btn" id="endBtn">End / cage scan</button><button class="btn" id="proxyBtn">ERC-1967 scan</button><button class="btn" id="routeBtn">Route autopsy</button><button class="btn" id="accrualBtn">Accrual autopsy</button><button class="btn" id="auditBtn">Self-audit</button><button class="btn" id="gateBtn">Hard-gate ledger</button><button class="btn" id="classifyBtn">Proxy classify</button><button class="btn" id="diffBtn">Diff timeline</button><button class="btn" id="warRoomBtn">V62.4 war-room</button><button class="btn" id="inferBtn">Convergence reasoner</button><button class="btn" id="canonProofBtn">Proven canon</button><button class="btn" id="bayesBtn">Bayesian model</button><button class="btn" id="identityBtn">Identity hunter</button><button class="btn" id="geminiBtn">Gemini packet</button><button class="btn" id="canonBtn">Canon falsifier</button><input id="txHashInput" class="mono" value="0x515a010fdb97cf00b6aaa1c7d5050ebd353a0b2cb259087cf1d91642a4e9e03c" style="min-width:360px;max-width:100%;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.24);color:var(--text);padding:10px 12px" /><button class="btn" id="tweetTxBtn">Tweet tx autopsy</button><button class="btn" id="reserveBtn">Reserve control-plane</button><button class="btn" id="nestedBtn">Nested governance</button><button class="btn" id="batchTxBtn">Batch tx packet</button><button class="btn" id="doctrineBtn">Proof doctrine</button><button class="btn" id="importBtn">Import report</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" /><button class="btn" id="autoBtn">Start autopilot</button><button class="btn danger" id="stopBtn">Stop</button><button class="btn" id="settingsBtn">Settings</button><button class="btn" id="exportBtn">Export report</button></div></div>
   </section>
 
@@ -3269,7 +3297,7 @@ body.v641-cinematic .v640Main:after{content:"";position:absolute;inset:0;pointer
     if(el('v640Explain')) el('v640Explain').textContent=(V.summary||'Build-confidence radar active.')+' RPC storm shield is active: raced endpoints, chunked logs, short cache, and aggressive scan cadence.';
     const grid=el('v641RpcGrid');
     if(grid){
-      grid.innerHTML=ranked().slice(0,3).map(u=>{const h=health(u); const cls=h.fail>h.ok+2?'bad':h.fail?'warn':'good'; return '<div class="v641RpcDot '+cls+'"><div class="u">'+u.replace(/^https?:\\/\\//,'')+'</div><div class="h">'+cls+' • '+(h.lat<9999?h.lat+'ms':'pending')+'</div></div>';}).join('');
+      grid.innerHTML=ranked().slice(0,3).map(u=>{const h=health(u); const cls=h.fail>h.ok+2?'bad':h.fail?'warn':'good'; return '<div class="v641RpcDot '+cls+'"><div class="u">'+u.replace('https://','').replace('http://','')+'</div><div class="h">'+cls+' • '+(h.lat<9999?h.lat+'ms':'pending')+'</div></div>';}).join('');
     }
     if(el('v641RpcRows')){
       const r=S.rpc||{};
@@ -3588,7 +3616,7 @@ body.v644-pioneer .sub{max-width:780px}
     const promotion=num((state.v648||state.v6348||state.v634||{}).promotionScore,0);
     const convergence=num(scoreSplit.convergenceScore||((state.convergence||{}).score),0);
     const hard=num(scoreSplit.pegProofScore,0);
-    const chokeScore=pct((choke.logs?.in||0)*6+(choke.logs?.out||0)*6+(choke.logs?.approvals||0)*18+(choke.balance>100000?18:0);
+    const chokeScore=pct((choke.logs?.in||0)*6+(choke.logs?.out||0)*6+(choke.logs?.approvals||0)*18+(choke.balance>100000?18:0));
     const terminalScore=pct((terminal.balance>100000?26:0)+(terminal.logs?.in||0)*8+(terminal.logs?.out||0)*4);
     const pioneer=pct(Math.round(chokeScore*.28+terminalScore*.18+promotion*.22+convergence*.20+proofTouch*5));
     const activation=pct((proofTouch*12)+(hardTargets.some(t=>t.balance>0)?22:0)+(hardTargets.some(t=>t.impl||t.admin)?18:0)+hard);
@@ -3677,6 +3705,238 @@ body.v644-pioneer .sub{max-width:780px}
   window.v644PioneerScan=pioneerMicroScan;
   window.v644Export=exportV644;
   setTimeout(()=>{ensureUI();renderV644();safe(()=>thought('good','V64.4 loaded','Pioneer Cortex is active: think like a PulseChain pioneer — watch choke-points, fuel, slots, approvals, and terminal persistence before the crowd sees price.'),null);},700);
+})();
+</script>
+
+
+<script id="v645-script">
+(function(){
+  'use strict';
+  const V645_VERSION='V64.5 Dominion Intelligence Auditor';
+  const V645_EXPORT='pdai-v64-5-dominion-intelligence-auditor-report.json';
+  const P='0x6B175474E89094C44Da98b954EedeAC495271d0F';
+  const TRANSFER='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  const APPROVAL='0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
+  const ZERO='0x0000000000000000000000000000000000000000000000000000000000000000';
+  window.V645_REPORT_SEED={"createdAt":"2026-05-27T05:04:23.004Z","sourceVersion":"V64.3 Export Dominance Watchdog","baseVersion":"V63.4.9 Omni Scoreline Reconciler","block":26632820,"scores":{"anomalyScore":92,"pegProofScore":23,"convergenceScore":55,"coincidenceDebt":75,"delta":69,"buildConfidence":40,"capitalFuelScore":44,"settlementReadiness":48,"autonomyScore":100},"snapshot":{"fromBlock":26632640,"latest":26632820,"logsCount":1684,"transfers":1680,"approvals":4,"totalSupply":44359319656.07227,"burned":524360.8493177593,"slots":{"0x7b12":"0x0000000000000000000000000000000000000000000000000000000000000000","0x0968":"0x0000000000000000000000000000000000000000000000000000000000000000"},"anchors":[{"name":"Native pDAI/WPLS","address":"0x947b4633e32e0c7f2c76753b43f008480715416d","reserve0":14635787.997398831,"reserve1":3310492823.615622},{"name":"ATROPA/DAI core","address":"0x5ef7aac0de4f2012cb36730da140025b113fada4","reserve0":5381687178.613196,"reserve1":256281404.6759582},{"name":"Bridged DAI/WPLS","address":"0xe56043671df55de5cdf8459710433c10324de0ae","reserve0":58698406138.84506,"reserve1":410872.73525953473}]},"watchdog":{"cycles":177,"timeouts":667,"releases":7,"currentTask":"Bridge scan","busy":true,"exportDominant":true,"buttonRebound":true},"routes":{"onwardRows":117,"intersections":39,"persistence":3,"targetIntelRows":102,"targetCounts":{"ordinary churn":57,"terminal contract accumulator":2,"shadow route / churn":31,"large accumulator":5,"bridge candidate":7},"terminalScore":100,"flowNodes":23,"flowEdges":36,"hardEdges":0,"topTerminals":[{"address":"0x4fd0aaa7506f3d9cb8274bdb946ec42a1b8751ef","score":95,"inbound":251314432.13641092,"maxBalance":341298244.6384047,"maxLeg":125657216.06820546,"tier":"T0 hard-class retained","contract":true,"label":null,"codeSize":null,"why":null},{"address":"0x9d10fa5ce0d5190b00eef27ccff7831dca167803","score":84,"inbound":61213697.90006843,"maxBalance":31440348.637942947,"maxLeg":10069689.236996654,"tier":"T0 hard-class retained","contract":false,"label":null,"codeSize":null,"why":null},{"address":"0x1a3316a074f1535a966822728d37897a1ce6fcd9","score":83,"inbound":19018663.24074951,"maxBalance":129113146.67610197,"maxLeg":3208835.6081166277,"tier":"T0 hard-class retained","contract":false,"label":null,"codeSize":null,"why":null},{"address":"0x92444f9319b38c39a6570a85409c327b02fc192e","score":82,"inbound":17580288.14620336,"maxBalance":367762173.4925187,"maxLeg":5180012.834735138,"tier":"T0 hard-class retained","contract":false,"label":null,"codeSize":null,"why":null},{"address":"0x1c23bcfab08964e9588046051c04c047c0a9be1e","score":81,"inbound":14046056.112296233,"maxBalance":9564333.508851046,"maxLeg":7023028.0561481165,"tier":"T0 hard-class retained","contract":false,"label":null,"codeSize":null,"why":null},{"address":"0x9d7891771cfb95049a8c351e7579568fa1e51358","score":81,"inbound":14821732.385481546,"maxBalance":7423433.782071287,"maxLeg":7410866.192740773,"tier":"T0 hard-class retained","contract":false,"label":null,"codeSize":null,"why":null},{"address":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","score":66,"inbound":27476249.88427196,"maxBalance":174668649.2201587,"maxLeg":3568181.7725596,"tier":"T1 terminal contract accumulator","contract":true,"label":null,"codeSize":null,"why":null},{"address":"0x78d58247be592f3cb7b87a5650c6b466ce4a5476","score":61,"inbound":3000000,"maxBalance":106874520.26533085,"maxLeg":1500000,"tier":"T1 terminal contract accumulator","contract":true,"label":null,"codeSize":null,"why":null},{"address":"0xa54e7486dc69219b6814798b30dd09e14ee9cd10","score":61,"inbound":4000000,"maxBalance":7088135.439746308,"maxLeg":2000000,"tier":"T1 terminal contract accumulator","contract":true,"label":null,"codeSize":null,"why":null},{"address":"0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6","score":56,"inbound":135873974.60991842,"maxBalance":307.5259794092578,"maxLeg":10069689.236996654,"tier":"T0 hard-class retained","contract":true,"label":null,"codeSize":null,"why":null}],"recentTopTransfers":[{"block":26632642,"from":"0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8","to":"0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6","amount":1096039.961878702,"tx":"0x463db4dedee797c504cf68cb3a67aab55b1b068b6538aba4325051169484de8d"},{"block":26632642,"from":"0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6","to":"0x80778d230c3587d331c2061c37832083034bb3ec","amount":1096039.961878702,"tx":"0x463db4dedee797c504cf68cb3a67aab55b1b068b6538aba4325051169484de8d"},{"block":26632642,"from":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","to":"0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8","amount":814022.4714962698,"tx":"0x463db4dedee797c504cf68cb3a67aab55b1b068b6538aba4325051169484de8d"},{"block":26632777,"from":"0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8","to":"0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6","amount":346372.7882719842,"tx":"0x376b75b34b56239334ad8752c01120167e96f588ee1a7bd9467a612686f4ab94"},{"block":26632777,"from":"0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6","to":"0x54fffe82ca3342d7c93dac080aaaebf7220e4cda","amount":346372.7882719842,"tx":"0x376b75b34b56239334ad8752c01120167e96f588ee1a7bd9467a612686f4ab94"},{"block":26632777,"from":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","to":"0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8","amount":312212.6351258746,"tx":"0x376b75b34b56239334ad8752c01120167e96f588ee1a7bd9467a612686f4ab94"},{"block":26632808,"from":"0x549da7bc37d3dfb243ebd556d3adcef4566377fc","to":"0xabc1b26998d1314192e0cadc41122923c09d5f30","amount":199999.99999999997,"tx":"0x20893952c1a70e7ddc5f07555d391026ddb08a8ba31f8db4476cb8e1b0977162"},{"block":26632808,"from":"0xabc1b26998d1314192e0cadc41122923c09d5f30","to":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","amount":199999.99999999997,"tx":"0x20893952c1a70e7ddc5f07555d391026ddb08a8ba31f8db4476cb8e1b0977162"},{"block":26632642,"from":"0x78d58247be592f3cb7b87a5650c6b466ce4a5476","to":"0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8","amount":144326.3075533665,"tx":"0x463db4dedee797c504cf68cb3a67aab55b1b068b6538aba4325051169484de8d"},{"block":26632651,"from":"0x367c28b7fe7eac09d948f37eaabb4ff6fc3b0950","to":"0xecf65d5885970e3e7b5819c90ad9b3a270f2f25f","amount":108195.57299581911,"tx":"0xf5a6f07c0510b17f373a3e6eeb9dd6d83e106955568047421c3e1c52ea2bbce4"},{"block":26632726,"from":"0x6e8f971afda98e4f54dea3505ee898dbbe445d96","to":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","amount":90000,"tx":"0x61eb4fa8ae8b1c7f698885a224e55d2df39c19c69c2adc9be6bfca4ab1fee85f"},{"block":26632777,"from":"0x0305fcb5da680ea6fd1b01a96c1949175b99d406","to":"0xae8429918fdbf9a5867e3243697637dc56aa76a1","amount":73330.59522965482,"tx":"0x1006ce6462dd8c945647e2bd3fed4e10cf75bb5e8f19ef24fd8554a8b26c7aef"}]},"hardGates":{"authorityHits":0,"proxyRows":1,"deadDelta":0,"f33cDelta":0,"bridgeHardEdges":0,"slot7b12":"0x0000000000000000000000000000000000000000000000000000000000000000","slot0968":"0x0000000000000000000000000000000000000000000000000000000000000000"},"proofQueue":[{"kind":"good","title":"Check pDAI \u2192 F33C linkage","msg":"Highest value: balanceOf(pDAI,F33C), approvals to F33C/owner, and route edges into F33C."},{"kind":"good","title":"Identify single approval recipient","msg":"Every approval spender gets promoted and classified; if it overlaps bridge/pCOMP/End, confidence rises."},{"kind":"info","title":"Decode recent top tx selectors","msg":"Classifier separates router addLiquidity from Maker/End/bridge calls to prevent false positives."},{"kind":"good","title":"Track ERC-1967 implementation slots","msg":"Read 0x3608...2bbc on proxy candidates, classify implementation code, and alert on upgradeTo / upgradeToAndCall."},{"kind":"info","title":"Scan End settlement selectors","msg":"Look for cage/pack/cash/skim/free/flow and then check collateral/redemption implications."},{"kind":"warn","title":"Autopsy the largest pDAI route chains","msg":"Fetch tx inputs/receipts, identify initiators/selectors/final sinks, and classify proof-target overlap."},{"kind":"info","title":"Probe pCOMP governance actors","msg":"Inspect seeded timelock/admin/fixer txs and classify whether they touch pDAI markets."},{"kind":"warn","title":"Bridge proof gate","msg":"Look for OFT/LayerZero/Liberty txs plus pDAI approval/lock/burn/mint and destination liquidity."},{"kind":"warn","title":"Keep 0x0968 / 0x7b12 tripwire armed","msg":"Slots remain null; hard ETA stays blocked."}],"blockers":["Watched pDAI storage slot opened","F33C immutable launch state verified","Direct pDAI linkage to F33C/F406","1M tracer reaches hard proof class","Terminal persistence confirmed","ERC-1967 implementation is pDAI-relevant","Bridge/Liberty redemption path","End/Vat settlement path","Material supply sink or burn","Authority closure","Route-vs-proof contradiction resolved","Manual review packet ready"],"keyClaims":["V64.3 report shows anomaly 92, peg proof 23, convergence 55, delta 69.","Snapshot block 26632820 covers 1684 logs over blocks 26632640-26632820.","Onward map contains 117 rows and 39 watched-target intersections.","Terminal ladder reached score 100, but hard edges remain zero.","Both watched custom slots 0x7b12 and 0x0968 are zero in the report snapshot.","Authority scan reports 0 hits across 126 tested actor-target pairs."]};
+  const HARD_TARGETS=[
+    {name:'F33C settlement gate',addr:'0xF33C0bB40d1BBf6EAfaAea2ADFb7d2D3EbC1E49C',class:'settlement gate'},
+    {name:'F406 execution proxy',addr:'0xF406a3Ab62Ce9316b39cF8C7A50623777B2A6Fb9',class:'execution proxy'},
+    {name:'BA86 fee manager',addr:'0xba86ca0aeca30247f9e2fd8736879997bcd01dc4',class:'fee/bridge manager'},
+    {name:'Omnibridge relay',addr:'0x4fd0aaa7506f3d9cb8274bdb946ec42a1b8751ef',class:'bridge lock proxy'},
+    {name:'Reserve executor',addr:'0x22d7937438b4bbf02f6ca55e3831abb94bd0b6f1',class:'reserve executor'},
+    {name:'DA9ABA choke hub',addr:'0xda9aba4eacf54e0273f56dffee6b8f1e20b23bba',class:'route hub'},
+    {name:'083D terminal receiver',addr:'0x083d25ce4c7e30c72580245607849b2385df93ad',class:'terminal receiver'},
+    {name:'6BF2 focus spender',addr:'0x6bf228eb7f8ad948d37ded07e595efddfaaf88a6',class:'focus spender'},
+    {name:'EFC4 focus nexus',addr:'0xefc4a83375ae500d01c27dc01a31ad26c6eb25d8',class:'route nexus'}
+  ];
+  function el(id){return document.getElementById(id)}
+  function safe(fn,fb){try{return fn()}catch(e){return fb}}
+  function n(v,d=0){v=Number(v);return Number.isFinite(v)?v:d}
+  function pct(v){return Math.max(0,Math.min(100,Math.round(n(v))))}
+  function fmt(v,d=0){return Number.isFinite(+v)?(+v).toLocaleString(undefined,{maximumFractionDigits:d}):'—'}
+  function lc(a){return String(a||'').toLowerCase()}
+  function short(a){a=String(a||'');return a.length>16?a.slice(0,8)+'…'+a.slice(-6):a||'—'}
+  function rowCls(ok,warn){return ok?'good':warn?'warn':'bad'}
+  function scoreClass(v){return v>=70?'good':v>=35?'warn':'bad'}
+  function reportScore(name,alt=0){
+    const S=window.V645_REPORT_SEED||{};
+    const ss=safe(()=>state.scoreSplit, null)||{};
+    const v640=safe(()=>state.v640, null)||{};
+    const conv=safe(()=>state.convergence, null)||{};
+    const map={
+      anomalyScore:ss.anomalyScore??S.scores?.anomalyScore,
+      pegProofScore:ss.pegProofScore??S.scores?.pegProofScore,
+      convergenceScore:ss.convergenceScore??conv.score??S.scores?.convergenceScore,
+      coincidenceDebt:ss.coincidenceDebt??S.scores?.coincidenceDebt,
+      delta:ss.delta??S.scores?.delta,
+      buildConfidence:v640.buildConfidence??S.scores?.buildConfidence,
+      capitalFuelScore:v640.capitalFuelScore??S.scores?.capitalFuelScore,
+      settlementReadiness:v640.settlementReadiness??S.scores?.settlementReadiness,
+      autonomyScore:v640.autonomyScore??S.scores?.autonomyScore
+    };
+    return n(map[name],alt);
+  }
+  function seedTerminals(){
+    const S=window.V645_REPORT_SEED||{};
+    const live=safe(()=>state.terminalLadder.rows, null);
+    if(Array.isArray(live)&&live.length)return live.slice(0,10).map(r=>({
+      address:r.address,score:n(r.score),inbound:n(r.inbound),maxBalance:n(r.maxBalance),maxLeg:n(r.maxLeg),tier:r.tier||'',contract:!!r.contract,label:r.label||''
+    }));
+    return (S.routes?.topTerminals||[]).slice(0,10);
+  }
+  function hardGateRows(){
+    const S=window.V645_REPORT_SEED||{};
+    const authorityHits=safe(()=>state.authority.hits.length,S.hardGates?.authorityHits||0);
+    const hardEdges=safe(()=>state.flowMap.hardEdges.length,S.hardGates?.bridgeHardEdges||0);
+    const deadDelta=safe(()=>state.sinks.deadDelta,S.hardGates?.deadDelta||0);
+    const f33cDelta=safe(()=>state.sinks.f33cDelta,S.hardGates?.f33cDelta||0);
+    const slots=safe(()=>state.snapshot.slots,S.snapshot?.slots||{});
+    const v644Targets=safe(()=>state.v644.targets,[]);
+    const targetCustody=(v644Targets||[]).filter(t=>['F33C settlement gate','F406 execution proxy','BA86 fee manager','Reserve executor'].includes(t.name)&&n(t.balance)>0);
+    const targetSlot=(v644Targets||[]).filter(t=>['F406 execution proxy','Reserve executor','Reserve impl candidate'].includes(t.name)&&(t.impl||t.admin||t.beacon));
+    return [
+      {kind:rowCls(deadDelta>0||f33cDelta>0,false),name:'Supply sink / F33C custody',value:`dead Δ ${fmt(deadDelta,2)} • F33C Δ ${fmt(f33cDelta,2)}`,why:(deadDelta>0||f33cDelta>0)?'Real pDAI sink delta is present. Promote to hard review.':'Still blocked: no dead/F33C delta in the attached report.'},
+      {kind:rowCls(authorityHits>0,false),name:'Authority / approval closure',value:`${authorityHits} hit(s)`,why:authorityHits>0?'Authority relation appeared. Decode call/receipt before promoting.':'Still blocked: report authority scan showed zero hits across tested pairs.'},
+      {kind:rowCls(hardEdges>0,false),name:'Bridge release / hard edge',value:`${hardEdges} hard edge(s)`,why:hardEdges>0?'Bridge-class path has direct hard edge. Verify mapping/release.':'Still blocked: flow map has no hard bridge-release edge.'},
+      {kind:rowCls(targetCustody.length>0,false),name:'Hard target pDAI custody',value:`${targetCustody.length} target(s)`,why:targetCustody.length?'F33C/F406/BA86/Reserve-like target holds pDAI in live V64.4 scan.':'Still blocked until target custody appears in a proof target.'},
+      {kind:rowCls(targetSlot.length>0,slots?.['0x7b12']!==ZERO||slots?.['0x0968']!==ZERO),name:'Proxy/custom slot mutation',value:`7b12 ${short(slots?.['0x7b12'])} • 0968 ${short(slots?.['0x0968'])}`,why:targetSlot.length?'ERC-1967 target slot appears in live target list.':'Report custom slots were zero; keep as tripwire, not proof.'}
+    ];
+  }
+  function missionRows() {
+    const anomaly=reportScore('anomalyScore');
+    const proof=reportScore('pegProofScore');
+    const conv=reportScore('convergenceScore');
+    const delta=Math.max(0,n(reportScore('delta',anomaly-proof),anomaly-proof));
+    const S=window.V645_REPORT_SEED||{};
+    const blockers=safe(()=>state.scoreSplit.blockers,S.blockers||[]).slice(0,6);
+    const terminals=seedTerminals();
+    const top=terminals[0]||{};
+    const rows=[
+      {kind:'warn',title:`Delta crusher: ${delta} points still unproven`,msg:`Anomaly is ${anomaly}, hard proof is ${proof}, convergence is ${conv}. The tool must not call this closed until the delta is paid down by custody, slot, authority, bridge-release, or sink evidence.`},
+      {kind:'good',title:'Terminal-ladder pressure stays hot',msg:`Top retained terminal is ${short(top.address)} with score ${top.score??'—'}, inbound ${fmt(top.inbound,2)} pDAI, max balance ${fmt(top.maxBalance,2)}. Treat this as route pressure, not final peg proof.`},
+      {kind:'warn',title:'Watchdog health now becomes evidence quality',msg:`Attached report had ${S.watchdog?.timeouts??0} timeout clips over ${S.watchdog?.cycles??0} cycles and exported while task was "${S.watchdog?.currentTask||'unknown'}". V64.5 separates engine-health debt from chain evidence.`},
+      {kind:'info',title:'Next live scan priority',msg:'Scan the last 80–180 blocks for pDAI Transfer/Approval touches involving DA9ABA, 083D, F33C, F406, BA86, 4FD0 bridge, Reserve executor, 6BF2, and EFC4.'},
+      {kind:'bad',title:'Promotion rule',msg:'A social/OSINT or route clue can create a mission, but only chain closure promotes pegProofScore: nonzero slot mutation, verified admin/implementation transition, settlement custody, bridge destination release, or irreversible pDAI sink.'}
+    ];
+    blockers.forEach((b,i)=>rows.push({kind:'bad',title:`Blocker ${i+1}`,msg:String(b)}));
+    return rows.slice(0,10);
+  }
+  function analyzeV645(reason='manual') {
+    const anomaly=reportScore('anomalyScore');
+    const proof=reportScore('pegProofScore');
+    const conv=reportScore('convergenceScore');
+    const build=reportScore('buildConfidence');
+    const settle=reportScore('settlementReadiness');
+    const cap=reportScore('capitalFuelScore');
+    const delta=Math.max(0,n(reportScore('delta',anomaly-proof),anomaly-proof));
+    const S=window.V645_REPORT_SEED||{};
+    const gates=hardGateRows();
+    const passed=gates.filter(g=>g.kind==='good').length;
+    const warnings=gates.filter(g=>g.kind==='warn').length;
+    const terminalHeat=n(safe(()=>state.terminalLadder.score,S.routes?.terminalScore),0);
+    const intersections=n(safe(()=>state.onward.intersections.length,S.routes?.intersections),0);
+    const watchdogDebt=pct((n(S.watchdog?.timeouts)/Math.max(1,n(S.watchdog?.cycles)))*18);
+    const dominion=pct((build*.18)+(settle*.16)+(cap*.12)+(conv*.18)+(terminalHeat*.14)+(intersections*.45)+(passed*9)-(delta*.18)-watchdogDebt*.08);
+    const verdict=passed>2?'hard-gate promotion emerging':delta<=35?'delta compressing; hunt exact closure':terminalHeat>=80?'route pressure is loud; proof still gated':'watch route pressure; do not overclaim';
+    safe(()=>{state.v645={version:V645_VERSION,updated:new Date().toISOString(),reason,seedBlock:S.block,scores:{anomaly,proof,conv,build,settle,cap,delta,terminalHeat,intersections,watchdogDebt,dominion},gates,missions:missionRows(),topTerminals:seedTerminals(),hardTargets:HARD_TARGETS,verdict};},null);
+    renderV645();
+    safe(()=>thought(dominion>=55?'good':'warn','V64.5 dominion analysis',`${verdict} • dominion ${dominion} • delta ${delta} • hard gates passed ${passed}/${gates.length}.`),null);
+    return safe(()=>state.v645,null);
+  }
+  async function v645LiveMicroScan() {
+    analyzeV645('pre-live-scan');
+    const started=Date.now();
+    setStatus&&setStatus('info','v64.5 micro scan');
+    const S=window.V645_REPORT_SEED||{};
+    const targets=[...HARD_TARGETS,...seedTerminals().slice(0,8).map((t,i)=>({name:'terminal '+(i+1),addr:t.address,class:'retained terminal'}))].filter(t=>t.addr);
+    const targetSet=new Set(targets.map(t=>lc(t.addr)));
+    const topicAddr=t=>'0x'+'0'.repeat(24)+lc(t).replace(/^0x/,'');
+    try{
+      const latestHex=await rpc('eth_blockNumber');
+      const latest=parseInt(latestHex,16);
+      const from=Math.max(0,latest-120);
+      const logs=await rpc('eth_getLogs',[{address:P,fromBlock:'0x'+from.toString(16),toBlock:'latest',topics:[[TRANSFER,APPROVAL]]}]);
+      const hits=[];
+      (logs||[]).forEach(l=>{
+        const sig=lc(l.topics?.[0]);
+        const a='0x'+String(l.topics?.[1]||'').slice(26);
+        const b='0x'+String(l.topics?.[2]||'').slice(26);
+        if(targetSet.has(lc(a))||targetSet.has(lc(b)))hits.push({kind:sig===lc(APPROVAL)?'Approval':'Transfer',block:parseInt(l.blockNumber,16),from:a,to:b,tx:l.transactionHash});
+      });
+      const balances=[];
+      for(const t of targets.slice(0,12)){
+        const data='0x70a08231'+'0'.repeat(24)+lc(t.addr).replace(/^0x/,'');
+        const bal=await rpc('eth_call',[{to:P,data},'latest']).catch(()=>ZERO);
+        balances.push({name:t.name,addr:t.addr,balance:Number(BigInt(bal||'0x0'))/1e18,class:t.class});
+      }
+      const slots=[];
+      for(const t of targets.slice(0,7)){
+        const impl=await rpc('eth_getStorageAt',[t.addr,'0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc','latest']).catch(()=>ZERO);
+        const admin=await rpc('eth_getStorageAt',[t.addr,'0xb53127684a568b3173ae13b9f8a6016e0192b2d357c43a0a358d3b8a2b35133d','latest']).catch(()=>ZERO);
+        if(impl!==ZERO||admin!==ZERO)slots.push({name:t.name,addr:t.addr,impl,admin});
+      }
+      state.v645=state.v645||{version:V645_VERSION};
+      state.v645.live={ok:true,ms:Date.now()-started,latest,from,hits,hitsCount:hits.length,balances,slots,slotHits:slots.length,updated:new Date().toISOString()};
+      analyzeV645('live-micro-scan');
+      renderV645();
+      thought(hits.length||slots.length?'good':'warn','V64.5 live micro-scan',`${hits.length} target pDAI log hit(s), ${slots.length} ERC-1967 slot hit(s), latest block ${latest}.`);
+      setStatus&&setStatus('good','v64.5 scan done');
+    }catch(e){
+      state.v645=state.v645||{version:V645_VERSION};
+      state.v645.live={ok:false,error:e.message,ms:Date.now()-started,updated:new Date().toISOString()};
+      renderV645();
+      thought('bad','V64.5 live scan failed',e.message);
+      setStatus&&setStatus('bad','v64.5 error');
+    }
+  }
+  function v645RescueLock() {
+    const age=Date.now()-n(safe(()=>state.busySince,0),0);
+    const wasBusy=!!safe(()=>state.busy,false);
+    if(wasBusy){state.busy=false;state.currentTask='v64.5 lock rescue';}
+    if(state.v642){state.v642.releases=n(state.v642.releases)+1;state.v642.steps=Array.isArray(state.v642.steps)?state.v642.steps:[];state.v642.steps.unshift({kind:'warn',name:'V64.5 lock rescue',ms:0,ts:new Date().toISOString()});state.v642.steps=state.v642.steps.slice(0,80);}
+    analyzeV645('lock-rescue');
+    thought(wasBusy?'warn':'info','V64.5 lock rescue',wasBusy?`Released stale busy flag after ${Math.round(age/1000)}s. Evidence state was preserved.`:'No active busy flag was present.');
+    setStatus&&setStatus('good','lock clear');
+  }
+  function ensureV645UI() {
+    if(!el('v645Btn')){
+      const c=document.querySelector('.controls');
+      if(c){const b=document.createElement('button');b.className='btn primary';b.id='v645Btn';b.textContent='V64.5 dominion';c.prepend(b);b.onclick=()=>analyzeV645('top-button');}
+    }
+    if(!el('v645Wrap')){
+      const d=document.createElement('section');
+      d.id='v645Wrap';
+      d.className='v645Wrap';
+      d.innerHTML=[
+        '<div class="v645Head"><div><div class="v645Badge"><i></i>V64.5 Dominion</div><div class="v645Title">Delta-crusher intelligence layer</div><div class="v645Sub">Reads the attached V64.3 export snapshot, repairs proof-vs-anomaly drift, converts soft alpha into exact chain missions, and refuses to promote the peg thesis until hard closure appears.</div></div><div class="v645Actions"><button class="btn primary" id="v645Analyze">Analyze</button><button class="btn" id="v645Live">Live micro-scan</button><button class="btn" id="v645Rescue">Rescue stuck lock</button><button class="btn" id="v645Export">Export V64.5</button></div></div>',
+        '<div class="v645Grid"><div class="v645Tile"><div class="k">dominion score</div><div class="v" id="v645Dominion">—</div><div class="t" id="v645DominionTxt">—</div></div><div class="v645Tile"><div class="k">proof delta</div><div class="v" id="v645Delta">—</div><div class="t">anomaly minus verified proof</div></div><div class="v645Tile"><div class="k">terminal heat</div><div class="v" id="v645Terminal">—</div><div class="t">route pressure, not final closure</div></div><div class="v645Tile"><div class="k">watchdog debt</div><div class="v" id="v645Debt">—</div><div class="t">timeout clips normalized</div></div><div class="v645Tile"><div class="k">live hits</div><div class="v" id="v645LiveHits">—</div><div class="t" id="v645LiveTxt">no live scan yet</div></div></div>',
+        '<div class="v645Cols"><div class="v645Mission"><div class="kicker">mission board</div><div class="v645Rows" id="v645Missions"></div></div><div class="v645Target"><div class="kicker">hard gates</div><div class="v645Rows" id="v645Gates"></div></div></div>',
+        '<div class="v645Target" style="margin-top:12px"><div class="kicker">top retained terminals / choke targets</div><div class="v645Table" id="v645Targets"></div></div>'
+      ].join('');
+      const anchor=el('v644Wrap')||document.querySelector('.tabs')||document.querySelector('.hero')||document.querySelector('.app');
+      if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(d,anchor); else document.body.appendChild(d);
+      el('v645Analyze').onclick=()=>analyzeV645('panel-button');
+      el('v645Live').onclick=()=>v645LiveMicroScan();
+      el('v645Rescue').onclick=()=>v645RescueLock();
+      el('v645Export').onclick=()=>v645Export();
+    }
+  }
+  function renderV645() {
+    ensureV645UI();
+    const V=safe(()=>state.v645,null)||analyzeV645('render-bootstrap');
+    const S=V.scores||{};
+    if(el('v645Dominion')){el('v645Dominion').textContent=fmt(S.dominion,0);el('v645Dominion').className='v '+scoreClass(S.dominion);}
+    if(el('v645DominionTxt'))el('v645DominionTxt').textContent=V.verdict||'—';
+    if(el('v645Delta')){el('v645Delta').textContent=fmt(S.delta,0);el('v645Delta').className='v '+(S.delta>50?'bad':S.delta>20?'warn':'good');}
+    if(el('v645Terminal')){el('v645Terminal').textContent=fmt(S.terminalHeat,0);el('v645Terminal').className='v '+scoreClass(S.terminalHeat);}
+    if(el('v645Debt')){el('v645Debt').textContent=fmt(S.watchdogDebt,0);el('v645Debt').className='v '+(S.watchdogDebt>45?'bad':S.watchdogDebt>20?'warn':'good');}
+    const live=V.live||{};
+    if(el('v645LiveHits')){el('v645LiveHits').textContent=live.ok?fmt(live.hitsCount||0,0):'—';el('v645LiveHits').className='v '+(live.hitsCount?'good':'warn');}
+    if(el('v645LiveTxt'))el('v645LiveTxt').textContent=live.ok?`blocks ${live.from}–${live.latest} • slots ${live.slotHits||0}`:live.error?live.error:'no live scan yet';
+    if(el('v645Missions'))el('v645Missions').innerHTML=(V.missions||[]).map(m=>`<div class="v645Row ${m.kind||'info'}"><b>${m.title}</b><span>${m.msg}</span></div>`).join('');
+    if(el('v645Gates'))el('v645Gates').innerHTML=(V.gates||[]).map(g=>`<div class="v645Row ${g.kind||'info'}"><b>${g.name} — ${g.value}</b><span>${g.why}</span></div>`).join('');
+    if(el('v645Targets')){
+      const rows=(V.topTerminals||[]).slice(0,10);
+      el('v645Targets').innerHTML='<table><tr><th>target</th><th>score</th><th>inbound</th><th>max balance</th><th>max leg</th><th>class</th></tr>'+rows.map((t,i)=>`<tr><td><b>${short(t.address)}</b><br><span class="mono">${t.address||'—'}</span></td><td>${t.score??'—'}</td><td>${fmt(t.inbound,2)}</td><td>${fmt(t.maxBalance,2)}</td><td>${fmt(t.maxLeg,2)}</td><td>${t.tier||t.class||''}${t.contract?' • contract':''}</td></tr>`).join('')+'</table>';
+    }
+  }
+  function v645Export() {
+    analyzeV645('export');
+    const obj={createdAt:new Date().toISOString(),version:V645_VERSION,baseVersion:'V64.4 Pioneer Cortex',cfg:safe(()=>state.cfg,null),block:safe(()=>state.block,null),snapshot:safe(()=>state.snapshot,null),scoreSplit:safe(()=>state.scoreSplit,null),convergence:safe(()=>state.convergence,null),v640:safe(()=>state.v640,null),v642:safe(()=>state.v642,null),v643:safe(()=>state.v643,null),v644:safe(()=>state.v644,null),v645:safe(()=>state.v645,null),attachedReportSeed:window.V645_REPORT_SEED,exportIntegrity:{version:V645_VERSION,topLevelV645:true,baseSyntaxPatched:true,dominanceLayer:true}};
+    const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=V645_EXPORT;a.click();URL.revokeObjectURL(a.href);
+    safe(()=>thought('good','V64.5 export complete',V645_EXPORT+' includes repaired base state, V64.4 if available, V64.5 dominion analysis, and attached report seed.'),null);
+  }
+  const oldRender=window.renderAll;
+  window.renderAll=function(){safe(()=>oldRender&&oldRender(),null);renderV645();};
+  const oldBoot=window.boot;
+  window.boot=function(){safe(()=>oldBoot&&oldBoot(),null);setTimeout(()=>{ensureV645UI();analyzeV645('boot');safe(()=>thought('good','V64.5 loaded','Dominion Intelligence is active: syntax repairs, delta-crusher proof board, report lens, stuck-lock rescue, and live hard-target micro-scan.'),null);},900);};
+  window.v645Analyze=analyzeV645;
+  window.v645LiveMicroScan=v645LiveMicroScan;
+  window.v645RescueLock=v645RescueLock;
+  window.v645Export=v645Export;
+  setTimeout(()=>{ensureV645UI();analyzeV645('auto-load');},850);
 })();
 </script>
 
