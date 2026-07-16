@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>pDAI Peg Cortex • V86 DAI Funnel Method-Attribution Cortex</title>
+<title>pDAI Peg Cortex • V87 Control-Plane Collision & Root-Key Verifier</title>
 <style>
 :root {
   --bg:#07090d; --panel:#0d1219cc; --panel2:#101722; --line:#233140; --muted:#8996a8;
@@ -260,8 +260,8 @@ summary { cursor:pointer; color:#dbe8f7; font-weight:750 }
   <section class="card" id="buildMapCard" style="margin-top:14px">
     <div class="row between">
       <div>
-        <h2>V83 Phase-change lab cortex — no hard peg gates</h2>
-        <div class="small">This mode maps the full behind-scenes peg plan: Morpho/oUSD, Alchemix/Transmuter, Teller/tDAI, Balancer→Compound→Teller route helpers, MCD_END/PSM settlement, cross-chain Merkle connectors, MCOPY compatibility locks, and 9E6F↔5996 actor linkage. It scores construction evidence, not final $1 certainty.</div>
+        <h2>V87 Control-Plane Collision & Root-Key Verifier — no hard peg gates</h2>
+        <div class="small">This mode reconstructs exact actors from claimed blocks, decodes transferAndCall and delegateBySig, verifies the EIP-2612 root-key claim cryptographically, and scans for a real Aave/oracle/proxy/PSM collision. Coordination scores construction; only stateful settlement closes ignition.</div>
       </div>
       <span class="badge good" id="v76ModeBadge">build-map mode</span>
     </div>
@@ -281,6 +281,27 @@ summary { cursor:pointer; color:#dbe8f7; font-weight:750 }
         <h3>Peg-plan state-change watch</h3>
         <div class="feed" id="v76Signals" style="max-height:420px"></div>
       </div>
+    </div>
+  </section>
+
+  <section class="card" id="v87ControlCard" style="margin-top:14px">
+    <div class="row between">
+      <div>
+        <h2>V87 control-plane collision lab</h2>
+        <div class="small">Exact-block reconstruction replaces partial labels such as <span class="mono">c000</span>, <span class="mono">0000</span>, <span class="mono">0x02Dc…3C3C</span>, and <span class="mono">0x0C45…66D9</span> with RPC-grounded addresses. Explorer method names are decoded and cross-examined before they are allowed to influence the peg map.</div>
+      </div>
+      <span class="badge warn" id="v87Phase">awaiting scan</span>
+    </div>
+    <div class="memoryGrid" style="margin-top:12px">
+      <div class="memoryCell"><div class="label">Collision score</div><div class="value" id="v87Score">—</div><div class="bar"><div class="fill" id="v87ScoreFill"></div></div></div>
+      <div class="memoryCell"><div class="label">Resolved actors</div><div class="value" id="v87Resolved">—</div><div class="small">partial labels → exact addresses</div></div>
+      <div class="memoryCell"><div class="label">Callback</div><div class="value" id="v87Callback">—</div><div class="small">transferAndCall receiver/data/receipt</div></div>
+      <div class="memoryCell"><div class="label">Root signer</div><div class="value" id="v87Root">—</div><div class="small">EIP-2612 digest + ecrecover</div></div>
+      <div class="memoryCell"><div class="label">Aave radial hits</div><div class="value" id="v87Aave">—</div><div class="small">tx and DAI coupling around callback block</div></div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div><h3>Claim cross-exam</h3><div class="feed" id="v87Claims" style="max-height:430px"></div></div>
+      <div><h3>Exact-block actor resolver</h3><div class="feed" id="v87ResolvedList" style="max-height:430px"></div></div>
     </div>
   </section>
 
@@ -255139,6 +255160,169 @@ exportState=function(){ const v86=computeV86DaiFunnel(state.report,state.live,st
   const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='pdai-v86-dai-funnel-method-attribution-cortex-export.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); };
 // ==== End V86 overlay ====
 
+// ==== V87 Control-Plane Collision & Root-Key Verifier Overlay ====
+const V87_VERSION='V87.0 Control-Plane Collision & Root-Key Verifier Cortex';
+const V87_DOCTRINE='no hard peg gates; reconstruct exact actors from claimed blocks, decode transferAndCall and delegateBySig rather than trusting explorer labels, cryptographically test the EIP-2612 root-key claim, and require Aave/oracle/proxy/PSM state collision before classifying ignition';
+const V87_PACKET={
+  source:'user-supplied July 2026 transaction corpus; narrative claims quarantined until RPC reconstruction',
+  actors:{
+    field1967:'0xfdbee32bcf68bb0ced033200373384a619c71967',
+    orchestrator5996:'0xb8698cffdfaaf26ca21fe8aa560c18cc2b2f5996',
+    claimedRoot48fc:'0x48fc8b22ae5319786a8e25ef49b1b49942000000',
+    controller54b5:'0x54b50187becd0bbcfd52ec5d538433dab044d2a8'
+  },
+  rails:{
+    pdai:'0x6b175474e89094c44da98b954eedeac495271d0f',
+    aaveADai:'0x028171bca77440897b824ca71d1c56cac55b68a3',
+    aaveV2Pool:'0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9',
+    aaveV2Provider:'0xb53c1a33016b2dc2ff3653530bff1848a515c8c5',
+    aaveV3Pool:'0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2',
+    aaveV3Acl:'0xc2aacf6553d20d1e9d78e365aaba8032af9c85b0',
+    beanstalk:'0xc1e088fc1323b20bcbee9bd1b9fc9546db5624c5',
+    sEuro:'0xb399511642fe1666c6a07f83483e6e4feaed9a00',
+    customRouter:'0xbdff8b3f3f7084bafc37364947a31ef351b82ce7',
+    da9a:'0xda9aba4eacf54e0273f56dffee6b8f1e20b23bba'
+  },
+  permitTx:'0x5b93742ab42c47408465f74cc258925496f4af3716b7fd928884e6e48da01855',
+  blocks:{
+    accumulatorFundsC000:26996358,
+    fieldPingsC000:26996452,
+    c000Burst:[26996453,26996454,26996455,26996457,26996458,26996459,26996460,26996461,26996462,26996463,26996465,26996466,26996467,26996468,26996469,26996470,26996471,26996472,26996473,26996475,26996477,26996478,26996479,26996480],
+    lockBurst:[26996667,26996668,26996671,26996673,26996674,26996683,26996699],
+    delegateBySig:27004963,
+    swapWave:[27005202,27005203,27005205,27005207,27005220,27005223,27005226,27005352],
+    transferAndCall:27005367
+  },
+  corpusMethodOccurrences:{
+    swapExactETHForTokensSupportingFeeOnTransferTokens:400,
+    '0x5d87675b':397,
+    buyAndFree22457070633:109,
+    multicall:105,
+    swapExactTokensForETHSupportingFeeOnTransferTokens:58,
+    '0x00000003':50,
+    randomizeAll:44,
+    '0x2bcd4a44':26,
+    '0x00000002':23,
+    '0x50cd3c11':17,
+    approve:10,
+    transferAndCall:1,
+    delegateBySig:1
+  },
+  quarantinedSelectors:{
+    '0xd76f529c':'claimed slot3 hard-state lock',
+    '0xb60c164c':'claimed dual recalibration broadcast',
+    '0xe70ccf6d':'claimed controller threshold override'
+  }
+};
+const V87_SELECTORS=Object.assign({},(typeof V86_SELECTORS!=='undefined'?V86_SELECTORS:{}),{
+  transferAndCall:'0x4000aea0', delegateBySig:'0xc3cda520', permit:'0xd505accf',
+  totalSupply:'0x18160ddd', balanceOf:'0x70a08231', nonces:'0x7ecebe00', domainSeparator:'0x3644e515',
+  approve:'0x095ea7b3', multicall:'0x5ae401dc', aggregate:'0x252dba42',
+  slot3Lock:'0xd76f529c', recalibration:'0xb60c164c', thresholdOverride:'0xe70ccf6d'
+});
+function v87Lc(x){return String(x||'').toLowerCase();}
+function v87Hex(x){return String(x||'').replace(/^0x/,'');}
+function v87Pad64(x){return v87Hex(x).padStart(64,'0').slice(-64);}
+function v87AddrWord(word){const h=v87Hex(word).padStart(64,'0');return '0x'+h.slice(-40).toLowerCase();}
+function v87UintWord(word){try{return BigInt('0x'+v87Hex(word)).toString();}catch(e){return '0';}}
+function v87Words(input){const h=v87Hex(input).slice(8);const a=[];for(let i=0;i<h.length;i+=64)a.push(h.slice(i,i+64).padEnd(64,'0'));return a;}
+function v87Selector(input){return ('0x'+v87Hex(input).slice(0,8)).toLowerCase();}
+function v87Short(x){x=String(x||'');return x.length>18?x.slice(0,10)+'…'+x.slice(-8):x;}
+function v87Num(x,d=0){const n=Number(x);return Number.isFinite(n)?n:d;}
+function v87HexBlock(n){return '0x'+Number(n).toString(16);}
+function v87IsZeroAddress(a){return !a||/^0x0{40}$/i.test(a);}
+function v87CodeSize(code){return Math.max(0,(v87Hex(code).length/2));}
+function v87DecodeString(hex){try{const h=v87Hex(hex);if(h.length===64){let bytes=[];for(let i=0;i<64;i+=2){const n=parseInt(h.slice(i,i+2),16);if(n)bytes.push(n);}return new TextDecoder().decode(new Uint8Array(bytes));}const off=parseInt(h.slice(0,64),16)*2;const len=parseInt(h.slice(off,off+64),16);const data=h.slice(off+64,off+64+len*2);const b=new Uint8Array(len);for(let i=0;i<len;i++)b[i]=parseInt(data.slice(i*2,i*2+2),16);return new TextDecoder().decode(b);}catch(e){return '';}}
+function v87DecodeTransferAndCall(tx){const out={ok:false,selector:v87Selector(tx?.input),token:v87Lc(tx?.to),receiver:null,amountRaw:'0',callbackData:'0x',callbackSelector:'0x'};if(out.selector!==V87_SELECTORS.transferAndCall)return out;const w=v87Words(tx.input);out.receiver=v87AddrWord(w[0]);out.amountRaw=v87UintWord(w[1]);try{const h=v87Hex(tx.input).slice(8);const off=Number(BigInt('0x'+w[2]))*2;const len=Number(BigInt('0x'+h.slice(off,off+64)));out.callbackData='0x'+h.slice(off+64,off+64+len*2);out.callbackSelector=v87Selector(out.callbackData);}catch(e){}out.ok=true;return out;}
+function v87DecodeDelegateBySig(tx){const out={ok:false,selector:v87Selector(tx?.input),target:v87Lc(tx?.to),delegatee:null,nonce:'0',expiry:'0',v:0,r:'0x',s:'0x'};if(out.selector!==V87_SELECTORS.delegateBySig)return out;const w=v87Words(tx.input);out.delegatee=v87AddrWord(w[0]);out.nonce=v87UintWord(w[1]);out.expiry=v87UintWord(w[2]);out.v=Number(BigInt('0x'+w[3]));out.r='0x'+w[4];out.s='0x'+w[5];out.ok=true;return out;}
+function v87DecodePermit(tx){const out={ok:false,selector:v87Selector(tx?.input),token:v87Lc(tx?.to),owner:null,spender:null,valueRaw:'0',deadline:'0',v:0,r:'0x',s:'0x'};if(out.selector!==V87_SELECTORS.permit)return out;const w=v87Words(tx.input);out.owner=v87AddrWord(w[0]);out.spender=v87AddrWord(w[1]);out.valueRaw=v87UintWord(w[2]);out.deadline=v87UintWord(w[3]);out.v=Number(BigInt('0x'+w[4]));out.r='0x'+w[5];out.s='0x'+w[6];out.ok=true;return out;}
+async function v87MapLimit(items,limit,fn){const out=new Array(items.length);let cursor=0;async function worker(){while(true){const i=cursor++;if(i>=items.length)return;try{out[i]=await fn(items[i],i);}catch(e){out[i]={error:e.message||String(e),item:items[i]};}}}await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));return out;}
+async function v87Block(n){return await rpc('eth_getBlockByNumber',[v87HexBlock(n),true],6500);}
+async function v87Receipt(hash){return await rpc('eth_getTransactionReceipt',[hash],5500);}
+async function v87Code(addr,block='latest'){return await rpc('eth_getCode',[addr,block],4500);}
+async function v87Call(to,data,block='latest',timeout=5000){return await rpc('eth_call',[{to:v87Lc(to),data},block],timeout);}
+function v87TxRow(tx,block){return {block,hash:tx?.hash||'',from:v87Lc(tx?.from),to:v87Lc(tx?.to),selector:v87Selector(tx?.input),value:tx?.value||'0x0',inputBytes:Math.max(0,v87Hex(tx?.input).length/2)};}
+async function v87ResolveExecutionSequence(deep=false){
+  const p=V87_PACKET,out={version:V87_VERSION,startedAt:new Date().toISOString(),resolved:{},criticalTxs:[],swapWave:[],c000Burst:[],lockBurst:[],errors:[]};
+  const critical=[p.blocks.accumulatorFundsC000,p.blocks.fieldPingsC000,p.blocks.delegateBySig,...p.blocks.swapWave,p.blocks.transferAndCall];
+  const cache=new Map();
+  const fetched=await v87MapLimit([...new Set(critical)],4,async n=>({n,b:await v87Block(n)}));for(const x of fetched){if(x?.b)cache.set(x.n,x.b);else if(x?.error)out.errors.push(`block ${x.item}: ${x.error}`);}
+  const txsAt=n=>(cache.get(n)?.transactions||[]);
+  const f1967=p.actors.field1967, f5996=p.actors.orchestrator5996;
+  const ping=(txsAt(p.blocks.fieldPingsC000)).find(t=>v87Lc(t.from)===f1967);if(ping){out.resolved.c000=v87Lc(ping.to);out.criticalTxs.push(v87TxRow(ping,p.blocks.fieldPingsC000));}
+  const funding=(txsAt(p.blocks.accumulatorFundsC000)).find(t=>out.resolved.c000&&v87Lc(t.to)===out.resolved.c000);if(funding){out.resolved.accumulator0000=v87Lc(funding.from);out.criticalTxs.push(v87TxRow(funding,p.blocks.accumulatorFundsC000));}
+  const del=(txsAt(p.blocks.delegateBySig)).find(t=>v87Lc(t.from)===f5996||v87Selector(t.input)===V87_SELECTORS.delegateBySig);if(del){out.resolved.lockEngine=v87Lc(del.to);out.delegateBySig=Object.assign(v87DecodeDelegateBySig(del),{tx:v87TxRow(del,p.blocks.delegateBySig),receipt:null});try{out.delegateBySig.receipt=await v87Receipt(del.hash);}catch(e){out.errors.push('delegate receipt: '+(e.message||e));}out.criticalTxs.push(v87TxRow(del,p.blocks.delegateBySig));}
+  for(const n of p.blocks.swapWave){for(const t of txsAt(n).filter(t=>v87Lc(t.from)===f1967)){const r=v87TxRow(t,n);out.swapWave.push(r);out.criticalTxs.push(r);}}
+  const tac=(txsAt(p.blocks.transferAndCall)).find(t=>v87Lc(t.from)===f1967||v87Selector(t.input)===V87_SELECTORS.transferAndCall);if(tac){out.transferAndCall=Object.assign(v87DecodeTransferAndCall(tac),{tx:v87TxRow(tac,p.blocks.transferAndCall),receipt:null,receiverCodeSize:0,transferLogs:0});try{out.transferAndCall.receipt=await v87Receipt(tac.hash);out.transferAndCall.transferLogs=(out.transferAndCall.receipt?.logs||[]).filter(l=>v87Lc(l.topics?.[0])===v87Lc(TRANSFER_TOPIC)).length;}catch(e){out.errors.push('transferAndCall receipt: '+(e.message||e));}try{out.transferAndCall.receiverCodeSize=v87CodeSize(await v87Code(out.transferAndCall.receiver));}catch(e){out.errors.push('receiver code: '+(e.message||e));}out.resolved.transferReceiver=out.transferAndCall.receiver;out.resolved.transferToken=out.transferAndCall.token;out.criticalTxs.push(v87TxRow(tac,p.blocks.transferAndCall));}
+  const burstBlocks=deep?p.blocks.c000Burst:[26996453,26996463,26996472,26996479,26996480];if(out.resolved.c000){const bb=await v87MapLimit(burstBlocks,4,async n=>({n,b:await v87Block(n)}));for(const x of bb){if(!x?.b){if(x?.error)out.errors.push(`c000 ${x.item}: ${x.error}`);continue;}for(const t of (x.b.transactions||[]).filter(t=>v87Lc(t.from)===out.resolved.c000))out.c000Burst.push(v87TxRow(t,x.n));}}
+  const lockBlocks=deep?p.blocks.lockBurst:[26996667,26996683,26996699];if(out.resolved.accumulator0000){const lb=await v87MapLimit(lockBlocks,4,async n=>({n,b:await v87Block(n)}));for(const x of lb){if(!x?.b){if(x?.error)out.errors.push(`lock ${x.item}: ${x.error}`);continue;}for(const t of (x.b.transactions||[]).filter(t=>v87Lc(t.from)===out.resolved.accumulator0000))out.lockBurst.push(v87TxRow(t,x.n));}}
+  out.completedAt=new Date().toISOString();return out;
+}
+
+const V87_MASK64=(1n<<64n)-1n;
+const V87_RC=[0x0000000000000001n,0x0000000000008082n,0x800000000000808an,0x8000000080008000n,0x000000000000808bn,0x0000000080000001n,0x8000000080008081n,0x8000000000008009n,0x000000000000008an,0x0000000000000088n,0x0000000080008009n,0x000000008000000an,0x000000008000808bn,0x800000000000008bn,0x8000000000008089n,0x8000000000008003n,0x8000000000008002n,0x8000000000000080n,0x000000000000800an,0x800000008000000an,0x8000000080008081n,0x8000000000008080n,0x0000000080000001n,0x8000000080008008n];
+const V87_RHO=[0,1,62,28,27,36,44,6,55,20,3,10,43,25,39,41,45,15,21,8,18,2,61,56,14];
+function v87Rotl64(x,n){n=BigInt(n);return n===0n?x:(((x<<n)|(x>>(64n-n)))&V87_MASK64);}
+function v87KeccakF(s){for(const rc of V87_RC){const c=new Array(5),d=new Array(5),b=new Array(25);for(let x=0;x<5;x++)c[x]=s[x]^s[x+5]^s[x+10]^s[x+15]^s[x+20];for(let x=0;x<5;x++)d[x]=c[(x+4)%5]^v87Rotl64(c[(x+1)%5],1);for(let x=0;x<5;x++)for(let y=0;y<5;y++)s[x+5*y]=(s[x+5*y]^d[x])&V87_MASK64;for(let x=0;x<5;x++)for(let y=0;y<5;y++){const nx=y,ny=(2*x+3*y)%5;b[nx+5*ny]=v87Rotl64(s[x+5*y],V87_RHO[x+5*y]);}for(let x=0;x<5;x++)for(let y=0;y<5;y++)s[x+5*y]=(b[x+5*y]^((~b[(x+1)%5+5*y])&b[(x+2)%5+5*y]))&V87_MASK64;s[0]=(s[0]^rc)&V87_MASK64;}}
+function v87HexToBytes(hex){hex=v87Hex(hex);if(hex.length%2)hex='0'+hex;const out=new Uint8Array(hex.length/2);for(let i=0;i<out.length;i++)out[i]=parseInt(hex.slice(i*2,i*2+2),16)||0;return out;}
+function v87BytesToHex(bytes){return [...bytes].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function v87ConcatBytes(...xs){const n=xs.reduce((a,x)=>a+x.length,0),o=new Uint8Array(n);let p=0;for(const x of xs){o.set(x,p);p+=x.length;}return o;}
+function v87Keccak256Bytes(input){const rate=136,bytes=input instanceof Uint8Array?input:new Uint8Array(input),paddedLen=Math.ceil((bytes.length+1)/rate)*rate,p=new Uint8Array(paddedLen);p.set(bytes);p[bytes.length]^=0x01;p[paddedLen-1]^=0x80;const st=new Array(25).fill(0n);for(let off=0;off<p.length;off+=rate){for(let i=0;i<rate/8;i++){let lane=0n;for(let j=0;j<8;j++)lane|=BigInt(p[off+i*8+j])<<(8n*BigInt(j));st[i]^=lane;}v87KeccakF(st);}const out=new Uint8Array(32);for(let i=0;i<32;i++)out[i]=Number((st[Math.floor(i/8)]>>(8n*BigInt(i%8)))&255n);return out;}
+function v87KeccakText(s){return v87Keccak256Bytes(new TextEncoder().encode(s));}
+function v87WordBytes(hex){return v87HexToBytes(v87Pad64(hex));}
+async function v87PermitRootProbe(){
+  const out={txHash:V87_PACKET.permitTx,found:false,decoded:null,domainSeparator:null,nonceBefore:null,digest:null,recovered:null,ownerMatches:false,rootMatches:false,receipt:null,errors:[]};
+  try{const tx=await rpc('eth_getTransactionByHash',[out.txHash],5500);if(!tx){out.errors.push('tx not found');return out;}out.found=true;out.tx={hash:tx.hash,block:tx.blockNumber?parseInt(tx.blockNumber,16):null,from:v87Lc(tx.from),to:v87Lc(tx.to),selector:v87Selector(tx.input)};out.decoded=v87DecodePermit(tx);out.receipt=await v87Receipt(tx.hash).catch(e=>{out.errors.push('receipt: '+(e.message||e));return null;});if(!out.decoded.ok){out.errors.push('input is not standard EIP-2612 permit');return out;}
+    const blockBefore=out.tx.block? v87HexBlock(Math.max(0,out.tx.block-1)):'latest';
+    const ownerWord=v87Pad64(out.decoded.owner),nonceData=V87_SELECTORS.nonces+ownerWord;
+    out.domainSeparator=await v87Call(out.decoded.token,V87_SELECTORS.domainSeparator,blockBefore,5500).catch(e=>{out.errors.push('domain: '+(e.message||e));return null;});
+    const nonceHex=await v87Call(out.decoded.token,nonceData,blockBefore,5500).catch(e=>{out.errors.push('nonce: '+(e.message||e));return null;});if(nonceHex)out.nonceBefore=v87UintWord(nonceHex);
+    if(!out.domainSeparator||out.nonceBefore===null)return out;
+    const typeHash=v87KeccakText('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)');
+    const encoded=v87ConcatBytes(typeHash,v87WordBytes(out.decoded.owner),v87WordBytes(out.decoded.spender),v87WordBytes(BigInt(out.decoded.valueRaw).toString(16)),v87WordBytes(BigInt(out.nonceBefore).toString(16)),v87WordBytes(BigInt(out.decoded.deadline).toString(16)));
+    const structHash=v87Keccak256Bytes(encoded),digest=v87Keccak256Bytes(v87ConcatBytes(new Uint8Array([0x19,0x01]),v87HexToBytes(out.domainSeparator),structHash));out.digest='0x'+v87BytesToHex(digest);
+    const ecData='0x'+v87BytesToHex(digest)+v87Pad64(BigInt(out.decoded.v).toString(16))+v87Pad64(out.decoded.r)+v87Pad64(out.decoded.s);
+    const rec=await rpc('eth_call',[{to:'0x0000000000000000000000000000000000000001',data:ecData},'latest'],5000).catch(e=>{out.errors.push('ecrecover: '+(e.message||e));return null;});if(rec){out.recovered=v87AddrWord(rec);out.ownerMatches=out.recovered===v87Lc(out.decoded.owner);out.rootMatches=out.recovered===V87_PACKET.actors.claimedRoot48fc;}
+  }catch(e){out.errors.push(e.message||String(e));}return out;
+}
+async function v87AaveCollisionProbe(sequence,deep=false){
+  const anchor=V87_PACKET.blocks.transferAndCall,radius=deep?50:8,from=anchor-radius,to=anchor+radius,rails=Object.entries(V87_PACKET.rails).filter(([k])=>k.startsWith('aave')).map(([k,a])=>({key:k,addr:v87Lc(a)}));
+  const out={anchor,radius,from,to,txHits:[],daiTouches:[],aDaiSnapshot:{},errors:[]};
+  const blocks=[];for(let n=from;n<=to;n++)blocks.push(n);const rows=await v87MapLimit(blocks,5,async n=>({n,b:await v87Block(n)}));for(const x of rows){if(!x?.b){if(x?.error&&out.errors.length<15)out.errors.push(`block ${x.item}: ${x.error}`);continue;}for(const tx of x.b.transactions||[]){const f=v87Lc(tx.from),t=v87Lc(tx.to),hit=rails.find(r=>r.addr===f||r.addr===t);if(hit)out.txHits.push(Object.assign(v87TxRow(tx,x.n),{rail:hit.key}));}}
+  try{const logs=await getLogsChunked({address:V87_PACKET.rails.pdai,fromBlock:from,toBlock:to,topics:[TRANSFER_TOPIC]},180);const watch=new Set(rails.map(x=>x.addr));watch.add(V87_PACKET.actors.field1967);watch.add(V87_PACKET.actors.claimedRoot48fc);if(sequence?.resolved?.transferReceiver)watch.add(sequence.resolved.transferReceiver);for(const l of logs||[]){const f=topicAddr(l.topics?.[1]),t=topicAddr(l.topics?.[2]);if(watch.has(f)||watch.has(t))out.daiTouches.push({block:parseInt(l.blockNumber,16),tx:l.transactionHash,from:f,to:t,amount:v86Dec18(l.data)});}}catch(e){out.errors.push('DAI logs: '+(e.message||e));}
+  const a=V87_PACKET.rails.aaveADai,before=v87HexBlock(anchor-1),after=v87HexBlock(anchor+1);const balData=x=>V87_SELECTORS.balanceOf+v87Pad64(x);
+  const calls=[['totalSupplyBefore',V87_SELECTORS.totalSupply,before],['totalSupplyAfter',V87_SELECTORS.totalSupply,after],['balance1967',balData(V87_PACKET.actors.field1967),'latest'],['balanceRoot',balData(V87_PACKET.actors.claimedRoot48fc),'latest'],['nonce1967',V87_SELECTORS.nonces+v87Pad64(V87_PACKET.actors.field1967),'latest'],['nonceRoot',V87_SELECTORS.nonces+v87Pad64(V87_PACKET.actors.claimedRoot48fc),'latest']];
+  for(const [k,d,b] of calls){try{const r=await v87Call(a,d,b,5000);out.aDaiSnapshot[k]={raw:r,decimal:v87UintWord(r)};}catch(e){out.aDaiSnapshot[k]={error:e.message||String(e)};}}
+  try{const b0=BigInt(out.aDaiSnapshot.totalSupplyBefore?.raw||'0x0'),b1=BigInt(out.aDaiSnapshot.totalSupplyAfter?.raw||'0x0');out.aDaiSnapshot.totalSupplyDelta=(b1-b0).toString();}catch(e){}
+  return out;
+}
+function v87MethodAtlas(live=state.live){const liveCounts=live?.v86DaiFunnelProbe?.txStats?.methodCounts||{};const seed=V87_PACKET.corpusMethodOccurrences;const overlaps=[];for(const [k,v] of Object.entries(seed)){const lv=v87Num(liveCounts[k]);if(lv>0)overlaps.push({method:k,corpusOccurrences:v,liveCount:lv});}return {corpus:seed,live:liveCounts,overlaps:overlaps.sort((a,b)=>b.liveCount-a.liveCount),note:'corpus counts are occurrences in the user-supplied pasted text and may include repeated narrative/table rows; live counts are authoritative for the current scan'};}
+function computeV87ControlCollision(report=state.report,live=state.live,memory=state.memory){
+  const seq=live?.v87ExecutionSequence||{},permit=live?.v87PermitRoot||{},aave=live?.v87AaveCollision||{},atlas=v87MethodAtlas(live);let score=0;
+  const resolvedCount=Object.keys(seq.resolved||{}).length;score+=Math.min(20,resolvedCount*4);if(seq.transferAndCall?.ok)score+=12;if(seq.transferAndCall?.receipt?.status==='0x1')score+=5;if(seq.transferAndCall?.receiverCodeSize>0)score+=3;if(seq.delegateBySig?.ok)score+=10;if(seq.delegateBySig?.receipt?.status==='0x1')score+=4;if(permit.found&&permit.decoded?.ok)score+=5;if(permit.ownerMatches)score+=8;if(permit.rootMatches)score+=12;if((aave.txHits||[]).length)score+=8;if((aave.daiTouches||[]).length)score+=7;if(String(aave.aDaiSnapshot?.totalSupplyDelta||'0')!=='0')score+=4;score+=Math.min(8,(atlas.overlaps||[]).length*2);score=Math.min(100,score);
+  const collision=(aave.txHits||[]).length+(aave.daiTouches||[]).length;let phase='claim corpus awaiting exact-block reconstruction';if(resolvedCount>=3)phase='operational sequence resolved';if(permit.rootMatches||seq.delegateBySig?.ok)phase='control-linkage verification active';if(seq.transferAndCall?.ok&&collision>0)phase='callback/Aave collision candidate';
+  const claims=[
+    {claim:'1967 transferAndCall was an ignition trigger',status:seq.transferAndCall?.ok?'decoded-operational':'unresolved',closure:'successful receipt + receiver code + callback data + pDAI/Aave/oracle/proxy state change'},
+    {claim:'5996 handed over the gavel',status:seq.delegateBySig?.ok?'vote-delegation call decoded':'unresolved',closure:'recover actual signer/delegatee and prove target is governance power; delegation is not admin transfer'},
+    {claim:'48Fc is the root signer for 1967',status:permit.rootMatches?'cryptographically reproduced':permit.decoded?.ok?'permit decoded; recovery not matched':'unresolved',closure:'EIP-2612 digest + ecrecover must match 48Fc/permit owner'},
+    {claim:'c000/0000 are accumulation and locking actors',status:seq.resolved?.c000&&seq.resolved?.accumulator0000?'exact addresses reconstructed':'partial labels only',closure:'decode every target and asset in burst; do not infer peg purpose from approve/multicall alone'},
+    {claim:'Aave interest/capital collision occurred',status:collision?`candidate hits=${collision}`:'not observed in radial window',closure:'Aave tx/log/index/supply delta coupled to transferAndCall and pDAI settlement output'}
+  ];
+  const strictIgnition=Boolean(seq.transferAndCall?.receipt?.status==='0x1'&&collision>0&&(permit.rootMatches||seq.delegateBySig?.ok)&&((live?.nonzeroSlots||0)>0||(live?.v81KillChainProbe?.proxyDeltas||[]).length));
+  return {version:V87_VERSION,doctrine:V87_DOCTRINE,noHardGates:true,score,phase,strictIgnition,sequenceSummary:{resolved:seq.resolved||{},criticalTxs:(seq.criticalTxs||[]).length,swapWave:(seq.swapWave||[]).length,c000Burst:(seq.c000Burst||[]).length,lockBurst:(seq.lockBurst||[]).length,transferAndCall:seq.transferAndCall||null,delegateBySig:seq.delegateBySig||null},permitSummary:{found:permit.found||false,owner:permit.decoded?.owner||null,spender:permit.decoded?.spender||null,recovered:permit.recovered||null,ownerMatches:permit.ownerMatches||false,rootMatches:permit.rootMatches||false,errors:permit.errors||[]},aaveSummary:{radius:aave.radius||0,txHits:(aave.txHits||[]).length,daiTouches:(aave.daiTouches||[]).length,totalSupplyDelta:aave.aDaiSnapshot?.totalSupplyDelta||null},methodAtlas:atlas,claimLedger:claims,verdict:strictIgnition?'multi-rail phase-change candidate captured; still require decoded pUSDC/PSM/pDAI settlement and durable oracle/proxy state':'operational coordination may be real, but transferAndCall, delegation, permits, swaps and locking are not themselves proof of a pDAI peg mechanism'};
+}
+function renderV87Panel(){const m=computeV87ControlCollision(state.report,state.live,state.memory),set=(id,v)=>{const e=$(id);if(e)e.textContent=v;};set('v87Score',m.score+'/100');const f=$('v87ScoreFill');if(f)f.style.width=m.score+'%';set('v87Phase',m.phase);set('v87Resolved',Object.keys(m.sequenceSummary.resolved||{}).length);set('v87Callback',m.sequenceSummary.transferAndCall?.ok?(m.sequenceSummary.transferAndCall.receipt?.status==='0x1'?'decoded ✓':'decoded'):'unresolved');set('v87Root',m.permitSummary.rootMatches?'48Fc verified':m.permitSummary.recovered?v87Short(m.permitSummary.recovered):'pending');set('v87Aave',`${m.aaveSummary.txHits} tx / ${m.aaveSummary.daiTouches} DAI`);const cl=$('v87Claims');if(cl)cl.innerHTML=m.claimLedger.map(x=>`<div class="item ${String(x.status).includes('verified')||String(x.status).includes('decoded-operational')?'good':'warn'}"><div class="k">${esc(x.status)}</div><div class="v"><b>${esc(x.claim)}</b><br><span class="small">Closure: ${esc(x.closure)}</span></div></div>`).join('');const rs=$('v87ResolvedList');if(rs){const rows=Object.entries(m.sequenceSummary.resolved||{});rs.innerHTML=(rows.length?rows:[['pending','Exact-block resolver has not run yet']]).map(([k,v])=>`<div class="item"><div class="k">${esc(k)}</div><div class="v addr">${esc(v)}</div></div>`).join('');}}
+const V87_ORIG_scoreReport=scoreReport;
+scoreReport=function(report,live=null){const s=V87_ORIG_scoreReport(report,live);const m=computeV87ControlCollision(report,live||state.live,state.memory);s.v87ControlCollision=m;s.moduleMode='V87 control-plane collision / root-key verifier / no hard gates';s.noHardGates=true;s.build=Math.max(v83N(s.build),m.score);s.dot=Math.max(v83N(s.dot),m.score);s.setupPressure=Math.max(v83N(s.setupPressure),m.score);s.evidence=Array.isArray(s.evidence)?s.evidence:[];s.evidence.push({pts:16,proof:0,debt:0,dot:10,kind:'good',title:'V87 exact-block execution reconstruction',msg:`phase=${m.phase}; score=${m.score}/100; resolved actors=${Object.keys(m.sequenceSummary.resolved||{}).length}; transferAndCall=${m.sequenceSummary.transferAndCall?.ok?'decoded':'pending'}; delegation=${m.sequenceSummary.delegateBySig?.ok?'decoded':'pending'}.`});s.evidence.push({pts:m.permitSummary.rootMatches?12:0,proof:m.permitSummary.rootMatches?6:0,debt:m.permitSummary.rootMatches?0:3,dot:8,kind:m.permitSummary.rootMatches?'good':'warn',title:'V87 EIP-2612 root-key verifier',msg:m.permitSummary.rootMatches?`Permit digest recovered ${m.permitSummary.recovered}; matches claimed 48Fc root.`:'Permit/root claim remains unclosed until local digest reconstruction and ecrecover match.'});s.evidence.push({pts:0,proof:0,debt:4,dot:9,kind:'warn',title:'V87 coordination-vs-ignition firewall',msg:m.verdict});return s;};
+const V87_ORIG_runLiveScan=runLiveScan;
+runLiveScan=async function(){await V87_ORIG_runLiveScan();try{const deep=Boolean($('deepToggle')?.checked);const seq=await v87ResolveExecutionSequence(deep);state.live=state.live||{};state.live.v87ExecutionSequence=seq;const permit=await v87PermitRootProbe();state.live.v87PermitRoot=permit;const aave=await v87AaveCollisionProbe(seq,deep);state.live.v87AaveCollision=aave;state.scores=scoreReport(state.report,state.live);await rememberCurrentRun('v87 control-plane collision scan').catch(()=>{});addFeed('good','V87 control-plane collision scan complete',`resolved=${Object.keys(seq.resolved||{}).length}; transferAndCall=${seq.transferAndCall?.ok?'decoded':'pending'}; root=${permit.rootMatches?'48Fc verified':'pending'}; Aave radial hits=${(aave.txHits||[]).length+(aave.daiTouches||[]).length}.`);renderAll();}catch(e){addFeed('warn','V87 collision scan skipped',e.message||String(e));}};
+const V87_ORIG_renderAll=renderAll;
+renderAll=function(){V87_ORIG_renderAll();try{renderV87Panel();}catch(e){}};
+const V87_ORIG_renderSummary=renderSummary;
+renderSummary=function(){V87_ORIG_renderSummary();try{const current=JSON.parse($('summaryBox').textContent||'{}');current.v87ControlCollision=computeV87ControlCollision(state.report,state.live,state.memory);current.v87Packet=V87_PACKET;$('summaryBox').textContent=JSON.stringify(current,null,2);}catch(e){}};
+exportState=function(){const v87=computeV87ControlCollision(state.report,state.live,state.memory);const pack={createdAt:new Date().toISOString(),module:V87_VERSION,seedVersion:state.report.version,mode:'control-plane collision and root-key verification; no hard peg gates; reconstructs exact actors, decodes transferAndCall/delegateBySig, verifies EIP-2612 signer claims, and scans Aave radial collision',scores:state.scores,v87ControlCollision:v87,v86DaiFunnelMap:computeV86DaiFunnel(state.report,state.live,state.memory),v85CloneLab:computeV85CloneLab(state.report,state.live,state.memory),v84ClearanceMap:computeV84ClearanceMap(state.report,state.live,state.memory),v83PhaseLab:computeV83PhaseLab(state.report,state.live,state.memory),v82Godmode:computeV82Godmode(state.report,state.live,state.memory),v81KillChain:computeV81KillChain(state.report,state.live,state.memory),v80ConvergenceMap:computeV80ConvergenceMap(state.report,state.live,state.memory),v79TriggerMap:computeV79TriggerMap(state.report,state.live,state.memory),v78PegMap:computeV78PegMap(state.report,state.live),v77StateMap:computeV77StateMap(state.report,state.live),v76BuildMap:computeV76BuildMap(state.report,state.live),v87Packet:V87_PACKET,v87ExecutionSequence:state.live?.v87ExecutionSequence||null,v87PermitRoot:state.live?.v87PermitRoot||null,v87AaveCollision:state.live?.v87AaveCollision||null,v86Probe:state.live?.v86DaiFunnelProbe||null,selectors:V87_SELECTORS,live:state.live,audit:state.audit,hypotheses:state.hypotheses,targets:state.targets,cues:state.cues,flowIntel:state.flowIntel,graph:state.graph,memory:compactClone(state.memory||freshMemory())};const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pdai-v87-control-plane-collision-root-key-cortex-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+// ==== End V87 overlay ====
+
 
 async function init() {
   state.targets = buildTargets(state.report);
@@ -255150,7 +255334,7 @@ async function init() {
   recomputeTargetScores();
   const events = (state.report.v644?.events || state.report.evidence || []).slice(0,16);
   events.forEach(ev => addFeed(ev.kind||'warn', ev.title||ev.claim||'Seed event', ev.msg||ev.impact||ev.why||'Imported seed evidence.'));
-  addFeed('good','V86 DAI funnel method-attribution cortex online','Persistent memory, route survival, red-X circuit mapping, Aave/9E6F governance probes, clone-volley tracking, bot-clearance intelligence, and the new DAI/buyAndFree/76A1 funnel lab now feed one exportable state-change model.');
+  addFeed('good','V87 control-plane collision cortex online','Persistent memory, DAI funnel attribution, exact-block actor resolution, transferAndCall/delegateBySig decoding, EIP-2612 root-key verification, and Aave radial collision scanning now feed one truth-calibrated state-change model.');
   $('runBtn').onclick = runLiveScan;
   $('autoBtn').onclick = toggleAuto;
   $('exportBtn').onclick = exportState;
@@ -255164,7 +255348,7 @@ async function init() {
   await loadMemory();
   if (LATEST_EXPORT_SEED && LATEST_EXPORT_SEED.live) {
     hydrateCortexExport(LATEST_EXPORT_SEED, 'embedded V85 field report');
-    addFeed('good','Embedded field report hydrated','Latest V85 field export plus the V86 DAI funnel packet are embedded; V86 starts from the current 81% target-dominant flow, 126B route corpus, clone-volley lab, and fresh 76A1 buyAndFree/megaflow snapshot.');
+    addFeed('good','Embedded field report hydrated','The V86 DAI-funnel baseline remains embedded. V87 adds the July execution corpus as a falsifiable block/tx test plan rather than accepting partial explorer labels or ignition narratives at face value.');
   }
   await rememberCurrentRun('boot seed').catch(()=>{});
   renderAll();
