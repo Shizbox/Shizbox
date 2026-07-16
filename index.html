@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>pDAI Peg Cortex • V87 Control-Plane Collision & Root-Key Verifier</title>
+<title>pDAI Peg Cortex • V88 Metric-Provenance & BridgeX Nexus Verifier</title>
 <style>
 :root {
   --bg:#07090d; --panel:#0d1219cc; --panel2:#101722; --line:#233140; --muted:#8996a8;
@@ -260,8 +260,8 @@ summary { cursor:pointer; color:#dbe8f7; font-weight:750 }
   <section class="card" id="buildMapCard" style="margin-top:14px">
     <div class="row between">
       <div>
-        <h2>V87 Control-Plane Collision & Root-Key Verifier — no hard peg gates</h2>
-        <div class="small">This mode reconstructs exact actors from claimed blocks, decodes transferAndCall and delegateBySig, verifies the EIP-2612 root-key claim cryptographically, and scans for a real Aave/oracle/proxy/PSM collision. Coordination scores construction; only stateful settlement closes ignition.</div>
+        <h2>V88 Metric-Provenance & BridgeX Nexus Verifier — no hard peg gates</h2>
+        <div class="small">This mode keeps the V87 control-plane verifier, then adds exact target-ratio formula attribution, counter-inflation auditing, 1967 router-call decoding, and an RPC-grounded pDAI↔BridgeX nexus trace. Market activity scores construction; only durable state and settlement transitions close ignition.</div>
       </div>
       <span class="badge good" id="v76ModeBadge">build-map mode</span>
     </div>
@@ -302,6 +302,28 @@ summary { cursor:pointer; color:#dbe8f7; font-weight:750 }
     <div class="grid" style="margin-top:12px">
       <div><h3>Claim cross-exam</h3><div class="feed" id="v87Claims" style="max-height:430px"></div></div>
       <div><h3>Exact-block actor resolver</h3><div class="feed" id="v87ResolvedList" style="max-height:430px"></div></div>
+    </div>
+  </section>
+
+
+  <section class="card" id="v88MetricNexusCard" style="margin-top:14px">
+    <div class="row between">
+      <div>
+        <h2>V88 metric-provenance & BridgeX nexus lab</h2>
+        <div class="small">This layer distinguishes raw on-chain facts from derived window metrics and narrative claims. It proves exactly why <span class="mono">targetRatio</span> moved, audits route-memory counter amplification, decodes the exact 1967 router transaction, and searches the reported <span class="mono">0x4CC2…1034</span> nexus blocks for same-transaction pDAI/BXUSD coupling.</div>
+      </div>
+      <span class="badge warn" id="v88Phase">awaiting scan</span>
+    </div>
+    <div class="memoryGrid" style="margin-top:12px">
+      <div class="memoryCell"><div class="label">Attribution score</div><div class="value" id="v88Score">—</div><div class="bar"><div class="fill" id="v88ScoreFill"></div></div></div>
+      <div class="memoryCell"><div class="label">Target ratio</div><div class="value" id="v88Ratio">—</div><div class="small">targetTouches ÷ transferCount</div></div>
+      <div class="memoryCell"><div class="label">Formula error</div><div class="value" id="v88FormulaError">—</div><div class="small">reported ratio vs exact quotient</div></div>
+      <div class="memoryCell"><div class="label">Nexus coupling</div><div class="value" id="v88Coupling">—</div><div class="small">pDAI + BXUSD in one atomic tx</div></div>
+      <div class="memoryCell"><div class="label">Counter amplification</div><div class="value" id="v88Inflation">—</div><div class="small">route runHits ÷ unique observed blocks</div></div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div><h3>Metric formula & delta decomposition</h3><div class="feed" id="v88MetricRows" style="max-height:470px"></div></div>
+      <div><h3>Router / BridgeX claim cross-exam</h3><div class="feed" id="v88NexusClaims" style="max-height:470px"></div></div>
     </div>
   </section>
 
@@ -255323,6 +255345,96 @@ renderSummary=function(){V87_ORIG_renderSummary();try{const current=JSON.parse($
 exportState=function(){const v87=computeV87ControlCollision(state.report,state.live,state.memory);const pack={createdAt:new Date().toISOString(),module:V87_VERSION,seedVersion:state.report.version,mode:'control-plane collision and root-key verification; no hard peg gates; reconstructs exact actors, decodes transferAndCall/delegateBySig, verifies EIP-2612 signer claims, and scans Aave radial collision',scores:state.scores,v87ControlCollision:v87,v86DaiFunnelMap:computeV86DaiFunnel(state.report,state.live,state.memory),v85CloneLab:computeV85CloneLab(state.report,state.live,state.memory),v84ClearanceMap:computeV84ClearanceMap(state.report,state.live,state.memory),v83PhaseLab:computeV83PhaseLab(state.report,state.live,state.memory),v82Godmode:computeV82Godmode(state.report,state.live,state.memory),v81KillChain:computeV81KillChain(state.report,state.live,state.memory),v80ConvergenceMap:computeV80ConvergenceMap(state.report,state.live,state.memory),v79TriggerMap:computeV79TriggerMap(state.report,state.live,state.memory),v78PegMap:computeV78PegMap(state.report,state.live),v77StateMap:computeV77StateMap(state.report,state.live),v76BuildMap:computeV76BuildMap(state.report,state.live),v87Packet:V87_PACKET,v87ExecutionSequence:state.live?.v87ExecutionSequence||null,v87PermitRoot:state.live?.v87PermitRoot||null,v87AaveCollision:state.live?.v87AaveCollision||null,v86Probe:state.live?.v86DaiFunnelProbe||null,selectors:V87_SELECTORS,live:state.live,audit:state.audit,hypotheses:state.hypotheses,targets:state.targets,cues:state.cues,flowIntel:state.flowIntel,graph:state.graph,memory:compactClone(state.memory||freshMemory())};const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pdai-v87-control-plane-collision-root-key-cortex-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 // ==== End V87 overlay ====
 
+// ==== V88 metric-provenance & BridgeX nexus overlay ====
+const V88_VERSION='V88.0 Metric-Provenance & BridgeX Nexus Verifier Cortex';
+const V88_DOCTRINE='no hard peg gates; classify every value as raw on-chain, derived formula, heuristic, or claim; prove pDAI/BXUSD coupling from transaction logs before promoting a router narrative; never treat cumulative memory counters as independent checkpoints';
+const V88_PACKET={
+  swapTx:'0x5958d415a428d2526dc7b3b3119067e9622f75266dac51c6f52f8601a91e2681',
+  swapBlock:27037554,
+  field1967:'0xfdbee32bcf68bb0ced033200373384a619c71967',
+  claimedRouter:'0xc1e088fc1323b20bcbee9bd1b9fc9546db5624c5',
+  swapSelector:'0xb442b398',
+  nexus:'0x4cc224e7179aa7b786400a2fdbc0019e9ea91034',
+  nexusBlocks:[27030059,27030238,27030768,27031045,27036822,27043374],
+  primaryNexusBlock:27043374,
+  pdai:'0x6b175474e89094c44da98b954eedeac495271d0f',
+  claims:[
+    '0xb442b398 is a PulseX fee-on-transfer swap',
+    'the 35,828-gas transaction is necessarily single-hop',
+    '0x4CC2…1034 atomically couples pDAI and BridgeX USD through Liberty V3',
+    'targetRatio drift is directly caused by arbitrage price action',
+    'route runHits are independent checkpoint observations'
+  ]
+};
+function v88N(v,d=0){const n=Number(v);return Number.isFinite(n)?n:d;}
+function v88HexNo0x(v){return String(v||'').toLowerCase().replace(/^0x/,'');}
+function v88Word(data,i){const h=v88HexNo0x(data).slice(8);return h.slice(i*64,(i+1)*64).padEnd(64,'0');}
+function v88WordAddr(w){return '0x'+String(w||'').slice(-40).toLowerCase();}
+function v88TopicAddr(t){const h=v88HexNo0x(t);return h.length>=40?'0x'+h.slice(-40):null;}
+function v88Big(word){try{return BigInt('0x'+(String(word||'0').replace(/^0x/, '')||'0'));}catch{return 0n;}}
+function v88Abs(n){return Math.abs(v88N(n));}
+function v88FmtUnits(raw,dec=18,places=6){try{let n=typeof raw==='bigint'?raw:BigInt(String(raw||'0'));let neg=n<0n;if(neg)n=-n;const d=10n**BigInt(Math.max(0,Number(dec)||0));const whole=n/d,frac=(n%d).toString().padStart(Number(dec)||0,'0').slice(0,places).replace(/0+$/,'');return (neg?'-':'')+whole.toString()+(frac?'.'+frac:'');}catch{return String(raw||'0');}}
+function v88DecodeString(raw){const h=v88HexNo0x(raw);if(!h)return null;try{let start=0;if(h.length>=128){const off=Number(BigInt('0x'+h.slice(0,64)));if(Number.isFinite(off)&&off*2+64<=h.length)start=off*2;}const len=Number(BigInt('0x'+h.slice(start,start+64)));if(Number.isFinite(len)&&len>=0&&start+64+len*2<=h.length){const bytes=h.slice(start+64,start+64+len*2).match(/../g)||[];return new TextDecoder().decode(new Uint8Array(bytes.map(x=>parseInt(x,16)))).replace(/\0/g,'').trim()||null;}const bytes=(h.slice(0,64).match(/../g)||[]).map(x=>parseInt(x,16));return new TextDecoder().decode(new Uint8Array(bytes)).replace(/\0/g,'').trim()||null;}catch{return null;}}
+async function v88TokenMeta(token,block='latest'){
+  const out={address:v87Lc(token),symbol:null,name:null,decimals:18,totalSupplyRaw:null,errors:[]};
+  const calls=[['symbol','0x95d89b41'],['name','0x06fdde03'],['decimals','0x313ce567'],['totalSupplyRaw','0x18160ddd']];
+  for(const [k,data] of calls){try{const r=await v87Call(out.address,data,block,4500);if(k==='symbol'||k==='name')out[k]=v88DecodeString(r);else if(k==='decimals')out[k]=Number(v88Big(r));else out[k]=v88Big(r).toString();}catch(e){out.errors.push(k+': '+(e.message||e));}}
+  return out;
+}
+async function v88BalanceOf(token,holder,block='latest'){const data='0x70a08231'+v87Pad64(v87Lc(holder));try{return v88Big(await v87Call(token,data,block,4500)).toString();}catch{return null;}}
+function v88DecodeSwapShape(tx){
+  const input=v88HexNo0x(tx?.input);const out={selector:input?'0x'+input.slice(0,8):'0x',abiShapeFit:false,amountInRaw:null,amountOutMinRaw:null,pathOffset:null,path:[],recipient:null,deadline:null,warning:'Selector identity requires verified ABI; shape parsing alone is not a function-name proof.'};
+  if(input.length<8+64*5)return out;
+  try{out.amountInRaw=v88Big(v88Word(tx.input,0)).toString();out.amountOutMinRaw=v88Big(v88Word(tx.input,1)).toString();out.pathOffset=Number(v88Big(v88Word(tx.input,2)));out.recipient=v88WordAddr(v88Word(tx.input,3));out.deadline=v88Big(v88Word(tx.input,4)).toString();const args=input.slice(8),pos=out.pathOffset*2;if(out.pathOffset%32!==0||pos+64>args.length)return out;const len=Number(v88Big(args.slice(pos,pos+64)));if(len<2||len>16||pos+64+len*64>args.length)return out;for(let i=0;i<len;i++)out.path.push(v88WordAddr(args.slice(pos+64+i*64,pos+64+(i+1)*64)));out.abiShapeFit=out.path.every(a=>/^0x[0-9a-f]{40}$/.test(a));}catch(e){out.error=e.message||String(e);}return out;
+}
+function v88TransferRows(logs){return (logs||[]).filter(l=>v87Lc(l?.topics?.[0])===v87Lc(TRANSFER_TOPIC)&&l.topics?.length>=3).map(l=>({token:v87Lc(l.address),from:v88TopicAddr(l.topics[1]),to:v88TopicAddr(l.topics[2]),raw:v88Big(l.data).toString(),tx:l.transactionHash,block:l.blockNumber?parseInt(l.blockNumber,16):null,logIndex:l.logIndex?parseInt(l.logIndex,16):null}));}
+async function v88SwapTxProbe(){
+  const out={version:V88_VERSION,txHash:V88_PACKET.swapTx,found:false,tx:null,receipt:null,shape:null,routerCodeSize:0,transfers:[],tokens:[],pathTokens:[],claimStatus:'unresolved',errors:[]};
+  try{const tx=await rpc('eth_getTransactionByHash',[out.txHash],5500);if(!tx){out.errors.push('transaction not found');return out;}out.found=true;out.tx={hash:tx.hash,block:parseInt(tx.blockNumber,16),from:v87Lc(tx.from),to:v87Lc(tx.to),selector:v87Selector(tx.input),value:tx.value,gas:parseInt(tx.gas,16),inputBytes:Math.max(0,v88HexNo0x(tx.input).length/2-4)};out.shape=v88DecodeSwapShape(tx);out.receipt=await v87Receipt(tx.hash);out.routerCodeSize=v87CodeSize(await v87Code(tx.to,v87HexBlock(out.tx.block)));out.transfers=v88TransferRows(out.receipt?.logs||[]);const toks=[...new Set(out.transfers.map(x=>x.token))];out.tokens=await v87MapLimit(toks,4,async a=>v88TokenMeta(a,v87HexBlock(out.tx.block)));if(out.shape?.path?.length)out.pathTokens=await v87MapLimit(out.shape.path,4,async a=>v88TokenMeta(a,v87HexBlock(out.tx.block)));const exactSender=out.tx.from===V88_PACKET.field1967,exactTarget=out.tx.to===V88_PACKET.claimedRouter,exactSelector=out.tx.selector===V88_PACKET.swapSelector;out.claimStatus=exactSender&&exactTarget&&exactSelector?(out.shape.abiShapeFit?'tx verified; V2-like ABI shape fits, router brand/function name still require ABI':'tx verified; selector present, claimed ABI shape does not parse cleanly'):'claimed tx fields differ from RPC';}catch(e){out.errors.push(e.message||String(e));}return out;
+}
+async function v88PoolProbe(addr,blockTag){
+  const out={address:v87Lc(addr),token0:null,token1:null,fee:null,codeSize:0,isV3Like:false,errors:[]};
+  try{out.codeSize=v87CodeSize(await v87Code(out.address,blockTag));if(!out.codeSize)return out;const a=await v87Call(out.address,'0x0dfe1681',blockTag,3500).catch(()=>null),b=await v87Call(out.address,'0xd21220a7',blockTag,3500).catch(()=>null),f=await v87Call(out.address,'0xddca3f43',blockTag,3500).catch(()=>null);if(a)out.token0=v87AddrWord(a);if(b)out.token1=v87AddrWord(b);if(f)out.fee=Number(v88Big(f));out.isV3Like=Boolean(out.token0&&out.token1&&out.token0!==v87Lc('0x0')&&out.token1!==v87Lc('0x0')&&Number.isFinite(out.fee));}catch(e){out.errors.push(e.message||String(e));}return out;
+}
+async function v88NexusBlockProbe(block){
+  const tag=v87HexBlock(block),out={block,nexus:V88_PACKET.nexus,matchingTxs:[],tokenMeta:[],coupled:false,bxusdTokens:[],pdaiSeen:false,poolCandidates:[],balanceDeltas:[],feeSplitCandidates:[],errors:[]};
+  try{const logs=await rpc('eth_getLogs',[{fromBlock:tag,toBlock:tag}],8000);const transfers=v88TransferRows(logs);const touch=transfers.filter(x=>x.from===V88_PACKET.nexus||x.to===V88_PACKET.nexus);const hashes=[...new Set(touch.map(x=>x.tx))];const allTokens=[...new Set(touch.map(x=>x.token))];out.tokenMeta=await v87MapLimit(allTokens,4,async a=>v88TokenMeta(a,tag));const metaMap=new Map(out.tokenMeta.map(x=>[x.address,x]));out.bxusdTokens=out.tokenMeta.filter(x=>String(x.symbol||'').toUpperCase()==='BXUSD').map(x=>x.address);out.pdaiSeen=allTokens.includes(V88_PACKET.pdai);out.coupled=out.pdaiSeen&&out.bxusdTokens.length>0;
+    for(const h of hashes){const tx=await rpc('eth_getTransactionByHash',[h],5000).catch(()=>null);const txRows=transfers.filter(x=>x.tx===h);const byToken={};for(const r of txRows){const x=byToken[r.token]||(byToken[r.token]={token:r.token,symbol:metaMap.get(r.token)?.symbol||null,decimals:metaMap.get(r.token)?.decimals??18,inRaw:0n,outRaw:0n,rows:[]});if(r.to===V88_PACKET.nexus)x.inRaw+=BigInt(r.raw);if(r.from===V88_PACKET.nexus)x.outRaw+=BigInt(r.raw);x.rows.push(r);}out.matchingTxs.push({hash:h,from:v87Lc(tx?.from),to:v87Lc(tx?.to),selector:v87Selector(tx?.input),nexusFlows:Object.values(byToken).map(x=>({token:x.token,symbol:x.symbol,decimals:x.decimals,inRaw:x.inRaw.toString(),outRaw:x.outRaw.toString(),in:v88FmtUnits(x.inRaw,x.decimals),out:v88FmtUnits(x.outRaw,x.decimals),rowCount:x.rows.length}))});
+      const outRows=txRows.filter(x=>x.from===V88_PACKET.nexus).sort((a,b)=>BigInt(a.raw)<BigInt(b.raw)?-1:1);for(let i=0;i<outRows.length;i++)for(let j=i+1;j<outRows.length;j++){if(outRows[i].token===outRows[j].token&&outRows[i].raw===outRows[j].raw){const inflow=txRows.filter(x=>x.token===outRows[i].token&&x.to===V88_PACKET.nexus).reduce((a,x)=>a+BigInt(x.raw),0n);out.feeSplitCandidates.push({tx:h,token:outRows[i].token,raw:outRows[i].raw,recipients:[outRows[i].to,outRows[j].to],ratioToInflow:inflow?Number(BigInt(outRows[i].raw)*100000000n/inflow)/100000000:null});}}
+    }
+    const emitters=[...new Set((logs||[]).map(l=>v87Lc(l.address)).filter(a=>a&&!allTokens.includes(a)&&a!==V88_PACKET.nexus))].slice(0,12);out.poolCandidates=(await v87MapLimit(emitters,4,async a=>v88PoolProbe(a,tag))).filter(x=>x.isV3Like);
+    const watched=[V88_PACKET.pdai,...out.bxusdTokens];for(const token of watched){const meta=metaMap.get(token)||await v88TokenMeta(token,tag);const before=await v88BalanceOf(token,V88_PACKET.nexus,v87HexBlock(block-1)),after=await v88BalanceOf(token,V88_PACKET.nexus,tag);out.balanceDeltas.push({token,symbol:meta.symbol,decimals:meta.decimals,beforeRaw:before,afterRaw:after,before:before!==null?v88FmtUnits(before,meta.decimals):null,after:after!==null?v88FmtUnits(after,meta.decimals):null,deltaRaw:before!==null&&after!==null?(BigInt(after)-BigInt(before)).toString():null});}
+  }catch(e){out.errors.push(e.message||String(e));}return out;
+}
+async function v88NexusProbe(deep=false){const blocks=deep?V88_PACKET.nexusBlocks:[27030768,V88_PACKET.primaryNexusBlock],out={version:V88_VERSION,blocks,results:[],coupledBlocks:[],discoveredBxusd:[],errors:[]};const rows=await v87MapLimit(blocks,2,async b=>v88NexusBlockProbe(b));for(const r of rows){if(r?.block){out.results.push(r);if(r.coupled)out.coupledBlocks.push(r.block);out.discoveredBxusd.push(...(r.bxusdTokens||[]));}else if(r?.error)out.errors.push(r.error);}out.discoveredBxusd=[...new Set(out.discoveredBxusd)];return out;}
+function v88MetricProvenance(memory=state.memory){
+  const raw=Array.isArray(memory?.snapshots)?memory.snapshots:[];const sorted=raw.slice().sort((a,b)=>(a.block||0)-(b.block||0)||String(a.ts||'').localeCompare(String(b.ts||'')));const byBlock=new Map();for(const s of sorted){if(v88N(s.live?.transferCount)>0)byBlock.set(v88N(s.block),s);}const rows=[...byBlock.values()].sort((a,b)=>(a.block||0)-(b.block||0));const formulaRows=rows.map(s=>{const n=v88N(s.live?.transferCount),t=v88N(s.live?.targetTouches),reported=v88N(s.flow?.targetRatio,NaN),exact=n?t/n:NaN;return {block:s.block,ts:s.ts,transferCount:n,targetTouches:t,reported,exact,error:Number.isFinite(reported)&&Number.isFinite(exact)?reported-exact:null,reason:s.reason};}).filter(x=>Number.isFinite(x.exact));const deltas=[];for(let i=1;i<formulaRows.length;i++){const a=formulaRows[i-1],b=formulaRows[i],n0=a.transferCount,n1=b.transferCount,t0=a.targetTouches,t1=b.targetTouches;if(!n0||!n1)continue;const numerator=.5*((t1/n0-t0/n0)+(t1/n1-t0/n1));const denominator=.5*((t0/n1-t0/n0)+(t1/n1-t1/n0));deltas.push({fromBlock:a.block,toBlock:b.block,delta:b.exact-a.exact,numeratorEffect:numerator,denominatorEffect:denominator,driver:Math.abs(numerator)>=Math.abs(denominator)?'watched-touch numerator':'total-transfer denominator',transferDelta:n1-n0,touchDelta:t1-t0});}deltas.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));const route=Object.values(memory?.routes||{}).sort((a,b)=>v88N(b.runHits)-v88N(a.runHits))[0]||null;const uniqueBlocks=rows.length,runHits=v88N(route?.runHits),amplification=uniqueBlocks?runHits/uniqueBlocks:0;const latest=formulaRows.at(-1)||null,maxFormulaError=formulaRows.length?Math.max(...formulaRows.map(x=>Math.abs(v88N(x.error)))):null;return {classification:'DERIVED METRIC',formula:'targetRatio = targetTouches / transferCount',rawSnapshots:raw.length,uniqueObservedBlocks:uniqueBlocks,latest,maxFormulaError,topDeltas:deltas.slice(0,12),routeCounterAudit:{routeKey:route?.key||null,runHits,routeAmount:v88N(route?.amount),uniqueObservedBlocks:uniqueBlocks,amplificationFactor:amplification,interpretation:amplification>10?'Cumulative/echo-amplified counter; do not describe as independent checkpoints.':'Counter is near the independent observation scale.'},verdict:'targetRatio is a rolling-window composition quotient. A swap affects it only when its pDAI Transfer logs change the watched-touch numerator and/or total-transfer denominator; it is not an on-chain oracle or peg-state variable.'};
+}
+function computeV88MetricNexus(report=state.report,live=state.live,memory=state.memory){
+  const metric=v88MetricProvenance(memory),swap=live?.v88SwapProbe||{},nexus=live?.v88NexusProbe||{},coupled=(nexus.coupledBlocks||[]).length,shape=Boolean(swap.shape?.abiShapeFit),score=Math.min(100,25+(swap.found?15:0)+(shape?10:0)+(coupled?25:0)+((nexus.discoveredBxusd||[]).length?10:0)+(metric.maxFormulaError!==null&&metric.maxFormulaError<1e-10?15:0));const phase=coupled?'pDAI/BXUSD atomic coupling observed; purpose still under falsification':swap.found?'router execution verified; nexus coupling unresolved':'metric provenance active; RPC nexus scan pending';const claims=[
+    {claim:'targetRatio is a hidden mechanical peg-state variable',status:'refuted by formula provenance',closure:metric.formula+'; latest numerator/denominator must be shown with every ratio'},
+    {claim:'1967 executed the reported router transaction',status:swap.found&&swap.tx?.from===V88_PACKET.field1967?'RPC verified':'pending',closure:'transaction, sender, target, selector, receipt and transfer logs'},
+    {claim:'0xb442b398 proves a named PulseX function',status:shape?'V2-like calldata shape fits; name/brand unverified':'selector-only claim',closure:'verified contract ABI or source-code selector match'},
+    {claim:'low gas proves a single-hop swap',status:swap.shape?.path?.length===2?'two-token calldata path candidate':'not proven',closure:'decoded calldata path plus receipt transfers and internal trace'},
+    {claim:'0x4CC2…1034 atomically couples pDAI and BXUSD',status:coupled?`verified in block(s) ${nexus.coupledBlocks.join(', ')}`:'not yet reproduced by RPC',closure:'same transaction must contain Transfer logs for both token contracts touching the nexus'},
+    {claim:'0x4CC2…1034 is a Liberty V3 AMO/PSM',status:(nexus.results||[]).some(r=>(r.poolCandidates||[]).length)?'V3-like pool surface observed; AMO/PSM role unproven':'role claim unverified',closure:'pool token0/token1/fee, factory provenance, callable strategy surface, custody accounting and price-target behavior'},
+    {claim:'route memory represents independent checkpoint count',status:metric.routeCounterAudit.amplificationFactor>10?'counter inflation warning':'plausible scale',closure:'use unique observed blocks/snapshots as denominator; preserve cumulative runHits only as an aggregate counter'},
+    {claim:'BridgeX activity closes the pDAI peg thesis',status:'not closed',closure:'decoded collateral provenance, redeemability, price target, durable liquidity, PSM/oracle/proxy state, and pDAI settlement output'}
+  ];return {version:V88_VERSION,doctrine:V88_DOCTRINE,noHardGates:true,score,phase,metricProvenance:metric,swapSummary:{found:swap.found||false,tx:swap.tx||null,shape:swap.shape||null,transferCount:(swap.transfers||[]).length,tokens:swap.tokens||[],claimStatus:swap.claimStatus||'pending',errors:swap.errors||[]},nexusSummary:{blocks:nexus.blocks||[],coupledBlocks:nexus.coupledBlocks||[],discoveredBxusd:nexus.discoveredBxusd||[],matchingTransactions:(nexus.results||[]).reduce((a,r)=>a+(r.matchingTxs||[]).length,0),v3LikePools:(nexus.results||[]).reduce((a,r)=>a+(r.poolCandidates||[]).length,0),errors:nexus.errors||[]},claimLedger:claims,closureKillchain:['ERC-1967 implementation/admin/beacon slot opening','decoded CCTP pUSDC mint → receiver → PSM → pDAI output','Compound cToken discovery and getCash vector','Aave pendingAdmin/acceptAdmin finality','non-zero watched oracle/storage state','0x01339c21 proxy-matrix hit with same-block multi-rail state change'],verdict:coupled?'A real pDAI/BXUSD transaction-level coupling candidate exists. That proves a liquidity relationship, not a dollar peg or protocol-level PSM.':'The new traces remain a falsifiable router/liquidity hypothesis until RPC reproduces same-transaction pDAI/BXUSD coupling.'};
+}
+function renderV88Panel(){const m=computeV88MetricNexus(state.report,state.live,state.memory),set=(id,v)=>{const e=$(id);if(e)e.textContent=v;};set('v88Score',m.score+'/100');const f=$('v88ScoreFill');if(f)f.style.width=m.score+'%';set('v88Phase',m.phase);const l=m.metricProvenance.latest;set('v88Ratio',l?`${(l.exact*100).toFixed(2)}%`:'—');set('v88FormulaError',m.metricProvenance.maxFormulaError===null?'—':m.metricProvenance.maxFormulaError.toExponential(2));set('v88Coupling',m.nexusSummary.coupledBlocks.length?`${m.nexusSummary.coupledBlocks.length} block(s)`:'unresolved');set('v88Inflation',`${m.metricProvenance.routeCounterAudit.amplificationFactor.toFixed(1)}×`);const mr=$('v88MetricRows');if(mr){const rows=[];if(l)rows.push({k:'exact formula',v:`block ${l.block}: ${l.targetTouches} ÷ ${l.transferCount} = ${(l.exact*100).toFixed(4)}%; reported ${(l.reported*100).toFixed(4)}%`});rows.push({k:'counter integrity',v:`${m.metricProvenance.routeCounterAudit.runHits.toLocaleString()} cumulative runHits ÷ ${m.metricProvenance.uniqueObservedBlocks.toLocaleString()} unique blocks = ${m.metricProvenance.routeCounterAudit.amplificationFactor.toFixed(2)}×. ${m.metricProvenance.routeCounterAudit.interpretation}`});for(const d of m.metricProvenance.topDeltas.slice(0,8))rows.push({k:`${d.fromBlock} → ${d.toBlock}`,v:`Δratio ${(d.delta*100).toFixed(3)}pp; touch effect ${(d.numeratorEffect*100).toFixed(3)}pp; transfer-denominator effect ${(d.denominatorEffect*100).toFixed(3)}pp; driver=${d.driver}.`});mr.innerHTML=rows.map(x=>`<div class="item"><div class="k">${esc(x.k)}</div><div class="v">${esc(x.v)}</div></div>`).join('');}const nc=$('v88NexusClaims');if(nc)nc.innerHTML=m.claimLedger.map(x=>`<div class="item ${String(x.status).includes('verified')||String(x.status).includes('refuted')?'good':'warn'}"><div class="k">${esc(x.status)}</div><div class="v"><b>${esc(x.claim)}</b><br><span class="small">Closure: ${esc(x.closure)}</span></div></div>`).join('');}
+const V88_ORIG_scoreReport=scoreReport;
+scoreReport=function(report,live=null){const s=V88_ORIG_scoreReport(report,live);const m=computeV88MetricNexus(report,live||state.live,state.memory);s.v88MetricNexus=m;s.moduleMode='V88 metric provenance / BridgeX nexus verifier / no hard gates';s.noHardGates=true;s.build=Math.max(v83N(s.build),m.score);s.dot=Math.max(v83N(s.dot),m.score);s.evidence=Array.isArray(s.evidence)?s.evidence:[];s.evidence.push({pts:14,proof:4,debt:0,dot:10,kind:'good',title:'V88 target-ratio provenance closed',msg:`${m.metricProvenance.formula}; latest exact ratio=${m.metricProvenance.latest?m.metricProvenance.latest.exact.toFixed(8):'n/a'}; max formula error=${m.metricProvenance.maxFormulaError}. This is a derived window metric, not a chain state variable.`});s.evidence.push({pts:m.nexusSummary.coupledBlocks.length?12:0,proof:m.nexusSummary.coupledBlocks.length?5:0,debt:m.nexusSummary.coupledBlocks.length?1:4,dot:9,kind:m.nexusSummary.coupledBlocks.length?'good':'warn',title:'V88 pDAI/BridgeX nexus reproduction',msg:m.nexusSummary.coupledBlocks.length?`Same-transaction pDAI/BXUSD coupling reproduced in block(s) ${m.nexusSummary.coupledBlocks.join(', ')}. Liquidity coupling is not peg closure.`:'Nexus coupling has not yet been reproduced locally; partial explorer labels remain claims.'});s.evidence.push({pts:0,proof:0,debt:m.metricProvenance.routeCounterAudit.amplificationFactor>10?5:1,dot:8,kind:'warn',title:'V88 cumulative-counter firewall',msg:`Route runHits amplification=${m.metricProvenance.routeCounterAudit.amplificationFactor.toFixed(2)}× versus unique observed blocks. Do not call cumulative/echo-amplified runHits independent checkpoints.`});return s;};
+const V88_ORIG_runLiveScan=runLiveScan;
+runLiveScan=async function(){await V88_ORIG_runLiveScan();try{const deep=Boolean($('deepToggle')?.checked);state.live=state.live||{};state.live.v88SwapProbe=await v88SwapTxProbe();state.live.v88NexusProbe=await v88NexusProbe(deep);state.scores=scoreReport(state.report,state.live);await rememberCurrentRun('v88 metric-provenance and BridgeX nexus scan').catch(()=>{});const m=computeV88MetricNexus(state.report,state.live,state.memory);addFeed(m.nexusSummary.coupledBlocks.length?'good':'warn','V88 metric/nexus scan complete',`ratio formula error=${m.metricProvenance.maxFormulaError}; router tx=${m.swapSummary.found?'verified':'missing'}; pDAI/BXUSD coupled blocks=${m.nexusSummary.coupledBlocks.join(', ')||'none'}; counter amplification=${m.metricProvenance.routeCounterAudit.amplificationFactor.toFixed(1)}×.`);renderAll();}catch(e){addFeed('warn','V88 metric/nexus scan skipped',e.message||String(e));}};
+const V88_ORIG_renderAll=renderAll;
+renderAll=function(){V88_ORIG_renderAll();try{renderV88Panel();}catch(e){}};
+const V88_ORIG_renderSummary=renderSummary;
+renderSummary=function(){V88_ORIG_renderSummary();try{const current=JSON.parse($('summaryBox').textContent||'{}');current.v88MetricNexus=computeV88MetricNexus(state.report,state.live,state.memory);current.v88Packet=V88_PACKET;$('summaryBox').textContent=JSON.stringify(current,null,2);}catch(e){}};
+exportState=function(){const v88=computeV88MetricNexus(state.report,state.live,state.memory),v87=computeV87ControlCollision(state.report,state.live,state.memory);const pack={createdAt:new Date().toISOString(),module:V88_VERSION,seedVersion:state.report.version,mode:'metric-provenance and BridgeX nexus verification; no hard peg gates; exact target-ratio formula/decomposition, cumulative-counter integrity, 1967 router calldata/receipt decoding, and pDAI/BXUSD same-transaction coupling reconstruction',scores:state.scores,v88MetricNexus:v88,v87ControlCollision:v87,v86DaiFunnelMap:computeV86DaiFunnel(state.report,state.live,state.memory),v85CloneLab:computeV85CloneLab(state.report,state.live,state.memory),v84ClearanceMap:computeV84ClearanceMap(state.report,state.live,state.memory),v83PhaseLab:computeV83PhaseLab(state.report,state.live,state.memory),v82Godmode:computeV82Godmode(state.report,state.live,state.memory),v81KillChain:computeV81KillChain(state.report,state.live,state.memory),v80ConvergenceMap:computeV80ConvergenceMap(state.report,state.live,state.memory),v79TriggerMap:computeV79TriggerMap(state.report,state.live,state.memory),v78PegMap:computeV78PegMap(state.report,state.live),v77StateMap:computeV77StateMap(state.report,state.live),v76BuildMap:computeV76BuildMap(state.report,state.live),v88Packet:V88_PACKET,v88SwapProbe:state.live?.v88SwapProbe||null,v88NexusProbe:state.live?.v88NexusProbe||null,v87ExecutionSequence:state.live?.v87ExecutionSequence||null,v87PermitRoot:state.live?.v87PermitRoot||null,v87AaveCollision:state.live?.v87AaveCollision||null,live:state.live,audit:state.audit,hypotheses:state.hypotheses,targets:state.targets,cues:state.cues,flowIntel:state.flowIntel,graph:state.graph,memory:compactClone(state.memory||freshMemory())};const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pdai-v88-metric-provenance-bridgex-nexus-cortex-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+// ==== End V88 overlay ====
+
+
 
 async function init() {
   state.targets = buildTargets(state.report);
@@ -255334,7 +255446,7 @@ async function init() {
   recomputeTargetScores();
   const events = (state.report.v644?.events || state.report.evidence || []).slice(0,16);
   events.forEach(ev => addFeed(ev.kind||'warn', ev.title||ev.claim||'Seed event', ev.msg||ev.impact||ev.why||'Imported seed evidence.'));
-  addFeed('good','V87 control-plane collision cortex online','Persistent memory, DAI funnel attribution, exact-block actor resolution, transferAndCall/delegateBySig decoding, EIP-2612 root-key verification, and Aave radial collision scanning now feed one truth-calibrated state-change model.');
+  addFeed('good','V88 metric-provenance & BridgeX nexus cortex online','V87 control-plane reconstruction remains active. V88 now exposes targetRatio as an exact numerator/denominator formula, audits cumulative route-counter inflation, decodes the reported 1967 router transaction, and reproduces pDAI/BXUSD coupling from raw transaction logs before promoting any AMO, PSM, or peg narrative.');
   $('runBtn').onclick = runLiveScan;
   $('autoBtn').onclick = toggleAuto;
   $('exportBtn').onclick = exportState;
@@ -255348,7 +255460,7 @@ async function init() {
   await loadMemory();
   if (LATEST_EXPORT_SEED && LATEST_EXPORT_SEED.live) {
     hydrateCortexExport(LATEST_EXPORT_SEED, 'embedded V85 field report');
-    addFeed('good','Embedded field report hydrated','The V86 DAI-funnel baseline remains embedded. V87 adds the July execution corpus as a falsifiable block/tx test plan rather than accepting partial explorer labels or ignition narratives at face value.');
+    addFeed('good','Embedded field report hydrated','The V86 DAI-funnel baseline remains embedded. V87 keeps exact-block control-plane verification; V88 adds metric provenance and BridgeX/pDAI transaction-level coupling tests, while refusing to treat cumulative memory counters or explorer commentary as final peg proof.');
   }
   await rememberCurrentRun('boot seed').catch(()=>{});
   renderAll();
