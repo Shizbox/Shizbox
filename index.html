@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>pDAI Mission Control | V91.2 Self-Diagnosing Scanner</title>
+<title>pDAI Mission Control | V91.2.1 Runtime Hotfix</title>
 <style>
 :root {
   --bg:#07090d; --panel:#0d1219cc; --panel2:#101722; --line:#233140; --muted:#8996a8;
@@ -251420,7 +251420,11 @@ exportState=function(){
   const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pdai-v91-1-mission-control-cortex-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 // ==== V91.2 self-diagnosing mission scanner overlay ====
-const V912_VERSION='V91.2 Self-Diagnosing Mission Control Cortex';
+const V912_VERSION='V91.2.1 Runtime-Hotfix Mission Control Cortex';
+// Every overlay from V87 onward renders through `esc(...)`, while the condensed
+// source only retained `escapeHtml(...)`. Keep one global compatibility alias so
+// both the mission dashboard and every preserved forensic panel render safely.
+const esc=typeof escapeHtml==='function'?escapeHtml:(value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])));
 const V912_PHASES=Object.freeze([
   ['base','Chain telemetry'],
   ['price','USD price'],
@@ -251556,7 +251560,7 @@ function v912BindControls(){
 exportState=function(){
   const v91=computeV91MissionControl(),v90=computeV90PegProgress(),v89=computeV89PegProgress(state.report,state.live,state.memory),v88=computeV88MetricNexus(state.report,state.live,state.memory),v87=computeV87ControlCollision(state.report,state.live,state.memory),diag=state.live?.v912Diagnostics||null;
   const pack={createdAt:new Date().toISOString(),module:V912_VERSION,seedVersion:state.report.version,mode:'self-diagnosing fast mission scan; base telemetry, redundant reserve price, transaction-net flow, state sentinels, bounded method verification, and bounded LP reserve accounting; every prior forensic module and export field is preserved',v912Diagnostics:diag,v912ScanPolicy:{default:'six bounded live phases; the dashboard no longer waits for the entire V76–V90 wrapper chain',rpc:'up to three configured PulseChain endpoints raced per fast call',partialExports:'export is disabled during a mission scan; diagnostics record every isolated phase error'},v91MissionControl:v91,v91EvidenceRegistry:v91.registry,v91CausalMap:v91.map,v91RegimeTimeline:v91.timeline,v91ContradictionEngine:v91.contradictions,v91InformationQueue:v91.informationQueue,v91FiveIntelligenceUpgrades:V91_IDEAS,v91MissionHistory:state.memory?.lenses?.v91MissionHistory||[],scores:state.scores,v90PegProgress:v90,v90UsdReference:state.live?.v90UsdReference||null,v90ReferenceConfig:V90_REFERENCE,v90ImportedBaseline:V90_IMPORTED_BASELINE,v90PriceHistory:state.memory?.lenses?.v90UsdPriceHistory||[],v89PegProgress:v89,v89Baseline:V89_BASELINE,v89CommitPacket:V89_COMMIT_PACKET,v89CommitFirewall:state.live?.v89CommitFirewall||null,v89MethodVerification:state.live?.v89MethodVerification||null,v89LpAccounting:state.live?.v89LpAccounting||null,v89NetFlowDedup:state.live?.v89NetFlowDedup||null,v89PriceHistory:state.memory?.lenses?.v89PriceHistory||[],v88MetricNexus:v88,v87ControlCollision:v87,v86DaiFunnelMap:computeV86DaiFunnel(state.report,state.live,state.memory),v85CloneLab:computeV85CloneLab(state.report,state.live,state.memory),v84ClearanceMap:computeV84ClearanceMap(state.report,state.live,state.memory),v83PhaseLab:computeV83PhaseLab(state.report,state.live,state.memory),v82Godmode:computeV82Godmode(state.report,state.live,state.memory),v81KillChain:computeV81KillChain(state.report,state.live,state.memory),v80ConvergenceMap:computeV80ConvergenceMap(state.report,state.live,state.memory),v79TriggerMap:computeV79TriggerMap(state.report,state.live,state.memory),v78PegMap:computeV78PegMap(state.report,state.live),v77StateMap:computeV77StateMap(state.report,state.live),v76BuildMap:computeV76BuildMap(state.report,state.live),v88Packet:V88_PACKET,v88SwapProbe:state.live?.v88SwapProbe||null,v88NexusProbe:state.live?.v88NexusProbe||null,v87ExecutionSequence:state.live?.v87ExecutionSequence||null,v87PermitRoot:state.live?.v87PermitRoot||null,v87AaveCollision:state.live?.v87AaveCollision||null,live:state.live,audit:state.audit,hypotheses:state.hypotheses,targets:state.targets,cues:state.cues,flowIntel:state.flowIntel,graph:state.graph,memory:compactClone(state.memory||freshMemory())};
-  const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pdai-v91-2-self-diagnosing-mission-control-cortex-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pdai-v91-2-1-runtime-hotfix-mission-control-cortex-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 v912BindControls();
 // ==== End V91.2 overlay ====
