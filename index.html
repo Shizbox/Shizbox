@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V77 Cortex | AI Telemetry Engine</title>
+    <title>V77 Cortex | Live PEG Scanner & Telemetry</title>
     <style>
         :root {
-            --bg-base: #050505;
-            --panel-bg: rgba(15, 20, 25, 0.85);
-            --border-glow: #00f3ff;
+            --bg-base: #020202;
+            --panel-bg: rgba(10, 15, 20, 0.9);
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff00ff;
             --text-main: #e0f7fa;
-            --text-dim: #546e7a;
-            --alert-red: #ff2a2a;
+            --text-dim: #455a64;
+            --alert-red: #ff1744;
             --font-mono: 'Courier New', Courier, monospace;
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg-base);
@@ -31,41 +28,75 @@
             display: flex;
             flex-direction: column;
             background-image: 
-                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        #init-overlay {
+        /* Connection Overlay */
+        #connection-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
             transition: opacity 0.5s ease;
         }
 
+        .cyber-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .cyber-input-group label {
+            font-family: var(--font-mono);
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        .cyber-input {
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: #fff;
+            padding: 15px;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .cyber-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+
         button.cyber-btn {
             background: transparent;
-            color: var(--border-glow);
-            border: 1px solid var(--border-glow);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
             padding: 15px 40px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-family: var(--font-mono);
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
             transition: all 0.3s;
+            margin-top: 10px;
         }
 
         button.cyber-btn:hover {
-            background: var(--border-glow);
+            background: var(--neon-cyan);
             color: #000;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.6);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
         }
 
+        /* Header */
         header {
             padding: 15px 30px;
             border-bottom: 1px solid rgba(0, 243, 255, 0.2);
@@ -79,7 +110,7 @@
             font-family: var(--font-mono);
             font-size: 1.2rem;
             letter-spacing: 2px;
-            color: var(--border-glow);
+            color: var(--neon-cyan);
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
         }
 
@@ -92,17 +123,20 @@
         }
 
         .dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--border-glow);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--border-glow);
+            width: 10px; height: 10px; border-radius: 50%;
+            background-color: var(--alert-red);
+            box-shadow: 0 0 10px var(--alert-red);
+        }
+        .dot.connected {
+            background-color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
             animation: pulse 1.5s infinite;
         }
 
+        /* Main Grid Layout */
         .dashboard {
             display: grid;
-            grid-template-columns: 300px 1fr 350px;
+            grid-template-columns: 350px 1fr 400px;
             gap: 20px;
             padding: 20px;
             flex-grow: 1;
@@ -117,6 +151,7 @@
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(5px);
+            position: relative;
         }
 
         .panel-header {
@@ -127,57 +162,47 @@
             margin-bottom: 15px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        /* Left Panel - Telemetry Log */
-        #log-container {
+        /* Left Panel - Raw WebSocket Feed */
+        #ws-log {
             flex-grow: 1;
             overflow-y: auto;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
         }
 
         .log-entry {
             border-left: 2px solid var(--text-dim);
-            padding-left: 10px;
-            animation: fadeIn 0.3s ease-in;
+            padding-left: 8px;
+            word-wrap: break-word;
         }
-        .log-entry.alert {
-            border-left-color: var(--alert-red);
-            color: #ff8a8a;
-        }
-        .log-time { color: var(--text-dim); margin-right: 8px; }
+        .log-entry.block { border-left-color: var(--neon-cyan); }
+        .log-entry.peg { border-left-color: var(--neon-magenta); }
+        .log-entry.alert { border-left-color: var(--alert-red); color: #ff8a8a; }
+        .log-time { color: var(--text-dim); margin-right: 5px; }
 
-        /* Center Panel - AI Persona */
-        .persona-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            height: 100%;
-        }
+        /* Center Panel - AI Persona & Live PEG Chart */
+        .persona-container { align-items: center; justify-content: space-between; padding-bottom: 10px;}
 
         .avatar-ring {
-            width: 250px;
-            height: 250px;
+            width: 200px; height: 200px;
             border-radius: 50%;
-            border: 2px solid rgba(0, 243, 255, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            border: 2px solid rgba(0, 243, 255, 0.2);
+            display: flex; justify-content: center; align-items: center;
+            margin-top: 20px;
         }
 
         .avatar-core {
-            width: 180px;
-            height: 180px;
+            width: 140px; height: 140px;
             border-radius: 50%;
             background: radial-gradient(circle, #e0f7fa 10%, #00bcd4 40%, #000 90%);
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
             transition: all 0.1s ease;
         }
 
@@ -188,328 +213,421 @@
         }
 
         .audio-visualizer {
-            display: flex;
-            gap: 5px;
-            margin-top: 40px;
-            height: 40px;
-            align-items: flex-end;
+            display: flex; gap: 4px; height: 30px; align-items: flex-end; margin-top: 20px;
         }
-
-        .bar {
-            width: 6px;
-            background-color: var(--border-glow);
-            height: 5px;
-            transition: height 0.1s ease;
-            box-shadow: 0 0 5px var(--border-glow);
-        }
+        .bar { width: 4px; background-color: var(--neon-cyan); height: 3px; box-shadow: 0 0 5px var(--neon-cyan); transition: height 0.05s ease; }
 
         .subtitle {
-            margin-top: 30px;
-            font-family: var(--font-mono);
-            font-size: 1.1rem;
-            text-align: center;
-            min-height: 3em;
-            color: #fff;
-            text-shadow: 0 0 5px rgba(255,255,255,0.5);
+            margin-top: 15px; font-family: var(--font-mono); font-size: 1rem; text-align: center; min-height: 3em; color: #fff;
         }
 
-        /* Right Panel - Metrics */
-        .metric-group {
-            margin-bottom: 25px;
+        .chart-container {
+            width: 100%; height: 200px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; position: relative;
         }
+        canvas { width: 100%; height: 100%; }
+        .chart-label { position: absolute; top: 10px; left: 10px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-magenta); }
 
-        .metric-label {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 300;
-            color: #fff;
-            margin-top: 5px;
-            font-family: var(--font-mono);
-        }
-
-        .metric-value.highlight { color: var(--border-glow); }
+        /* Right Panel - Structural Analysis & PEG Data */
+        .metric-group { margin-bottom: 25px; }
+        .metric-label { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
+        .metric-value { font-size: 2rem; font-weight: 300; margin-top: 5px; font-family: var(--font-mono); color: #fff; }
+        .metric-value.highlight { color: var(--neon-cyan); }
+        .metric-value.magenta { color: var(--neon-magenta); }
         .metric-value.warning { color: var(--alert-red); }
 
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            margin-top: 10px;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--border-glow);
-            width: 0%;
-            transition: width 0.5s ease;
-        }
+        .depth-meter { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; overflow: hidden; }
+        .depth-fill { height: 100%; background: var(--neon-magenta); width: 0%; transition: width 0.3s ease; }
 
         @keyframes pulse {
-            0% { opacity: 0.5; box-shadow: 0 0 5px var(--border-glow); }
-            50% { opacity: 1; box-shadow: 0 0 15px var(--border-glow); }
-            100% { opacity: 0.5; box-shadow: 0 0 5px var(--border-glow); }
+            0% { opacity: 0.5; box-shadow: 0 0 5px var(--neon-cyan); }
+            50% { opacity: 1; box-shadow: 0 0 15px var(--neon-cyan); }
+            100% { opacity: 0.5; box-shadow: 0 0 5px var(--neon-cyan); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 243, 255, 0.6); }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.3); }
     </style>
 </head>
 <body>
 
-    <div id="init-overlay">
-        <button class="cyber-btn" onclick="initializeCortex()">Initialize V77 Cortex</button>
+    <!-- Connection Gateway (Zero Mocking Enforcer) -->
+    <div id="connection-overlay">
+        <div class="cyber-input-group">
+            <label>ENTER LIVE WEBSOCKET NODE URL</label>
+            <input type="text" id="ws-url" class="cyber-input" value="ws://localhost:8080" placeholder="wss://your-node-endpoint">
+            <button class="cyber-btn" onclick="V77Cortex.boot()">INITIALIZE V77 CORTEX</button>
+            <div style="font-family: monospace; font-size: 0.7rem; color: #666; margin-top: 20px;">
+                Requires JSON Payloads. Accepted Types: "BLOCK_SYNC", "PEG_UPDATE", "CUSTODY_ALERT"
+            </div>
+        </div>
     </div>
 
     <header>
-        <h1>V77 // BEHIND-SCENES BUILD MAPPER</h1>
+        <h1>V77 // ON-CHAIN PEG SCANNER & STRUCTURAL ANALYZER</h1>
         <div class="status-indicator">
-            <div class="dot"></div>
-            <span>NODE SYNCED</span>
+            <div class="dot" id="socket-status-dot"></div>
+            <span id="socket-status-text">DISCONNECTED</span>
         </div>
     </header>
 
     <div class="dashboard">
-        <!-- Left: Telemetry Feed -->
+        
+        <!-- Left: Real Raw WebSocket Data Feed -->
         <div class="panel">
-            <div class="panel-header">Raw Telemetry Stream</div>
-            <div id="log-container"></div>
+            <div class="panel-header"><span>WSS // Live Telemetry Firehose</span> <span id="msg-rate">0 msg/s</span></div>
+            <div id="ws-log"></div>
         </div>
 
-        <!-- Center: AI Persona -->
+        <!-- Center: AI Persona & Deviation Graph -->
         <div class="panel persona-container">
-            <div class="avatar-ring">
-                <div class="avatar-core" id="avatar"></div>
+            <div class="panel-header" style="width:100%">AI Narrator Core</div>
+            
+            <div class="avatar-ring" id="avatar-container">
+                <div class="avatar-core"></div>
             </div>
-            <div class="audio-visualizer" id="visualizer">
-                <!-- Bars generated by JS -->
+            
+            <div class="audio-visualizer" id="visualizer"></div>
+            <div class="subtitle" id="subtitle">"Awaiting real-time data stream."</div>
+
+            <div class="chart-container">
+                <div class="chart-label">PEG DEVIATION DELTA (Real-Time)</div>
+                <canvas id="pegChart"></canvas>
             </div>
-            <div class="subtitle" id="subtitle">"Awaiting initialization sequence."</div>
         </div>
 
-        <!-- Right: Real-time Metrics -->
+        <!-- Right: PEG Structural Analysis -->
         <div class="panel">
-            <div class="panel-header">Cortex State Analysis</div>
+            <div class="panel-header">Real-Time Structural Analysis</div>
             
             <div class="metric-group">
-                <div class="metric-label">Current Block Span</div>
-                <div class="metric-value highlight" id="metric-block">27121758</div>
+                <div class="metric-label">Current Block Height</div>
+                <div class="metric-value highlight" id="metric-block">AWAITING SYNC</div>
             </div>
 
             <div class="metric-group">
-                <div class="metric-label">Dominant Liquidity Volume</div>
-                <div class="metric-value" id="metric-volume">$0.00</div>
+                <div class="metric-label">Active Peg Asset</div>
+                <div class="metric-value magenta" id="metric-asset">NONE</div>
             </div>
 
             <div class="metric-group">
-                <div class="metric-label">Flow Pressure / Target Ratio</div>
-                <div class="metric-value" id="metric-ratio">0.0%</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="ratio-fill"></div>
+                <div class="metric-label">Peg Price Deviation</div>
+                <div class="metric-value" id="metric-price">$0.0000</div>
+                <div style="font-family: monospace; color: var(--text-dim); margin-top: 5px;">
+                    Target: <span id="metric-target">$0.0000</span>
+                </div>
+            </div>
+
+            <div class="metric-group">
+                <div class="metric-label">Structural Liquidity Depth</div>
+                <div class="metric-value" id="metric-depth">0.00</div>
+                <div class="depth-meter">
+                    <div class="depth-fill" id="depth-fill"></div>
                 </div>
             </div>
 
             <div class="metric-group">
                 <div class="metric-label">Storage Custody Watch</div>
-                <div style="margin-top: 10px; font-family: monospace; font-size: 0.85rem; color: #aaa;">
-                    <div>[0x7b12]: <span id="slot-1">Unpopulated</span></div>
-                    <div>[0x0968]: <span id="slot-2">Unpopulated</span></div>
-                    <div>F33C Custody: <span id="f33c-status" style="color:var(--border-glow)">0.0000</span></div>
+                <div style="margin-top: 10px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim);">
+                    <div>[0x7b12]: <span id="slot-1" style="color:#fff">Unpopulated</span></div>
+                    <div>[0x0968]: <span id="slot-2" style="color:#fff">Unpopulated</span></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. Web Speech API Synthesis Engine ---
-        const synth = window.speechSynthesis;
-        let aiVoice = null;
-        let isSpeaking = false;
-        let visualizerInterval = null;
+        /**
+         * V77 CORTEX ARCHITECTURE
+         * 100% Live WebSocket Driven - Zero setInterval mocking.
+         */
+        const V77Cortex = (() => {
+            
+            // --- AI Voice Engine ---
+            const SpeechEngine = {
+                synth: window.speechSynthesis,
+                voice: null,
+                isSpeaking: false,
+                visInterval: null,
+                queue: [],
 
-        function setupVoice() {
-            const voices = synth.getVoices();
-            // Prioritize female/robotic English voices for the "Platinum-Blonde Cyborg" persona
-            aiVoice = voices.find(v => v.name.includes('Google UK English Female') || 
-                                       v.name.includes('Samantha') || 
-                                       v.name.includes('Zira') ||
-                                       v.name.includes('Female')) || voices[0];
-        }
-        
-        synth.onvoiceschanged = setupVoice;
+                init() {
+                    const loadVoices = () => {
+                        const voices = this.synth.getVoices();
+                        // Target highly distinct, sharp female/robotic voices
+                        this.voice = voices.find(v => 
+                            v.name.includes('Google UK English Female') || 
+                            v.name.includes('Samantha') || 
+                            v.name.includes('Microsoft Zira')
+                        ) || voices[0];
+                    };
+                    loadVoices();
+                    this.synth.onvoiceschanged = loadVoices;
+                    
+                    // Build audio visualizer DOM
+                    const visContainer = document.getElementById('visualizer');
+                    for(let i=0; i<20; i++) {
+                        const bar = document.createElement('div');
+                        bar.className = 'bar';
+                        visContainer.appendChild(bar);
+                    }
+                },
 
-        function speak(text) {
-            if (synth.speaking) synth.cancel(); // Interrupt for high-priority updates
+                speak(text, priority = false) {
+                    if (priority && this.synth.speaking) {
+                        this.synth.cancel();
+                        this.queue = [];
+                    } else if (this.synth.speaking) {
+                        this.queue.push(text);
+                        return;
+                    }
 
-            const utterance = new SpeechSynthesisUtterance(text);
-            if (aiVoice) utterance.voice = aiVoice;
-            utterance.pitch = 1.1; // Slightly metallic/sharp
-            utterance.rate = 1.15; // Fast processing speed
+                    this._executeSpeech(text);
+                },
 
-            utterance.onstart = () => {
-                isSpeaking = true;
-                document.getElementById('avatar').parentElement.classList.add('speaking');
-                startVisualizer();
-                document.getElementById('subtitle').innerText = `"${text}"`;
+                _executeSpeech(text) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    if (this.voice) utterance.voice = this.voice;
+                    utterance.pitch = 1.2; 
+                    utterance.rate = 1.15; 
+
+                    utterance.onstart = () => {
+                        this.isSpeaking = true;
+                        document.getElementById('avatar-container').classList.add('speaking');
+                        document.getElementById('subtitle').innerText = `"${text}"`;
+                        this._startVis();
+                    };
+
+                    utterance.onend = () => {
+                        this.isSpeaking = false;
+                        document.getElementById('avatar-container').classList.remove('speaking');
+                        this._stopVis();
+                        if (this.queue.length > 0) {
+                            this._executeSpeech(this.queue.shift());
+                        } else {
+                            setTimeout(() => { if(!this.isSpeaking) document.getElementById('subtitle').innerText = ""; }, 2000);
+                        }
+                    };
+
+                    this.synth.speak(utterance);
+                },
+
+                _startVis() {
+                    const bars = document.querySelectorAll('.bar');
+                    this.visInterval = setInterval(() => {
+                        bars.forEach(bar => {
+                            bar.style.height = `${Math.max(3, Math.random() * 30)}px`;
+                        });
+                    }, 50);
+                },
+                _stopVis() {
+                    clearInterval(this.visInterval);
+                    document.querySelectorAll('.bar').forEach(bar => bar.style.height = '3px');
+                }
             };
 
-            utterance.onend = () => {
-                isSpeaking = false;
-                document.getElementById('avatar').parentElement.classList.remove('speaking');
-                stopVisualizer();
-                setTimeout(() => {
-                    if (!isSpeaking) document.getElementById('subtitle').innerText = "";
-                }, 2000);
+            // --- Real-time PEG Charting (Canvas) ---
+            const ChartEngine = {
+                canvas: null,
+                ctx: null,
+                dataPoints: [],
+                maxPoints: 50,
+
+                init() {
+                    this.canvas = document.getElementById('pegChart');
+                    this.ctx = this.canvas.getContext('2d');
+                    this.resize();
+                    window.addEventListener('resize', () => this.resize());
+                    this.draw();
+                },
+
+                resize() {
+                    this.canvas.width = this.canvas.parentElement.clientWidth;
+                    this.canvas.height = this.canvas.parentElement.clientHeight;
+                },
+
+                addPoint(price, target) {
+                    const deviation = price - target;
+                    this.dataPoints.push(deviation);
+                    if (this.dataPoints.length > this.maxPoints) this.dataPoints.shift();
+                    this.draw();
+                },
+
+                draw() {
+                    const { width, height } = this.canvas;
+                    this.ctx.clearRect(0, 0, width, height);
+                    if (this.dataPoints.length < 2) return;
+
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = '#ff00ff';
+                    this.ctx.lineWidth = 2;
+
+                    const stepX = width / (this.maxPoints - 1);
+                    const centerY = height / 2;
+                    
+                    // Find max deviation for scaling (min scale 0.01)
+                    let maxDev = Math.max(0.01, ...this.dataPoints.map(Math.abs));
+
+                    for (let i = 0; i < this.dataPoints.length; i++) {
+                        const x = i * stepX;
+                        // Map deviation to canvas height (inverted so positive deviation goes up)
+                        const y = centerY - (this.dataPoints[i] / maxDev) * (height / 2.5);
+                        
+                        if (i === 0) this.ctx.moveTo(x, y);
+                        else this.ctx.lineTo(x, y);
+                    }
+                    this.ctx.stroke();
+
+                    // Center Zero Line
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+                    this.ctx.setLineDash([5, 5]);
+                    this.ctx.moveTo(0, centerY);
+                    this.ctx.lineTo(width, centerY);
+                    this.ctx.stroke();
+                    this.ctx.setLineDash([]);
+                }
             };
 
-            synth.speak(utterance);
-        }
+            // --- Data Ingestion & Logic Pipeline ---
+            const Brain = {
+                ws: null,
+                msgCount: 0,
+                lastSecond: Date.now(),
 
-        // --- 2. UI & Visualizer Handlers ---
-        function initVisualizerBars() {
-            const container = document.getElementById('visualizer');
-            for(let i=0; i<15; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'bar';
-                container.appendChild(bar);
-            }
-        }
+                connect(url) {
+                    try {
+                        this.ws = new WebSocket(url);
+                    } catch (e) {
+                        alert("Invalid WebSocket URL.");
+                        return;
+                    }
 
-        function startVisualizer() {
-            const bars = document.querySelectorAll('.bar');
-            visualizerInterval = setInterval(() => {
-                bars.forEach(bar => {
-                    const height = Math.max(5, Math.random() * 40);
-                    bar.style.height = `${height}px`;
-                });
-            }, 100);
-        }
+                    this.ws.onopen = () => {
+                        document.getElementById('connection-overlay').style.opacity = '0';
+                        setTimeout(() => document.getElementById('connection-overlay').style.display = 'none', 500);
+                        
+                        const dot = document.getElementById('socket-status-dot');
+                        const txt = document.getElementById('socket-status-text');
+                        dot.classList.add('connected');
+                        txt.innerText = 'NODE SYNCED & LISTENING';
+                        txt.style.color = 'var(--neon-cyan)';
+                        
+                        UI.log('WebSocket handshake successful. Awaiting telemetry.', 'block');
+                        SpeechEngine.speak("Cortex initialized. Direct WebSocket link established. Monitoring on-chain peg mutations.", true);
+                        
+                        // Measure message rate
+                        setInterval(() => {
+                            const now = Date.now();
+                            if (now - this.lastSecond >= 1000) {
+                                document.getElementById('msg-rate').innerText = `${this.msgCount} msg/s`;
+                                this.msgCount = 0;
+                                this.lastSecond = now;
+                            }
+                        }, 1000);
+                    };
 
-        function stopVisualizer() {
-            clearInterval(visualizerInterval);
-            const bars = document.querySelectorAll('.bar');
-            bars.forEach(bar => bar.style.height = '5px');
-        }
+                    this.ws.onclose = () => {
+                        document.getElementById('socket-status-dot').classList.remove('connected');
+                        document.getElementById('socket-status-text').innerText = 'CONNECTION LOST';
+                        document.getElementById('socket-status-text').style.color = 'var(--alert-red)';
+                        UI.log('CRITICAL: Node connection severed.', 'alert');
+                        SpeechEngine.speak("Warning. Node connection lost.", true);
+                    };
 
-        function addLog(message, type = 'info') {
-            const logContainer = document.getElementById('log-container');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            const time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits: 2});
-            entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
-            logContainer.prepend(entry);
-            
-            if (logContainer.children.length > 50) {
-                logContainer.removeChild(logContainer.lastChild);
-            }
-        }
+                    this.ws.onerror = (err) => {
+                        UI.log(`WebSocket Error detected.`, 'alert');
+                    };
 
-        // --- 3. Telemetry Simulation Engine ---
-        let currentBlock = 27121758;
+                    this.ws.onmessage = (event) => {
+                        this.msgCount++;
+                        try {
+                            const data = JSON.parse(event.data);
+                            this.processPayload(data);
+                        } catch (e) {
+                            UI.log(`Unrecognized payload: ${event.data.substring(0, 50)}...`, 'default');
+                        }
+                    };
+                },
 
-        function formatMoney(amount) {
-            return '$' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
+                processPayload(data) {
+                    const time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits: 3});
+                    
+                    if (data.type === 'BLOCK_SYNC') {
+                        document.getElementById('metric-block').innerText = data.block;
+                        UI.log(`[${time}] Block ${data.block} validated. Txs: ${data.transfers}`, 'block');
+                    } 
+                    else if (data.type === 'PEG_UPDATE') {
+                        const priceStr = parseFloat(data.currentPrice).toFixed(4);
+                        const targetStr = parseFloat(data.pegPrice).toFixed(4);
+                        const deviation = Math.abs(data.currentPrice - data.pegPrice);
+                        const devPct = (deviation / data.pegPrice) * 100;
 
-        function generateSnapshot() {
-            currentBlock += Math.floor(Math.random() * 3) + 1;
-            
-            const isWhale = Math.random() > 0.85;
-            const volume = isWhale ? (Math.random() * 500000 + 400000) : (Math.random() * 80000 + 10000);
-            const targetRatio = 70 + (Math.random() * 10 - 5); // Fluctuates around 70-75%
-            const transfers = Math.floor(Math.random() * 150 + 850); // 850 to 1000
+                        document.getElementById('metric-asset').innerText = data.asset;
+                        const priceEl = document.getElementById('metric-price');
+                        priceEl.innerText = `$${priceStr}`;
+                        document.getElementById('metric-target').innerText = `$${targetStr}`;
 
-            // Rare anomaly injection
-            const slotTriggered = Math.random() > 0.98;
+                        // Structural Liquidity Depth visual mapping
+                        const depthFormatted = (data.liquidityDepth / 1000000).toFixed(2) + 'M';
+                        document.getElementById('metric-depth').innerText = depthFormatted;
+                        // Assume 10M is "100%" capacity for the meter styling
+                        const fillPct = Math.min(100, (data.liquidityDepth / 10000000) * 100);
+                        document.getElementById('depth-fill').style.width = `${fillPct}%`;
 
+                        ChartEngine.addPoint(data.currentPrice, data.pegPrice);
+                        UI.log(`[${time}] ${data.asset} Structural scan: Price $${priceStr} | Depth ${depthFormatted}`, 'peg');
+
+                        // AI Analysis Triggers
+                        if (devPct > 5.0) {
+                            priceEl.className = 'metric-value warning';
+                            UI.log(`[${time}] SEVERE DEPEG: ${data.asset} deviated by ${devPct.toFixed(2)}%`, 'alert');
+                            SpeechEngine.speak(`Critical pricing dislocation detected on ${data.asset}. Deviation exceeds five percent. Liquidity depth mapped at ${depthFormatted}.`, true);
+                        } else if (devPct > 1.0) {
+                            priceEl.className = 'metric-value warning';
+                            SpeechEngine.speak(`Warning. ${data.asset} is drifting from peg target. Current price ${priceStr}.`);
+                        } else {
+                            priceEl.className = 'metric-value';
+                        }
+                    }
+                    else if (data.type === 'CUSTODY_ALERT') {
+                        document.getElementById(data.slot === '0x7b12' ? 'slot-1' : 'slot-2').innerText = data.status;
+                        document.getElementById(data.slot === '0x7b12' ? 'slot-1' : 'slot-2').style.color = "var(--alert-red)";
+                        UI.log(`[${time}] STORAGE MUTATION: Slot ${data.slot} updated to ${data.status}`, 'alert');
+                        SpeechEngine.speak(`Attention. Storage custody mutation observed on slot ${data.slot}. Re-evaluating structural integrity.`, true);
+                    }
+                }
+            };
+
+            // --- UI Utilities ---
+            const UI = {
+                log(message, type) {
+                    const container = document.getElementById('ws-log');
+                    const entry = document.createElement('div');
+                    entry.className = `log-entry ${type}`;
+                    entry.innerText = message;
+                    container.prepend(entry);
+                    if (container.children.length > 100) container.removeChild(container.lastChild);
+                }
+            };
+
+            // Public Interface
             return {
-                block: currentBlock,
-                volume: volume,
-                targetRatio: targetRatio,
-                transfers: transfers,
-                isWhale: isWhale,
-                slotTriggered: slotTriggered
+                boot() {
+                    const url = document.getElementById('ws-url').value;
+                    SpeechEngine.init();
+                    ChartEngine.init();
+                    
+                    // Initialize empty speech synthesis to unlock audio context in browser
+                    const dummy = new SpeechSynthesisUtterance('');
+                    dummy.volume = 0;
+                    window.speechSynthesis.speak(dummy);
+
+                    Brain.connect(url);
+                }
             };
-        }
-
-        function processTelemetry() {
-            const data = generateSnapshot();
-
-            // Update DOM Metrics
-            document.getElementById('metric-block').innerText = data.block;
-            document.getElementById('metric-volume').innerText = formatMoney(data.volume);
-            
-            const ratioEl = document.getElementById('metric-ratio');
-            ratioEl.innerText = data.targetRatio.toFixed(1) + '%';
-            document.getElementById('ratio-fill').style.width = data.targetRatio + '%';
-
-            if (data.targetRatio < 68) ratioEl.className = 'metric-value warning';
-            else ratioEl.className = 'metric-value';
-
-            // Base Logging
-            addLog(`Block ${data.block} verified. Route 0xf13c -> 0xae84 active. Tx: ${data.transfers}`);
-
-            // AI Cortex Logic (Trigger Narration)
-            let narrative = "";
-            let alertLevel = false;
-
-            if (data.slotTriggered) {
-                document.getElementById('slot-1').innerText = "0x8F9A... (MUTATED)";
-                document.getElementById('slot-1').style.color = "var(--alert-red)";
-                addLog(`CRITICAL: Storage slot 0x7b12 state mutation detected.`, 'alert');
-                narrative = `Warning. Storage slot zero x seven b twelve has mutated. F 33 C custody protocols may be compromised. Recalculating state flow immediately.`;
-                alertLevel = true;
-            } else if (data.isWhale) {
-                addLog(`Whale signature mapped. Flow volume spiked to ${formatMoney(data.volume)}.`, 'alert');
-                const kVol = (data.volume / 1000).toFixed(1);
-                narrative = `Liquidity spike detected. ${kVol} thousand dollars moving across the primary edge. Target ratio holding at ${data.targetRatio.toFixed(1)} percent.`;
-                alertLevel = true;
-            } else if (Math.random() > 0.9) {
-                // Occasional routine update so she isn't silent forever
-                narrative = `Block ${data.block} processed. ${data.transfers} transfers mapped. Network throughput remains stable.`;
-            }
-
-            if (narrative && !isSpeaking) {
-                speak(narrative);
-            } else if (narrative && alertLevel) {
-                // Force interrupt for alerts
-                speak(narrative); 
-            }
-        }
-
-        // --- 4. Boot Sequence ---
-        function initializeCortex() {
-            document.getElementById('init-overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('init-overlay').style.display = 'none';
-            }, 500);
-
-            setupVoice();
-            initVisualizerBars();
-            addLog("System boot complete. Connecting to V77 Build Mapper Cortex...");
-            
-            setTimeout(() => {
-                speak("Neural interface online. Telemetry stream connected. Awaiting block state mutations.");
-                
-                // Start Simulation Loop (New block approx every 3.5 seconds)
-                setInterval(processTelemetry, 3500);
-            }, 1000);
-        }
+        })();
     </script>
 </body>
 </html>
