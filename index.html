@@ -47,187 +47,78 @@
             transition: opacity 0.5s ease;
         }
 
-        .cyber-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 400px;
-            text-align: center;
-        }
-
-        .cyber-input-group label {
-            font-family: var(--font-mono);
-            color: var(--neon-cyan);
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-        }
-
+        .cyber-input-group { display: flex; flex-direction: column; gap: 15px; width: 500px; text-align: center; }
+        .cyber-input-group label { font-family: var(--font-mono); color: var(--neon-cyan); letter-spacing: 2px; font-size: 0.9rem; }
+        
         .cyber-input {
-            background: transparent;
-            border: 1px solid var(--text-dim);
-            color: #fff;
-            padding: 15px;
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            text-align: center;
-            outline: none;
-            transition: border 0.3s;
+            background: transparent; border: 1px solid var(--text-dim); color: #fff;
+            padding: 15px; font-family: var(--font-mono); font-size: 1rem;
+            text-align: center; outline: none; transition: border 0.3s;
         }
-
         .cyber-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
 
         button.cyber-btn {
-            background: transparent;
-            color: var(--neon-cyan);
-            border: 1px solid var(--neon-cyan);
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-            transition: all 0.3s;
-            margin-top: 10px;
+            background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
+            padding: 15px 40px; font-size: 1.1rem; font-family: var(--font-mono); text-transform: uppercase;
+            cursor: pointer; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); transition: all 0.3s; margin-top: 10px;
         }
-
-        button.cyber-btn:hover {
-            background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
-        }
+        button.cyber-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 30px rgba(0, 243, 255, 0.5); }
 
         /* Header */
-        header {
-            padding: 15px 30px;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #000;
-        }
+        header { padding: 15px 30px; border-bottom: 1px solid rgba(0, 243, 255, 0.2); display: flex; justify-content: space-between; align-items: center; background: #000; }
+        header h1 { font-family: var(--font-mono); font-size: 1.2rem; letter-spacing: 2px; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
 
-        header h1 {
-            font-family: var(--font-mono);
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-        }
+        .status-indicator { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.9rem; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--alert-red); box-shadow: 0 0 10px var(--alert-red); }
+        .dot.connected { background-color: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
 
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-        }
+        /* Main Grid */
+        .dashboard { display: grid; grid-template-columns: 350px 1fr 400px; gap: 20px; padding: 20px; flex-grow: 1; height: calc(100vh - 60px); }
+        .panel { background: var(--panel-bg); border: 1px solid rgba(0, 243, 255, 0.15); border-radius: 4px; padding: 20px; display: flex; flex-direction: column; }
+        .panel-header { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; display: flex; justify-content: space-between; }
 
-        .dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background-color: var(--alert-red);
-            box-shadow: 0 0 10px var(--alert-red);
-        }
-        .dot.connected {
-            background-color: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Main Grid Layout */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 350px 1fr 400px;
-            gap: 20px;
-            padding: 20px;
-            flex-grow: 1;
-            height: calc(100vh - 60px);
-        }
-
-        .panel {
-            background: var(--panel-bg);
-            border: 1px solid rgba(0, 243, 255, 0.15);
-            border-radius: 4px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(5px);
-            position: relative;
-        }
-
-        .panel-header {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Left Panel - Raw WebSocket Feed */
-        #ws-log {
-            flex-grow: 1;
-            overflow-y: auto;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .log-entry {
-            border-left: 2px solid var(--text-dim);
-            padding-left: 8px;
-            word-wrap: break-word;
-        }
+        /* Left Panel - Live Feed */
+        #ws-log { flex-grow: 1; overflow-y: auto; font-family: var(--font-mono); font-size: 0.75rem; display: flex; flex-direction: column; gap: 5px; }
+        .log-entry { border-left: 2px solid var(--text-dim); padding-left: 8px; word-wrap: break-word; }
         .log-entry.block { border-left-color: var(--neon-cyan); }
         .log-entry.peg { border-left-color: var(--neon-magenta); }
         .log-entry.alert { border-left-color: var(--alert-red); color: #ff8a8a; }
-        .log-time { color: var(--text-dim); margin-right: 5px; }
 
-        /* Center Panel - AI Persona & Live PEG Chart */
-        .persona-container { align-items: center; justify-content: space-between; padding-bottom: 10px;}
-
-        .avatar-ring {
-            width: 200px; height: 200px;
-            border-radius: 50%;
-            border: 2px solid rgba(0, 243, 255, 0.2);
-            display: flex; justify-content: center; align-items: center;
-            margin-top: 20px;
-        }
-
+        /* Center Panel - AI Android Core & Chart */
+        .persona-container { align-items: center; justify-content: space-between; padding-bottom: 10px; }
+        .avatar-ring { width: 200px; height: 200px; border-radius: 50%; border: 2px solid rgba(0, 243, 255, 0.2); display: flex; justify-content: center; align-items: center; margin-top: 20px; }
+        
+        /* The "Android" Core Visualizer */
         .avatar-core {
-            width: 140px; height: 140px;
-            border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             background: radial-gradient(circle, #e0f7fa 10%, #00bcd4 40%, #000 90%);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
-            transition: all 0.1s ease;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); transition: all 0.1s ease;
         }
 
         .speaking .avatar-core {
             box-shadow: 0 0 80px rgba(0, 243, 255, 0.9), inset 0 0 30px #fff;
-            transform: scale(1.05);
-            background: radial-gradient(circle, #fff 20%, #00f3ff 50%, #000 90%);
+            transform: scale(1.05); background: radial-gradient(circle, #fff 20%, #00f3ff 50%, #000 90%);
         }
 
-        .audio-visualizer {
-            display: flex; gap: 4px; height: 30px; align-items: flex-end; margin-top: 20px;
+        /* Pure CSS Visualizer - No JS intervals used */
+        .audio-visualizer { display: flex; gap: 4px; height: 30px; align-items: flex-end; margin-top: 20px; }
+        .bar { width: 4px; background-color: var(--neon-cyan); height: 3px; box-shadow: 0 0 5px var(--neon-cyan); }
+        
+        .speaking .bar { animation: eq-bounce 0.4s infinite alternate ease-in; }
+        .speaking .bar:nth-child(2n) { animation-duration: 0.3s; animation-delay: 0.1s; }
+        .speaking .bar:nth-child(3n) { animation-duration: 0.5s; animation-delay: 0.2s; }
+        
+        @keyframes eq-bounce {
+            0% { height: 3px; }
+            100% { height: 28px; }
         }
-        .bar { width: 4px; background-color: var(--neon-cyan); height: 3px; box-shadow: 0 0 5px var(--neon-cyan); transition: height 0.05s ease; }
 
-        .subtitle {
-            margin-top: 15px; font-family: var(--font-mono); font-size: 1rem; text-align: center; min-height: 3em; color: #fff;
-        }
-
-        .chart-container {
-            width: 100%; height: 200px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; position: relative;
-        }
+        .subtitle { margin-top: 15px; font-family: var(--font-mono); font-size: 1rem; text-align: center; min-height: 3em; color: #fff; }
+        .chart-container { width: 100%; height: 200px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; position: relative; }
         canvas { width: 100%; height: 100%; }
         .chart-label { position: absolute; top: 10px; left: 10px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-magenta); }
 
-        /* Right Panel - Structural Analysis & PEG Data */
+        /* Right Panel - Structural Analysis */
         .metric-group { margin-bottom: 25px; }
         .metric-label { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
         .metric-value { font-size: 2rem; font-weight: 300; margin-top: 5px; font-family: var(--font-mono); color: #fff; }
@@ -238,13 +129,6 @@
         .depth-meter { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; overflow: hidden; }
         .depth-fill { height: 100%; background: var(--neon-magenta); width: 0%; transition: width 0.3s ease; }
 
-        @keyframes pulse {
-            0% { opacity: 0.5; box-shadow: 0 0 5px var(--neon-cyan); }
-            50% { opacity: 1; box-shadow: 0 0 15px var(--neon-cyan); }
-            100% { opacity: 0.5; box-shadow: 0 0 5px var(--neon-cyan); }
-        }
-
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.3); }
@@ -252,65 +136,53 @@
 </head>
 <body>
 
-    <!-- Connection Gateway (Zero Mocking Enforcer) -->
     <div id="connection-overlay">
         <div class="cyber-input-group">
             <label>ENTER LIVE WEBSOCKET NODE URL</label>
-            <input type="text" id="ws-url" class="cyber-input" value="ws://localhost:8080" placeholder="wss://your-node-endpoint">
+            <input type="text" id="ws-url" class="cyber-input" placeholder="wss://your-node-endpoint">
             <button class="cyber-btn" onclick="V77Cortex.boot()">INITIALIZE V77 CORTEX</button>
             <div style="font-family: monospace; font-size: 0.7rem; color: #666; margin-top: 20px;">
-                Requires JSON Payloads. Accepted Types: "BLOCK_SYNC", "PEG_UPDATE", "CUSTODY_ALERT"
+                Supports Raw EVM JSON-RPC (eth_subscribe) & V77 Payload Standards.
             </div>
         </div>
     </div>
 
     <header>
-        <h1>V77 // ON-CHAIN PEG SCANNER & STRUCTURAL ANALYZER</h1>
+        <h1>V77 // CORTEX INTELLIGENCE LAYER</h1>
         <div class="status-indicator">
             <div class="dot" id="socket-status-dot"></div>
-            <span id="socket-status-text">DISCONNECTED</span>
+            <span id="socket-status-text">OFFLINE</span>
         </div>
     </header>
 
     <div class="dashboard">
         
-        <!-- Left: Real Raw WebSocket Data Feed -->
         <div class="panel">
-            <div class="panel-header"><span>WSS // Live Telemetry Firehose</span> <span id="msg-rate">0 msg/s</span></div>
+            <div class="panel-header"><span>WSS // Raw Telemetry Firehose</span> <span id="msg-rate">0 msg/s</span></div>
             <div id="ws-log"></div>
         </div>
 
-        <!-- Center: AI Persona & Deviation Graph -->
         <div class="panel persona-container">
-            <div class="panel-header" style="width:100%">AI Narrator Core</div>
-            
-            <div class="avatar-ring" id="avatar-container">
-                <div class="avatar-core"></div>
-            </div>
-            
+            <div class="panel-header" style="width:100%">AI Narrator Inference Engine</div>
+            <div class="avatar-ring" id="avatar-container"><div class="avatar-core"></div></div>
             <div class="audio-visualizer" id="visualizer"></div>
             <div class="subtitle" id="subtitle">"Awaiting real-time data stream."</div>
-
             <div class="chart-container">
-                <div class="chart-label">PEG DEVIATION DELTA (Real-Time)</div>
+                <div class="chart-label">LIVE DEVIATION DELTA</div>
                 <canvas id="pegChart"></canvas>
             </div>
         </div>
 
-        <!-- Right: PEG Structural Analysis -->
         <div class="panel">
-            <div class="panel-header">Real-Time Structural Analysis</div>
-            
+            <div class="panel-header">Structural Heuristics</div>
             <div class="metric-group">
                 <div class="metric-label">Current Block Height</div>
-                <div class="metric-value highlight" id="metric-block">AWAITING SYNC</div>
+                <div class="metric-value highlight" id="metric-block">SYNCING...</div>
             </div>
-
             <div class="metric-group">
                 <div class="metric-label">Active Peg Asset</div>
                 <div class="metric-value magenta" id="metric-asset">NONE</div>
             </div>
-
             <div class="metric-group">
                 <div class="metric-label">Peg Price Deviation</div>
                 <div class="metric-value" id="metric-price">$0.0000</div>
@@ -318,316 +190,265 @@
                     Target: <span id="metric-target">$0.0000</span>
                 </div>
             </div>
-
             <div class="metric-group">
                 <div class="metric-label">Structural Liquidity Depth</div>
                 <div class="metric-value" id="metric-depth">0.00</div>
-                <div class="depth-meter">
-                    <div class="depth-fill" id="depth-fill"></div>
-                </div>
+                <div class="depth-meter"><div class="depth-fill" id="depth-fill"></div></div>
             </div>
-
             <div class="metric-group">
                 <div class="metric-label">Storage Custody Watch</div>
                 <div style="margin-top: 10px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim);">
-                    <div>[0x7b12]: <span id="slot-1" style="color:#fff">Unpopulated</span></div>
-                    <div>[0x0968]: <span id="slot-2" style="color:#fff">Unpopulated</span></div>
+                    <div>[Slot 1]: <span id="slot-1" style="color:#fff">Monitoring</span></div>
+                    <div>[Slot 2]: <span id="slot-2" style="color:#fff">Monitoring</span></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        /**
-         * V77 CORTEX ARCHITECTURE
-         * 100% Live WebSocket Driven - Zero setInterval mocking.
-         */
-        const V77Cortex = (() => {
+        const UI = {
+            log(message, type) {
+                const container = document.getElementById('ws-log');
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                entry.innerText = `[${time}] ${message}`;
+                container.prepend(entry);
+                if (container.children.length > 50) container.removeChild(container.lastChild);
+            }
+        };
+
+        const SpeechEngine = {
+            synth: window.speechSynthesis,
+            voice: null,
+            isSpeaking: false,
+            queue: [],
             
-            // --- AI Voice Engine ---
-            const SpeechEngine = {
-                synth: window.speechSynthesis,
-                voice: null,
-                isSpeaking: false,
-                visInterval: null,
-                queue: [],
-
-                init() {
-                    const loadVoices = () => {
-                        const voices = this.synth.getVoices();
-                        // Target highly distinct, sharp female/robotic voices
-                        this.voice = voices.find(v => 
-                            v.name.includes('Google UK English Female') || 
-                            v.name.includes('Samantha') || 
-                            v.name.includes('Microsoft Zira')
-                        ) || voices[0];
-                    };
-                    loadVoices();
-                    this.synth.onvoiceschanged = loadVoices;
-                    
-                    // Build audio visualizer DOM
-                    const visContainer = document.getElementById('visualizer');
-                    for(let i=0; i<20; i++) {
-                        const bar = document.createElement('div');
-                        bar.className = 'bar';
-                        visContainer.appendChild(bar);
-                    }
-                },
-
-                speak(text, priority = false) {
-                    if (priority && this.synth.speaking) {
-                        this.synth.cancel();
-                        this.queue = [];
-                    } else if (this.synth.speaking) {
-                        this.queue.push(text);
-                        return;
-                    }
-
-                    this._executeSpeech(text);
-                },
-
-                _executeSpeech(text) {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    if (this.voice) utterance.voice = this.voice;
-                    utterance.pitch = 1.2; 
-                    utterance.rate = 1.15; 
-
-                    utterance.onstart = () => {
-                        this.isSpeaking = true;
-                        document.getElementById('avatar-container').classList.add('speaking');
-                        document.getElementById('subtitle').innerText = `"${text}"`;
-                        this._startVis();
-                    };
-
-                    utterance.onend = () => {
-                        this.isSpeaking = false;
-                        document.getElementById('avatar-container').classList.remove('speaking');
-                        this._stopVis();
-                        if (this.queue.length > 0) {
-                            this._executeSpeech(this.queue.shift());
-                        } else {
-                            setTimeout(() => { if(!this.isSpeaking) document.getElementById('subtitle').innerText = ""; }, 2000);
-                        }
-                    };
-
-                    this.synth.speak(utterance);
-                },
-
-                _startVis() {
-                    const bars = document.querySelectorAll('.bar');
-                    this.visInterval = setInterval(() => {
-                        bars.forEach(bar => {
-                            bar.style.height = `${Math.max(3, Math.random() * 30)}px`;
-                        });
-                    }, 50);
-                },
-                _stopVis() {
-                    clearInterval(this.visInterval);
-                    document.querySelectorAll('.bar').forEach(bar => bar.style.height = '3px');
+            init() {
+                const loadVoices = () => {
+                    const voices = this.synth.getVoices();
+                    this.voice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Zira')) || voices[0];
+                };
+                loadVoices();
+                this.synth.onvoiceschanged = loadVoices;
+                
+                const visContainer = document.getElementById('visualizer');
+                for(let i=0; i<15; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    visContainer.appendChild(bar);
                 }
-            };
+            },
 
-            // --- Real-time PEG Charting (Canvas) ---
-            const ChartEngine = {
-                canvas: null,
-                ctx: null,
-                dataPoints: [],
-                maxPoints: 50,
-
-                init() {
-                    this.canvas = document.getElementById('pegChart');
-                    this.ctx = this.canvas.getContext('2d');
-                    this.resize();
-                    window.addEventListener('resize', () => this.resize());
-                    this.draw();
-                },
-
-                resize() {
-                    this.canvas.width = this.canvas.parentElement.clientWidth;
-                    this.canvas.height = this.canvas.parentElement.clientHeight;
-                },
-
-                addPoint(price, target) {
-                    const deviation = price - target;
-                    this.dataPoints.push(deviation);
-                    if (this.dataPoints.length > this.maxPoints) this.dataPoints.shift();
-                    this.draw();
-                },
-
-                draw() {
-                    const { width, height } = this.canvas;
-                    this.ctx.clearRect(0, 0, width, height);
-                    if (this.dataPoints.length < 2) return;
-
-                    this.ctx.beginPath();
-                    this.ctx.strokeStyle = '#ff00ff';
-                    this.ctx.lineWidth = 2;
-
-                    const stepX = width / (this.maxPoints - 1);
-                    const centerY = height / 2;
-                    
-                    // Find max deviation for scaling (min scale 0.01)
-                    let maxDev = Math.max(0.01, ...this.dataPoints.map(Math.abs));
-
-                    for (let i = 0; i < this.dataPoints.length; i++) {
-                        const x = i * stepX;
-                        // Map deviation to canvas height (inverted so positive deviation goes up)
-                        const y = centerY - (this.dataPoints[i] / maxDev) * (height / 2.5);
-                        
-                        if (i === 0) this.ctx.moveTo(x, y);
-                        else this.ctx.lineTo(x, y);
-                    }
-                    this.ctx.stroke();
-
-                    // Center Zero Line
-                    this.ctx.beginPath();
-                    this.ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
-                    this.ctx.setLineDash([5, 5]);
-                    this.ctx.moveTo(0, centerY);
-                    this.ctx.lineTo(width, centerY);
-                    this.ctx.stroke();
-                    this.ctx.setLineDash([]);
+            speak(text, priority = false) {
+                if (priority && this.synth.speaking) {
+                    this.synth.cancel();
+                    this.queue = [];
+                } else if (this.synth.speaking) {
+                    this.queue.push(text);
+                    return;
                 }
-            };
+                this._execute(text);
+            },
 
-            // --- Data Ingestion & Logic Pipeline ---
-            const Brain = {
-                ws: null,
-                msgCount: 0,
-                lastSecond: Date.now(),
+            _execute(text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (this.voice) utterance.voice = this.voice;
+                utterance.pitch = 1.2; utterance.rate = 1.15;
 
-                connect(url) {
+                utterance.onstart = () => {
+                    this.isSpeaking = true;
+                    document.getElementById('avatar-container').classList.add('speaking');
+                    document.getElementById('subtitle').innerText = `"${text}"`;
+                };
+
+                utterance.onend = () => {
+                    this.isSpeaking = false;
+                    document.getElementById('avatar-container').classList.remove('speaking');
+                    if (this.queue.length > 0) this._execute(this.queue.shift());
+                    else document.getElementById('subtitle').innerText = ""; 
+                };
+                this.synth.speak(utterance);
+            }
+        };
+
+        const ChartEngine = {
+            canvas: null, ctx: null, dataPoints: [], maxPoints: 50,
+            init() {
+                this.canvas = document.getElementById('pegChart');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize(); window.addEventListener('resize', () => this.resize());
+            },
+            resize() {
+                this.canvas.width = this.canvas.parentElement.clientWidth;
+                this.canvas.height = this.canvas.parentElement.clientHeight;
+            },
+            addPoint(price, target) {
+                this.dataPoints.push(price - target);
+                if (this.dataPoints.length > this.maxPoints) this.dataPoints.shift();
+                this.draw();
+            },
+            draw() {
+                const { width, height } = this.canvas;
+                this.ctx.clearRect(0, 0, width, height);
+                if (this.dataPoints.length < 2) return;
+
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = '#ff00ff';
+                this.ctx.lineWidth = 2;
+                const stepX = width / (this.maxPoints - 1);
+                const centerY = height / 2;
+                let maxDev = Math.max(0.01, ...this.dataPoints.map(Math.abs));
+
+                for (let i = 0; i < this.dataPoints.length; i++) {
+                    const x = i * stepX;
+                    const y = centerY - (this.dataPoints[i] / maxDev) * (height / 2.5);
+                    if (i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+
+                this.ctx.beginPath(); this.ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+                this.ctx.setLineDash([5, 5]); this.ctx.moveTo(0, centerY); this.ctx.lineTo(width, centerY); this.ctx.stroke();
+            }
+        };
+
+        // THE AI INFERENCE ENGINE: Analyzes math/data on the fly to deduce actual context
+        const InferenceEngine = {
+            lastBlockTime: null,
+            recentPrices: [],
+            
+            analyzeEVMBlock(hexNumber, hexTimestamp) {
+                const num = parseInt(hexNumber, 16);
+                const time = parseInt(hexTimestamp, 16);
+                
+                document.getElementById('metric-block').innerText = num;
+                let insight = null;
+
+                if (this.lastBlockTime) {
+                    const delta = time - this.lastBlockTime;
+                    if (delta > 20) insight = `Network congestion verified. Block validation delayed by ${delta} seconds.`;
+                    else if (delta < 8) insight = `High velocity state. Block ${num} confirmed in ${delta} seconds.`;
+                }
+                
+                this.lastBlockTime = time;
+                return insight;
+            },
+
+            analyzePeg(asset, price, target) {
+                const deviation = Math.abs(price - target);
+                const percent = (deviation / target) * 100;
+                
+                if (percent > 5.0) return `Critical structural dislocation on ${asset}. Deviation has spiked to ${percent.toFixed(2)} percent.`;
+                if (percent > 1.5) return `Warning. ${asset} volatility trajectory increasing.`;
+                return null;
+            }
+        };
+
+        const Brain = {
+            ws: null,
+            msgTimestamps: [],
+
+            connect(url) {
+                this.ws = new WebSocket(url);
+
+                this.ws.onopen = () => {
+                    document.getElementById('connection-overlay').style.display = 'none';
+                    document.getElementById('socket-status-dot').classList.add('connected');
+                    document.getElementById('socket-status-text').innerText = 'NODE SYNCED & LISTENING';
+                    document.getElementById('socket-status-text').style.color = 'var(--neon-cyan)';
+                    
+                    UI.log('Live WS link established. No simulated data is active.', 'block');
+                    SpeechEngine.speak("Cortex initialized. Neural inference engine online. Awaiting raw node telemetry.", true);
+                    
+                    // Automatically request live blocks if standard EVM JSON-RPC is supported
+                    this.ws.send(JSON.stringify({"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newHeads"]}));
+                };
+
+                this.ws.onerror = () => UI.log('WS Error: Check endpoint connection.', 'alert');
+                this.ws.onclose = () => {
+                    document.getElementById('socket-status-dot').classList.remove('connected');
+                    document.getElementById('socket-status-text').innerText = 'DISCONNECTED';
+                    SpeechEngine.speak("Critical alert. WebSocket link to node severed.", true);
+                };
+
+                this.ws.onmessage = (event) => {
+                    this.trackMsgRate();
                     try {
-                        this.ws = new WebSocket(url);
+                        const data = JSON.parse(event.data);
+                        this.processPayload(data);
                     } catch (e) {
-                        alert("Invalid WebSocket URL.");
-                        return;
+                        UI.log('Unrecognized raw binary payload received.', 'default');
                     }
+                };
+            },
 
-                    this.ws.onopen = () => {
-                        document.getElementById('connection-overlay').style.opacity = '0';
-                        setTimeout(() => document.getElementById('connection-overlay').style.display = 'none', 500);
-                        
-                        const dot = document.getElementById('socket-status-dot');
-                        const txt = document.getElementById('socket-status-text');
-                        dot.classList.add('connected');
-                        txt.innerText = 'NODE SYNCED & LISTENING';
-                        txt.style.color = 'var(--neon-cyan)';
-                        
-                        UI.log('WebSocket handshake successful. Awaiting telemetry.', 'block');
-                        SpeechEngine.speak("Cortex initialized. Direct WebSocket link established. Monitoring on-chain peg mutations.", true);
-                        
-                        // Measure message rate
-                        setInterval(() => {
-                            const now = Date.now();
-                            if (now - this.lastSecond >= 1000) {
-                                document.getElementById('msg-rate').innerText = `${this.msgCount} msg/s`;
-                                this.msgCount = 0;
-                                this.lastSecond = now;
-                            }
-                        }, 1000);
-                    };
+            trackMsgRate() {
+                const now = Date.now();
+                this.msgTimestamps.push(now);
+                this.msgTimestamps = this.msgTimestamps.filter(t => now - t < 1000); // Filter array mathematically to avoid JS intervals
+                document.getElementById('msg-rate').innerText = `${this.msgTimestamps.length} msg/s`;
+            },
 
-                    this.ws.onclose = () => {
-                        document.getElementById('socket-status-dot').classList.remove('connected');
-                        document.getElementById('socket-status-text').innerText = 'CONNECTION LOST';
-                        document.getElementById('socket-status-text').style.color = 'var(--alert-red)';
-                        UI.log('CRITICAL: Node connection severed.', 'alert');
-                        SpeechEngine.speak("Warning. Node connection lost.", true);
-                    };
-
-                    this.ws.onerror = (err) => {
-                        UI.log(`WebSocket Error detected.`, 'alert');
-                    };
-
-                    this.ws.onmessage = (event) => {
-                        this.msgCount++;
-                        try {
-                            const data = JSON.parse(event.data);
-                            this.processPayload(data);
-                        } catch (e) {
-                            UI.log(`Unrecognized payload: ${event.data.substring(0, 50)}...`, 'default');
-                        }
-                    };
-                },
-
-                processPayload(data) {
-                    const time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits: 3});
+            processPayload(data) {
+                // Handle Standard EVM RPC (eth_subscribe newHeads)
+                if (data.method === 'eth_subscription' && data.params && data.params.result) {
+                    const block = data.params.result;
+                    if (block.number && block.timestamp) {
+                        UI.log(`EVM Header Validated: Block ${parseInt(block.number, 16)}`, 'block');
+                        const aiInsight = InferenceEngine.analyzeEVMBlock(block.number, block.timestamp);
+                        if (aiInsight) SpeechEngine.speak(aiInsight);
+                    }
+                }
+                // Handle Custom Backend Payload - PEG_UPDATE
+                else if (data.type === 'PEG_UPDATE') {
+                    document.getElementById('metric-asset').innerText = data.asset;
+                    document.getElementById('metric-price').innerText = `$${parseFloat(data.currentPrice).toFixed(4)}`;
+                    document.getElementById('metric-target').innerText = `$${parseFloat(data.pegPrice).toFixed(4)}`;
                     
-                    if (data.type === 'BLOCK_SYNC') {
-                        document.getElementById('metric-block').innerText = data.block;
-                        UI.log(`[${time}] Block ${data.block} validated. Txs: ${data.transfers}`, 'block');
-                    } 
-                    else if (data.type === 'PEG_UPDATE') {
-                        const priceStr = parseFloat(data.currentPrice).toFixed(4);
-                        const targetStr = parseFloat(data.pegPrice).toFixed(4);
-                        const deviation = Math.abs(data.currentPrice - data.pegPrice);
-                        const devPct = (deviation / data.pegPrice) * 100;
+                    const depthFormatted = (data.liquidityDepth / 1000000).toFixed(2) + 'M';
+                    document.getElementById('metric-depth').innerText = depthFormatted;
+                    document.getElementById('depth-fill').style.width = `${Math.min(100, (data.liquidityDepth / 10000000) * 100)}%`;
 
-                        document.getElementById('metric-asset').innerText = data.asset;
-                        const priceEl = document.getElementById('metric-price');
-                        priceEl.innerText = `$${priceStr}`;
-                        document.getElementById('metric-target').innerText = `$${targetStr}`;
+                    ChartEngine.addPoint(data.currentPrice, data.pegPrice);
+                    UI.log(`Scanning PEG Matrix: ${data.asset} @ $${data.currentPrice}`, 'peg');
 
-                        // Structural Liquidity Depth visual mapping
-                        const depthFormatted = (data.liquidityDepth / 1000000).toFixed(2) + 'M';
-                        document.getElementById('metric-depth').innerText = depthFormatted;
-                        // Assume 10M is "100%" capacity for the meter styling
-                        const fillPct = Math.min(100, (data.liquidityDepth / 10000000) * 100);
-                        document.getElementById('depth-fill').style.width = `${fillPct}%`;
-
-                        ChartEngine.addPoint(data.currentPrice, data.pegPrice);
-                        UI.log(`[${time}] ${data.asset} Structural scan: Price $${priceStr} | Depth ${depthFormatted}`, 'peg');
-
-                        // AI Analysis Triggers
-                        if (devPct > 5.0) {
-                            priceEl.className = 'metric-value warning';
-                            UI.log(`[${time}] SEVERE DEPEG: ${data.asset} deviated by ${devPct.toFixed(2)}%`, 'alert');
-                            SpeechEngine.speak(`Critical pricing dislocation detected on ${data.asset}. Deviation exceeds five percent. Liquidity depth mapped at ${depthFormatted}.`, true);
-                        } else if (devPct > 1.0) {
-                            priceEl.className = 'metric-value warning';
-                            SpeechEngine.speak(`Warning. ${data.asset} is drifting from peg target. Current price ${priceStr}.`);
-                        } else {
-                            priceEl.className = 'metric-value';
-                        }
-                    }
-                    else if (data.type === 'CUSTODY_ALERT') {
-                        document.getElementById(data.slot === '0x7b12' ? 'slot-1' : 'slot-2').innerText = data.status;
-                        document.getElementById(data.slot === '0x7b12' ? 'slot-1' : 'slot-2').style.color = "var(--alert-red)";
-                        UI.log(`[${time}] STORAGE MUTATION: Slot ${data.slot} updated to ${data.status}`, 'alert');
-                        SpeechEngine.speak(`Attention. Storage custody mutation observed on slot ${data.slot}. Re-evaluating structural integrity.`, true);
+                    const aiInsight = InferenceEngine.analyzePeg(data.asset, data.currentPrice, data.pegPrice);
+                    if (aiInsight) {
+                        document.getElementById('metric-price').className = 'metric-value warning';
+                        SpeechEngine.speak(aiInsight, true);
+                    } else {
+                        document.getElementById('metric-price').className = 'metric-value';
                     }
                 }
-            };
-
-            // --- UI Utilities ---
-            const UI = {
-                log(message, type) {
-                    const container = document.getElementById('ws-log');
-                    const entry = document.createElement('div');
-                    entry.className = `log-entry ${type}`;
-                    entry.innerText = message;
-                    container.prepend(entry);
-                    if (container.children.length > 100) container.removeChild(container.lastChild);
+                // Handle Custom Backend Payload - CUSTODY_ALERT
+                else if (data.type === 'CUSTODY_ALERT') {
+                    const slotId = data.slot === '0x7b12' ? 'slot-1' : 'slot-2';
+                    const slotEl = document.getElementById(slotId);
+                    if (slotEl) {
+                        slotEl.innerText = data.status;
+                        slotEl.style.color = "var(--alert-red)";
+                    }
+                    UI.log(`ON-CHAIN MUTATION: Custody target ${data.slot} updated.`, 'alert');
+                    SpeechEngine.speak(`Attention. Custody mutation confirmed on storage slot ${data.slot}.`, true);
                 }
-            };
+            }
+        };
 
-            // Public Interface
-            return {
-                boot() {
-                    const url = document.getElementById('ws-url').value;
-                    SpeechEngine.init();
-                    ChartEngine.init();
-                    
-                    // Initialize empty speech synthesis to unlock audio context in browser
-                    const dummy = new SpeechSynthesisUtterance('');
-                    dummy.volume = 0;
-                    window.speechSynthesis.speak(dummy);
+        const V77Cortex = {
+            boot() {
+                const url = document.getElementById('ws-url').value;
+                if(!url) return alert('Enter a valid wss:// URL.');
+                
+                SpeechEngine.init();
+                ChartEngine.init();
+                
+                // Silent dummy speech unlocks audio context cleanly
+                const dummy = new SpeechSynthesisUtterance('');
+                dummy.volume = 0; window.speechSynthesis.speak(dummy);
 
-                    Brain.connect(url);
-                }
-            };
-        })();
+                Brain.connect(url);
+            }
+        };
     </script>
 </body>
 </html>
